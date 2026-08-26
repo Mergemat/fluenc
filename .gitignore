@@ -1,0 +1,12 @@
+node_modules
+.output
+.tanstack
+dist
+.cache
+.vercel
+.env*
+!.env.example
+*.db
+*.db-shm
+*.db-wal
+src/routeTree.gen.ts

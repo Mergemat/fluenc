@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #17211e;
+  --color-muted: #66726e;
+  --color-paper: #fbfcfa;
+  --color-mist: #e5ebe7;
+  --color-jade: #176b5b;
+  --color-jade-light: #dcece6;
+  --color-fluenc-blue: #315d82;
+  --color-blue-light: #e0eaf2;
+  --color-fluenc-red: #c95746;
+  --color-line: #d7dfda;
+  --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --font-hanzi: "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+
+@layer base {
+  :root {
+    color: var(--color-ink);
+    background: #eef2ef;
+    font-family: var(--font-ui);
+    font-synthesis: none;
+  }
+
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    opacity: .48;
+  }
+
+  button:not(:disabled) {
+    transition: color 140ms ease-out, background-color 140ms ease-out, border-color 140ms ease-out, box-shadow 140ms ease-out, transform 140ms ease-out;
+  }
+
+  button:not(:disabled):active {
+    transform: scale(.96);
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid rgb(49 93 130 / .24);
+    outline-offset: 2px;
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    background: #eef2ef;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
