@@ -8,6 +8,11 @@ export type HanziComposition = {
 
 const componentPattern = /[\p{Script=Han}\u2e80-\u2eff\u31c0-\u31ef]/u
 
+export function isHanziCharacter(value: string) {
+  const characters = Array.from(value)
+  return characters.length === 1 && componentPattern.test(characters[0])
+}
+
 export function findHanziComposition(
   index: HanziIndex,
   character: string,

@@ -3,6 +3,7 @@ import { useDeferredValue, useState } from 'react'
 
 import { splitMeaning } from '../lib/meaning'
 import { getLibrary, type LibraryData } from '../server/curriculum'
+import { getHanziCompositions, type HanziCompositions } from '../server/hanzi'
 import { MandarinAudioButton } from './MandarinAudioButton'
 import { NeutralToneBadge } from './NeutralToneHint'
 import { Button } from './ui/Button'
@@ -27,6 +28,15 @@ export function LibraryView() {
     !deferredSearch || `${item.hanzi} ${item.pinyin} ${item.meaning}`.toLocaleLowerCase().includes(deferredSearch),
   )
   const visibleItems = items.slice(0, 120)
+  const compositionCharacters = kind === 'characters'
+    ? visibleItems.map((item) => item.hanzi)
+    : []
+  const compositionsQuery = useQuery({
+    queryKey: ['hanzi-compositions', compositionCharacters.join('')],
+    queryFn: () => getHanziCompositions({ data: { characters: compositionCharacters } }),
+    enabled: compositionCharacters.length > 0,
+    staleTime: Number.POSITIVE_INFINITY,
+  })
 
   return (
     <Page>
@@ -52,7 +62,13 @@ export function LibraryView() {
       ) : visibleItems.length ? (
         <>
           <div className="grid gap-2">
-            {visibleItems.map((item) => <LibraryCard key={item.id} item={item} />)}
+            {visibleItems.map((item) => (
+              <LibraryCard
+                key={item.id}
+                item={item}
+                composition={kind === 'characters' ? compositionsQuery.data?.[item.hanzi] : undefined}
+              />
+            ))}
           </div>
           {items.length > visibleItems.length ? (
             <p className="mt-4 mb-0 text-center text-xs text-muted">First {visibleItems.length} of {items.length}. Refine your search.</p>
@@ -75,7 +91,10 @@ function TabButton({ active, count, label, onClick }: { active: boolean; count?:
   )
 }
 
-function LibraryCard({ item }: { item: LibraryItem }) {
+function LibraryCard({ composition, item }: {
+  composition?: HanziCompositions[string] | null
+  item: LibraryItem
+}) {
   const meaning = splitMeaning(item.meaning)
   return (
     <article className="grid min-h-[64px] grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl bg-white/60 px-3.5 py-2 shadow-[0_1px_4px_rgb(43_58_66/0.05)]">
@@ -85,7 +104,17 @@ function LibraryCard({ item }: { item: LibraryItem }) {
           <strong className="text-sm font-medium">{item.pinyin}</strong>
           <NeutralToneBadge text={item.hanzi} pinyin={item.pinyin} />
         </div>
-        <span className="overflow-hidden text-xs text-ellipsis whitespace-nowrap text-muted">{meaning.primary}</span>
+        <div className="flex min-w-0 items-center gap-1.5 overflow-hidden text-xs whitespace-nowrap text-muted">
+          <span className="overflow-hidden text-ellipsis">{meaning.primary}</span>
+          {composition?.components.length ? (
+            <>
+              <span className="text-faint">·</span>
+              <span className="font-hanzi text-glaze" lang="zh-CN">
+                {composition.components.join(' + ')}
+              </span>
+            </>
+          ) : null}
+        </div>
       </div>
       <div className="flex items-center gap-2">
         <span className={`text-[10px] uppercase tracking-wide ${item.status === 'review' ? 'text-ink' : item.status === 'learning' ? 'text-muted' : 'text-faint'}`}>
