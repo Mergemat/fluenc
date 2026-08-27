@@ -1,5 +1,7 @@
 import { parse } from 'csv-parse/sync'
 
+import { findHanziComposition, type HanziIndex } from '../src/lib/hanzi'
+
 const WORDS_URL =
   'https://adsonant.com/word-frequency-lists/Adsonant-1000-most-common-chinese-words.csv'
 const CHARACTERS_URL =
@@ -44,11 +46,15 @@ for (const line of (await charactersResponse.text()).split('\n')) {
   dictionary.set(entry.character, entry)
 }
 
+const hanziIndex = Object.fromEntries(
+  [...dictionary.values()].map((entry) => [
+    entry.character,
+    [entry.radical, entry.decomposition],
+  ]),
+) as HanziIndex
+
 const isHanzi = (value: string) => /[\p{Script=Han}\u2e80-\u2eff\u31c0-\u31ef]/u.test(value)
 const splitHanzi = (value: string) => Array.from(value).filter(isHanzi)
-const componentOverrides: Record<string, string[]> = {
-  人: ['丿', '㇏'],
-}
 
 const uniqueRecords = [...records.reduce((items, record) => {
   if (!items.has(record.word)) items.set(record.word, record)
@@ -85,24 +91,13 @@ const characters = [...stats.entries()]
   .map(([hanzi, characterStats]) => {
     const dictionaryEntry = dictionary.get(hanzi)
     const standalone = firstStandaloneWord.get(hanzi)
-    const components = componentOverrides[hanzi] ?? (dictionaryEntry?.decomposition
-      ? [
-          ...new Set(
-            splitHanzi(dictionaryEntry.decomposition).filter(
-              (component) => component !== hanzi,
-            ),
-          ),
-        ]
-      : [])
 
     return {
       id: hanzi,
       hanzi,
       pinyin: dictionaryEntry?.pinyin.at(0) ?? standalone?.pinyin ?? '',
       meaningEn: dictionaryEntry?.definition ?? standalone?.meaningEn ?? '',
-      radical: dictionaryEntry?.radical ?? '',
-      decomposition: dictionaryEntry?.decomposition ?? hanzi,
-      components,
+      components: findHanziComposition(hanziIndex, hanzi)?.components ?? [],
       frequencyRank: characterStats.rank,
       unlocks: characterStats.unlocks,
     }
@@ -114,8 +109,8 @@ const characters = [...stats.entries()]
       left.hanzi.localeCompare(right.hanzi),
   )
 
-const payload = {
-  version: '2026-08-26',
+const curriculum = {
+  version: '2026-08-27',
   sources: {
     words: WORDS_URL,
     characters: CHARACTERS_URL,
@@ -124,9 +119,17 @@ const payload = {
   characters,
 }
 
-await Bun.write(
-  new URL('../src/data/curriculum.generated.json', import.meta.url),
-  `${JSON.stringify(payload)}\n`,
-)
+await Promise.all([
+  Bun.write(
+    new URL('../src/data/curriculum.generated.json', import.meta.url),
+    `${JSON.stringify(curriculum)}\n`,
+  ),
+  Bun.write(
+    new URL('../src/data/hanzi-index.generated.json', import.meta.url),
+    `${JSON.stringify(hanziIndex)}\n`,
+  ),
+])
 
-console.log(`Synced ${words.length} words and ${characters.length} characters.`)
+console.log(
+  `Synced ${words.length} words, ${characters.length} curriculum characters, and ${dictionary.size} Hanzi decompositions.`,
+)

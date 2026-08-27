@@ -3,8 +3,6 @@ export type Character = {
   hanzi: string
   pinyin: string
   meaningEn: string
-  radical: string
-  decomposition: string
   components: string[]
   frequencyRank: number
   unlocks: number
