@@ -56,16 +56,8 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
   })
 
   return (
-    <article className="relative flex h-[calc(100dvh-264px)] min-h-[420px] flex-col overflow-hidden md:h-[calc(100dvh-185px)]">
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 grid select-none place-items-center font-hanzi text-[80vw] leading-none font-semibold text-glaze/5"
-        lang="zh-CN"
-      >
-        {item.hanzi}
-      </span>
-
-      <div className="relative grid min-h-0 flex-1 place-content-center justify-items-center gap-2.5 py-1">
+    <article className="flex h-[calc(100dvh-264px)] min-h-[420px] flex-col overflow-hidden md:h-[calc(100dvh-185px)]">
+      <div className="grid min-h-0 flex-1 place-content-center justify-items-center gap-2.5 py-1">
         <div
           className="grid place-items-center rounded-[2rem] px-9 py-3"
           style={{
@@ -92,7 +84,7 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
         <span className="text-[11px] uppercase tracking-[0.24em] text-faint">{meaning.primary}</span>
       </div>
 
-      <div className="relative flex shrink-0 items-start justify-center gap-5 pb-4">
+      <div className="flex shrink-0 items-start justify-center gap-5 pb-4">
         {props.map((prop, index) => (
           <ParameterPlaque
             key={prop.hanzi}
@@ -106,7 +98,7 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
         ))}
       </div>
 
-      <div className="relative flex shrink-0 items-start justify-center gap-4">
+      <div className="flex shrink-0 items-start justify-center gap-4">
         <ParameterPlaque
           glyph={item.movie.actorKey}
           label={`Actor for ${item.movie.actorKey}`}
@@ -130,7 +122,7 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
         />
       </div>
 
-      <div className="relative grid shrink-0 gap-2.5 pt-4">
+      <div className="grid shrink-0 gap-2.5 pt-4">
         <p className="m-0 text-center text-[13px] leading-relaxed">
           <span className={actorName.trim() ? 'font-medium text-ink' : 'text-faint'}>{actorName || '·····'}</span>
           <span className="px-1 text-faint">in</span>

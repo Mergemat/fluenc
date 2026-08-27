@@ -27,31 +27,21 @@ export function PalaceView() {
 
 function PalaceContent({ palace }: { palace: PalaceData }) {
   return (
-    <div className="relative">
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 grid select-none place-items-center font-hanzi text-[75vw] leading-none font-semibold text-glaze/5"
-        lang="zh-CN"
-      >
-        宫
-      </span>
-
-      <div className="relative grid gap-9">
-        <ToneFloor rooms={palace.rooms} />
-        <Residents
-          title="Initial → actor"
-          items={palace.actors}
-          emptyLabel="No actors yet"
-          emptyHint="Your first initial assigns one."
-        />
-        <Residents
-          title="Final → set"
-          items={palace.sets}
-          emptyLabel="No sets yet"
-          emptyHint="Your first final assigns one."
-        />
-        <Props items={palace.props} />
-      </div>
+    <div className="grid gap-9">
+      <ToneFloor rooms={palace.rooms} />
+      <Residents
+        title="Initial → actor"
+        items={palace.actors}
+        emptyLabel="No actors yet"
+        emptyHint="Your first initial assigns one."
+      />
+      <Residents
+        title="Final → set"
+        items={palace.sets}
+        emptyLabel="No sets yet"
+        emptyHint="Your first final assigns one."
+      />
+      <Props items={palace.props} />
     </div>
   )
 }
