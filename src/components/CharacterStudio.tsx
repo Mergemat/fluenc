@@ -59,7 +59,7 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
     <article className="flex h-[calc(100dvh-264px)] min-h-[420px] flex-col overflow-hidden md:h-[calc(100dvh-185px)]">
       <div className="grid min-h-0 flex-1 place-content-center justify-items-center gap-2.5 py-1">
         <div
-          className="grid place-items-center rounded-[2rem] px-9 py-3"
+          className="relative grid place-items-center rounded-[2rem] px-9 py-3"
           style={{
             background: 'linear-gradient(165deg, #ffffff 0%, #f4f8f5 65%, #e9f1ec 100%)',
             boxShadow: '0 16px 36px rgb(43 58 66 / 0.16), 0 2px 6px rgb(43 58 66 / 0.06), inset 0 1px 0 #fff',
@@ -68,20 +68,17 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
           <span className="font-hanzi text-[min(19vw,80px)] leading-none font-semibold text-glaze" lang="zh-CN">
             {item.hanzi}
           </span>
+          <MandarinAudioButton
+            text={item.hanzi}
+            pinyin={item.pinyin}
+            className="absolute -top-2 -right-2 rounded-full bg-paper shadow-[0_4px_14px_rgb(43_58_66/0.18)]"
+          />
         </div>
-        <div className="flex items-center gap-2.5">
-          <span className="text-[22px] leading-none font-light tracking-[0.05em]">{item.pinyin}</span>
-          <span
-            className="grid size-6 place-items-center rounded-full bg-glaze text-[11px] leading-none text-white"
-            aria-label={`Tone: ${tone.label}`}
-            title={tone.label}
-          >
-            {tone.contour}
-          </span>
-          <NeutralToneBadge text={item.hanzi} pinyin={item.pinyin} />
-          <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} />
+        <div className="relative">
+          <strong className="block text-center text-[30px] leading-none font-medium tracking-[0.025em] text-ink">{item.pinyin}</strong>
+          <NeutralToneBadge text={item.hanzi} pinyin={item.pinyin} className="absolute top-1/2 left-full ml-3 -translate-y-1/2" />
         </div>
-        <span className="text-[11px] uppercase tracking-[0.24em] text-faint">{meaning.primary}</span>
+        <strong className="text-lg leading-tight font-medium tracking-[0.02em] text-ink">{meaning.primary}</strong>
       </div>
 
       <div className="flex shrink-0 items-start justify-center gap-5 pb-4">
