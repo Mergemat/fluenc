@@ -3,10 +3,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { AppSidebar, type AppView } from '../components/AppSidebar'
+import { LessonsView } from '../components/LessonsView'
 import { LibraryView } from '../components/LibraryView'
 import { PalaceView } from '../components/PalaceView'
 import { ProfileDialog } from '../components/ProfileDialog'
-import { SessionFlow } from '../components/SessionFlow'
+import { ReadingView } from '../components/ReadingView'
+import { ReviewView } from '../components/ReviewView'
 import { getDashboard } from '../server/curriculum'
 
 const dashboardQueryOptions = queryOptions({
@@ -26,7 +28,7 @@ export const Route = createFileRoute('/')({
 
 function Home() {
   const { data } = useSuspenseQuery(dashboardQueryOptions)
-  const [view, setView] = useState<AppView>('session')
+  const [view, setView] = useState<AppView>(() => data.codebookQueue.length + data.reviewQueue.length ? 'review' : 'lessons')
   const [profileOpen, setProfileOpen] = useState(false)
 
   return (
@@ -38,7 +40,11 @@ function Home() {
         onViewChange={setView}
       />
       <section className="min-w-0">
-        {view === 'session' ? <SessionFlow data={data} /> : view === 'library' ? <LibraryView /> : <PalaceView />}
+        {view === 'review' ? <ReviewView data={data} />
+          : view === 'lessons' ? <LessonsView data={data} />
+            : view === 'reading' ? <ReadingView data={data} />
+              : view === 'library' ? <LibraryView />
+                : <PalaceView />}
       </section>
       {profileOpen ? <ProfileDialog learner={data.learner} onClose={() => setProfileOpen(false)} /> : null}
     </div>

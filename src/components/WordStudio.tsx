@@ -11,7 +11,7 @@ import { StudioCard } from './ui/StudioCard'
 
 type WordItem = Extract<BuildItem, { type: 'word' }>
 
-export function WordStudio({ item, onComplete }: { item: WordItem; onComplete: () => void }) {
+export function WordStudio({ item }: { item: WordItem }) {
   const queryClient = useQueryClient()
   const meaning = splitMeaning(item.meaning)
   const [story, setStory] = useState(item.livingLink)
@@ -26,7 +26,6 @@ export function WordStudio({ item, onComplete }: { item: WordItem; onComplete: (
     onSuccess: async () => {
       setShowValidation(false)
       await queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-      onComplete()
     },
   })
 

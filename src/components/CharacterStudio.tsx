@@ -22,7 +22,7 @@ const categoryNames = {
   wildcard: 'wildcard-персонаж',
 }
 
-export function CharacterStudio({ item, onComplete }: { item: CharacterItem; onComplete: () => void }) {
+export function CharacterStudio({ item }: { item: CharacterItem }) {
   const queryClient = useQueryClient()
   const meaning = splitMeaning(item.meaning)
   const tone = getToneDetail(item.movie.tone)
@@ -59,7 +59,6 @@ export function CharacterStudio({ item, onComplete }: { item: CharacterItem; onC
     onSuccess: async () => {
       setShowValidation(false)
       await queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-      onComplete()
     },
   })
 

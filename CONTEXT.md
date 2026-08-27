@@ -1,24 +1,24 @@
 # Fluenc learning context
 
-Fluenc guides one focused Mandarin study session using the Mandarin Blueprint Build and Get sequence and the Hanzi Movie Method.
+Fluenc presents Mandarin Blueprint-style learning as separate, self-paced activities. Review, new lessons, and comprehensible reading never force the learner into one timed session.
 
-## Session
+## Learning activities
 
-**Session**:
-A focused study period that moves through due Review, new Build material, then optional Get practice. A learner starts one session and the product chooses the next activity.
-_Avoid_: Mode, deck, daily screen
+**Lesson**:
+One small Build unit that introduces the next dependency-ready character or word. A learner opens and completes lessons independently, one at a time.
+_Avoid_: Session stage, new-card queue, 30-minute block
 
 **Review**:
-Fast retrieval practice for material the learner has already understood. Due pronunciation associations, characters, words, and sentences belong to the same Review stage.
-_Avoid_: Learning, test, Codebook mode
+Fast retrieval practice for material the learner has already understood. Due pronunciation associations, characters, words, and sentences share one independent Review destination.
+_Avoid_: Learning, test, lesson stage
 
 **Build**:
 Learning new material in dependency order: pronunciation associations, character components, a character and its common meaning, then words made from known characters.
-_Avoid_: New-card queue, studio
+_Avoid_: Timed stage, bulk study session
 
 **Get**:
-Reading and listening to messages made almost entirely from material the learner already knows. A understood sentence can then enter Review for spoken retrieval.
-_Avoid_: Immersion library, locked content
+An independent reading activity with messages made almost entirely from material the learner already knows. An understood sentence can then enter Review for spoken retrieval.
+_Avoid_: Session reward, leftover time, locked content
 
 ## Memory system
 
