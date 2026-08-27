@@ -1,4 +1,4 @@
-import { AudioLines, LoaderCircle } from 'lucide-react'
+import { LoaderCircle } from 'lucide-react'
 
 import { useMandarinSpeech } from '../hooks/useMandarinSpeech'
 import { getNeutralToneExample } from '../lib/pinyinAudio'
@@ -14,17 +14,16 @@ export function MandarinAudioButton({ text, pinyin, label, className = '' }: Pro
   const speech = useMandarinSpeech()
   const neutralExample = getNeutralToneExample(text, pinyin)
   const stateClass = speech.status === 'speaking'
-    ? 'border-accent bg-accent text-white'
+    ? 'text-ink'
     : speech.status === 'error'
-      ? 'border-danger/40 bg-danger/5 text-danger'
+      ? 'text-danger'
       : ''
-  const shapeClass = label
-    ? 'inline-flex h-10 w-max min-w-max flex-none items-center justify-center gap-1.5 rounded-xl px-4 text-xs font-semibold whitespace-nowrap'
-    : 'grid size-9 shrink-0 place-items-center rounded-full border border-line bg-paper'
 
   return (
     <button
-      className={`${shapeClass} text-ink hover:border-accent hover:bg-accent hover:text-white ${stateClass} ${className}`.trim()}
+      className={`inline-flex h-10 items-center justify-center gap-1.5 border-0 bg-transparent p-0 text-muted hover:text-ink ${
+        label ? 'px-2 text-sm font-medium' : 'size-10 shrink-0'
+      } ${stateClass} ${className}`.trim()}
       type="button"
       disabled={speech.status === 'loading'}
       onClick={() => speech.speak(text, pinyin)}
@@ -37,8 +36,18 @@ export function MandarinAudioButton({ text, pinyin, label, className = '' }: Pro
     >
       {speech.status === 'loading'
         ? <LoaderCircle className="animate-spin motion-reduce:animate-none" size={17} />
-        : <AudioLines size={17} />}
+        : <AudioGlyph />}
       {label ? <span>{speech.status === 'loading' ? 'Loading…' : label}</span> : null}
     </button>
+  )
+}
+
+function AudioGlyph() {
+  return (
+    <svg aria-hidden="true" fill="none" height="17" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="17">
+      <path d="M11 5 6 9H2v6h4l5 4z" />
+      <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+      <path d="M18.5 5.5a9 9 0 0 1 0 13" />
+    </svg>
   )
 }

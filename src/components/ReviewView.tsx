@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Check } from 'lucide-react'
 import { useRef } from 'react'
 
 import { reviewItem, type DashboardData } from '../server/curriculum'
@@ -38,7 +37,7 @@ export function ReviewView({ data }: { data: DashboardData }) {
     <Page>
       <PageHeader
         title="Review"
-        meta={dueCount ? <><b className="text-sm text-ink tabular-nums">{dueCount}</b> due</> : 'Queue is empty'}
+        meta={dueCount ? `${dueCount} due` : 'Queue is empty'}
       />
 
       {activeCodebook ? (
@@ -64,7 +63,6 @@ export function ReviewView({ data }: { data: DashboardData }) {
         />
       ) : (
         <Empty
-          icon={<Check size={18} />}
           title="All caught up"
           detail="New cards appear here on schedule. Lessons and reading are always open."
         />

@@ -1,25 +1,18 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Check } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { Check, Pencil, X } from 'lucide-react'
+import { useState } from 'react'
 
 import { splitMeaning } from '../lib/meaning'
 import { getToneDetail } from '../lib/tones'
 import { enrollItem, saveMovie, type BuildItem } from '../server/curriculum'
 import { MandarinAudioButton } from './MandarinAudioButton'
-import { NeutralToneBadge, NeutralToneExample } from './NeutralToneHint'
+import { NeutralToneBadge } from './NeutralToneHint'
 import { WritingPad } from './WritingPad'
 import { Button } from './ui/Button'
-import { Card, ErrorNote } from './ui/Layout'
+import { ErrorNote } from './ui/Layout'
 
 type CharacterItem = Extract<BuildItem, { type: 'character' }>
 type MovieProp = CharacterItem['movie']['components'][number]
-
-const categoryNames = {
-  male: 'male actor',
-  female: 'female actor',
-  fictional: 'fictional character',
-  wildcard: 'wildcard character',
-}
 
 export function CharacterStudio({ item }: { item: CharacterItem }) {
   const queryClient = useQueryClient()
@@ -32,6 +25,7 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
   const [setName, setSetName] = useState(item.movie.setName)
   const [props, setProps] = useState(item.movie.components)
   const [showValidation, setShowValidation] = useState(false)
+  const [writeOpen, setWriteOpen] = useState(false)
   const mappingsReady = Boolean(
     actorName.trim() &&
     setName.trim() &&
@@ -62,71 +56,61 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
   })
 
   return (
-    <Card>
-      <header className="p-5 pb-4">
-        <p className="m-0 mb-3 text-[10px] font-bold tracking-[.12em] text-faint uppercase">
-          {item.movie.isPrimitive ? 'Basic component' : 'New character'} · #{item.rank}
-        </p>
-        <div className="flex flex-wrap items-center gap-4">
-          <span className="font-hanzi text-7xl leading-none font-semibold tracking-tight sm:text-8xl" lang="zh-CN">{item.hanzi}</span>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <strong className="text-base text-accent">{item.pinyin}</strong>
-              <NeutralToneBadge text={item.hanzi} pinyin={item.pinyin} />
-              <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} />
-            </div>
-            <span className="mt-0.5 block text-xl font-semibold tracking-tight">{meaning.primary}</span>
-            <NeutralToneExample text={item.hanzi} pinyin={item.pinyin} />
-          </div>
+    <article>
+      <header className="grid justify-items-center text-center">
+        <p className="m-0 mb-4 text-[11px] font-semibold tracking-[.16em] text-faint">#{item.rank}</p>
+        <span className="font-hanzi text-8xl leading-none font-semibold tracking-tight" lang="zh-CN">{item.hanzi}</span>
+        <div className="mt-5 flex items-center justify-center gap-2">
+          <strong className="text-lg font-medium">{item.pinyin}</strong>
+          <NeutralToneBadge text={item.hanzi} pinyin={item.pinyin} />
+          <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} />
         </div>
+        <span className="mt-1 block text-base font-medium tracking-tight">{meaning.primary}</span>
       </header>
 
-      <section className="border-t border-line p-5">
-        <div className="mb-4 flex items-baseline justify-between gap-4">
-          <h2 className="m-0 text-xs font-bold uppercase tracking-wide">Coordinates</h2>
-          <small className="text-[10px] text-muted">choose each new link once</small>
-        </div>
-        <div className="grid gap-4">
-          <CoordinateField
-            code={`Initial · ${item.movie.actorKey}`}
-            help={categoryNames[item.movie.actorCategory]}
+      <section className="mt-10 border-t border-line pt-6">
+        <p className="m-0 mb-6 text-3xl font-semibold tracking-tight" aria-label={`Initial ${item.movie.actorKey}, final ${item.movie.finalKey}, tone ${item.movie.tone}`}>
+          {item.movie.actorKey}
+          <span className="mx-2.5 font-normal text-faint">+</span>
+          {item.movie.finalKey}
+          <span className="mx-2.5 font-normal text-faint">+</span>
+          {tone.mark}
+        </p>
+        <div className="grid gap-5">
+          <GlyphField
+            glyph={item.movie.actorKey}
             invalid={showValidation && !actorName.trim()}
-            marker="A"
-            onChange={actorLocked ? undefined : setActorName}
-            placeholder="Pick an actor"
+            locked={actorLocked}
+            placeholder="actor"
             value={actorName}
+            onChange={setActorName}
           />
-          <CoordinateField
-            code={`Final · ${item.movie.finalKey}`}
-            help="a familiar place"
+          <GlyphField
+            glyph={item.movie.finalKey}
             invalid={showValidation && !setName.trim()}
-            marker="S"
-            onChange={setLocked ? undefined : setSetName}
-            placeholder="Pick a set"
+            locked={setLocked}
+            placeholder="set"
             value={setName}
+            onChange={setSetName}
           />
-          <CoordinateField
-            code={`${tone.syllable} · ${tone.label}`}
-            help={tone.motion}
-            marker={tone.mark}
-            value={roomName}
-            tone
-          />
+          <GlyphField glyph={tone.mark} value={roomName} />
         </div>
       </section>
 
-      <section className="border-t border-line p-5">
-        <div className="mb-4 flex items-center justify-between gap-4">
-          <h2 className="m-0 text-xs font-bold uppercase tracking-wide">Props</h2>
-          <span className="font-hanzi text-sm font-semibold text-accent">{item.movie.components.map((component) => component.hanzi).join(' + ')}</span>
-        </div>
-        <div className="grid gap-4">
+      <section className="mt-10 border-t border-line pt-6">
+        <p className="m-0 mb-6 font-hanzi text-3xl leading-none font-semibold tracking-tight" lang="zh-CN">
+          {props.map((prop) => prop.hanzi).join(' + ')}
+        </p>
+        <div className="grid gap-5">
           {props.map((prop, index) => (
-            <PropField
+            <GlyphField
               key={prop.hanzi}
+              glyph={prop.hanzi}
+              hanzi
               invalid={showValidation && !prop.propName.trim()}
               locked={Boolean(item.movie.components[index]?.propName.trim())}
-              prop={prop}
+              placeholder="prop"
+              value={prop.propName}
               onChange={(value) => setProps((current) => current.map((entry, entryIndex) => entryIndex === index ? { ...entry, propName: value } : entry))}
             />
           ))}
@@ -134,82 +118,87 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
       </section>
 
       {!item.movie.isPrimitive ? (
-        <section className="border-t border-line p-5">
-          <h2 className="m-0 mb-2 text-xs font-bold uppercase tracking-wide">One short scene</h2>
-          <p className="m-0 text-sm leading-relaxed text-muted">
-            <strong className="text-ink">{actorName || 'The actor'}</strong> in <strong className="text-ink">{roomName} · {setName || 'the set'}</strong> uses{' '}
-            <strong className="text-ink">{props.map((prop) => prop.propName || prop.hanzi).join(' and ')}</strong> to show “<strong className="text-ink">{meaning.primary}</strong>”.
-          </p>
-        </section>
+        <p className="mt-10 border-t border-line pt-6 text-sm leading-relaxed text-muted">
+          {actorName || 'The actor'} in {roomName} · {setName || 'the set'} uses{' '}
+          {props.map((prop) => prop.propName || prop.hanzi).join(' and ')} to show {meaning.primary}.
+        </p>
       ) : null}
 
-      <WritingPad character={item.hanzi} />
-
-      <footer className="border-t border-line p-5">
+      <footer className="mt-10 border-t border-line pt-6">
         <Button
-          className="w-full sm:w-auto"
           type="button"
           disabled={finishMutation.isPending}
           onClick={() => { if (mappingsReady) finishMutation.mutate(); else setShowValidation(true) }}
         >
-          <Check size={16} />
-          {finishMutation.isPending ? 'Saving…' : 'Mark as learned'}
+          <Check size={16} /> {finishMutation.isPending ? 'Saving…' : 'Learned'}
         </Button>
+        <div className="mt-3 grid justify-items-center">
+          <Button variant="ghost" type="button" onClick={() => setWriteOpen(true)}>
+            <Pencil size={14} /> Write it
+          </Button>
+        </div>
       </footer>
-      {showValidation && !mappingsReady ? <ErrorNote>Fill in only the new, empty links.</ErrorNote> : null}
+      {showValidation && !mappingsReady ? <ErrorNote>Fill in the empty slots.</ErrorNote> : null}
       {finishMutation.isError ? <ErrorNote>Could not save this character. Try again.</ErrorNote> : null}
-    </Card>
+
+      {writeOpen ? <WritingModal character={item.hanzi} onClose={() => setWriteOpen(false)} /> : null}
+    </article>
   )
 }
 
-function CoordinateField({ code, help, invalid = false, marker, onChange, placeholder, tone = false, value }: {
-  code: string
-  help: string
-  invalid?: boolean
-  marker: ReactNode
-  onChange?: (value: string) => void
-  placeholder?: string
-  tone?: boolean
-  value: string
-}) {
+function WritingModal({ character, onClose }: { character: string; onClose: () => void }) {
   return (
-    <div className={`grid grid-cols-[32px_1fr] items-center gap-3 ${invalid ? 'text-danger' : ''}`}>
-      <span className={`text-center text-lg font-bold ${tone ? 'text-danger' : 'text-accent'}`}>{marker}</span>
-      <span className="flex min-w-0 flex-col gap-0.5">
-        <small className="overflow-hidden text-[9px] font-bold tracking-[.06em] text-faint uppercase text-ellipsis whitespace-nowrap">{code}</small>
-        {onChange ? (
-          <input
-            className="min-w-0 border-0 border-b border-line bg-transparent py-1 text-sm font-semibold focus:border-accent"
-            aria-invalid={invalid}
-            value={value}
-            onChange={(event) => onChange(event.target.value)}
-            placeholder={placeholder}
-          />
-        ) : <strong className="overflow-hidden text-sm text-ellipsis whitespace-nowrap">{value}</strong>}
-        <small className="overflow-hidden text-[10px] text-muted text-ellipsis whitespace-nowrap">{help}</small>
-      </span>
+    <div
+      className="fixed inset-0 z-20 flex items-center justify-center bg-ink/30 p-6 backdrop-blur-sm"
+      role="presentation"
+      onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}
+    >
+      <section
+        className="w-full max-w-sm rounded-3xl bg-paper p-5"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Write ${character}`}
+      >
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-hanzi text-2xl font-semibold" lang="zh-CN">{character}</span>
+          <Button variant="icon" type="button" onClick={onClose} aria-label="Close"><X size={17} /></Button>
+        </div>
+        <WritingPad character={character} />
+      </section>
     </div>
   )
 }
 
-function PropField({ invalid, locked, onChange, prop }: { invalid: boolean; locked: boolean; onChange: (value: string) => void; prop: MovieProp }) {
+function GlyphField({ glyph, hanzi = false, invalid = false, locked = false, onChange, placeholder, value }: {
+  glyph: string
+  hanzi?: boolean
+  invalid?: boolean
+  locked?: boolean
+  onChange?: (value: string) => void
+  placeholder?: string
+  value: string
+}) {
   return (
     <div className={`grid grid-cols-[44px_1fr] items-center gap-3 ${invalid ? 'text-danger' : ''}`}>
-      <span className="font-hanzi text-3xl leading-none font-semibold" lang="zh-CN">{prop.hanzi}</span>
-      <span className="flex min-w-0 flex-col gap-0.5">
-        {locked ? <strong className="overflow-hidden text-sm text-ellipsis whitespace-nowrap">{prop.propName}</strong> : (
-          <input
-            className="min-w-0 border-0 border-b border-line bg-transparent py-1 text-sm font-semibold focus:border-accent"
-            aria-invalid={invalid}
-            value={prop.propName}
-            onChange={(event) => onChange(event.target.value)}
-            placeholder="One permanent image"
-          />
-        )}
-        {prop.character
-          ? <small className="overflow-hidden text-[10px] text-muted text-ellipsis whitespace-nowrap">{prop.character.pinyin} · {splitMeaning(prop.character.meaning).primary}</small>
-          : <small className="text-[10px] text-muted">component</small>}
+      <span
+        className={`text-center text-2xl leading-none font-semibold ${hanzi ? 'font-hanzi' : ''}`}
+        lang={hanzi ? 'zh-CN' : undefined}
+        title={invalid ? 'Fill in this slot' : undefined}
+      >
+        {glyph}
       </span>
+      {onChange && !locked ? (
+        <input
+          className="min-w-0 border-0 border-b border-line bg-transparent py-1.5 text-[15px] font-medium focus:border-ink"
+          aria-label={placeholder}
+          aria-invalid={invalid}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={placeholder}
+        />
+      ) : (
+        <strong className={`overflow-hidden border-b border-transparent py-1.5 text-[15px] font-medium text-ellipsis whitespace-nowrap ${onChange ? '' : 'text-muted'}`}>{value}</strong>
+      )}
     </div>
   )
 }

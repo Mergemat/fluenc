@@ -13,14 +13,11 @@ export function PalaceView() {
   const palace = palaceQuery.data
 
   return (
-    <Page width="wide">
-      <PageHeader
-        title="Palace"
-        meta="Your permanent pronunciation code and scene props"
-      />
+    <Page>
+      <PageHeader title="Palace" meta="Your pronunciation code" />
 
       {palaceQuery.isPending ? (
-        <Status title="Loading the palace…" />
+        <Status title="Loading…" />
       ) : palaceQuery.isError ? (
         <Status title="Could not load the palace" action={<Button variant="secondary" type="button" onClick={() => palaceQuery.refetch()}>Retry</Button>} />
       ) : palace ? <PalaceContent palace={palace} /> : null}
@@ -30,20 +27,12 @@ export function PalaceView() {
 
 function PalaceContent({ palace }: { palace: PalaceData }) {
   return (
-    <div className="space-y-8">
-      <section className="rounded-2xl border border-line bg-paper px-5 py-4 text-lg font-semibold tracking-tight">
-        <span className="text-muted">initial</span> → actor
-        <span className="mx-2 font-normal text-faint">+</span>
-        <span className="text-muted">final</span> → set
-        <span className="mx-2 font-normal text-faint">+</span>
-        <span className="text-muted">tone</span> → room
-      </section>
-
+    <div>
       <ToneRooms rooms={palace.rooms} />
 
-      <div className="grid gap-8 md:grid-cols-2">
-        <MappingList eyebrow="Initial → person" title="Actors" items={palace.actors} empty="An actor appears with your first new initial." />
-        <MappingList eyebrow="Final → building" title="Sets" items={palace.sets} empty="A set appears with your first new final." />
+      <div className="mt-10 grid gap-10 md:grid-cols-2">
+        <MappingList items={palace.actors} title="Initial → actor" empty="An actor appears with your first new initial." />
+        <MappingList items={palace.sets} title="Final → set" empty="A set appears with your first new final." />
       </div>
 
       <PropList items={palace.props} />
@@ -51,19 +40,23 @@ function PalaceContent({ palace }: { palace: PalaceData }) {
   )
 }
 
+function SectionTitle({ children }: { children: string }) {
+  return <h2 className="m-0 mb-4 text-[11px] font-semibold uppercase tracking-[.16em] text-faint">{children}</h2>
+}
+
 function ToneRooms({ rooms }: { rooms: PalaceData['rooms'] }) {
   return (
     <section>
-      <h2 className="m-0 mb-3 text-xs font-bold uppercase tracking-wide">Rooms · tone → zone</h2>
-      <div className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-5">
+      <SectionTitle>Tone → room</SectionTitle>
+      <div className="grid grid-cols-5 gap-3">
         {rooms.map((room) => {
           const tone = getToneDetail(room.tone)
           return (
-            <article className="flex items-center gap-3 bg-paper px-4 py-3.5 sm:flex-col sm:items-start sm:gap-1" key={room.tone}>
-              <strong className="text-2xl leading-none font-semibold text-accent">{tone.syllable}</strong>
-              <span className="min-w-0 flex-1 truncate text-xs font-semibold">{room.name}</span>
+            <div className="flex min-w-0 flex-col gap-1" key={room.tone}>
+              <strong className="text-xl leading-none font-semibold">{tone.syllable}</strong>
+              <span className="overflow-hidden text-xs text-muted text-ellipsis whitespace-nowrap">{room.name}</span>
               <ToneAudioButton pinyin={tone.syllable} label={null} />
-            </article>
+            </div>
           )
         })}
       </div>
@@ -71,40 +64,38 @@ function ToneRooms({ rooms }: { rooms: PalaceData['rooms'] }) {
   )
 }
 
-function MappingList({ empty, eyebrow, items, title }: { empty: string; eyebrow: string; items: MappingItem[]; title: string }) {
+function MappingList({ empty, items, title }: { empty: string; items: MappingItem[]; title: string }) {
   return (
     <section>
-      <p className="m-0 mb-1 text-[9px] font-bold tracking-[.1em] text-faint uppercase">{eyebrow}</p>
-      <h2 className="m-0 mb-3 text-xs font-bold uppercase tracking-wide">{title}</h2>
+      <SectionTitle>{title}</SectionTitle>
       {items.length ? (
         <dl className="m-0 border-t border-line">
           {items.map((item) => (
-            <div className="grid grid-cols-[70px_1fr] items-baseline border-b border-line py-2.5" key={item.key}>
-              <dt className="text-xs font-bold text-accent">{item.key}</dt>
-              <dd className="m-0 overflow-hidden text-xs font-semibold text-ellipsis whitespace-nowrap">{item.name}</dd>
+            <div className="grid grid-cols-[64px_1fr] items-baseline border-b border-line py-2.5" key={item.key}>
+              <dt className="text-xs font-medium">{item.key}</dt>
+              <dd className="m-0 overflow-hidden text-xs text-ellipsis whitespace-nowrap">{item.name}</dd>
             </div>
           ))}
         </dl>
-      ) : <p className="text-xs text-muted">{empty}</p>}
+      ) : <p className="m-0 text-xs text-muted">{empty}</p>}
     </section>
   )
 }
 
 function PropList({ items }: { items: PalaceData['props'] }) {
   return (
-    <section>
-      <p className="m-0 mb-1 text-[9px] font-bold tracking-[.1em] text-faint uppercase">Component → object</p>
-      <h2 className="m-0 mb-3 text-xs font-bold uppercase tracking-wide">Props</h2>
+    <section className="mt-10">
+      <SectionTitle>Component → prop</SectionTitle>
       {items.length ? (
-        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-6 border-t border-line sm:grid-cols-3">
           {items.map((item) => (
-            <div className="flex items-center gap-2.5 bg-paper px-4 py-3" key={item.key}>
+            <div className="flex items-center gap-2.5 border-b border-line py-2.5" key={item.key}>
               <b className="font-hanzi text-xl leading-none font-semibold" lang="zh-CN">{item.key}</b>
-              <span className="overflow-hidden text-xs font-semibold text-ellipsis whitespace-nowrap">{item.name}</span>
+              <span className="overflow-hidden text-xs text-ellipsis whitespace-nowrap">{item.name}</span>
             </div>
           ))}
         </div>
-      ) : <p className="text-xs text-muted">Props appear after your first scene.</p>}
+      ) : <p className="m-0 text-xs text-muted">Props appear after your first scene.</p>}
     </section>
   )
 }

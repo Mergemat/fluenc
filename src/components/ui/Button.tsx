@@ -4,12 +4,12 @@ type Variant = 'primary' | 'secondary' | 'ghost' | 'icon'
 
 const variants: Record<Variant, string> = {
   primary:
-    'inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-transparent bg-ink px-5 text-sm font-semibold text-white hover:bg-black',
+    'inline-flex h-13 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-paper',
   secondary:
-    'inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-line bg-paper px-4 text-xs font-semibold text-ink hover:border-ink',
+    'inline-flex h-12 items-center justify-center gap-1.5 rounded-full border border-line px-5 text-sm font-medium text-ink',
   ghost:
-    'inline-flex h-9 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-semibold text-muted hover:bg-black/5 hover:text-ink',
-  icon: 'grid size-9 place-items-center rounded-lg border border-transparent text-muted hover:bg-black/5 hover:text-ink',
+    'inline-flex h-10 items-center justify-center gap-1.5 px-2 text-sm font-medium text-muted',
+  icon: 'grid size-10 shrink-0 place-items-center rounded-full text-muted',
 }
 
 export function Button({
