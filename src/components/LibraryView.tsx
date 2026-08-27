@@ -33,7 +33,7 @@ export function LibraryView() {
       <PageHeader title="Library" meta="In learning order" />
 
       <input
-        className="mb-6 h-12 w-full border-0 border-b border-line bg-transparent text-[15px] focus:border-ink"
+        className="mb-6 h-12 w-full rounded-full bg-white/70 px-4 text-[15px] shadow-[0_2px_8px_rgb(43_58_66/0.06)] outline-none placeholder:text-faint focus:shadow-[0_0_0_2px_rgb(47_109_158/0.3)]"
         type="search"
         value={search}
         onChange={(event) => setSearch(event.target.value)}
@@ -51,7 +51,7 @@ export function LibraryView() {
         <Status title="Could not load the library" action={<Button variant="secondary" type="button" onClick={() => libraryQuery.refetch()}>Retry</Button>} />
       ) : visibleItems.length ? (
         <>
-          <div className="border-t border-line">
+          <div className="grid gap-2">
             {visibleItems.map((item) => <LibraryCard key={item.id} item={item} />)}
           </div>
           {items.length > visibleItems.length ? (
@@ -66,7 +66,7 @@ export function LibraryView() {
 function TabButton({ active, count, label, onClick }: { active: boolean; count?: number; label: string; onClick: () => void }) {
   return (
     <button
-      className={`inline-flex items-center gap-1.5 border-0 bg-transparent px-0 pb-2.5 pt-1 text-sm font-medium ${active ? 'text-ink' : 'text-faint'}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border-0 px-3.5 py-2 text-sm font-medium transition ${active ? 'bg-paper text-ink shadow-[0_2px_8px_rgb(43_58_66/0.08)]' : 'bg-transparent text-faint'}`}
       type="button"
       onClick={onClick}
     >
@@ -78,8 +78,8 @@ function TabButton({ active, count, label, onClick }: { active: boolean; count?:
 function LibraryCard({ item }: { item: LibraryItem }) {
   const meaning = splitMeaning(item.meaning)
   return (
-    <article className="grid min-h-[64px] grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-3 border-b border-line py-2">
-      <span className="font-hanzi text-3xl leading-none font-semibold" lang="zh-CN">{item.hanzi}</span>
+    <article className="grid min-h-[64px] grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl bg-white/60 px-3.5 py-2 shadow-[0_1px_4px_rgb(43_58_66/0.05)]">
+      <span className="font-hanzi text-3xl leading-none font-semibold text-glaze" lang="zh-CN">{item.hanzi}</span>
       <div className="flex min-w-0 flex-col gap-0.5">
         <div className="flex items-center gap-1.5">
           <strong className="text-sm font-medium">{item.pinyin}</strong>

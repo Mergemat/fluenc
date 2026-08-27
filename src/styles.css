@@ -1,13 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #171716;
-  --color-muted: #83827c;
-  --color-faint: #b8b7b0;
-  --color-line: #e9e8e2;
+  --color-ink: #2b3a42;
+  --color-muted: #5f7480;
+  --color-faint: #8ba0a8;
+  --color-line: #dbe5e0;
   --color-paper: #ffffff;
-  --color-canvas: #fafaf8;
+  --color-canvas: #e7eeea;
   --color-danger: #b0402c;
+  --color-glaze: #2f6d9e;
   --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
   --font-hanzi: "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
 }

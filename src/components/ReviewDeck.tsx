@@ -25,9 +25,17 @@ export function ReviewDeck({ item, pending, onRate }: Props) {
   return (
     <article>
       <div className={`grid place-items-center px-2 text-center ${revealed ? '' : 'min-h-[340px] py-6'}`}>
-        <p className={`m-0 font-hanzi font-semibold leading-none tracking-tight ${revealed ? 'text-6xl' : 'text-8xl'}`} lang="zh-CN">
-          {item.hanzi}
-        </p>
+        <div
+          className="grid place-items-center rounded-[2rem] px-8 py-3"
+          style={{
+            background: 'linear-gradient(165deg, #ffffff 0%, #f4f8f5 65%, #e9f1ec 100%)',
+            boxShadow: '0 16px 36px rgb(43 58 66 / 0.16), 0 2px 6px rgb(43 58 66 / 0.06), inset 0 1px 0 #fff',
+          }}
+        >
+          <p className={`m-0 font-hanzi font-semibold leading-none tracking-tight text-glaze ${revealed ? 'text-6xl' : 'text-7xl'}`} lang="zh-CN">
+            {item.hanzi}
+          </p>
+        </div>
         {!revealed ? (
           <>
             <p className="mt-6 mb-0 text-sm text-muted">Recall the meaning, pinyin, tone.</p>
@@ -48,7 +56,7 @@ export function ReviewDeck({ item, pending, onRate }: Props) {
           </div>
 
           {item.type === 'character' ? (
-            <details className="mx-auto mt-8 max-w-sm">
+            <details className="mx-auto mt-8 max-w-sm rounded-2xl bg-white/55 px-4 py-3">
               <summary className="grid list-none justify-items-center text-xs text-muted">Movie</summary>
               <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 text-center">
                 <MovieFact label={`Initial · ${item.movie.actorKey}`} value={item.movie.actorName || 'not set'} />
@@ -61,7 +69,7 @@ export function ReviewDeck({ item, pending, onRate }: Props) {
             <p className="mx-auto mt-8 max-w-sm text-center text-xs leading-relaxed text-muted">{item.livingLink}</p>
           ) : null}
 
-          <div className="mt-10 border-t border-line pt-2">
+          <div className="mt-10">
             <SrsRatingButtons pending={pending} onRate={onRate} />
           </div>
         </div>

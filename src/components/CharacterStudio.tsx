@@ -20,9 +20,9 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
   const tone = getToneDetail(item.movie.tone)
   const actorLocked = Boolean(item.movie.actorName.trim())
   const setLocked = Boolean(item.movie.setName.trim())
-  const roomName = item.movie.roomName
   const [actorName, setActorName] = useState(item.movie.actorName)
   const [setName, setSetName] = useState(item.movie.setName)
+  const [roomName, setRoomName] = useState(item.movie.roomName)
   const [props, setProps] = useState(item.movie.components)
   const [showValidation, setShowValidation] = useState(false)
   const [writeOpen, setWriteOpen] = useState(false)
@@ -56,93 +56,176 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
   })
 
   return (
-    <article>
-      <header className="grid justify-items-center text-center">
-        <p className="m-0 mb-4 text-[11px] font-semibold tracking-[.16em] text-faint">#{item.rank}</p>
-        <span className="font-hanzi text-8xl leading-none font-semibold tracking-tight" lang="zh-CN">{item.hanzi}</span>
-        <div className="mt-5 flex items-center justify-center gap-2">
-          <strong className="text-lg font-medium">{item.pinyin}</strong>
+    <article className="relative flex h-[calc(100dvh-264px)] min-h-[420px] flex-col overflow-hidden md:h-[calc(100dvh-185px)]">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 grid select-none place-items-center font-hanzi text-[80vw] leading-none font-semibold text-glaze/5"
+        lang="zh-CN"
+      >
+        {item.hanzi}
+      </span>
+
+      <div className="relative grid min-h-0 flex-1 place-content-center justify-items-center gap-2.5 py-1">
+        <div
+          className="grid place-items-center rounded-[2rem] px-9 py-3"
+          style={{
+            background: 'linear-gradient(165deg, #ffffff 0%, #f4f8f5 65%, #e9f1ec 100%)',
+            boxShadow: '0 16px 36px rgb(43 58 66 / 0.16), 0 2px 6px rgb(43 58 66 / 0.06), inset 0 1px 0 #fff',
+          }}
+        >
+          <span className="font-hanzi text-[min(19vw,80px)] leading-none font-semibold text-glaze" lang="zh-CN">
+            {item.hanzi}
+          </span>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <span className="text-[22px] leading-none font-light tracking-[0.05em]">{item.pinyin}</span>
+          <span
+            className="grid size-6 place-items-center rounded-full bg-glaze text-[11px] leading-none text-white"
+            aria-label={`Tone: ${tone.label}`}
+            title={tone.label}
+          >
+            {tone.contour}
+          </span>
           <NeutralToneBadge text={item.hanzi} pinyin={item.pinyin} />
           <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} />
         </div>
-        <span className="mt-1 block text-base font-medium tracking-tight">{meaning.primary}</span>
-      </header>
+        <span className="text-[11px] uppercase tracking-[0.24em] text-faint">{meaning.primary}</span>
+      </div>
 
-      <section className="mt-10 border-t border-line pt-6">
-        <p className="m-0 mb-6 text-3xl font-semibold tracking-tight" aria-label={`Initial ${item.movie.actorKey}, final ${item.movie.finalKey}, tone ${item.movie.tone}`}>
-          {item.movie.actorKey}
-          <span className="mx-2.5 font-normal text-faint">+</span>
-          {item.movie.finalKey}
-          <span className="mx-2.5 font-normal text-faint">+</span>
-          {tone.mark}
-        </p>
-        <div className="grid gap-5">
-          <GlyphField
-            glyph={item.movie.actorKey}
-            invalid={showValidation && !actorName.trim()}
-            locked={actorLocked}
-            placeholder="actor"
-            value={actorName}
-            onChange={setActorName}
+      <div className="relative flex shrink-0 items-start justify-center gap-5 pb-4">
+        {props.map((prop, index) => (
+          <ParameterPlaque
+            key={prop.hanzi}
+            glyph={prop.hanzi}
+            invalid={showValidation && !prop.propName.trim()}
+            label={`Prop for ${prop.hanzi}`}
+            locked={Boolean(item.movie.components[index]?.propName.trim())}
+            value={prop.propName}
+            onChange={(value) => setProps((current) => current.map((entry, entryIndex) => entryIndex === index ? { ...entry, propName: value } : entry))}
           />
-          <GlyphField
-            glyph={item.movie.finalKey}
-            invalid={showValidation && !setName.trim()}
-            locked={setLocked}
-            placeholder="set"
-            value={setName}
-            onChange={setSetName}
-          />
-          <GlyphField glyph={tone.mark} value={roomName} />
-        </div>
-      </section>
+        ))}
+      </div>
 
-      <section className="mt-10 border-t border-line pt-6">
-        <p className="m-0 mb-6 font-hanzi text-3xl leading-none font-semibold tracking-tight" lang="zh-CN">
-          {props.map((prop) => prop.hanzi).join(' + ')}
+      <div className="relative flex shrink-0 items-start justify-center gap-4">
+        <ParameterPlaque
+          glyph={item.movie.actorKey}
+          label={`Actor for ${item.movie.actorKey}`}
+          locked={actorLocked}
+          value={actorName}
+          onChange={setActorName}
+        />
+        <ParameterPlaque
+          glyph={item.movie.finalKey}
+          label={`Set for ${item.movie.finalKey}`}
+          locked={setLocked}
+          value={setName}
+          onChange={setSetName}
+        />
+        <ParameterPlaque
+          glyph={tone.mark}
+          label={`Room for tone ${item.movie.tone}`}
+          tone
+          value={roomName}
+          onChange={setRoomName}
+        />
+      </div>
+
+      <div className="relative grid shrink-0 gap-2.5 pt-4">
+        <p className="m-0 text-center text-[13px] leading-relaxed">
+          <span className={actorName.trim() ? 'font-medium text-ink' : 'text-faint'}>{actorName || '·····'}</span>
+          <span className="px-1 text-faint">in</span>
+          <span className={roomName.trim() ? 'font-medium text-ink' : 'text-faint'}>{roomName || '·····'}</span>
+          <span className="px-1 text-faint">·</span>
+          <span className={setName.trim() ? 'font-medium text-ink' : 'text-faint'}>{setName || '·····'}</span>
+          <span className="px-1 text-faint">uses</span>
+          <span className={props.every((prop) => prop.propName.trim()) ? 'font-medium text-ink' : 'text-faint'}>
+            {props.map((prop) => prop.propName.trim() || '···').join(' + ')}
+          </span>
+          <span className="px-1 text-faint">to show</span>
+          <span className="font-medium text-ink">{meaning.primary}</span>
         </p>
-        <div className="grid gap-5">
-          {props.map((prop, index) => (
-            <GlyphField
-              key={prop.hanzi}
-              glyph={prop.hanzi}
-              hanzi
-              invalid={showValidation && !prop.propName.trim()}
-              locked={Boolean(item.movie.components[index]?.propName.trim())}
-              placeholder="prop"
-              value={prop.propName}
-              onChange={(value) => setProps((current) => current.map((entry, entryIndex) => entryIndex === index ? { ...entry, propName: value } : entry))}
-            />
-          ))}
-        </div>
-      </section>
-
-      {!item.movie.isPrimitive ? (
-        <p className="mt-10 border-t border-line pt-6 text-sm leading-relaxed text-muted">
-          {actorName || 'The actor'} in {roomName} · {setName || 'the set'} uses{' '}
-          {props.map((prop) => prop.propName || prop.hanzi).join(' and ')} to show {meaning.primary}.
-        </p>
-      ) : null}
-
-      <footer className="mt-10 border-t border-line pt-6">
-        <Button
-          type="button"
-          disabled={finishMutation.isPending}
-          onClick={() => { if (mappingsReady) finishMutation.mutate(); else setShowValidation(true) }}
-        >
-          <Check size={16} /> {finishMutation.isPending ? 'Saving…' : 'Learned'}
-        </Button>
-        <div className="mt-3 grid justify-items-center">
-          <Button variant="ghost" type="button" onClick={() => setWriteOpen(true)}>
-            <Pencil size={14} /> Write it
+        <div className="flex items-center justify-center gap-2.5">
+          <Button
+            type="button"
+            className="max-w-56"
+            disabled={finishMutation.isPending}
+            onClick={() => { if (mappingsReady) finishMutation.mutate(); else setShowValidation(true) }}
+          >
+            <Check size={16} /> {finishMutation.isPending ? 'Saving…' : 'Learned'}
           </Button>
+          <button
+            type="button"
+            aria-label="Write it"
+            className="grid size-13 shrink-0 place-items-center rounded-full bg-paper/70 text-muted shadow-[0_2px_8px_rgb(43_58_66/0.08)]"
+            onClick={() => setWriteOpen(true)}
+          >
+            <Pencil size={17} />
+          </button>
         </div>
-      </footer>
-      {showValidation && !mappingsReady ? <ErrorNote>Fill in the empty slots.</ErrorNote> : null}
-      {finishMutation.isError ? <ErrorNote>Could not save this character. Try again.</ErrorNote> : null}
+        {showValidation && !mappingsReady ? <ErrorNote>Fill in the empty plaques.</ErrorNote> : null}
+        {finishMutation.isError ? <ErrorNote>Could not save this character. Try again.</ErrorNote> : null}
+      </div>
 
       {writeOpen ? <WritingModal character={item.hanzi} onClose={() => setWriteOpen(false)} /> : null}
     </article>
+  )
+}
+
+/* One character parameter: glyph identifies it, the plaque takes the name.
+   Empty — translucent plaque, ghost glyph. Named — the plaque fires: gloss
+   white, underglaze glyph, seal-dot. Locked mappings show as filled plaques. */
+function ParameterPlaque({ glyph, invalid = false, label, locked = false, onChange, tone = false, value }: {
+  glyph: string
+  invalid?: boolean
+  label: string
+  locked?: boolean
+  onChange?: (value: string) => void
+  tone?: boolean
+  value: string
+}) {
+  const filled = locked || Boolean(value.trim())
+  const [focused, setFocused] = useState(false)
+  const ring = focused
+    ? '0 0 0 2px rgb(47 109 158 / 0.35), 0 8px 20px rgb(47 109 158 / 0.14)'
+    : invalid && !filled
+      ? '0 0 0 2px rgb(176 64 44 / 0.45), 0 2px 8px rgb(43 58 66 / 0.07)'
+      : filled
+        ? '0 8px 20px rgb(47 109 158 / 0.14), inset 0 1px 0 #fff'
+        : '0 2px 8px rgb(43 58 66 / 0.07), inset 0 1px 0 rgb(255 255 255 / 0.8)'
+
+  return (
+    <div
+      className="grid w-[6.6rem] justify-items-center gap-0.5 rounded-2xl px-2 pt-2.5 pb-1.5 transition-all duration-200"
+      style={{
+        background: filled ? 'linear-gradient(180deg, #ffffff 0%, #eef5f1 100%)' : 'rgb(255 255 255 / 0.55)',
+        boxShadow: ring,
+      }}
+    >
+      <span
+        className={`relative font-hanzi text-[2.3rem] leading-none font-semibold transition-colors duration-200 ${invalid && !filled ? 'text-danger' : ''}`}
+        lang="zh-CN"
+        style={{ color: filled || tone ? 'var(--color-glaze)' : 'rgb(43 58 66 / 0.32)' }}
+      >
+        {glyph}
+        {filled ? (
+          <span className="absolute -top-1 -right-2 size-2 rounded-full bg-glaze" aria-hidden />
+        ) : null}
+      </span>
+      {locked ? (
+        <strong className="grid h-6 w-full place-items-center text-[13px] font-medium text-ink">{value}</strong>
+      ) : (
+        <input
+          className="h-6 w-full bg-transparent text-center text-[13px] font-medium text-ink outline-none placeholder:text-ink/30"
+          aria-label={label}
+          aria-invalid={invalid}
+          placeholder="name it"
+          value={value}
+          onChange={(event) => onChange?.(event.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+        />
+      )}
+    </div>
   )
 }
 
@@ -154,51 +237,18 @@ function WritingModal({ character, onClose }: { character: string; onClose: () =
       onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}
     >
       <section
-        className="w-full max-w-sm rounded-3xl bg-paper p-5"
+        className="w-full max-w-sm rounded-[2rem] bg-paper p-5"
+        style={{ boxShadow: '0 24px 60px rgb(43 58 66 / 0.3), inset 0 1px 0 #fff' }}
         role="dialog"
         aria-modal="true"
         aria-label={`Write ${character}`}
       >
         <div className="flex items-center justify-between gap-3">
-          <span className="font-hanzi text-2xl font-semibold" lang="zh-CN">{character}</span>
+          <span className="font-hanzi text-2xl font-semibold text-glaze" lang="zh-CN">{character}</span>
           <Button variant="icon" type="button" onClick={onClose} aria-label="Close"><X size={17} /></Button>
         </div>
         <WritingPad character={character} />
       </section>
-    </div>
-  )
-}
-
-function GlyphField({ glyph, hanzi = false, invalid = false, locked = false, onChange, placeholder, value }: {
-  glyph: string
-  hanzi?: boolean
-  invalid?: boolean
-  locked?: boolean
-  onChange?: (value: string) => void
-  placeholder?: string
-  value: string
-}) {
-  return (
-    <div className={`grid grid-cols-[44px_1fr] items-center gap-3 ${invalid ? 'text-danger' : ''}`}>
-      <span
-        className={`text-center text-2xl leading-none font-semibold ${hanzi ? 'font-hanzi' : ''}`}
-        lang={hanzi ? 'zh-CN' : undefined}
-        title={invalid ? 'Fill in this slot' : undefined}
-      >
-        {glyph}
-      </span>
-      {onChange && !locked ? (
-        <input
-          className="min-w-0 border-0 border-b border-line bg-transparent py-1.5 text-[15px] font-medium focus:border-ink"
-          aria-label={placeholder}
-          aria-invalid={invalid}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          placeholder={placeholder}
-        />
-      ) : (
-        <strong className={`overflow-hidden border-b border-transparent py-1.5 text-[15px] font-medium text-ellipsis whitespace-nowrap ${onChange ? '' : 'text-muted'}`}>{value}</strong>
-      )}
     </div>
   )
 }

@@ -19,9 +19,17 @@ export function ReadingLesson({ item }: { item: ReadingItem }) {
   return (
     <article>
       <div className="grid justify-items-center gap-8 px-2 py-10 text-center">
-        <p className="m-0 font-hanzi text-4xl leading-snug font-semibold tracking-tight" lang="zh-CN">
-          {item.hanzi}
-        </p>
+        <div
+          className="grid place-items-center rounded-[2rem] px-8 py-3"
+          style={{
+            background: 'linear-gradient(165deg, #ffffff 0%, #f4f8f5 65%, #e9f1ec 100%)',
+            boxShadow: '0 16px 36px rgb(43 58 66 / 0.16), 0 2px 6px rgb(43 58 66 / 0.06), inset 0 1px 0 #fff',
+          }}
+        >
+          <p className="m-0 font-hanzi text-4xl leading-snug font-semibold tracking-tight text-glaze" lang="zh-CN">
+            {item.hanzi}
+          </p>
+        </div>
         <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} label="Listen" />
 
         {revealed ? (

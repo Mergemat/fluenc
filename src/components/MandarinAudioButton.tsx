@@ -14,7 +14,7 @@ export function MandarinAudioButton({ text, pinyin, label, className = '' }: Pro
   const speech = useMandarinSpeech()
   const neutralExample = getNeutralToneExample(text, pinyin)
   const stateClass = speech.status === 'speaking'
-    ? 'text-ink'
+    ? 'text-glaze'
     : speech.status === 'error'
       ? 'text-danger'
       : ''

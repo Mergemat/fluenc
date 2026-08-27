@@ -33,12 +33,20 @@ export function WordStudio({ item }: { item: WordItem }) {
     <article className="flex min-h-[calc(100dvh-190px)] flex-col">
       <header className="grid justify-items-center text-center">
         <p className="m-0 mb-4 text-[11px] font-semibold uppercase tracking-[.16em] text-faint">Word · {item.rank}</p>
-        <span className="font-hanzi text-8xl leading-none font-semibold tracking-tight" lang="zh-CN">{item.hanzi}</span>
+        <div
+          className="grid place-items-center rounded-[2rem] px-9 py-3"
+          style={{
+            background: 'linear-gradient(165deg, #ffffff 0%, #f4f8f5 65%, #e9f1ec 100%)',
+            boxShadow: '0 16px 36px rgb(43 58 66 / 0.16), 0 2px 6px rgb(43 58 66 / 0.06), inset 0 1px 0 #fff',
+          }}
+        >
+          <span className="font-hanzi text-6xl leading-none font-semibold text-glaze" lang="zh-CN">{item.hanzi}</span>
+        </div>
         <div className="mt-5 flex items-center justify-center gap-2">
-          <strong className="text-lg font-medium">{item.pinyin}</strong>
+          <strong className="text-lg font-light tracking-[0.04em]">{item.pinyin}</strong>
           <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} />
         </div>
-        <span className="mt-1 block text-base font-medium tracking-tight">{meaning.primary}</span>
+        <span className="mt-1 block text-[11px] uppercase tracking-[0.24em] text-faint">{meaning.primary}</span>
       </header>
 
       <div className="flex flex-1 flex-col justify-center gap-8 py-6">
@@ -46,7 +54,7 @@ export function WordStudio({ item }: { item: WordItem }) {
           <div className="flex flex-wrap items-baseline justify-center gap-2">
             {item.characterIds.map((character, index) => (
               <span key={`${character}-${index}`} className="flex items-baseline gap-2">
-                <b className="font-hanzi text-3xl leading-none font-semibold" lang="zh-CN">{character}</b>
+                <b className="font-hanzi text-3xl leading-none font-semibold text-glaze" lang="zh-CN">{character}</b>
                 {index < item.characterIds.length - 1 ? <i className="text-faint not-italic">+</i> : null}
               </span>
             ))}
@@ -57,7 +65,7 @@ export function WordStudio({ item }: { item: WordItem }) {
           <label className="grid gap-1.5">
             <span className="text-[10px] uppercase tracking-wide text-faint">Living link</span>
             <textarea
-              className={`w-full resize-none border-0 border-b bg-transparent py-1.5 text-[15px] leading-relaxed font-medium focus:border-ink ${showValidation && linkTooShort ? 'border-danger' : 'border-line'}`}
+              className={`w-full resize-none rounded-2xl bg-white/60 p-3.5 text-[15px] leading-relaxed font-medium shadow-[0_2px_8px_rgb(43_58_66/0.06)] outline-none placeholder:text-faint focus:shadow-[0_0_0_2px_rgb(47_109_158/0.3)] ${showValidation && linkTooShort ? 'shadow-[0_0_0_2px_rgb(176_64_44/0.45)]' : ''}`}
               aria-invalid={showValidation && linkTooShort}
               value={story}
               onChange={(event) => setStory(event.target.value)}
@@ -79,7 +87,7 @@ export function WordStudio({ item }: { item: WordItem }) {
         {finishMutation.isError ? <ErrorNote>Could not finish the lesson. Try again.</ErrorNote> : null}
       </div>
 
-      <footer className="border-t border-line pt-6">
+      <footer className="pt-2">
         <Button
           type="button"
           disabled={finishMutation.isPending}

@@ -27,7 +27,7 @@ export function AppHeader({
   const dueCount = data.codebookQueue.length + data.reviewQueue.length
 
   return (
-    <header className="sticky top-0 z-10 border-b border-line bg-canvas/90 backdrop-blur-md">
+    <header className="sticky top-0 z-10 bg-canvas/90 shadow-[0_4px_16px_rgb(43_58_66/0.05)] backdrop-blur-md">
       <div className="mx-auto flex h-13 w-full max-w-xl items-center gap-2 px-5">
         <button
           aria-label="Fluenc home"
@@ -86,7 +86,7 @@ export function AppTabBar({
   return (
     <nav
       aria-label="Main"
-      className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-canvas/95 pb-[max(env(safe-area-inset-bottom),6px)] backdrop-blur-md md:hidden"
+      className="fixed inset-x-0 bottom-0 z-10 bg-canvas/95 pb-[max(env(safe-area-inset-bottom),6px)] shadow-[0_-10px_30px_rgb(43_58_66/0.07)] backdrop-blur-md md:hidden"
     >
       <div className="mx-auto flex w-full max-w-xl">
         {navigation.map((item) => (

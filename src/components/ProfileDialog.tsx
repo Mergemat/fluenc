@@ -24,7 +24,8 @@ export function ProfileDialog({ learner, onClose }: { learner: DashboardData['le
       onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}
     >
       <section
-        className="w-full max-w-sm bg-paper px-6 pb-10 pt-6 sm:rounded-3xl sm:pb-6"
+        className="w-full max-w-sm rounded-[2rem] bg-paper px-6 pb-8 pt-6"
+        style={{ boxShadow: '0 24px 60px rgb(43 58 66 / 0.3), inset 0 1px 0 #fff' }}
         role="dialog"
         aria-modal="true"
         aria-labelledby="profile-title"
@@ -34,7 +35,7 @@ export function ProfileDialog({ learner, onClose }: { learner: DashboardData['le
         <label className="grid gap-1.5">
           <span className="text-[10px] uppercase tracking-wide text-faint">Name</span>
           <input
-            className="h-11 w-full border-0 border-b border-line bg-transparent text-[15px] font-medium focus:border-ink"
+            className="h-11 w-full rounded-xl bg-canvas/70 px-3.5 text-[15px] font-medium outline-none focus:shadow-[0_0_0_2px_rgb(47_109_158/0.3)]"
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
           />
@@ -43,7 +44,7 @@ export function ProfileDialog({ learner, onClose }: { learner: DashboardData['le
           <label className="grid gap-1.5">
             <span className="text-[10px] uppercase tracking-wide text-faint">Characters / day</span>
             <input
-              className="h-11 w-full border-0 border-b border-line bg-transparent text-[15px] font-medium focus:border-ink"
+              className="h-11 w-full rounded-xl bg-canvas/70 px-3.5 text-[15px] font-medium outline-none focus:shadow-[0_0_0_2px_rgb(47_109_158/0.3)]"
               type="number"
               min="1"
               max="20"
@@ -54,7 +55,7 @@ export function ProfileDialog({ learner, onClose }: { learner: DashboardData['le
           <label className="grid gap-1.5">
             <span className="text-[10px] uppercase tracking-wide text-faint">Words / day</span>
             <input
-              className="h-11 w-full border-0 border-b border-line bg-transparent text-[15px] font-medium focus:border-ink"
+              className="h-11 w-full rounded-xl bg-canvas/70 px-3.5 text-[15px] font-medium outline-none focus:shadow-[0_0_0_2px_rgb(47_109_158/0.3)]"
               type="number"
               min="1"
               max="30"

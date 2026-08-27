@@ -18,7 +18,7 @@ export function SrsRatingButtons({
     <div className="grid grid-cols-4 gap-2" aria-label="Rate your recall">
       {reviewRatings.map((rating) => (
         <button
-          className={`flex h-14 items-center justify-center border-0 bg-transparent text-sm font-medium ${
+          className={`flex h-14 items-center justify-center rounded-2xl border-0 bg-paper/70 text-sm font-medium shadow-[0_2px_8px_rgb(43_58_66/0.08)] transition active:scale-[0.97] ${
             rating.value === 1 ? 'text-danger' : 'text-ink'
           }`}
           key={rating.value}

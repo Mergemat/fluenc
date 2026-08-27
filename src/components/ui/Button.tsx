@@ -4,9 +4,9 @@ type Variant = 'primary' | 'secondary' | 'ghost' | 'icon'
 
 const variants: Record<Variant, string> = {
   primary:
-    'inline-flex h-13 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-paper',
+    'inline-flex h-13 w-full items-center justify-center gap-2 rounded-full bg-glaze px-6 text-[15px] font-medium text-paper shadow-[0_8px_20px_rgb(47_109_158/0.35)]',
   secondary:
-    'inline-flex h-12 items-center justify-center gap-1.5 rounded-full border border-line px-5 text-sm font-medium text-ink',
+    'inline-flex h-12 items-center justify-center gap-1.5 rounded-full bg-paper/70 px-5 text-sm font-medium text-ink shadow-[0_2px_8px_rgb(43_58_66/0.08)]',
   ghost:
     'inline-flex h-10 items-center justify-center gap-1.5 px-2 text-sm font-medium text-muted',
   icon: 'grid size-10 shrink-0 place-items-center rounded-full text-muted',

@@ -33,9 +33,9 @@ export function WritingPad({ character }: { character: string }) {
         padding: 10,
         showCharacter: false,
         showOutline: false,
-        strokeColor: '#171716',
-        drawingColor: '#171716',
-        highlightColor: '#b0402c',
+        strokeColor: '#2b3a42',
+        drawingColor: '#2b3a42',
+        highlightColor: '#2f6d9e',
         onLoadCharDataSuccess: () => {
           if (!active) return
           setWriterState('ready')
@@ -70,7 +70,15 @@ export function WritingPad({ character }: { character: string }) {
         <ErrorNote>Could not load strokes. Check your connection and reload the page.</ErrorNote>
       ) : null}
       <div
-        className={`mx-auto size-[200px] border ${status === 'writing' ? 'border-ink' : status === 'done' ? 'border-faint' : 'border-line'} bg-paper bg-[linear-gradient(to_right,transparent_calc(50%-.5px),#efeeea_calc(50%-.5px),#efeeea_calc(50%+.5px),transparent_calc(50%+.5px)),linear-gradient(to_bottom,transparent_calc(50%-.5px),#efeeea_calc(50%-.5px),#efeeea_calc(50%+.5px),transparent_calc(50%+.5px))]`}
+        className="mx-auto size-[200px] rounded-2xl bg-paper"
+        style={{
+          boxShadow: status === 'writing'
+            ? '0 0 0 2px rgb(47 109 158 / 0.4), 0 4px 14px rgb(43 58 66 / 0.1)'
+            : status === 'done'
+              ? '0 0 0 2px rgb(139 160 168 / 0.4)'
+              : '0 2px 8px rgb(43 58 66 / 0.08)',
+          backgroundImage: 'linear-gradient(to right, transparent calc(50%-.5px), #dbe5e0 calc(50%-.5px), #dbe5e0 calc(50%+.5px), transparent calc(50%+.5px)), linear-gradient(to bottom, transparent calc(50%-.5px), #dbe5e0 calc(50%-.5px), #dbe5e0 calc(50%+.5px), transparent calc(50%+.5px))',
+        }}
         ref={targetRef}
         aria-label={`Writing pad for ${character}`}
       />
