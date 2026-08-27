@@ -2,25 +2,25 @@ import { BookOpen } from 'lucide-react'
 
 import type { DashboardData } from '../server/curriculum'
 import { ReadingLesson } from './ReadingLesson'
-import { ActivityEmpty, ActivityHeader } from './ui/ActivityHeader'
+import { Empty, Page, PageHeader } from './ui/Layout'
 
 export function ReadingView({ data }: { data: DashboardData }) {
   const sentence = data.getQueue[0]
 
   return (
-    <main className="min-h-screen">
-      <ActivityHeader
-        eyebrow="Get"
-        title="Чтение"
-        detail={sentence ? <><b className="text-base text-ink tabular-nums">{data.getQueue.length}</b><br />понятных фраз</> : 'Материалов пока нет'}
+    <Page>
+      <PageHeader
+        title="Read"
+        meta={sentence ? <><b className="text-sm text-ink tabular-nums">{data.getQueue.length}</b> sentences</> : 'Nothing yet'}
       />
 
       {sentence ? <ReadingLesson key={sentence.id} item={sentence} /> : (
-        <ActivityEmpty icon={<BookOpen size={20} />}>
-          <h2 className="m-0 text-2xl tracking-[-.035em] text-ink">Пока нечего читать</h2>
-          <p className="m-0 max-w-[440px] text-sm leading-[1.6]">Новые фразы откроются, когда вы изучите достаточно входящих в них иероглифов и слов.</p>
-        </ActivityEmpty>
+        <Empty
+          icon={<BookOpen size={18} />}
+          title="Nothing to read yet"
+          detail="New sentences unlock as you learn the characters and words they are built from."
+        />
       )}
-    </main>
+    </Page>
   )
 }

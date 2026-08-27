@@ -9,17 +9,16 @@ import { MandarinAudioButton } from './MandarinAudioButton'
 import { NeutralToneBadge, NeutralToneExample } from './NeutralToneHint'
 import { WritingPad } from './WritingPad'
 import { Button } from './ui/Button'
-import { Eyebrow } from './ui/Eyebrow'
-import { StudioCard } from './ui/StudioCard'
+import { Card, ErrorNote } from './ui/Layout'
 
 type CharacterItem = Extract<BuildItem, { type: 'character' }>
 type MovieProp = CharacterItem['movie']['components'][number]
 
 const categoryNames = {
-  male: 'мужской актёр',
-  female: 'женский актёр',
-  fictional: 'вымышленный герой',
-  wildcard: 'wildcard-персонаж',
+  male: 'male actor',
+  female: 'female actor',
+  fictional: 'fictional character',
+  wildcard: 'wildcard character',
 }
 
 export function CharacterStudio({ item }: { item: CharacterItem }) {
@@ -63,45 +62,47 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
   })
 
   return (
-    <StudioCard>
-      <header className="px-7 pt-6 pb-5 max-[720px]:px-4">
-        <Eyebrow>{item.movie.isPrimitive ? 'Базовый компонент' : 'Новый иероглиф'} · #{item.rank}</Eyebrow>
-        <div className="mt-3 flex items-center gap-5">
-          <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} />
-          <span className="font-hanzi text-[88px] font-semibold leading-[.84] tracking-[-.08em] max-[720px]:text-[68px]" lang="zh-CN">{item.hanzi}</span>
+    <Card>
+      <header className="p-5 pb-4">
+        <p className="m-0 mb-3 text-[10px] font-bold tracking-[.12em] text-faint uppercase">
+          {item.movie.isPrimitive ? 'Basic component' : 'New character'} · #{item.rank}
+        </p>
+        <div className="flex flex-wrap items-center gap-4">
+          <span className="font-hanzi text-7xl leading-none font-semibold tracking-tight sm:text-8xl" lang="zh-CN">{item.hanzi}</span>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <strong className="text-lg text-jade">{item.pinyin}</strong>
+              <strong className="text-base text-accent">{item.pinyin}</strong>
               <NeutralToneBadge text={item.hanzi} pinyin={item.pinyin} />
+              <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} />
             </div>
-            <span className="mt-1 block text-[26px] font-semibold leading-[1.1] tracking-[-.025em] text-ink" lang="en">{meaning.primary}</span>
+            <span className="mt-0.5 block text-xl font-semibold tracking-tight">{meaning.primary}</span>
             <NeutralToneExample text={item.hanzi} pinyin={item.pinyin} />
           </div>
         </div>
       </header>
 
-      <section className="border-t border-line px-7 py-5 max-[720px]:px-4">
+      <section className="border-t border-line p-5">
         <div className="mb-4 flex items-baseline justify-between gap-4">
-          <h2 className="m-0 text-xs font-bold">Координаты</h2>
-          <small className="text-[9px] text-muted">новую связь выбираете один раз</small>
+          <h2 className="m-0 text-xs font-bold uppercase tracking-wide">Coordinates</h2>
+          <small className="text-[10px] text-muted">choose each new link once</small>
         </div>
-        <div className="grid grid-cols-3 divide-x divide-line max-[720px]:grid-cols-1 max-[720px]:divide-x-0 max-[720px]:divide-y">
+        <div className="grid gap-4">
           <CoordinateField
             code={`Initial · ${item.movie.actorKey}`}
             help={categoryNames[item.movie.actorCategory]}
             invalid={showValidation && !actorName.trim()}
             marker="A"
             onChange={actorLocked ? undefined : setActorName}
-            placeholder="Выберите актёра"
+            placeholder="Pick an actor"
             value={actorName}
           />
           <CoordinateField
             code={`Final · ${item.movie.finalKey}`}
-            help="знакомое место"
+            help="a familiar place"
             invalid={showValidation && !setName.trim()}
             marker="S"
             onChange={setLocked ? undefined : setSetName}
-            placeholder="Выберите место"
+            placeholder="Pick a set"
             value={setName}
           />
           <CoordinateField
@@ -114,12 +115,12 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
         </div>
       </section>
 
-      <section className="border-t border-line px-7 py-5 max-[720px]:px-4">
+      <section className="border-t border-line p-5">
         <div className="mb-4 flex items-center justify-between gap-4">
-          <h2 className="m-0 text-xs font-bold">Реквизит</h2>
-          <span className="font-hanzi text-sm font-semibold text-jade">{item.movie.components.map((component) => component.hanzi).join(' + ')}</span>
+          <h2 className="m-0 text-xs font-bold uppercase tracking-wide">Props</h2>
+          <span className="font-hanzi text-sm font-semibold text-accent">{item.movie.components.map((component) => component.hanzi).join(' + ')}</span>
         </div>
-        <div className={`grid gap-x-8 gap-y-3 ${props.length > 1 ? 'grid-cols-2 max-[720px]:grid-cols-1' : 'grid-cols-1'}`}>
+        <div className="grid gap-4">
           {props.map((prop, index) => (
             <PropField
               key={prop.hanzi}
@@ -133,25 +134,31 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
       </section>
 
       {!item.movie.isPrimitive ? (
-        <section className="mx-7 my-4 border-l-2 border-jade pl-4 max-[720px]:mx-4">
-          <Eyebrow>Один короткий кадр</Eyebrow>
-          <p className="mt-1 mb-0 text-[13px] leading-[1.65] text-muted">
-            <strong className="text-ink">{actorName || 'Актёр'}</strong> в месте <strong className="text-ink">{roomName} · {setName || 'сет'}</strong> использует <strong className="text-ink">{props.map((prop) => prop.propName || prop.hanzi).join(' и ')}</strong>, чтобы показать «<strong className="text-ink">{meaning.primary}</strong>».
+        <section className="border-t border-line p-5">
+          <h2 className="m-0 mb-2 text-xs font-bold uppercase tracking-wide">One short scene</h2>
+          <p className="m-0 text-sm leading-relaxed text-muted">
+            <strong className="text-ink">{actorName || 'The actor'}</strong> in <strong className="text-ink">{roomName} · {setName || 'the set'}</strong> uses{' '}
+            <strong className="text-ink">{props.map((prop) => prop.propName || prop.hanzi).join(' and ')}</strong> to show “<strong className="text-ink">{meaning.primary}</strong>”.
           </p>
         </section>
       ) : null}
 
       <WritingPad character={item.hanzi} />
 
-      <footer className="flex justify-end border-t border-line px-7 py-5 max-[720px]:px-4">
-        <Button type="button" disabled={finishMutation.isPending} onClick={() => { if (mappingsReady) finishMutation.mutate(); else setShowValidation(true) }}>
-          <Check size={17} />
-          {finishMutation.isPending ? 'Сохраняю…' : 'Иероглиф изучен'}
+      <footer className="border-t border-line p-5">
+        <Button
+          className="w-full sm:w-auto"
+          type="button"
+          disabled={finishMutation.isPending}
+          onClick={() => { if (mappingsReady) finishMutation.mutate(); else setShowValidation(true) }}
+        >
+          <Check size={16} />
+          {finishMutation.isPending ? 'Saving…' : 'Mark as learned'}
         </Button>
       </footer>
-      {showValidation && !mappingsReady ? <BuildError>Заполните только новые пустые связи.</BuildError> : null}
-      {finishMutation.isError ? <BuildError>Не удалось сохранить иероглиф. Попробуйте ещё раз.</BuildError> : null}
-    </StudioCard>
+      {showValidation && !mappingsReady ? <ErrorNote>Fill in only the new, empty links.</ErrorNote> : null}
+      {finishMutation.isError ? <ErrorNote>Could not save this character. Try again.</ErrorNote> : null}
+    </Card>
   )
 }
 
@@ -166,20 +173,20 @@ function CoordinateField({ code, help, invalid = false, marker, onChange, placeh
   value: string
 }) {
   return (
-    <div className={`grid min-w-0 grid-cols-[28px_1fr] items-center gap-2.5 px-4 py-1 first:pl-0 last:pr-0 max-[720px]:px-0 max-[720px]:py-3 ${invalid ? 'text-fluenc-red' : ''}`}>
-      <span className={`text-center text-base font-extrabold ${tone ? 'text-fluenc-red' : 'text-jade'}`}>{marker}</span>
+    <div className={`grid grid-cols-[32px_1fr] items-center gap-3 ${invalid ? 'text-danger' : ''}`}>
+      <span className={`text-center text-lg font-bold ${tone ? 'text-danger' : 'text-accent'}`}>{marker}</span>
       <span className="flex min-w-0 flex-col gap-0.5">
-        <small className="overflow-hidden text-[8px] font-bold tracking-[.06em] text-ellipsis whitespace-nowrap text-muted uppercase">{code}</small>
+        <small className="overflow-hidden text-[9px] font-bold tracking-[.06em] text-faint uppercase text-ellipsis whitespace-nowrap">{code}</small>
         {onChange ? (
           <input
-            className="min-w-0 border-0 border-b border-line bg-transparent py-0.5 text-xs font-semibold text-ink outline-0 focus:border-jade"
+            className="min-w-0 border-0 border-b border-line bg-transparent py-1 text-sm font-semibold focus:border-accent"
             aria-invalid={invalid}
             value={value}
             onChange={(event) => onChange(event.target.value)}
             placeholder={placeholder}
           />
-        ) : <strong className="overflow-hidden text-xs text-ellipsis whitespace-nowrap">{value}</strong>}
-        <small className="overflow-hidden text-[8px] text-ellipsis whitespace-nowrap text-muted">{help}</small>
+        ) : <strong className="overflow-hidden text-sm text-ellipsis whitespace-nowrap">{value}</strong>}
+        <small className="overflow-hidden text-[10px] text-muted text-ellipsis whitespace-nowrap">{help}</small>
       </span>
     </div>
   )
@@ -187,24 +194,22 @@ function CoordinateField({ code, help, invalid = false, marker, onChange, placeh
 
 function PropField({ invalid, locked, onChange, prop }: { invalid: boolean; locked: boolean; onChange: (value: string) => void; prop: MovieProp }) {
   return (
-    <div className={`grid min-w-0 grid-cols-[42px_1fr] items-center gap-3 border-b border-line pb-3 ${invalid ? 'text-fluenc-red' : ''}`}>
-      <span className="font-hanzi text-[30px] font-semibold leading-none text-ink" lang="zh-CN">{prop.hanzi}</span>
+    <div className={`grid grid-cols-[44px_1fr] items-center gap-3 ${invalid ? 'text-danger' : ''}`}>
+      <span className="font-hanzi text-3xl leading-none font-semibold" lang="zh-CN">{prop.hanzi}</span>
       <span className="flex min-w-0 flex-col gap-0.5">
-        {locked ? <strong className="overflow-hidden text-xs text-ellipsis whitespace-nowrap">{prop.propName}</strong> : (
+        {locked ? <strong className="overflow-hidden text-sm text-ellipsis whitespace-nowrap">{prop.propName}</strong> : (
           <input
-            className="min-w-0 border-0 border-b border-line bg-transparent py-0.5 text-xs font-semibold text-ink outline-0 focus:border-jade"
+            className="min-w-0 border-0 border-b border-line bg-transparent py-1 text-sm font-semibold focus:border-accent"
             aria-invalid={invalid}
             value={prop.propName}
             onChange={(event) => onChange(event.target.value)}
-            placeholder="Один постоянный образ"
+            placeholder="One permanent image"
           />
         )}
-        {prop.character ? <small className="overflow-hidden text-[8px] text-ellipsis whitespace-nowrap text-muted">{prop.character.pinyin} · {splitMeaning(prop.character.meaning).primary}</small> : <small className="text-[8px] text-muted">компонент</small>}
+        {prop.character
+          ? <small className="overflow-hidden text-[10px] text-muted text-ellipsis whitespace-nowrap">{prop.character.pinyin} · {splitMeaning(prop.character.meaning).primary}</small>
+          : <small className="text-[10px] text-muted">component</small>}
       </span>
     </div>
   )
-}
-
-function BuildError({ children }: { children: ReactNode }) {
-  return <p className="m-0 bg-[#fae8e4] px-6 py-2.5 text-xs text-[#9f3528] max-[720px]:px-4" role="alert">{children}</p>
 }

@@ -222,7 +222,7 @@ function resolveStudyItem(type: ReviewableItemType, id: string, mappings: Mappin
       id: sentence.id,
       hanzi: sentence.hanzi,
       pinyin: sentence.pinyin,
-      meaning: sentence.meaningRu,
+      meaning: sentence.meaning,
     } : null
   }
   return null
@@ -238,9 +238,9 @@ function resolveCodebookItem(item: LearnerItem, mappings: MappingRows) {
   if (!mapping) return null
 
   const labels = {
-    actor: { code: 'Initial', association: 'Актёр' },
-    set: { code: 'Final', association: 'Сет' },
-    tone: { code: 'Тон', association: 'Комната' },
+    actor: { code: 'Initial', association: 'Actor' },
+    set: { code: 'Final', association: 'Set' },
+    tone: { code: 'Tone', association: 'Room' },
   }
 
   return {
@@ -430,13 +430,13 @@ export async function enrollItemHandler(data: EnrollInput) {
   await ensureLearner()
 
   if (data.itemType === 'character' && !charactersById.has(data.itemId)) {
-    throw new Error('Иероглиф не найден')
+    throw new Error('Character not found')
   }
   if (data.itemType === 'word' && !wordsById.has(data.itemId)) {
-    throw new Error('Слово не найдено')
+    throw new Error('Word not found')
   }
   if (data.itemType === 'sentence' && !sentencesById.has(data.itemId)) {
-    throw new Error('Предложение не найдено')
+    throw new Error('Sentence not found')
   }
 
   const card = createEmptyCard(new Date())
@@ -462,7 +462,7 @@ export async function reviewItemHandler(data: ReviewInput) {
     )
     .limit(1)
 
-  if (!existing[0]) throw new Error('Карточка ещё не добавлена в Review')
+  if (!existing[0]) throw new Error('Card is not in review yet')
 
   const now = new Date()
   const currentCard = fromLearnerItem(existing[0])

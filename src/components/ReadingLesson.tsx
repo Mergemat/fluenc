@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { enrollItem, type DashboardData } from '../server/curriculum'
 import { MandarinAudioButton } from './MandarinAudioButton'
 import { Button } from './ui/Button'
+import { ErrorNote, Page, PageHeader } from './ui/Layout'
 
 type ReadingItem = DashboardData['getQueue'][number]
 
@@ -17,30 +18,39 @@ export function ReadingLesson({ item }: { item: ReadingItem }) {
   })
 
   return (
-    <section className="mx-auto grid min-h-[calc(100vh-80px)] w-[min(820px,calc(100%-48px))] content-center py-10 max-[720px]:min-h-[calc(100vh-126px)] max-[720px]:w-[calc(100%-28px)]">
-      <p className="mb-5 text-[10px] font-bold text-muted">Понятное предложение · прочитайте вслух</p>
+    <Page>
+      <PageHeader title="Read" meta="Understand it, then say it" />
 
-      <article className="border-y border-line py-10 text-center max-[720px]:py-8">
-        <p className="mt-0 mb-7 text-xs text-muted">Сначала поймите фразу без перевода. Затем послушайте.</p>
-        <p className="my-0 font-hanzi text-[clamp(42px,8vw,72px)] font-semibold leading-[1.25] tracking-[-.045em]" lang="zh-CN">{item.hanzi}</p>
-        <MandarinAudioButton className="mx-auto mt-7" text={item.hanzi} pinyin={item.pinyin} label="Послушать" />
+      <section className="grid justify-items-center gap-6 rounded-2xl border border-line bg-paper px-5 py-10 text-center">
+        <p className="m-0 font-hanzi text-4xl leading-snug font-semibold tracking-tight sm:text-5xl" lang="zh-CN">
+          {item.hanzi}
+        </p>
+        <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} label="Listen" />
 
         {revealed ? (
-          <div className="mx-auto mt-8 max-w-[600px] border-t border-line pt-6">
-            <p className="mt-0 mb-2 text-base font-semibold text-jade">{item.pinyin}</p>
-            <p className="m-0 text-lg font-semibold">{item.meaningRu}</p>
+          <div className="w-full max-w-[420px] border-t border-line pt-5">
+            <p className="m-0 mb-1.5 text-base font-bold text-accent">{item.pinyin}</p>
+            <p className="m-0 text-lg font-semibold">{item.meaning}</p>
           </div>
-        ) : null}
-      </article>
+        ) : (
+          <p className="m-0 max-w-[380px] text-sm leading-relaxed text-muted">
+            Understand the sentence first, without a translation. Then listen.
+          </p>
+        )}
+      </section>
 
-      <footer className="mt-6 flex justify-end">
+      <footer className="mt-5">
         {revealed ? (
-          <Button type="button" disabled={mutation.isPending} onClick={() => mutation.mutate()}>
-            <ArrowRight size={16} /> {mutation.isPending ? 'Сохраняю…' : 'Следующая фраза'}
+          <Button className="w-full sm:w-auto" type="button" disabled={mutation.isPending} onClick={() => mutation.mutate()}>
+            <ArrowRight size={16} /> {mutation.isPending ? 'Saving…' : 'Next sentence'}
           </Button>
-        ) : <Button type="button" onClick={() => setRevealed(true)}>Проверить смысл</Button>}
+        ) : (
+          <Button className="w-full sm:w-auto" variant="secondary" type="button" onClick={() => setRevealed(true)}>
+            Check meaning
+          </Button>
+        )}
       </footer>
-      {mutation.isError ? <p className="mt-3 text-right text-xs text-fluenc-red" role="alert">Не удалось сохранить предложение.</p> : null}
-    </section>
+      {mutation.isError ? <ErrorNote>Could not save this sentence. Try again.</ErrorNote> : null}
+    </Page>
   )
 }

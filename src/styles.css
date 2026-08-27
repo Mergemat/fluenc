@@ -1,16 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #17211e;
-  --color-muted: #66726e;
-  --color-paper: #fbfcfa;
-  --color-mist: #e5ebe7;
-  --color-jade: #176b5b;
-  --color-jade-light: #dcece6;
-  --color-fluenc-blue: #315d82;
-  --color-blue-light: #e0eaf2;
-  --color-fluenc-red: #c95746;
-  --color-line: #d7dfda;
+  --color-ink: #1a1b1c;
+  --color-muted: #71706a;
+  --color-faint: #a4a39b;
+  --color-line: #e8e7e1;
+  --color-paper: #ffffff;
+  --color-canvas: #f7f6f2;
+  --color-accent: #2e6b57;
+  --color-accent-soft: #e4ede8;
+  --color-danger: #b0402c;
   --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
   --font-hanzi: "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
 }
@@ -18,9 +17,21 @@
 @layer base {
   :root {
     color: var(--color-ink);
-    background: #eef2ef;
+    background: var(--color-canvas);
     font-family: var(--font-ui);
     font-synthesis: none;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--color-canvas);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   button,
@@ -35,30 +46,22 @@
 
   button:disabled {
     cursor: not-allowed;
-    opacity: .48;
-  }
-
-  button:not(:disabled) {
-    transition: color 140ms ease-out, background-color 140ms ease-out, border-color 140ms ease-out, box-shadow 140ms ease-out, transform 140ms ease-out;
+    opacity: .45;
   }
 
   button:not(:disabled):active {
-    transform: scale(.96);
+    transform: scale(.98);
   }
 
   button:focus-visible,
   input:focus-visible,
   textarea:focus-visible {
-    outline: 3px solid rgb(49 93 130 / .24);
+    outline: 2px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
     outline-offset: 2px;
   }
 
-  body {
-    min-width: 320px;
-    min-height: 100vh;
-    margin: 0;
-    background: #eef2ef;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  input,
+  textarea {
+    outline: 0;
   }
 }

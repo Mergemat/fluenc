@@ -22,11 +22,11 @@ export type MovieCoordinates = {
 }
 
 export const defaultToneRooms: Record<number, string> = {
-  1: 'У входа',
-  2: 'Кухня',
-  3: 'Спальня',
-  4: 'Ванная',
-  5: 'Крыша',
+  1: 'Entrance hall',
+  2: 'Kitchen',
+  3: 'Bedroom',
+  4: 'Bathroom',
+  5: 'Rooftop',
 }
 
 function getActorCategory(actorKey: string): MovieCoordinates['actorCategory'] {

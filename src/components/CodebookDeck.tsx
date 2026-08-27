@@ -1,91 +1,79 @@
 import { ArrowLeftRight, KeyRound } from 'lucide-react'
-import { useEffect, useState } from 'react'
 
 import type { CodebookItem } from '../server/curriculum'
+import { useReveal } from '../hooks/useReveal'
 import { SrsRatingButtons } from './SrsRatingButtons'
 import { ToneAudioButton } from './ToneAudioButton'
-import { RevealButton, ReviewCard, ReviewHeading, ReviewWorkspace } from './ui/ReviewFrame'
+import { Button } from './ui/Button'
+import { Card } from './ui/Layout'
 
 type Props = {
   item: CodebookItem
   pending: boolean
-  remaining: number
   onRate: (rating: number) => void
 }
 
-export function CodebookDeck({ item, pending, remaining, onRate }: Props) {
-  const [revealed, setRevealed] = useState(false)
+export function CodebookDeck({ item, pending, onRate }: Props) {
+  const { revealed, reveal } = useReveal({ pending, onRate })
   const asksForCode = item.direction === 'decode'
   const prompt = asksForCode ? item.association : item.code
   const answer = asksForCode ? item.code : item.association
   const promptLabel = asksForCode ? item.associationLabel : item.codeLabel
   const answerLabel = asksForCode ? item.codeLabel : item.associationLabel
-  const directionLabel = asksForCode
-    ? 'Recall произношения · образ → звук'
-    : 'Build сцены · звук → образ'
-  const associationQuestion = item.associationLabel === 'Комната' ? 'Какая' : 'Какой'
   const promptIsTone = item.type === 'tone' && !asksForCode
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code === 'Space' && !revealed) {
-        event.preventDefault()
-        setRevealed(true)
-        return
-      }
-
-      const rating = Number(event.key)
-      if (revealed && !pending && rating >= 1 && rating <= 4) onRate(rating)
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [onRate, pending, revealed])
+  const question = asksForCode
+    ? `Which ${item.codeLabel.toLowerCase()} is paired with this ${item.associationLabel.toLowerCase()}?`
+    : `Which ${item.associationLabel.toLowerCase()} does this ${item.codeLabel.toLowerCase()} stand for?`
 
   return (
-    <ReviewWorkspace>
-      <ReviewHeading eyebrow="Pronunciation Codebook" title="Закрепите координату" remaining={remaining} />
-
-      <ReviewCard>
-        <div className={`grid place-items-center content-center px-7 text-center max-[720px]:px-[18px] ${revealed ? 'min-h-[170px] pt-[17px] pb-[15px]' : 'min-h-[390px] pt-12 pb-[42px] max-[720px]:min-h-[360px]'}`}>
-          <span className="mb-2.5 text-[9px] font-bold tracking-[.06em] text-fluenc-blue uppercase">{directionLabel}</span>
-          <span className={`inline-flex items-center gap-1.5 text-[10px] font-extrabold tracking-[.1em] text-muted uppercase ${revealed ? 'mb-2' : 'mb-[23px]'}`}><KeyRound size={15} /> {promptLabel}</span>
-          <span className={`max-w-[min(620px,100%)] [overflow-wrap:anywhere] font-bold leading-none tracking-[-.045em] text-ink ${revealed ? 'text-[clamp(38px,6vw,58px)]' : 'text-[clamp(52px,9vw,88px)]'}`}>{prompt}</span>
-          {promptIsTone && !revealed ? <ToneAudioButton className="mt-5" pinyin={prompt} /> : null}
-          <p className={`mx-auto max-w-[510px] text-[13px] leading-[1.55] text-muted text-pretty ${revealed ? 'mt-2 mb-0' : promptIsTone ? 'mt-4 mb-[22px]' : 'mt-7 mb-[22px]'}`}>
-            {asksForCode
-              ? `Какой ${item.codeLabel.toLocaleLowerCase()} закреплён за этим образом?`
-              : `${associationQuestion} ${item.associationLabel.toLocaleLowerCase()} закреплён${item.associationLabel === 'Комната' ? 'а' : ''} за этим кодом?`}
-          </p>
-          {!revealed ? (
-            <RevealButton onClick={() => setRevealed(true)}>
-              Показать связь <kbd>Space</kbd>
-            </RevealButton>
-          ) : null}
-        </div>
-
-        {revealed ? (
-          <div className="border-t border-line px-7 pt-[25px] pb-7 max-[720px]:px-4">
-            <div className="mx-auto grid max-w-[670px] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-[18px] max-[720px]:grid-cols-1 max-[720px]:gap-[9px]" aria-label={`${prompt} связано с ${answer}`}>
-              <CodebookFact label={promptLabel} value={prompt} audioPinyin={item.type === 'tone' && !asksForCode ? prompt : undefined} />
-              <ArrowLeftRight className="text-jade max-[720px]:rotate-90" size={22} />
-              <CodebookFact label={answerLabel} value={answer} audioPinyin={item.type === 'tone' && asksForCode ? answer : undefined} />
-            </div>
-            <p className="mx-auto mt-3.5 mb-0 max-w-[560px] text-center text-[10px] leading-normal text-muted">Вспомните эту связь в обе стороны без иероглифа. После закрепления она станет координатой фильма.</p>
-            <SrsRatingButtons kind="codebook" pending={pending} onRate={onRate} />
-          </div>
+    <Card>
+      <div className={`grid place-items-center px-5 text-center ${revealed ? 'py-8' : 'min-h-[320px] py-10 sm:min-h-[380px]'}`}>
+        <span className="mb-1.5 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[.1em] text-muted uppercase">
+          <KeyRound size={13} /> {promptLabel}
+        </span>
+        <span className={`max-w-full font-bold leading-none tracking-tight [overflow-wrap:anywhere] ${revealed ? 'text-4xl sm:text-5xl' : 'text-6xl sm:text-7xl'}`}>
+          {prompt}
+        </span>
+        {promptIsTone && !revealed ? <ToneAudioButton className="mt-4" pinyin={prompt} /> : null}
+        {!revealed ? (
+          <>
+            <p className="mt-5 mb-0 max-w-[380px] text-sm leading-relaxed text-muted">{question}</p>
+            <Button className="mt-6 w-full sm:w-auto" type="button" onClick={reveal}>
+              Show connection <kbd className="font-mono text-[10px] opacity-60">space</kbd>
+            </Button>
+          </>
         ) : null}
-      </ReviewCard>
-    </ReviewWorkspace>
+      </div>
+
+      {revealed ? (
+        <div className="border-t border-line p-5">
+          <div
+            aria-label={`${prompt} is paired with ${answer}`}
+            className="mx-auto grid max-w-[520px] items-center gap-3 sm:grid-cols-[1fr_auto_1fr]"
+          >
+            <Fact label={promptLabel} value={prompt} audioPinyin={promptIsTone ? prompt : undefined} />
+            <ArrowLeftRight aria-hidden className="mx-auto rotate-90 text-faint sm:rotate-0" size={18} />
+            <Fact
+              label={answerLabel}
+              value={answer}
+              audioPinyin={item.type === 'tone' && asksForCode ? answer : undefined}
+            />
+          </div>
+          <div className="mt-5">
+            <SrsRatingButtons pending={pending} onRate={onRate} />
+          </div>
+        </div>
+      ) : null}
+    </Card>
   )
 }
 
-function CodebookFact({ label, value, audioPinyin }: { label: string; value: string; audioPinyin?: string }) {
+function Fact({ label, value, audioPinyin }: { label: string; value: string; audioPinyin?: string }) {
   return (
-    <div className="flex min-w-0 flex-col gap-[5px] border-y border-line p-[17px] text-center">
-      <small className="text-[9px] font-extrabold tracking-[.1em] text-muted uppercase">{label}</small>
-      <strong className="text-[clamp(22px,4vw,34px)] leading-[1.1] [overflow-wrap:anywhere]">{value}</strong>
-      {audioPinyin ? <ToneAudioButton className="mx-auto mt-1.5" pinyin={audioPinyin} /> : null}
+    <div className="flex min-w-0 flex-col items-center gap-1 border border-line rounded-xl px-3 py-3 text-center">
+      <small className="text-[9px] font-bold tracking-[.1em] text-faint uppercase">{label}</small>
+      <strong className="text-2xl leading-tight [overflow-wrap:anywhere]">{value}</strong>
+      {audioPinyin ? <ToneAudioButton className="mt-1" pinyin={audioPinyin} /> : null}
     </div>
   )
 }

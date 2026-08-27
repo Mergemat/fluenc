@@ -6,7 +6,7 @@ import { reviewItem, type DashboardData } from '../server/curriculum'
 import { CodebookDeck } from './CodebookDeck'
 import { ReviewDeck } from './ReviewDeck'
 import { SentenceReviewDeck } from './SentenceReviewDeck'
-import { ActivityEmpty, ActivityHeader } from './ui/ActivityHeader'
+import { Empty, ErrorNote, Page, PageHeader } from './ui/Layout'
 
 export function ReviewView({ data }: { data: DashboardData }) {
   const queryClient = useQueryClient()
@@ -18,7 +18,7 @@ export function ReviewView({ data }: { data: DashboardData }) {
 
   const mutation = useMutation({
     mutationFn: (rating: number) => {
-      if (!reviewTarget) throw new Error('Нет карточки для повторения')
+      if (!reviewTarget) throw new Error('No card to review')
       return reviewItem({
         data: {
           itemType: reviewTarget.type,
@@ -35,18 +35,16 @@ export function ReviewView({ data }: { data: DashboardData }) {
   })
 
   return (
-    <main className="min-h-screen">
-      <ActivityHeader
-        eyebrow="Review"
-        title="Повторение"
-        detail={dueCount ? <><b className="text-base text-ink tabular-nums">{dueCount}</b><br />пора вспомнить</> : 'Очередь пуста'}
+    <Page>
+      <PageHeader
+        title="Review"
+        meta={dueCount ? <><b className="text-sm text-ink tabular-nums">{dueCount}</b> due</> : 'Queue is empty'}
       />
 
       {activeCodebook ? (
         <CodebookDeck
           key={`${activeCodebook.type}:${activeCodebook.id}`}
           item={activeCodebook}
-          remaining={dueCount}
           pending={mutation.isPending}
           onRate={(rating) => mutation.mutate(rating)}
         />
@@ -54,7 +52,6 @@ export function ReviewView({ data }: { data: DashboardData }) {
         <SentenceReviewDeck
           key={`${activeReview.type}:${activeReview.id}`}
           item={activeReview}
-          remaining={dueCount}
           pending={mutation.isPending}
           onRate={(rating) => mutation.mutate(rating)}
         />
@@ -62,18 +59,18 @@ export function ReviewView({ data }: { data: DashboardData }) {
         <ReviewDeck
           key={`${activeReview.type}:${activeReview.id}`}
           item={activeReview}
-          remaining={dueCount}
           pending={mutation.isPending}
           onRate={(rating) => mutation.mutate(rating)}
         />
       ) : (
-        <ActivityEmpty icon={<Check size={20} />}>
-          <h2 className="m-0 text-2xl tracking-[-.035em] text-ink">Всё повторено</h2>
-          <p className="m-0 max-w-[420px] text-sm leading-[1.6]">Новые карточки появятся здесь по расписанию. Уроки и чтение доступны отдельно.</p>
-        </ActivityEmpty>
+        <Empty
+          icon={<Check size={18} />}
+          title="All caught up"
+          detail="New cards appear here on schedule. Lessons and reading are always open."
+        />
       )}
 
-      {mutation.isError ? <p className="mx-auto mb-7 w-[min(780px,calc(100%-28px))] text-center text-xs text-fluenc-red" role="alert">Не удалось сохранить повторение.</p> : null}
-    </main>
+      {mutation.isError ? <ErrorNote>Could not save this review. Try again.</ErrorNote> : null}
+    </Page>
   )
 }

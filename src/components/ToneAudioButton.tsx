@@ -6,7 +6,7 @@ type Props = {
   className?: string
 }
 
-export function ToneAudioButton({ pinyin, label = 'Проиграть звук', className }: Props) {
+export function ToneAudioButton({ pinyin, label = 'Play sound', className }: Props) {
   return (
     <MandarinAudioButton
       className={className}

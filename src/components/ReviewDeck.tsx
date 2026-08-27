@@ -1,101 +1,100 @@
 import { Brain, Check, Clapperboard } from 'lucide-react'
-import { useEffect, useState } from 'react'
 
+import { useReveal } from '../hooks/useReveal'
 import { splitMeaning } from '../lib/meaning'
 import { getToneDetail } from '../lib/tones'
 import type { ReviewItem } from '../server/curriculum'
 import { MandarinAudioButton } from './MandarinAudioButton'
-import { NeutralToneBadge, NeutralToneExample } from './NeutralToneHint'
+import { NeutralToneBadge } from './NeutralToneHint'
 import { SrsRatingButtons } from './SrsRatingButtons'
-import { RevealButton, ReviewCard, ReviewHeading, ReviewWorkspace } from './ui/ReviewFrame'
+import { Button } from './ui/Button'
+import { Card } from './ui/Layout'
 
 type RecallItem = Exclude<ReviewItem, { type: 'sentence' }>
 
 type Props = {
   item: RecallItem
   pending: boolean
-  remaining: number
   onRate: (rating: number) => void
 }
 
-export function ReviewDeck({ item, pending, remaining, onRate }: Props) {
-  const [revealed, setRevealed] = useState(false)
+export function ReviewDeck({ item, pending, onRate }: Props) {
+  const { revealed, reveal } = useReveal({ pending, onRate })
   const meaning = splitMeaning(item.meaning)
   const tone = item.type === 'character' ? getToneDetail(item.movie.tone) : null
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.code === 'Space' && !revealed) {
-        event.preventDefault()
-        setRevealed(true)
-        return
-      }
-
-      const rating = Number(event.key)
-      if (revealed && !pending && rating >= 1 && rating <= 4) onRate(rating)
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [onRate, pending, revealed])
-
   return (
-    <ReviewWorkspace>
-      <ReviewHeading eyebrow="Сегодня · Review" title={item.srsState === 0 ? 'Первая проверка' : 'Вспомните без подсказок'} remaining={remaining} />
+    <Card>
+      <div className={`grid place-items-center px-5 text-center ${revealed ? 'py-8' : 'min-h-[340px] py-10 sm:min-h-[400px]'}`}>
+        <span className="mb-2 inline-flex items-center gap-1.5 text-[10px] font-bold tracking-[.1em] text-muted uppercase">
+          <Brain size={13} /> {item.type === 'character' ? 'Character' : 'Word'}
+        </span>
+        <span
+          className={`font-hanzi font-semibold leading-none tracking-tight ${revealed ? 'text-6xl sm:text-7xl' : 'text-[88px] sm:text-[120px]'}`}
+          lang="zh-CN"
+        >
+          {item.hanzi}
+        </span>
+        {!revealed ? (
+          <>
+            <p className="mt-5 mb-0 max-w-[380px] text-sm leading-relaxed text-muted">
+              Recall one core meaning, pinyin, and tone. Ten seconds at most.
+            </p>
+            <Button className="mt-6 w-full sm:w-auto" type="button" onClick={reveal}>
+              Show answer <kbd className="font-mono text-[10px] opacity-60">space</kbd>
+            </Button>
+          </>
+        ) : null}
+      </div>
 
-      <ReviewCard>
-        <div className={`grid place-items-center content-center px-7 text-center max-[720px]:px-[18px] ${revealed ? 'min-h-[170px] pt-[17px] pb-[15px]' : 'min-h-[430px] pt-12 pb-[42px] max-[720px]:min-h-[360px]'}`}>
-          <span className={`inline-flex items-center gap-1.5 text-[10px] font-extrabold tracking-[.1em] text-muted uppercase ${revealed ? 'mb-2' : 'mb-[23px]'}`}><Brain size={15} /> {item.type === 'character' ? 'Иероглиф' : 'Слово'}</span>
-          <span className={`font-hanzi font-semibold leading-[.92] tracking-[-.08em] text-ink ${revealed ? 'text-[clamp(68px,9vw,82px)]' : 'text-[clamp(112px,18vw,174px)]'}`} lang="zh-CN">{item.hanzi}</span>
-          <p className={`mx-auto max-w-[510px] text-[13px] leading-[1.55] text-muted text-pretty ${revealed ? 'mt-2 mb-0' : 'mt-7 mb-[22px]'}`}>
-            {item.type === 'character'
-              ? 'Вспомните одно основное значение, pinyin и тон. Не дольше 10 секунд.'
-              : 'Вспомните одно основное значение и произношение.'}
-          </p>
-          {!revealed ? (
-            <RevealButton onClick={() => setRevealed(true)}>
-              Показать ответ <kbd>Space</kbd>
-            </RevealButton>
-          ) : null}
-        </div>
-
-        {revealed ? (
-          <div className="border-t border-line px-7 pt-[25px] pb-7 max-[720px]:px-4">
-            <div className="flex items-center justify-center gap-[15px] max-[720px]:flex-wrap">
-              <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} label="Послушать" />
-              <div className="flex flex-wrap items-baseline justify-center gap-x-3 gap-y-[7px]">
-                <strong className="w-full text-center text-[clamp(30px,5vw,44px)] leading-[1.05] tracking-[-.04em] text-ink">{meaning.primary}</strong>
-                <span className="text-[23px] font-bold text-jade">{item.pinyin}</span>
-                {tone ? <span className="text-[11px] font-bold text-fluenc-red">{tone.syllable} · {tone.label.toLocaleLowerCase()}</span> : null}
-                <NeutralToneBadge text={item.hanzi} pinyin={item.pinyin} className="text-[11px]" />
-                <NeutralToneExample text={item.hanzi} pinyin={item.pinyin} className="w-full text-center" />
-              </div>
+      {revealed ? (
+        <div className="border-t border-line p-5">
+          <div className="grid justify-items-center gap-2 text-center">
+            <strong className="text-3xl leading-tight tracking-tight sm:text-4xl">{meaning.primary}</strong>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <span className="text-lg font-bold text-accent">{item.pinyin}</span>
+              {tone ? <span className="text-xs font-semibold text-muted">{tone.syllable} · {tone.label.toLowerCase()}</span> : null}
+              <NeutralToneBadge text={item.hanzi} pinyin={item.pinyin} />
+              <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} />
             </div>
+          </div>
 
-            {item.type === 'character' ? (
-              <details className="mt-[22px] border-t border-line pt-4">
-                <summary className="flex cursor-pointer list-none items-center gap-2 text-[11px] font-bold text-jade"><Clapperboard size={16} /> Не вспомнили? Проверьте фильм</summary>
-                <div className="mt-4 grid grid-cols-4 gap-4 max-[720px]:grid-cols-2">
-                  <MovieFact label={`Initial · ${item.movie.actorKey}`} value={item.movie.actorName || 'не задано'} />
-                  <MovieFact label={`Final · ${item.movie.finalKey}`} value={item.movie.setName || 'не задано'} />
-                  <MovieFact label={`Тон · ${item.movie.tone}`} value={item.movie.roomName} />
-                  <MovieFact label="Реквизит" value={item.movie.components.map((part) => part.propName || part.hanzi).join(' + ')} />
-                </div>
-              </details>
-            ) : item.livingLink ? (
-              <section className="mt-[22px] border-t border-line pt-4">
-                <div className="flex items-center gap-2.5 text-jade [&>span]:flex [&>span]:flex-col [&>span]:gap-0.5 [&_b]:text-[11px] [&_b]:text-ink [&_small]:text-[10px] [&_small]:leading-[1.45] [&_small]:text-muted"><Check size={17} /><span><b>Living Link</b><small>{item.livingLink}</small></span></div>
-              </section>
-            ) : null}
+          {item.type === 'character' ? (
+            <details className="mt-5 border-t border-line pt-4">
+              <summary className="flex cursor-pointer list-none items-center gap-2 text-xs font-semibold text-accent">
+                <Clapperboard size={15} /> Forgot? Check the movie
+              </summary>
+              <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+                <MovieFact label={`Initial · ${item.movie.actorKey}`} value={item.movie.actorName || 'not set'} />
+                <MovieFact label={`Final · ${item.movie.finalKey}`} value={item.movie.setName || 'not set'} />
+                <MovieFact label={`Tone · ${item.movie.tone}`} value={item.movie.roomName} />
+                <MovieFact label="Props" value={item.movie.components.map((part) => part.propName || part.hanzi).join(' + ')} />
+              </dl>
+            </details>
+          ) : item.livingLink ? (
+            <div className="mt-5 flex items-start gap-2 border-t border-line pt-4 text-accent">
+              <Check size={15} className="mt-0.5" />
+              <p className="m-0 text-xs leading-relaxed text-muted">
+                <b className="block text-ink">Living link</b>
+                {item.livingLink}
+              </p>
+            </div>
+          ) : null}
 
+          <div className="mt-5">
             <SrsRatingButtons pending={pending} onRate={onRate} />
           </div>
-        ) : null}
-      </ReviewCard>
-    </ReviewWorkspace>
+        </div>
+      ) : null}
+    </Card>
   )
 }
 
 function MovieFact({ label, value }: { label: string; value: string }) {
-  return <div className="flex min-w-0 flex-col gap-[3px]"><small className="text-[8px] font-bold tracking-[.08em] text-muted uppercase">{label}</small><strong className="overflow-hidden text-[11px] text-ellipsis whitespace-nowrap">{value || 'не задано'}</strong></div>
+  return (
+    <div className="flex min-w-0 flex-col gap-0.5">
+      <dt className="m-0 overflow-hidden text-[9px] font-bold tracking-[.08em] text-faint uppercase text-ellipsis whitespace-nowrap">{label}</dt>
+      <dd className="m-0 overflow-hidden text-xs font-semibold text-ellipsis whitespace-nowrap">{value || 'not set'}</dd>
+    </div>
+  )
 }

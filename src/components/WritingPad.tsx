@@ -27,14 +27,14 @@ export function WritingPad({ character }: { character: string }) {
       if (!active || !targetRef.current) return
       targetRef.current.replaceChildren()
       writerRef.current = HanziWriter.create(targetRef.current, character, {
-        width: 190,
-        height: 190,
+        width: 180,
+        height: 180,
         padding: 10,
         showCharacter: false,
         showOutline: false,
-        strokeColor: '#17211e',
-        drawingColor: '#176b5b',
-        highlightColor: '#c95746',
+        strokeColor: '#1a1b1c',
+        drawingColor: '#2e6b57',
+        highlightColor: '#b0402c',
         onLoadCharDataSuccess: () => {
           if (!active) return
           setWriterState('ready')
@@ -55,17 +55,27 @@ export function WritingPad({ character }: { character: string }) {
   }, [character])
 
   return (
-    <section className="mx-7 grid grid-cols-[minmax(0,1fr)_190px] items-center gap-6 border-t border-line py-5 max-[720px]:mx-4 max-[720px]:grid-cols-1">
-      <div>
-        <h2 className="m-0 text-xs font-bold">Напишите один раз</h2>
-        <p className="mt-1 mb-0 text-[10px] text-muted">Поле уже активно.</p>
-        <div className="mt-3 flex gap-[7px]">
-          <Button type="button" variant="secondary" disabled={writerState !== 'ready'} onClick={() => writerRef.current?.animateCharacter()}><Play size={15} /> Порядок</Button>
-          <Button type="button" variant="secondary" disabled={writerState !== 'ready'} onClick={() => startQuiz()}>{status === 'done' ? <Check size={15} /> : <RotateCcw size={15} />} {writerState === 'loading' ? 'Загружаю…' : status === 'done' ? 'Ещё раз' : 'Стереть'}</Button>
+    <section className="border-t border-line p-5">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="m-0 text-xs font-bold uppercase tracking-wide">Write it once</h2>
+        <div className="flex gap-1.5">
+          <Button variant="secondary" disabled={writerState !== 'ready'} onClick={() => writerRef.current?.animateCharacter()}>
+            <Play size={14} /> Strokes
+          </Button>
+          <Button variant="secondary" disabled={writerState !== 'ready'} onClick={() => startQuiz()}>
+            {status === 'done' ? <Check size={14} /> : <RotateCcw size={14} />}
+            {writerState === 'loading' ? 'Loading…' : status === 'done' ? 'Again' : 'Retry'}
+          </Button>
         </div>
-        {writerState === 'error' ? <p className="mt-[9px]! text-fluenc-red!" role="alert">Не удалось загрузить штрихи. Проверьте соединение и обновите страницу.</p> : null}
       </div>
-      <div className={`size-[190px] border bg-[linear-gradient(to_right,transparent_calc(50%-.5px),#e3e8e5_calc(50%-.5px),#e3e8e5_calc(50%+.5px),transparent_calc(50%+.5px)),linear-gradient(to_bottom,transparent_calc(50%-.5px),#e3e8e5_calc(50%-.5px),#e3e8e5_calc(50%+.5px),transparent_calc(50%+.5px))] max-[720px]:mx-auto ${status === 'writing' ? 'border-fluenc-blue' : status === 'done' ? 'border-jade' : 'border-[#cfd8d3]'}`} ref={targetRef} aria-label={`Поле для написания ${character}`} />
+      {writerState === 'error' ? (
+        <p className="m-0 mb-3 text-xs text-danger" role="alert">Could not load strokes. Check your connection and reload the page.</p>
+      ) : null}
+      <div
+        className={`mx-auto size-[180px] border bg-paper ${status === 'writing' ? 'border-accent' : status === 'done' ? 'border-accent/60' : 'border-line'} bg-[linear-gradient(to_right,transparent_calc(50%-.5px),#eeeeea_calc(50%-.5px),#eeeeea_calc(50%+.5px),transparent_calc(50%+.5px)),linear-gradient(to_bottom,transparent_calc(50%-.5px),#eeeeea_calc(50%-.5px),#eeeeea_calc(50%+.5px),transparent_calc(50%+.5px))]`}
+        ref={targetRef}
+        aria-label={`Writing pad for ${character}`}
+      />
     </section>
   )
 }

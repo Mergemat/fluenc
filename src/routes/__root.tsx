@@ -15,11 +15,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'Fluenc · Mandarin memory studio' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
+      { title: 'Fluenc — learn Mandarin characters' },
       {
         name: 'description',
-        content: 'Учебный маршрут по иероглифам, словам и понятным предложениям.',
+        content: 'Build characters from parts, review what you know, and read sentences you understand.',
       },
     ],
     links: [{ rel: 'stylesheet', href: appCss }],
@@ -40,7 +40,7 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="ru">
+    <html lang="en">
       <head>
         <HeadContent />
       </head>

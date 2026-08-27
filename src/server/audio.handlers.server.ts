@@ -28,7 +28,7 @@ async function getCachedAudioUrl(pathname: string) {
 export async function getPronunciationAudioHandler(data: PronunciationInput) {
   const apiKey = process.env.ELEVENLABS_API_KEY
   const voiceId = process.env.ELEVENLABS_VOICE_ID
-  if (!apiKey || !voiceId) throw new Error('ElevenLabs не настроен на сервере')
+  if (!apiKey || !voiceId) throw new Error('ElevenLabs is not configured on the server')
 
   const cacheKey = getCacheKey(data, voiceId)
   const cachePathname = `elevenlabs/v${PRONUNCIATION_VERSION}/${cacheKey}.mp3`
@@ -61,7 +61,7 @@ export async function getPronunciationAudioHandler(data: PronunciationInput) {
   )
 
   if (!response.ok) {
-    throw new Error(`ElevenLabs не сгенерировал аудио (${response.status})`)
+    throw new Error(`ElevenLabs returned no audio (${response.status})`)
   }
 
   const audio = Buffer.from(await response.arrayBuffer())

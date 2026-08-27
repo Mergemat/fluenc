@@ -1,10 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Save, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useState } from 'react'
 
 import { savePreferences, type DashboardData } from '../server/curriculum'
 import { Button } from './ui/Button'
-import { Eyebrow } from './ui/Eyebrow'
 
 export function ProfileDialog({ learner, onClose }: { learner: DashboardData['learner']; onClose: () => void }) {
   const queryClient = useQueryClient()
@@ -20,16 +19,63 @@ export function ProfileDialog({ learner, onClose }: { learner: DashboardData['le
   })
 
   return (
-    <div className="fixed inset-0 z-20 grid place-items-center bg-[rgba(15,25,21,.42)] p-5 backdrop-blur-[5px]" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
-      <section className="w-[min(470px,100%)] rounded-[18px] bg-paper p-[22px] shadow-[0_30px_90px_rgba(14,27,22,.28)] [&_label]:mt-3.5 [&_label]:grid [&_label]:gap-[7px] [&_label]:text-xs [&_label]:font-semibold [&_label]:text-muted [&_input]:min-h-11 [&_input]:w-full [&_input]:rounded-[10px] [&_input]:border [&_input]:border-line [&_input]:bg-white [&_input]:px-3 [&_input]:text-base [&_input]:text-ink [&_input]:outline-0 [&_input]:focus:border-fluenc-blue" role="dialog" aria-modal="true" aria-labelledby="profile-title">
-        <header className="mb-[22px] flex justify-between gap-6"><div><Eyebrow>Настройки маршрута</Eyebrow><h2 className="m-0 text-2xl tracking-[-.035em]" id="profile-title">Ваш темп</h2></div><Button variant="icon" type="button" onClick={onClose} aria-label="Закрыть"><X size={18} /></Button></header>
-        <label><span>Имя</span><input value={displayName} onChange={(event) => setDisplayName(event.target.value)} /></label>
-        <div className="grid grid-cols-2 gap-3">
-          <label><span>Новых иероглифов</span><input type="number" min="1" max="20" value={dailyCharacterGoal} onChange={(event) => setDailyCharacterGoal(Number(event.target.value))} /></label>
-          <label><span>Новых слов</span><input type="number" min="1" max="30" value={dailyWordGoal} onChange={(event) => setDailyWordGoal(Number(event.target.value))} /></label>
+    <div
+      className="fixed inset-0 z-20 flex items-end justify-center bg-black/40 p-0 backdrop-blur-sm sm:items-center sm:p-6"
+      role="presentation"
+      onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}
+    >
+      <section
+        className="w-full max-w-sm rounded-t-2xl border border-line bg-paper p-5 shadow-xl sm:rounded-2xl"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="profile-title"
+      >
+        <header className="mb-5 flex items-center justify-between gap-4">
+          <h2 className="m-0 text-lg font-semibold tracking-tight" id="profile-title">Your pace</h2>
+          <Button variant="icon" type="button" onClick={onClose} aria-label="Close"><X size={17} /></Button>
+        </header>
+
+        <label className="mt-3.5 grid gap-1.5 text-xs font-semibold text-muted">
+          Name
+          <input
+            className="h-11 w-full rounded-xl border border-line bg-paper px-3 text-base text-ink focus:border-ink"
+            value={displayName}
+            onChange={(event) => setDisplayName(event.target.value)}
+          />
+        </label>
+        <div className="mt-3.5 grid grid-cols-2 gap-3">
+          <label className="grid gap-1.5 text-xs font-semibold text-muted">
+            New characters / day
+            <input
+              className="h-11 w-full rounded-xl border border-line bg-paper px-3 text-base text-ink focus:border-ink"
+              type="number"
+              min="1"
+              max="20"
+              value={dailyCharacterGoal}
+              onChange={(event) => setDailyCharacterGoal(Number(event.target.value))}
+            />
+          </label>
+          <label className="grid gap-1.5 text-xs font-semibold text-muted">
+            New words / day
+            <input
+              className="h-11 w-full rounded-xl border border-line bg-paper px-3 text-base text-ink focus:border-ink"
+              type="number"
+              min="1"
+              max="30"
+              value={dailyWordGoal}
+              onChange={(event) => setDailyWordGoal(Number(event.target.value))}
+            />
+          </label>
         </div>
-        {saveMutation.isError ? <p className="text-xs text-fluenc-red" role="alert">Не удалось сохранить настройки.</p> : null}
-        <footer className="mt-6 flex justify-end gap-2"><Button variant="secondary" type="button" onClick={onClose}>Отмена</Button><Button type="button" disabled={!displayName.trim() || saveMutation.isPending} onClick={() => saveMutation.mutate()}><Save size={16} />{saveMutation.isPending ? 'Сохраняю…' : 'Сохранить'}</Button></footer>
+
+        {saveMutation.isError ? <p className="mt-3 text-xs text-danger" role="alert">Could not save settings.</p> : null}
+
+        <footer className="mt-6 flex justify-end gap-2">
+          <Button variant="secondary" type="button" onClick={onClose}>Cancel</Button>
+          <Button type="button" disabled={!displayName.trim() || saveMutation.isPending} onClick={() => saveMutation.mutate()}>
+            {saveMutation.isPending ? 'Saving…' : 'Save'}
+          </Button>
+        </footer>
       </section>
     </div>
   )

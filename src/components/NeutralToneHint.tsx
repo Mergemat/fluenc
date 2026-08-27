@@ -12,10 +12,10 @@ export function NeutralToneBadge({ text, pinyin, className = '' }: Props) {
 
   return (
     <span
-      className={`w-max rounded-md bg-[#f4ded9] px-1.5 py-1 text-[9px] font-extrabold leading-none text-[#9c3f32] uppercase ${className}`.trim()}
-      title={`Нейтральный тон в слове ${example.text} · ${example.pinyin}`}
+      className={`w-max rounded-md bg-accent-soft px-1.5 py-0.5 text-[9px] font-bold leading-none text-accent uppercase ${className}`.trim()}
+      title={`Neutral tone, as in ${example.text} · ${example.pinyin}`}
     >
-      нейтр.
+      neutral
     </span>
   )
 }
@@ -26,7 +26,7 @@ export function NeutralToneExample({ text, pinyin, className = '' }: Props) {
 
   return (
     <span className={`text-[10px] text-muted ${className}`.trim()}>
-      В слове <span className="font-hanzi font-semibold text-ink" lang="zh-CN">{example.text}</span> · <strong className="text-jade">{example.pinyin}</strong>
+      As in <span className="font-hanzi font-semibold text-ink" lang="zh-CN">{example.text}</span> · <strong className="text-accent">{example.pinyin}</strong>
     </span>
   )
 }

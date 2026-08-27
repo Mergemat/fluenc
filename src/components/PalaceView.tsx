@@ -4,7 +4,7 @@ import { getToneDetail } from '../lib/tones'
 import { getPalace, type PalaceData } from '../server/curriculum'
 import { ToneAudioButton } from './ToneAudioButton'
 import { Button } from './ui/Button'
-import { CollectionFrame, CollectionHeader, ViewStatus } from './ui/CollectionFrame'
+import { Page, PageHeader, Status } from './ui/Layout'
 
 type MappingItem = { key: string; name: string }
 
@@ -13,37 +13,37 @@ export function PalaceView() {
   const palace = palaceQuery.data
 
   return (
-    <CollectionFrame>
-      <CollectionHeader
-        eyebrow="Hanzi Movie Method"
-        title="Дворец"
-        description="Постоянный код произношения и реквизит для сцен. Связь выбирается один раз и используется снова."
+    <Page width="wide">
+      <PageHeader
+        title="Palace"
+        meta="Your permanent pronunciation code and scene props"
       />
 
       {palaceQuery.isPending ? (
-        <ViewStatus><p>Загружаю дворец…</p></ViewStatus>
+        <Status title="Loading the palace…" />
       ) : palaceQuery.isError ? (
-        <ViewStatus><p>Не удалось загрузить дворец</p><Button variant="secondary" type="button" onClick={() => palaceQuery.refetch()}>Повторить</Button></ViewStatus>
+        <Status title="Could not load the palace" action={<Button variant="secondary" type="button" onClick={() => palaceQuery.refetch()}>Retry</Button>} />
       ) : palace ? <PalaceContent palace={palace} /> : null}
-    </CollectionFrame>
+    </Page>
   )
 }
 
 function PalaceContent({ palace }: { palace: PalaceData }) {
   return (
-    <div className="space-y-10">
-      <section>
-        <p className="mb-3 text-[9px] font-bold tracking-[.1em] text-jade uppercase">Адрес сцены</p>
-        <div className="flex items-baseline gap-3 border-y border-line py-5 text-[clamp(20px,4vw,36px)] font-semibold tracking-[-.04em] max-[620px]:flex-wrap">
-          <span>initial → актёр</span><i className="font-normal text-line">+</i><span>final → место</span><i className="font-normal text-line">+</i><span>тон → комната</span>
-        </div>
+    <div className="space-y-8">
+      <section className="rounded-2xl border border-line bg-paper px-5 py-4 text-lg font-semibold tracking-tight">
+        <span className="text-muted">initial</span> → actor
+        <span className="mx-2 font-normal text-faint">+</span>
+        <span className="text-muted">final</span> → set
+        <span className="mx-2 font-normal text-faint">+</span>
+        <span className="text-muted">tone</span> → room
       </section>
 
       <ToneRooms rooms={palace.rooms} />
 
-      <div className="grid grid-cols-2 gap-10 max-[720px]:grid-cols-1">
-        <MappingList eyebrow="Initial → человек" items={palace.actors} title="Актёры" empty="Актёр появится при первом новом initial." />
-        <MappingList eyebrow="Final → здание" items={palace.sets} title="Места" empty="Место появится при первом новом final." />
+      <div className="grid gap-8 md:grid-cols-2">
+        <MappingList eyebrow="Initial → person" title="Actors" items={palace.actors} empty="An actor appears with your first new initial." />
+        <MappingList eyebrow="Final → building" title="Sets" items={palace.sets} empty="A set appears with your first new final." />
       </div>
 
       <PropList items={palace.props} />
@@ -54,18 +54,15 @@ function PalaceContent({ palace }: { palace: PalaceData }) {
 function ToneRooms({ rooms }: { rooms: PalaceData['rooms'] }) {
   return (
     <section>
-      <header className="mb-4">
-        <p className="mb-1 text-[9px] font-bold tracking-[.1em] text-fluenc-red uppercase">Тон → зона места</p>
-        <h2 className="m-0 text-xl tracking-[-.035em]">Комнаты</h2>
-      </header>
-      <div className="grid grid-cols-5 border-y border-line max-[800px]:grid-cols-1 max-[800px]:divide-y max-[800px]:divide-line">
+      <h2 className="m-0 mb-3 text-xs font-bold uppercase tracking-wide">Rooms · tone → zone</h2>
+      <div className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-5">
         {rooms.map((room) => {
           const tone = getToneDetail(room.tone)
           return (
-            <article className="grid min-w-0 justify-items-center gap-1 border-l border-line px-2 py-5 first:border-0 max-[800px]:grid-cols-[80px_1fr_38px] max-[800px]:items-center max-[800px]:justify-items-start max-[800px]:border-l-0 max-[800px]:py-3" key={room.tone}>
-              <strong className="text-[32px] leading-none tracking-[-.05em] text-jade">{tone.syllable}</strong>
-              <span className="overflow-hidden text-center text-[10px] font-semibold text-ellipsis whitespace-nowrap max-[800px]:text-left">{room.name}</span>
-              <ToneAudioButton className="mt-2 size-8 max-[800px]:mt-0" label={null} pinyin={tone.syllable} />
+            <article className="flex items-center gap-3 bg-paper px-4 py-3.5 sm:flex-col sm:items-start sm:gap-1" key={room.tone}>
+              <strong className="text-2xl leading-none font-semibold text-accent">{tone.syllable}</strong>
+              <span className="min-w-0 flex-1 truncate text-xs font-semibold">{room.name}</span>
+              <ToneAudioButton pinyin={tone.syllable} label={null} />
             </article>
           )
         })}
@@ -77,13 +74,13 @@ function ToneRooms({ rooms }: { rooms: PalaceData['rooms'] }) {
 function MappingList({ empty, eyebrow, items, title }: { empty: string; eyebrow: string; items: MappingItem[]; title: string }) {
   return (
     <section>
-      <p className="mb-1 text-[9px] font-bold tracking-[.1em] text-jade uppercase">{eyebrow}</p>
-      <h2 className="mt-0 mb-4 text-xl tracking-[-.035em]">{title}</h2>
+      <p className="m-0 mb-1 text-[9px] font-bold tracking-[.1em] text-faint uppercase">{eyebrow}</p>
+      <h2 className="m-0 mb-3 text-xs font-bold uppercase tracking-wide">{title}</h2>
       {items.length ? (
         <dl className="m-0 border-t border-line">
           {items.map((item) => (
             <div className="grid grid-cols-[70px_1fr] items-baseline border-b border-line py-2.5" key={item.key}>
-              <dt className="text-xs font-bold text-jade">{item.key}</dt>
+              <dt className="text-xs font-bold text-accent">{item.key}</dt>
               <dd className="m-0 overflow-hidden text-xs font-semibold text-ellipsis whitespace-nowrap">{item.name}</dd>
             </div>
           ))}
@@ -96,18 +93,18 @@ function MappingList({ empty, eyebrow, items, title }: { empty: string; eyebrow:
 function PropList({ items }: { items: PalaceData['props'] }) {
   return (
     <section>
-      <p className="mb-1 text-[9px] font-bold tracking-[.1em] text-fluenc-blue uppercase">Компонент → предмет</p>
-      <h2 className="mt-0 mb-4 text-xl tracking-[-.035em]">Реквизит</h2>
+      <p className="m-0 mb-1 text-[9px] font-bold tracking-[.1em] text-faint uppercase">Component → object</p>
+      <h2 className="m-0 mb-3 text-xs font-bold uppercase tracking-wide">Props</h2>
       {items.length ? (
-        <div className="grid grid-cols-4 border-t border-line max-[800px]:grid-cols-2 max-[460px]:grid-cols-1">
+        <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item) => (
-            <div className="grid min-w-0 grid-cols-[44px_1fr] items-center gap-2 border-r border-b border-line py-2.5 pr-3 even:max-[800px]:border-r-0 max-[460px]:border-r-0" key={item.key}>
-              <b className="font-hanzi text-[24px] font-semibold leading-none" lang="zh-CN">{item.key}</b>
+            <div className="flex items-center gap-2.5 bg-paper px-4 py-3" key={item.key}>
+              <b className="font-hanzi text-xl leading-none font-semibold" lang="zh-CN">{item.key}</b>
               <span className="overflow-hidden text-xs font-semibold text-ellipsis whitespace-nowrap">{item.name}</span>
             </div>
           ))}
         </div>
-      ) : <p className="text-xs text-muted">Реквизит появится после первой сцены.</p>}
+      ) : <p className="text-xs text-muted">Props appear after your first scene.</p>}
     </section>
   )
 }

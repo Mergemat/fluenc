@@ -14,27 +14,31 @@ export function MandarinAudioButton({ text, pinyin, label, className = '' }: Pro
   const speech = useMandarinSpeech()
   const neutralExample = getNeutralToneExample(text, pinyin)
   const stateClass = speech.status === 'speaking'
-    ? 'border-jade bg-jade text-white shadow-[0_0_0_4px_rgba(23,107,91,.12)]'
+    ? 'border-accent bg-accent text-white'
     : speech.status === 'error'
-      ? 'border-[#e3b2aa] bg-[#fff3f1] text-fluenc-red'
+      ? 'border-danger/40 bg-danger/5 text-danger'
       : ''
   const shapeClass = label
-    ? 'inline-flex h-10 w-max min-w-max flex-none items-center justify-center gap-[7px] rounded-[10px] px-3 text-[11px] font-bold whitespace-nowrap'
-    : 'grid size-[35px] shrink-0 place-items-center rounded-full'
+    ? 'inline-flex h-10 w-max min-w-max flex-none items-center justify-center gap-1.5 rounded-xl px-4 text-xs font-semibold whitespace-nowrap'
+    : 'grid size-9 shrink-0 place-items-center rounded-full border border-line bg-paper'
 
   return (
     <button
-      className={`${shapeClass} border border-line bg-white text-ink transition-transform active:scale-[.96] hover:border-jade hover:bg-jade hover:text-white ${stateClass} ${className}`.trim()}
+      className={`${shapeClass} text-ink hover:border-accent hover:bg-accent hover:text-white ${stateClass} ${className}`.trim()}
       type="button"
       disabled={speech.status === 'loading'}
       onClick={() => speech.speak(text, pinyin)}
-      aria-label={label ? `${label}: ${text}, ${pinyin}` : neutralExample ? `Нейтральный тон в примере ${neutralExample.text}` : `Произнести ${text}`}
-      title={speech.status === 'error' ? 'Не удалось получить произношение' : neutralExample ? `Нейтральный тон в слове: ${neutralExample.text} · ${neutralExample.pinyin}` : undefined}
+      aria-label={label ? `${label}: ${text}, ${pinyin}` : neutralExample ? `Neutral tone, as in ${neutralExample.text}` : `Pronounce ${text}`}
+      title={speech.status === 'error'
+        ? 'Could not get pronunciation'
+        : neutralExample
+          ? `Neutral tone, as in ${neutralExample.text} · ${neutralExample.pinyin}`
+          : undefined}
     >
       {speech.status === 'loading'
-        ? <LoaderCircle className="animate-spin motion-reduce:animate-none" size={18} />
-        : <AudioLines size={18} />}
-      {label ? <span>{speech.status === 'loading' ? 'Загружаю…' : label}</span> : null}
+        ? <LoaderCircle className="animate-spin motion-reduce:animate-none" size={17} />
+        : <AudioLines size={17} />}
+      {label ? <span>{speech.status === 'loading' ? 'Loading…' : label}</span> : null}
     </button>
   )
 }
