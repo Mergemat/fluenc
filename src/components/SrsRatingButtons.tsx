@@ -15,11 +15,11 @@ export function SrsRatingButtons({
   onRate: (rating: number) => void
 }) {
   return (
-    <div className="grid grid-cols-4 gap-2" aria-label="Rate your recall">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Rate your recall">
       {reviewRatings.map((rating) => (
         <button
-          className={`flex h-14 items-center justify-center rounded-2xl border-0 bg-paper/70 text-sm font-medium shadow-[0_2px_8px_rgb(43_58_66/0.08)] transition active:scale-[0.97] ${
-            rating.value === 1 ? 'text-danger' : 'text-ink'
+          className={`flex h-13 items-center justify-center rounded-xl border bg-paper text-sm font-bold transition hover:border-ink ${
+            rating.value === 1 ? 'border-danger/30 text-danger' : 'border-line text-ink'
           }`}
           key={rating.value}
           type="button"

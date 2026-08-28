@@ -43,7 +43,7 @@ export function LibraryView() {
       <PageHeader title="Library" meta="In learning order" />
 
       <input
-        className="mb-6 h-12 w-full rounded-full bg-white/70 px-4 text-[15px] shadow-[0_2px_8px_rgb(43_58_66/0.06)] outline-none placeholder:text-faint focus:shadow-[0_0_0_2px_rgb(47_109_158/0.3)]"
+        className="mb-6 h-12 w-full rounded-xl border border-line bg-paper px-4 text-[15px] placeholder:text-faint focus:border-ink"
         type="search"
         value={search}
         onChange={(event) => setSearch(event.target.value)}
@@ -61,7 +61,10 @@ export function LibraryView() {
         <Status title="Could not load the library" action={<Button variant="secondary" type="button" onClick={() => libraryQuery.refetch()}>Retry</Button>} />
       ) : visibleItems.length ? (
         <>
-          <div className="grid gap-2">
+          <div className="overflow-hidden rounded-2xl border border-line bg-paper">
+            <div className="hidden grid-cols-[76px_120px_minmax(0,1fr)_110px_48px] border-b border-line bg-canvas/70 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-faint md:grid">
+              <span>Hanzi</span><span>Pinyin</span><span>Meaning and parts</span><span>Status</span><span />
+            </div>
             {visibleItems.map((item) => (
               <LibraryCard
                 key={item.id}
@@ -82,7 +85,7 @@ export function LibraryView() {
 function TabButton({ active, count, label, onClick }: { active: boolean; count?: number; label: string; onClick: () => void }) {
   return (
     <button
-      className={`inline-flex items-center gap-1.5 rounded-full border-0 px-3.5 py-2 text-sm font-medium transition ${active ? 'bg-paper text-ink shadow-[0_2px_8px_rgb(43_58_66/0.08)]' : 'bg-transparent text-faint'}`}
+      className={`inline-flex items-center gap-1.5 border-b-2 px-1 py-2 text-sm font-bold transition ${active ? 'border-glaze text-ink' : 'border-transparent text-faint'}`}
       type="button"
       onClick={onClick}
     >
@@ -97,14 +100,14 @@ function LibraryCard({ composition, item }: {
 }) {
   const meaning = splitMeaning(item.meaning)
   return (
-    <article className="grid min-h-[64px] grid-cols-[52px_minmax(0,1fr)_auto] items-center gap-3 rounded-2xl bg-white/60 px-3.5 py-2 shadow-[0_1px_4px_rgb(43_58_66/0.05)]">
+    <article className="grid min-h-[70px] grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3 border-b border-line px-4 py-2 last:border-b-0 md:grid-cols-[76px_120px_minmax(0,1fr)_110px_48px] md:gap-0 md:py-3">
       <span className="font-hanzi text-3xl leading-none font-semibold text-glaze" lang="zh-CN">{item.hanzi}</span>
-      <div className="flex min-w-0 flex-col gap-0.5">
+      <div className="flex min-w-0 flex-col gap-0.5 md:contents">
         <div className="flex items-center gap-1.5">
           <strong className="text-sm font-medium">{item.pinyin}</strong>
           <NeutralToneBadge text={item.hanzi} pinyin={item.pinyin} />
         </div>
-        <div className="flex min-w-0 items-center gap-1.5 overflow-hidden text-xs whitespace-nowrap text-muted">
+        <div className="flex min-w-0 items-center gap-1.5 overflow-hidden text-xs whitespace-nowrap text-muted md:pr-4">
           <span className="overflow-hidden text-ellipsis">{meaning.primary}</span>
           {composition?.components.length ? (
             <>
@@ -116,7 +119,7 @@ function LibraryCard({ composition, item }: {
           ) : null}
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 md:contents">
         <span className={`text-[10px] uppercase tracking-wide ${item.status === 'review' ? 'text-ink' : item.status === 'learning' ? 'text-muted' : 'text-faint'}`}>
           {statusLabels[item.status]}
         </span>

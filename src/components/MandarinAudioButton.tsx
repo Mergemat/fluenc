@@ -21,7 +21,7 @@ export function MandarinAudioButton({ text, pinyin, label, className = '' }: Pro
 
   return (
     <button
-      className={`inline-flex h-10 items-center justify-center gap-1.5 border-0 bg-transparent p-0 text-muted hover:text-ink ${
+      className={`inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-transparent p-0 text-muted hover:border-line hover:bg-paper hover:text-ink ${
         label ? 'px-2 text-sm font-medium' : 'size-10 shrink-0'
       } ${stateClass} ${className}`.trim()}
       type="button"

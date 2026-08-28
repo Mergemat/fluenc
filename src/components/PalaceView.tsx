@@ -47,7 +47,7 @@ function PalaceContent({ palace }: { palace: PalaceData }) {
 }
 
 function SectionTitle({ children }: { children: string }) {
-  return <h2 className="m-0 mb-3.5 text-[11px] font-semibold uppercase tracking-[.16em] text-faint">{children}</h2>
+  return <h2 className="m-0 mb-3.5 text-sm font-black tracking-tight text-ink">{children}</h2>
 }
 
 /* The tone floor: five chambers under one roof. The only part of the palace
@@ -56,19 +56,12 @@ function ToneFloor({ rooms }: { rooms: PalaceData['rooms'] }) {
   return (
     <section>
       <SectionTitle>Tone → room</SectionTitle>
-      <div
-        className="grid grid-cols-5 gap-1.5 rounded-[2rem] p-2"
-        style={{
-          background: 'linear-gradient(165deg, #ffffff 0%, #f4f8f5 65%, #e9f1ec 100%)',
-          boxShadow: '0 16px 36px rgb(43 58 66 / 0.14), 0 2px 6px rgb(43 58 66 / 0.05), inset 0 1px 0 #fff',
-        }}
-      >
+      <div className="study-card grid grid-cols-5 gap-px overflow-hidden bg-line p-0">
         {rooms.map((room) => {
           const tone = getToneDetail(room.tone)
           return (
             <div
-              className="flex min-w-0 flex-col items-center gap-0.5 rounded-2xl px-1 py-3"
-              style={{ background: 'linear-gradient(180deg, #f7faf8 0%, #e9f1ec 100%)' }}
+              className="flex min-w-0 flex-col items-center gap-0.5 bg-paper px-1 py-4"
               key={room.tone}
             >
               <strong className="text-[21px] leading-none font-semibold text-glaze">{tone.syllable}</strong>
@@ -98,7 +91,7 @@ function Residents({ emptyHint, emptyLabel, items, title }: {
         <div className="grid gap-2 sm:grid-cols-2">
           {items.map((item) => (
             <div
-              className="grid grid-cols-[56px_1fr] items-baseline rounded-2xl bg-white/60 px-4 py-3 shadow-[0_2px_10px_rgb(43_58_66/0.06)]"
+              className="study-card grid grid-cols-[56px_1fr] items-baseline px-4 py-3"
               key={item.key}
             >
               <dt className="text-sm font-medium text-glaze">{item.key}</dt>
@@ -107,8 +100,8 @@ function Residents({ emptyHint, emptyLabel, items, title }: {
           ))}
         </div>
       ) : (
-        <div className="grid justify-items-center gap-2 rounded-[1.6rem] bg-white/35 px-4 py-8 text-center">
-          <span className="grid size-10 place-items-center rounded-full bg-canvas text-xl font-light text-faint">+</span>
+        <div className="study-card grid justify-items-center gap-2 px-4 py-8 text-center">
+          <span className="grid size-10 place-items-center rounded-lg border border-line bg-canvas text-xl font-light text-faint">+</span>
           <p className="m-0 text-[11px] uppercase tracking-[0.18em] text-faint">{emptyLabel}</p>
           <p className="m-0 text-xs text-muted">{emptyHint}</p>
         </div>
@@ -125,7 +118,7 @@ function Props({ items }: { items: PalaceData['props'] }) {
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {items.map((item) => (
             <div
-              className="flex items-center gap-3 rounded-2xl bg-white/60 px-3.5 py-2.5 shadow-[0_2px_10px_rgb(43_58_66/0.06)]"
+              className="study-card flex items-center gap-3 px-3.5 py-2.5"
               key={item.key}
             >
               <b className="font-hanzi text-2xl leading-none font-semibold text-glaze" lang="zh-CN">{item.key}</b>
@@ -134,8 +127,8 @@ function Props({ items }: { items: PalaceData['props'] }) {
           ))}
         </div>
       ) : (
-        <div className="grid justify-items-center gap-2 rounded-[1.6rem] bg-white/35 px-4 py-8 text-center">
-          <span className="grid size-10 place-items-center rounded-full bg-canvas text-xl font-light text-faint">+</span>
+        <div className="study-card grid justify-items-center gap-2 px-4 py-8 text-center">
+          <span className="grid size-10 place-items-center rounded-lg border border-line bg-canvas text-xl font-light text-faint">+</span>
           <p className="m-0 text-[11px] uppercase tracking-[0.18em] text-faint">No props yet</p>
           <p className="m-0 text-xs text-muted">They appear after your first scene.</p>
         </div>

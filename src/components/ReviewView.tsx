@@ -5,7 +5,7 @@ import { reviewItem, type DashboardData } from '../server/curriculum'
 import { CodebookDeck } from './CodebookDeck'
 import { ReviewDeck } from './ReviewDeck'
 import { SentenceReviewDeck } from './SentenceReviewDeck'
-import { Empty, ErrorNote, Page, PageHeader } from './ui/Layout'
+import { Empty, ErrorNote } from './ui/Layout'
 
 export function ReviewView({ data }: { data: DashboardData }) {
   const queryClient = useQueryClient()
@@ -34,11 +34,8 @@ export function ReviewView({ data }: { data: DashboardData }) {
   })
 
   return (
-    <Page>
-      <PageHeader
-        title="Review"
-        meta={dueCount ? `${dueCount} due` : 'Queue is empty'}
-      />
+    <section className="mx-auto w-full max-w-6xl px-3 py-3 sm:px-5 md:px-8 md:py-6">
+      {dueCount ? <div className="mb-2 flex items-center justify-between px-1 md:mb-4"><h1 className="m-0 text-sm font-black md:text-xl">Review</h1><span className="text-xs font-bold text-muted">{dueCount} due</span></div> : null}
 
       {activeCodebook ? (
         <CodebookDeck
@@ -68,7 +65,7 @@ export function ReviewView({ data }: { data: DashboardData }) {
         />
       )}
 
-      {mutation.isError ? <ErrorNote>Could not save this review. Try again.</ErrorNote> : null}
-    </Page>
+      {mutation.isError ? <div className="mt-3"><ErrorNote>Could not save this review. Try again.</ErrorNote></div> : null}
+    </section>
   )
 }

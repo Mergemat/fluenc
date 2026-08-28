@@ -96,7 +96,7 @@ export function WritingPad({ character }: { character: string }) {
           type="button"
           disabled={writerState !== 'ready'}
           onClick={() => writerRef.current?.animateCharacter()}
-          className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-canvas px-4 text-[13px] font-medium text-ink transition-colors hover:bg-line/60 disabled:opacity-35"
+          className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-line bg-canvas px-4 text-[13px] font-bold text-ink transition-colors hover:border-ink disabled:opacity-35"
         >
           <Play size={13} /> Strokes
         </button>
@@ -104,7 +104,7 @@ export function WritingPad({ character }: { character: string }) {
           type="button"
           disabled={writerState !== 'ready'}
           onClick={() => startQuiz()}
-          className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-canvas px-4 text-[13px] font-medium text-ink transition-colors hover:bg-line/60 disabled:opacity-35"
+          className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg border border-line bg-canvas px-4 text-[13px] font-bold text-ink transition-colors hover:border-ink disabled:opacity-35"
         >
           {status === 'done' ? <Check size={13} /> : <RotateCcw size={13} />}
           {status === 'done' ? 'Again' : 'Retry'}
@@ -114,7 +114,7 @@ export function WritingPad({ character }: { character: string }) {
         <ErrorNote>Could not load strokes. Check your connection and reload the page.</ErrorNote>
       ) : null}
       <div
-        className="writing-pad relative mx-auto overflow-hidden rounded-[2rem] bg-paper transition-[box-shadow] duration-300"
+        className="writing-pad relative mx-auto overflow-hidden rounded-xl bg-paper transition-[box-shadow] duration-300"
         style={{ width: SIZE, height: SIZE, boxShadow: ring }}
       >
         <RiceGrid />
@@ -125,7 +125,7 @@ export function WritingPad({ character }: { character: string }) {
         ) : null}
         <div ref={targetRef} className="relative" aria-label={`Writing pad for ${character}`} role="img" />
         {status === 'done' ? (
-          <span className="animate-pop absolute right-2 top-2 grid size-7 place-items-center rounded-full bg-glaze text-paper shadow-[0_4px_12px_rgb(47_109_158/0.4)]">
+          <span className="animate-pop absolute right-2 top-2 grid size-7 place-items-center rounded-md bg-glaze text-paper">
             <Check size={15} />
           </span>
         ) : null}

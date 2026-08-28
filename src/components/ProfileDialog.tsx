@@ -19,23 +19,22 @@ export function ProfileDialog({ learner, onClose }: { learner: DashboardData['le
 
   return (
     <div
-      className="fixed inset-0 z-20 flex items-end justify-center bg-ink/30 backdrop-blur-sm"
+      className="fixed inset-0 z-20 flex items-end justify-center bg-ink/55 p-0 backdrop-blur-sm sm:items-center sm:p-6"
       role="presentation"
       onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}
     >
       <section
-        className="w-full max-w-sm rounded-[2rem] bg-paper px-6 pb-8 pt-6"
-        style={{ boxShadow: '0 24px 60px rgb(43 58 66 / 0.3), inset 0 1px 0 #fff' }}
+        className="w-full max-w-md rounded-t-2xl border border-line bg-paper px-6 pb-8 pt-6 sm:rounded-2xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="profile-title"
       >
-        <h2 className="m-0 mb-7 text-[11px] font-semibold uppercase tracking-[.16em] text-faint" id="profile-title">Your pace</h2>
+        <h2 className="m-0 mb-7 text-2xl font-black tracking-tight" id="profile-title">Study settings</h2>
 
         <label className="grid gap-1.5">
           <span className="text-[10px] uppercase tracking-wide text-faint">Name</span>
           <input
-            className="h-11 w-full rounded-xl bg-canvas/70 px-3.5 text-[15px] font-medium outline-none focus:shadow-[0_0_0_2px_rgb(47_109_158/0.3)]"
+            className="h-11 w-full rounded-lg border border-line bg-canvas px-3.5 text-[15px] font-medium focus:border-ink"
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
           />
@@ -44,7 +43,7 @@ export function ProfileDialog({ learner, onClose }: { learner: DashboardData['le
           <label className="grid gap-1.5">
             <span className="text-[10px] uppercase tracking-wide text-faint">Characters / day</span>
             <input
-              className="h-11 w-full rounded-xl bg-canvas/70 px-3.5 text-[15px] font-medium outline-none focus:shadow-[0_0_0_2px_rgb(47_109_158/0.3)]"
+              className="h-11 w-full rounded-lg border border-line bg-canvas px-3.5 text-[15px] font-medium focus:border-ink"
               type="number"
               min="1"
               max="20"
@@ -55,7 +54,7 @@ export function ProfileDialog({ learner, onClose }: { learner: DashboardData['le
           <label className="grid gap-1.5">
             <span className="text-[10px] uppercase tracking-wide text-faint">Words / day</span>
             <input
-              className="h-11 w-full rounded-xl bg-canvas/70 px-3.5 text-[15px] font-medium outline-none focus:shadow-[0_0_0_2px_rgb(47_109_158/0.3)]"
+              className="h-11 w-full rounded-lg border border-line bg-canvas px-3.5 text-[15px] font-medium focus:border-ink"
               type="number"
               min="1"
               max="30"

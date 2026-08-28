@@ -32,9 +32,9 @@ function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="min-h-dvh md:grid md:grid-cols-[228px_minmax(0,1fr)]">
       <AppHeader data={data} view={view} onOpenSettings={() => setSettingsOpen(true)} onViewChange={setView} />
-      <main className="flex-1">
+      <main className="min-w-0">
         {view === 'review' ? <ReviewView data={data} />
           : view === 'lessons' ? <LessonsView data={data} />
             : view === 'reading' ? <ReadingView data={data} />

@@ -3,20 +3,12 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react'
 type Variant = 'primary' | 'secondary' | 'ghost' | 'icon'
 
 const variants: Record<Variant, string> = {
-  primary:
-    'inline-flex h-13 w-full items-center justify-center gap-2 rounded-full bg-glaze px-6 text-[15px] font-medium text-paper shadow-[0_8px_20px_rgb(47_109_158/0.35)]',
-  secondary:
-    'inline-flex h-12 items-center justify-center gap-1.5 rounded-full bg-paper/70 px-5 text-sm font-medium text-ink shadow-[0_2px_8px_rgb(43_58_66/0.08)]',
-  ghost:
-    'inline-flex h-10 items-center justify-center gap-1.5 px-2 text-sm font-medium text-muted',
-  icon: 'grid size-10 shrink-0 place-items-center rounded-full text-muted',
+  primary: 'inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-ink bg-ink px-6 text-sm font-bold text-paper transition hover:border-glaze hover:bg-glaze',
+  secondary: 'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-line bg-paper px-5 text-sm font-bold text-ink transition hover:border-ink',
+  ghost: 'inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-3 text-sm font-bold text-muted transition hover:bg-paper hover:text-ink',
+  icon: 'grid size-10 shrink-0 place-items-center rounded-lg border border-transparent text-muted transition hover:border-line hover:bg-paper hover:text-ink',
 }
 
-export function Button({
-  variant = 'primary',
-  className = '',
-  children,
-  ...props
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; children: ReactNode }) {
+export function Button({ variant = 'primary', className = '', children, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; children: ReactNode }) {
   return <button className={`${variants[variant]} ${className}`.trim()} {...props}>{children}</button>
 }
