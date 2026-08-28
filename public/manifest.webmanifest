@@ -1,0 +1,19 @@
+{
+  "name": "Fluenc Mandarin",
+  "short_name": "Fluenc",
+  "description": "Learn Mandarin characters, words, and sentences.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f0e8",
+  "theme_color": "#a4452f",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

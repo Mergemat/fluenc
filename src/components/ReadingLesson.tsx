@@ -2,7 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowRight, Eye } from 'lucide-react'
 import { useState } from 'react'
 
-import { enrollItem, type DashboardData } from '../server/curriculum'
+import { saveEnrollment } from '../offline/progress'
+import type { DashboardData } from '../server/curriculum'
 import { MandarinAudioButton } from './MandarinAudioButton'
 import { Button } from './ui/Button'
 import { ErrorNote } from './ui/Layout'
@@ -13,7 +14,7 @@ export function ReadingLesson({ item }: { item: ReadingItem }) {
   const queryClient = useQueryClient()
   const [revealed, setRevealed] = useState(false)
   const mutation = useMutation({
-    mutationFn: () => enrollItem({ data: { itemType: 'sentence', itemId: item.id } }),
+    mutationFn: () => saveEnrollment({ itemType: 'sentence', itemId: item.id }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
   })
 

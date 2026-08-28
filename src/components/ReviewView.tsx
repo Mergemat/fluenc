@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRef } from 'react'
 
-import { reviewItem, type DashboardData } from '../server/curriculum'
+import { saveReview } from '../offline/progress'
+import type { DashboardData } from '../server/curriculum'
 import { CodebookDeck } from './CodebookDeck'
 import { ReviewDeck } from './ReviewDeck'
 import { SentenceReviewDeck } from './SentenceReviewDeck'
@@ -18,13 +19,11 @@ export function ReviewView({ data }: { data: DashboardData }) {
   const mutation = useMutation({
     mutationFn: (rating: number) => {
       if (!reviewTarget) throw new Error('No card to review')
-      return reviewItem({
-        data: {
-          itemType: reviewTarget.type,
-          itemId: reviewTarget.id,
-          rating,
-          durationMs: Date.now() - cardStartedAt.current,
-        },
+      return saveReview({
+        itemType: reviewTarget.type,
+        itemId: reviewTarget.id,
+        rating,
+        durationMs: Date.now() - cardStartedAt.current,
       })
     },
     onSuccess: async () => {

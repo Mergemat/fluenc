@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { useDeferredValue, useState } from 'react'
 
 import { splitMeaning } from '../lib/meaning'
-import { getLibrary, type LibraryData } from '../server/curriculum'
+import { getOfflineLibrary } from '../offline/progress'
+import type { LibraryData } from '../server/curriculum'
 import { getHanziCompositions, type HanziCompositions } from '../server/hanzi'
 import { MandarinAudioButton } from './MandarinAudioButton'
 import { NeutralToneBadge } from './NeutralToneHint'
@@ -22,7 +23,7 @@ export function LibraryView() {
   const [kind, setKind] = useState<LibraryKind>('characters')
   const [search, setSearch] = useState('')
   const deferredSearch = useDeferredValue(search.trim().toLocaleLowerCase())
-  const libraryQuery = useQuery({ queryKey: ['library'], queryFn: () => getLibrary() })
+  const libraryQuery = useQuery({ queryKey: ['library'], queryFn: () => getOfflineLibrary() })
 
   const items = (libraryQuery.data?.[kind] ?? []).filter((item) =>
     !deferredSearch || `${item.hanzi} ${item.pinyin} ${item.meaning}`.toLocaleLowerCase().includes(deferredSearch),

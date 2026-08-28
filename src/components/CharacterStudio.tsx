@@ -4,7 +4,8 @@ import { useState, type ReactNode } from 'react'
 
 import { splitMeaning } from '../lib/meaning'
 import { getToneDetail } from '../lib/tones'
-import { enrollItem, saveMovie, type BuildItem } from '../server/curriculum'
+import { saveEnrollment, saveMovieOffline } from '../offline/progress'
+import type { BuildItem } from '../server/curriculum'
 import { MandarinAudioButton } from './MandarinAudioButton'
 import { NeutralToneBadge } from './NeutralToneHint'
 import { WritingPad } from './WritingPad'
@@ -28,8 +29,8 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
 
   const finishMutation = useMutation({
     mutationFn: async () => {
-      await saveMovie({ data: { characterId: item.id, actorKey: item.movie.actorKey, actorName, finalKey: item.movie.finalKey, setName, tone: item.movie.tone, roomName, props: props.map((prop) => ({ component: prop.hanzi, propName: prop.propName })) } })
-      return enrollItem({ data: { itemType: 'character', itemId: item.id } })
+      await saveMovieOffline({ characterId: item.id, actorKey: item.movie.actorKey, actorName, finalKey: item.movie.finalKey, setName, tone: item.movie.tone, roomName, props: props.map((prop) => ({ component: prop.hanzi, propName: prop.propName })) })
+      return saveEnrollment({ itemType: 'character', itemId: item.id })
     },
     onSuccess: async () => {
       setShowValidation(false)

@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 
-import { savePreferences, type DashboardData } from '../server/curriculum'
+import { savePreferencesOffline } from '../offline/progress'
+import type { DashboardData } from '../server/curriculum'
 import { Button } from './ui/Button'
 
 export function ProfileDialog({ learner, onClose }: { learner: DashboardData['learner']; onClose: () => void }) {
@@ -10,7 +11,7 @@ export function ProfileDialog({ learner, onClose }: { learner: DashboardData['le
   const [dailyCharacterGoal, setDailyCharacterGoal] = useState(learner.dailyCharacterGoal)
   const [dailyWordGoal, setDailyWordGoal] = useState(learner.dailyWordGoal)
   const saveMutation = useMutation({
-    mutationFn: () => savePreferences({ data: { displayName, dailyCharacterGoal, dailyWordGoal } }),
+    mutationFn: () => savePreferencesOffline({ displayName, dailyCharacterGoal, dailyWordGoal }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       onClose()

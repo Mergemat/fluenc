@@ -1,15 +1,18 @@
 import { z } from 'zod'
 
 export const reviewInput = z.object({
+  eventId: z.uuid(),
   itemType: z.enum(['character', 'word', 'sentence', 'actor', 'set', 'tone']),
   itemId: z.string().min(1),
   rating: z.number().int().min(1).max(4),
   durationMs: z.number().int().min(0).max(3_600_000).default(0),
+  reviewedAt: z.iso.datetime(),
 })
 
 export const enrollInput = z.object({
   itemType: z.enum(['character', 'word', 'sentence']),
   itemId: z.string().min(1),
+  enrolledAt: z.iso.datetime(),
 })
 
 export const movieInput = z.object({

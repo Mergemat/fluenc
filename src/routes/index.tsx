@@ -9,11 +9,12 @@ import { PalaceView } from '../components/PalaceView'
 import { ProfileDialog } from '../components/ProfileDialog'
 import { ReadingView } from '../components/ReadingView'
 import { ReviewView } from '../components/ReviewView'
-import { getDashboard } from '../server/curriculum'
+import { getOfflineDashboard } from '../offline/progress'
+import { useOfflineSync } from '../offline/useOfflineSync'
 
 const dashboardQueryOptions = queryOptions({
   queryKey: ['dashboard'],
-  queryFn: () => getDashboard(),
+  queryFn: () => getOfflineDashboard(),
   refetchInterval: (query) => {
     const nextReviewAt = query.state.data?.nextReviewAt
     if (!nextReviewAt) return false
@@ -28,6 +29,7 @@ export const Route = createFileRoute('/')({
 
 function Home() {
   const { data } = useSuspenseQuery(dashboardQueryOptions)
+  useOfflineSync(data)
   const [view, setView] = useState<AppView>(() => data.codebookQueue.length + data.reviewQueue.length ? 'review' : 'lessons')
   const [settingsOpen, setSettingsOpen] = useState(false)
 

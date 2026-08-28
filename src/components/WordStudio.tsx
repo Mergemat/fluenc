@@ -3,7 +3,8 @@ import { Check, Link2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { splitMeaning } from '../lib/meaning'
-import { enrollItem, saveLivingLink, type BuildItem } from '../server/curriculum'
+import { saveEnrollment, saveLivingLinkOffline } from '../offline/progress'
+import type { BuildItem } from '../server/curriculum'
 import { MandarinAudioButton } from './MandarinAudioButton'
 import { Button } from './ui/Button'
 import { ErrorNote } from './ui/Layout'
@@ -20,8 +21,8 @@ export function WordStudio({ item }: { item: WordItem }) {
   const finishMutation = useMutation({
     mutationFn: async () => {
       const trimmedStory = story.trim()
-      if (trimmedStory) await saveLivingLink({ data: { wordId: item.id, story: trimmedStory } })
-      return enrollItem({ data: { itemType: 'word', itemId: item.id } })
+      if (trimmedStory) await saveLivingLinkOffline({ wordId: item.id, story: trimmedStory })
+      return saveEnrollment({ itemType: 'word', itemId: item.id })
     },
     onSuccess: async () => {
       setShowValidation(false)

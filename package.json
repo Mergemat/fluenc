@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "bun scripts/build.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "data:sync": "bun scripts/sync-curriculum.ts",
@@ -22,6 +22,7 @@
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "hanzi-writer": "^3.7.3",
+    "idb": "^8.0.3",
     "lucide-react": "^1.34.0",
     "nitro": "^3.0.260610-beta",
     "react": "^19.2.8",
@@ -39,6 +40,7 @@
     "drizzle-kit": "^0.31.10",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "workbox-build": "^7.4.1"
   }
 }

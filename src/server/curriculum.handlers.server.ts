@@ -13,6 +13,7 @@ import {
   palaceActors,
   palaceSets,
   reviewLogs,
+  syncEvents,
   toneRooms,
   type ItemType,
   type LearnerItem,
@@ -71,7 +72,7 @@ function fromLearnerItem(item: LearnerItem): Card {
   }
 }
 
-function learnerItemValues(itemType: ItemType, itemId: string, card: Card) {
+function learnerItemValues(itemType: ItemType, itemId: string, card: Card, introducedAt?: Date) {
   return {
     learnerId: LEARNER_ID,
     itemType,
@@ -86,6 +87,22 @@ function learnerItemValues(itemType: ItemType, itemId: string, card: Card) {
     lapses: card.lapses,
     state: card.state,
     lastReview: card.last_review,
+    ...(introducedAt ? { introducedAt } : {}),
+  }
+}
+
+function scheduledCard(item: LearnerItem) {
+  return {
+    due: item.due.toISOString(),
+    stability: item.stability,
+    difficulty: item.difficulty,
+    elapsedDays: item.elapsedDays,
+    scheduledDays: item.scheduledDays,
+    learningSteps: item.learningSteps,
+    reps: item.reps,
+    lapses: item.lapses,
+    state: item.state,
+    lastReview: item.lastReview?.toISOString() ?? null,
   }
 }
 
@@ -253,6 +270,7 @@ function resolveCodebookItem(item: LearnerItem, mappings: MappingRows) {
     associationLabel: labels[mapping.kind].association,
     srsState: item.state,
     reps: item.reps,
+    card: scheduledCard(item),
   }
 }
 
@@ -300,6 +318,7 @@ export async function getDashboardHandler() {
         queueKind: 'review' as const,
         srsState: progress.state,
         reps: progress.reps,
+        card: scheduledCard(progress),
       } : null
     })
     .filter((item) => item !== null)
@@ -405,6 +424,23 @@ export async function getDashboardHandler() {
     .filter((item) => item.due > now)
     .reduce<Date | null>((earliest, item) => !earliest || item.due < earliest ? item.due : earliest, null)
 
+  const scheduledQueue = items
+    .filter((item) => item.due > now)
+    .map((progress) => {
+      if (progress.itemType === 'character' || progress.itemType === 'word' || progress.itemType === 'sentence') {
+        const item = resolveStudyItem(progress.itemType, progress.itemId, mappings)
+        return item ? {
+          ...item,
+          queueKind: 'review' as const,
+          srsState: progress.state,
+          reps: progress.reps,
+          card: scheduledCard(progress),
+        } : null
+      }
+      return resolveCodebookItem(progress, mappings)
+    })
+    .filter((item) => item !== null)
+
   return {
     learner: profile,
     curriculum: {
@@ -422,6 +458,7 @@ export async function getDashboardHandler() {
     codebookQueue,
     buildQueue: [...newWords, ...newCharacters],
     getQueue,
+    scheduledQueue,
     nextReviewAt: nextDue?.toISOString() ?? null,
   }
 }
@@ -439,10 +476,11 @@ export async function enrollItemHandler(data: EnrollInput) {
     throw new Error('Sentence not found')
   }
 
-  const card = createEmptyCard(new Date())
+  const introducedAt = new Date(data.enrolledAt)
+  const card = createEmptyCard(introducedAt)
   await db
     .insert(learnerItems)
-    .values(learnerItemValues(data.itemType, data.itemId, card))
+    .values(learnerItemValues(data.itemType, data.itemId, card, introducedAt))
     .onConflictDoNothing()
 
   return { due: card.due.toISOString(), state: card.state }
@@ -450,42 +488,54 @@ export async function enrollItemHandler(data: EnrollInput) {
 
 export async function reviewItemHandler(data: ReviewInput) {
   await ensureLearner()
-  const existing = await db
-    .select()
-    .from(learnerItems)
-    .where(
-      and(
-        eq(learnerItems.learnerId, LEARNER_ID),
-        eq(learnerItems.itemType, data.itemType),
-        eq(learnerItems.itemId, data.itemId),
-      ),
-    )
-    .limit(1)
+  return db.transaction(async (transaction) => {
+    const claimed = await transaction
+      .insert(syncEvents)
+      .values({ id: data.eventId, learnerId: LEARNER_ID })
+      .onConflictDoNothing()
+      .returning({ id: syncEvents.id })
+    if (!claimed.length) return { duplicate: true as const }
 
-  if (!existing[0]) throw new Error('Card is not in review yet')
+    const existing = await transaction
+      .select()
+      .from(learnerItems)
+      .where(
+        and(
+          eq(learnerItems.learnerId, LEARNER_ID),
+          eq(learnerItems.itemType, data.itemType),
+          eq(learnerItems.itemId, data.itemId),
+        ),
+      )
+      .limit(1)
 
-  const now = new Date()
-  const currentCard = fromLearnerItem(existing[0])
-  const nextCard = scheduler.next(currentCard, now, data.rating as Grade).card
-  const values = learnerItemValues(data.itemType, data.itemId, nextCard)
+    if (!existing[0]) throw new Error('Card is not in review yet')
 
-  await db
-    .insert(learnerItems)
-    .values(values)
-    .onConflictDoUpdate({
-      target: [learnerItems.learnerId, learnerItems.itemType, learnerItems.itemId],
-      set: values,
+    const requestedReviewTime = new Date(data.reviewedAt)
+    const reviewedAt = existing[0].lastReview && requestedReviewTime <= existing[0].lastReview
+      ? new Date(existing[0].lastReview.getTime() + 1)
+      : requestedReviewTime
+    const currentCard = fromLearnerItem(existing[0])
+    const nextCard = scheduler.next(currentCard, reviewedAt, data.rating as Grade).card
+    const values = learnerItemValues(data.itemType, data.itemId, nextCard)
+
+    await transaction
+      .insert(learnerItems)
+      .values(values)
+      .onConflictDoUpdate({
+        target: [learnerItems.learnerId, learnerItems.itemType, learnerItems.itemId],
+        set: values,
+      })
+    await transaction.insert(reviewLogs).values({
+      learnerId: LEARNER_ID,
+      itemType: data.itemType,
+      itemId: data.itemId,
+      rating: data.rating,
+      durationMs: data.durationMs,
+      reviewedAt,
     })
-  await db.insert(reviewLogs).values({
-    learnerId: LEARNER_ID,
-    itemType: data.itemType,
-    itemId: data.itemId,
-    rating: data.rating,
-    durationMs: data.durationMs,
-    reviewedAt: now,
-  })
 
-  return { due: nextCard.due.toISOString(), state: nextCard.state }
+    return { due: nextCard.due.toISOString(), state: nextCard.state, duplicate: false as const }
+  })
 }
 
 export async function saveMovieHandler(data: MovieInput) {

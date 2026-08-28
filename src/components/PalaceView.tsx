@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { getToneDetail } from '../lib/tones'
-import { getPalace, type PalaceData } from '../server/curriculum'
+import { getOfflinePalace } from '../offline/progress'
+import type { PalaceData } from '../server/curriculum'
 import { ToneAudioButton } from './ToneAudioButton'
 import { Button } from './ui/Button'
 import { Page, PageHeader, Status } from './ui/Layout'
@@ -9,7 +10,7 @@ import { Page, PageHeader, Status } from './ui/Layout'
 type MappingItem = { key: string; name: string }
 
 export function PalaceView() {
-  const palaceQuery = useQuery({ queryKey: ['palace'], queryFn: () => getPalace() })
+  const palaceQuery = useQuery({ queryKey: ['palace'], queryFn: () => getOfflinePalace() })
   const palace = palaceQuery.data
 
   return (

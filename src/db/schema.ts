@@ -68,6 +68,16 @@ export const reviewLogs = sqliteTable(
   (table) => [index('review_logs_learner_date_idx').on(table.learnerId, table.reviewedAt)],
 )
 
+export const syncEvents = sqliteTable('sync_events', {
+  id: text('id').primaryKey(),
+  learnerId: text('learner_id')
+    .notNull()
+    .references(() => learners.id, { onDelete: 'cascade' }),
+  appliedAt: integer('applied_at', { mode: 'timestamp_ms' })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+})
+
 export const palaceActors = sqliteTable(
   'palace_actors',
   {
