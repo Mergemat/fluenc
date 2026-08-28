@@ -56,8 +56,8 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
   })
 
   return (
-    <article className="flex h-[calc(100dvh-264px)] min-h-[420px] flex-col overflow-hidden md:h-[calc(100dvh-185px)]">
-      <div className="grid min-h-0 flex-1 place-content-center justify-items-center gap-2.5 py-1">
+    <article className="flex min-h-[max(420px,calc(100dvh-264px))] flex-col md:min-h-[calc(100dvh-185px)]">
+      <div className="grid flex-1 place-content-center justify-items-center gap-2.5 py-4 md:py-1">
         <div
           className="relative grid place-items-center rounded-[2rem] px-9 py-3"
           style={{
@@ -81,7 +81,7 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
         <strong className="text-lg leading-tight font-medium tracking-[0.02em] text-ink">{meaning.primary}</strong>
       </div>
 
-      <div className="flex shrink-0 items-start justify-center gap-5 pb-4">
+      <div className="flex shrink-0 flex-wrap items-start justify-center gap-2 pb-4 sm:gap-5">
         {props.map((prop, index) => (
           <ParameterPlaque
             key={prop.hanzi}
@@ -95,7 +95,7 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
         ))}
       </div>
 
-      <div className="flex shrink-0 items-start justify-center gap-4">
+      <div className="grid w-full shrink-0 grid-cols-3 items-start justify-items-center gap-2 sm:flex sm:w-auto sm:justify-center sm:gap-4">
         <ParameterPlaque
           glyph={item.movie.actorKey}
           label={`Actor for ${item.movie.actorKey}`}
@@ -184,7 +184,7 @@ function ParameterPlaque({ glyph, invalid = false, label, locked = false, onChan
 
   return (
     <div
-      className="grid w-[6.6rem] justify-items-center gap-0.5 rounded-2xl px-2 pt-2.5 pb-1.5 transition-all duration-200"
+      className="grid w-full min-w-0 max-w-[6.6rem] justify-items-center gap-0.5 rounded-2xl px-2 pt-2.5 pb-1.5 transition-all duration-200"
       style={{
         background: filled ? 'linear-gradient(180deg, #ffffff 0%, #eef5f1 100%)' : 'rgb(255 255 255 / 0.55)',
         boxShadow: ring,
