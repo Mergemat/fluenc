@@ -23,14 +23,25 @@ const dashboardQueryOptions = queryOptions({
 })
 
 export const Route = createFileRoute('/')({
+  validateSearch: (search: Record<string, unknown>): { variant?: 'a' | 'b' | 'c'; example?: 'ming' } => ({
+    variant: search.variant === 'a' || search.variant === 'b' || search.variant === 'c' ? search.variant : undefined,
+    example: search.example === 'ming' ? 'ming' : undefined,
+  }),
   loader: ({ context }) => context.queryClient.ensureQueryData(dashboardQueryOptions),
   component: Home,
 })
 
 function Home() {
+  const search = Route.useSearch()
+  const navigate = Route.useNavigate()
   const { data } = useSuspenseQuery(dashboardQueryOptions)
   useOfflineSync(data)
-  const [view, setView] = useState<AppView>(() => data.codebookQueue.length + data.reviewQueue.length ? 'review' : 'lessons')
+  const [selectedView, setSelectedView] = useState<AppView>(() => data.codebookQueue.length + data.reviewQueue.length ? 'review' : 'lessons')
+  const view = import.meta.env.DEV && search.variant ? 'lessons' : selectedView
+  const setView = (next: AppView) => {
+    setSelectedView(next)
+    if (search.variant || search.example) void navigate({ search: {}, replace: true })
+  }
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
