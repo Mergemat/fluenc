@@ -1,6 +1,8 @@
 import { createEmptyCard, fsrs, State, type Card, type Grade } from 'ts-fsrs'
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
 
+import { isStudyItemType } from '../data/types'
+
 import type {
   EnrollInput,
   LivingLinkInput,
@@ -47,7 +49,6 @@ interface FluencOfflineDatabase extends DBSchema {
 
 type CardSnapshot = DashboardData['scheduledQueue'][number]['card']
 type ReviewQueueItem = DashboardData['reviewQueue'][number]
-type CodebookQueueItem = DashboardData['codebookQueue'][number]
 type ScheduledQueueItem = DashboardData['scheduledQueue'][number]
 
 const scheduler = fsrs({
@@ -110,17 +111,14 @@ function itemKey(item: { type: string; id: string }) {
 
 function refreshDueQueues(data: DashboardData, now = new Date()) {
   const next = structuredClone(data)
+  next.reviewQueue = next.reviewQueue.filter(item => isStudyItemType(item.type))
+  next.scheduledQueue = next.scheduledQueue.filter(item => isStudyItemType(item.type))
   const due = next.scheduledQueue.filter((item) => Date.parse(item.card.due) <= now.getTime())
   next.scheduledQueue = next.scheduledQueue.filter((item) => Date.parse(item.card.due) > now.getTime())
 
   const reviewKeys = new Set(next.reviewQueue.map(itemKey))
-  const codebookKeys = new Set(next.codebookQueue.map(itemKey))
   for (const item of due) {
-    if (item.type === 'actor' || item.type === 'set' || item.type === 'tone') {
-      if (!codebookKeys.has(itemKey(item))) next.codebookQueue.push(item as CodebookQueueItem)
-    } else if (!reviewKeys.has(itemKey(item))) {
-      next.reviewQueue.push(item as ReviewQueueItem)
-    }
+    if (!reviewKeys.has(itemKey(item))) next.reviewQueue.push(item)
   }
 
   next.nextReviewAt = next.scheduledQueue
@@ -130,7 +128,7 @@ function refreshDueQueues(data: DashboardData, now = new Date()) {
 
 function applyReview(data: DashboardData, operation: Extract<ProgressOperation, { kind: 'review' }>) {
   const key = `${operation.data.itemType}:${operation.data.itemId}`
-  const item = [...data.codebookQueue, ...data.reviewQueue].find((candidate) => itemKey(candidate) === key)
+  const item = data.reviewQueue.find((candidate) => itemKey(candidate) === key)
   if (!item) return data
 
   const reviewedAt = new Date(operation.data.reviewedAt)
@@ -143,7 +141,6 @@ function applyReview(data: DashboardData, operation: Extract<ProgressOperation, 
   } as ScheduledQueueItem
   const next = structuredClone(data)
   next.reviewQueue = next.reviewQueue.filter((candidate) => itemKey(candidate) !== key)
-  next.codebookQueue = next.codebookQueue.filter((candidate) => itemKey(candidate) !== key)
   next.scheduledQueue = [
     ...next.scheduledQueue.filter((candidate) => itemKey(candidate) !== key),
     scheduled,
@@ -358,7 +355,9 @@ async function performFlush() {
     await transaction.done
     if (!cursor) break
     try {
-      await sendOperation(cursor.value)
+      if (cursor.value.kind !== 'review' || isStudyItemType(cursor.value.data.itemType)) {
+        await sendOperation(cursor.value)
+      }
       await database.delete('outbox', cursor.primaryKey)
       synced += 1
     } catch {

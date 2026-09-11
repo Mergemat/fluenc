@@ -15,7 +15,7 @@ const navigation: Array<{ id: AppView; label: string; icon: ReactNode }> = [
 type NavigationProps = { data: DashboardData; view: AppView; onViewChange: (view: AppView) => void }
 
 export function AppHeader({ data, onViewChange, view }: NavigationProps) {
-  const dueCount = data.codebookQueue.length + data.reviewQueue.length
+  const dueCount = data.reviewQueue.length
   return <header className="app-header">
     <button className="app-brand" type="button" onClick={() => onViewChange('lessons')} aria-label="Fluenc home"><span className="font-hanzi" aria-hidden="true">文</span>fluenc</button>
     <div className="nav-day"><span>Your practice</span><p>{dueCount ? `${dueCount} cards to revisit` : 'A little, every day.'}</p></div>
@@ -24,6 +24,6 @@ export function AppHeader({ data, onViewChange, view }: NavigationProps) {
 }
 
 export function AppTabBar({ data, onViewChange, view }: NavigationProps) {
-  const dueCount = data.codebookQueue.length + data.reviewQueue.length
+  const dueCount = data.reviewQueue.length
   return <nav aria-label="Main" className="mobile-nav">{navigation.map(item => <button key={item.id} type="button" aria-label={item.label} aria-current={view === item.id ? 'page' : undefined} onClick={() => onViewChange(item.id)}><span className="mobile-nav-icon">{item.icon}{item.id === 'review' && dueCount ? <small>{dueCount}</small> : null}</span>{item.label}</button>)}</nav>
 }

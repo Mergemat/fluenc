@@ -8,6 +8,8 @@ import {
   text,
 } from 'drizzle-orm/sqlite-core'
 
+import { studyItemTypes } from '../data/types'
+
 export const learners = sqliteTable('learners', {
   id: text('id').primaryKey(),
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
@@ -22,7 +24,7 @@ export const learnerItems = sqliteTable(
       .notNull()
       .references(() => learners.id, { onDelete: 'cascade' }),
     itemType: text('item_type', {
-      enum: ['character', 'word', 'sentence', 'actor', 'set', 'tone'],
+      enum: studyItemTypes,
     }).notNull(),
     itemId: text('item_id').notNull(),
     due: integer('due', { mode: 'timestamp_ms' }).notNull(),
@@ -53,7 +55,7 @@ export const reviewLogs = sqliteTable(
       .notNull()
       .references(() => learners.id, { onDelete: 'cascade' }),
     itemType: text('item_type', {
-      enum: ['character', 'word', 'sentence', 'actor', 'set', 'tone'],
+      enum: studyItemTypes,
     }).notNull(),
     itemId: text('item_id').notNull(),
     rating: integer('rating').notNull(),

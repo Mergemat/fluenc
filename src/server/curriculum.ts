@@ -53,7 +53,6 @@ export const getPalace = createServerFn({ method: 'GET' }).handler(async () => {
 export type DashboardData = Awaited<ReturnType<typeof getDashboard>>
 export type BuildItem = DashboardData['buildQueue'][number]
 export type ReviewItem = DashboardData['reviewQueue'][number]
-export type CodebookItem = DashboardData['codebookQueue'][number]
 export type StudyItem = BuildItem | ReviewItem
 export type LibraryData = Awaited<ReturnType<typeof getLibrary>>
 export type PalaceData = Awaited<ReturnType<typeof getPalace>>

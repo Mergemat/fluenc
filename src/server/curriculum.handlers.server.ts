@@ -1,9 +1,9 @@
-import { and, eq, gte } from 'drizzle-orm'
+import { and, eq, inArray } from 'drizzle-orm'
 import { createEmptyCard, fsrs, State, type Card, type Grade } from 'ts-fsrs'
 
 import curriculumJson from '../data/curriculum.generated.json'
 import { sentences } from '../data/sentences'
-import type { Character, Curriculum, Word } from '../data/types'
+import { studyItemTypes, type Character, type Curriculum, type Word } from '../data/types'
 import { db } from '../db'
 import {
   componentProps,
@@ -18,18 +18,9 @@ import {
   type ItemType,
   type LearnerItem,
 } from '../db/schema'
-import {
-  codebookCoordinateIds,
-  codebookDirections,
-  codebookItemId,
-  codebookKinds,
-  parseCodebookItemId,
-  type CodebookKind,
-} from '../lib/codebook'
 import { directCharacters } from '../lib/character-props'
 import { groupHanziComponents } from '../lib/hanzi'
 import { defaultToneRooms, getMovieCoordinates } from '../lib/pinyin'
-import { getToneSyllable } from '../lib/tones'
 import type {
   EnrollInput,
   LivingLinkInput,
@@ -107,53 +98,6 @@ function scheduledCard(item: LearnerItem) {
   }
 }
 
-function codebookMappings(mappings: MappingRows) {
-  return [
-    ...mappings.actors.map((item) => ({
-      kind: 'actor' as const,
-      key: item.actorKey,
-      association: item.actorName,
-      code: item.actorKey,
-    })),
-    ...mappings.sets.map((item) => ({
-      kind: 'set' as const,
-      key: item.finalKey,
-      association: item.setName,
-      code: item.finalKey,
-    })),
-    ...mappings.rooms.map((item) => ({
-      kind: 'tone' as const,
-      key: String(item.tone),
-      association: item.roomName,
-      code: String(item.tone),
-    })),
-  ]
-}
-
-async function ensureCodebookItems(mappings: MappingRows) {
-  const now = new Date()
-  const values = codebookMappings(mappings).flatMap((mapping) =>
-    codebookDirections.map((direction) =>
-      learnerItemValues(mapping.kind, codebookItemId(mapping.key, direction), createEmptyCard(now)),
-    ),
-  )
-
-  if (values.length) {
-    await db.insert(learnerItems).values(values).onConflictDoNothing()
-  }
-}
-
-async function resetCodebookCoordinate(kind: CodebookKind, key: string) {
-  const now = new Date()
-  await Promise.all(codebookCoordinateIds(kind, key).map(({ itemType, itemId }) => {
-    const values = learnerItemValues(itemType, itemId, createEmptyCard(now))
-    return db.insert(learnerItems).values(values).onConflictDoUpdate({
-      target: [learnerItems.learnerId, learnerItems.itemType, learnerItems.itemId],
-      set: values,
-    })
-  }))
-}
-
 type MappingRows = Awaited<ReturnType<typeof getMappings>>
 
 async function getMappings() {
@@ -225,9 +169,7 @@ function wordStudyItem(word: Word, mappings: MappingRows) {
   }
 }
 
-type ReviewableItemType = Extract<ItemType, 'character' | 'word' | 'sentence'>
-
-function resolveStudyItem(type: ReviewableItemType, id: string, mappings: MappingRows) {
+function resolveStudyItem(type: ItemType, id: string, mappings: MappingRows) {
   if (type === 'character') {
     const character = charactersById.get(id)
     return character ? characterStudyItem(character, mappings) : null
@@ -249,55 +191,14 @@ function resolveStudyItem(type: ReviewableItemType, id: string, mappings: Mappin
   return null
 }
 
-function resolveCodebookItem(item: LearnerItem, mappings: MappingRows) {
-  if (!codebookKinds.includes(item.itemType as CodebookKind)) return null
-  const parsed = parseCodebookItemId(item.itemId)
-  if (!parsed) return null
-  const mapping = codebookMappings(mappings).find(
-    (candidate) => candidate.kind === item.itemType && candidate.key === parsed.key,
-  )
-  if (!mapping) return null
-
-  const labels = {
-    actor: { code: 'Initial', association: 'Actor' },
-    set: { code: 'Final', association: 'Set' },
-    tone: { code: 'Tone', association: 'Room' },
-  }
-
-  return {
-    type: mapping.kind,
-    id: item.itemId,
-    direction: parsed.direction,
-    code: mapping.kind === 'tone' ? getToneSyllable(Number(mapping.code)) : mapping.code,
-    association: mapping.association,
-    codeLabel: labels[mapping.kind].code,
-    associationLabel: labels[mapping.kind].association,
-    srsState: item.state,
-    reps: item.reps,
-    card: scheduledCard(item),
-  }
-}
-
 export async function getDashboardHandler() {
   await ensureLearner()
   const mappings = await getMappings()
-  await ensureCodebookItems(mappings)
-  const startOfToday = new Date()
-  startOfToday.setHours(0, 0, 0, 0)
   const now = new Date()
-
-  const [items, todayLogs] = await Promise.all([
-    db.select().from(learnerItems).where(eq(learnerItems.learnerId, LEARNER_ID)),
-    db
-      .select()
-      .from(reviewLogs)
-      .where(
-        and(
-          eq(reviewLogs.learnerId, LEARNER_ID),
-          gte(reviewLogs.reviewedAt, startOfToday),
-        ),
-      ),
-  ])
+  const items = await db.select().from(learnerItems).where(and(
+    eq(learnerItems.learnerId, LEARNER_ID),
+    inArray(learnerItems.itemType, studyItemTypes),
+  ))
 
   const itemKey = (type: ItemType, id: string) => `${type}:${id}`
   const introduced = new Set(items.map((item) => itemKey(item.itemType, item.itemId)))
@@ -310,9 +211,7 @@ export async function getDashboardHandler() {
     items.filter((item) => item.itemType === 'sentence').map((item) => item.itemId),
   )
   const dueItems = items
-    .filter((item): item is LearnerItem & { itemType: ReviewableItemType } =>
-      (item.itemType === 'character' || item.itemType === 'word' || item.itemType === 'sentence') && item.due <= now,
-    )
+    .filter((item) => item.due <= now)
     .sort((left, right) => left.due.getTime() - right.due.getTime())
     .map((progress) => {
       const item = resolveStudyItem(progress.itemType, progress.itemId, mappings)
@@ -326,11 +225,6 @@ export async function getDashboardHandler() {
     })
     .filter((item) => item !== null)
 
-  const codebookQueue = items
-    .filter((item) => codebookKinds.includes(item.itemType as CodebookKind) && item.due <= now)
-    .sort((left, right) => left.due.getTime() - right.due.getTime())
-    .map((item) => resolveCodebookItem(item, mappings))
-    .filter((item) => item !== null)
   const knownProps = new Set(mappings.props.map((item) => item.component))
   const newCharacters = curriculum.characters
     .filter((item) => !introduced.has(itemKey('character', item.id)))
@@ -356,37 +250,6 @@ export async function getDashboardHandler() {
         item.characterIds.every((character) => introducedCharacters.has(character)),
     )
     .map((item) => ({ ...wordStudyItem(item, mappings), queueKind: 'new' as const }))
-
-  const activeCharacter = newCharacters[0]
-  const activeCoordinates = activeCharacter
-    ? new Set([
-      `actor:${activeCharacter.movie.actorKey}`,
-      `set:${activeCharacter.movie.finalKey}`,
-      `tone:${activeCharacter.movie.tone}`,
-    ])
-    : new Set<string>()
-  const mirrorSpacingStart = new Date(now.getTime() - 5 * 60 * 1000)
-  const recentlyReviewedCoordinates = new Set(
-    todayLogs
-      .filter((log) =>
-        codebookKinds.includes(log.itemType as CodebookKind) &&
-        log.reviewedAt >= mirrorSpacingStart,
-      )
-      .map((log) => `${log.itemType}:${parseCodebookItemId(log.itemId)?.key}`),
-  )
-  const queueScore = (item: (typeof codebookQueue)[number]) => {
-    const coordinate = `${item.type}:${parseCodebookItemId(item.id)?.key}`
-    return [
-      recentlyReviewedCoordinates.has(coordinate) ? 1 : 0,
-      activeCoordinates.has(coordinate) ? 0 : 1,
-      item.direction === 'encode' ? 0 : 1,
-    ]
-  }
-  codebookQueue.sort((left, right) => {
-    const leftScore = queueScore(left)
-    const rightScore = queueScore(right)
-    return leftScore[0] - rightScore[0] || leftScore[1] - rightScore[1] || leftScore[2] - rightScore[2]
-  })
 
   const getQueue = sentences
     .filter((sentence) => !introducedSentences.has(sentence.id))
@@ -418,17 +281,14 @@ export async function getDashboardHandler() {
   const scheduledQueue = items
     .filter((item) => item.due > now)
     .map((progress) => {
-      if (progress.itemType === 'character' || progress.itemType === 'word' || progress.itemType === 'sentence') {
-        const item = resolveStudyItem(progress.itemType, progress.itemId, mappings)
-        return item ? {
-          ...item,
-          queueKind: 'review' as const,
-          srsState: progress.state,
-          reps: progress.reps,
-          card: scheduledCard(progress),
-        } : null
-      }
-      return resolveCodebookItem(progress, mappings)
+      const item = resolveStudyItem(progress.itemType, progress.itemId, mappings)
+      return item ? {
+        ...item,
+        queueKind: 'review' as const,
+        srsState: progress.state,
+        reps: progress.reps,
+        card: scheduledCard(progress),
+      } : null
     })
     .filter((item) => item !== null)
 
@@ -443,7 +303,6 @@ export async function getDashboardHandler() {
       introducedWords: learnedWords.size,
     },
     reviewQueue: dueItems,
-    codebookQueue,
     buildQueue: [...newWords, ...newCharacters],
     getQueue,
     scheduledQueue,
@@ -528,7 +387,6 @@ export async function reviewItemHandler(data: ReviewInput) {
 
 export async function saveMovieHandler(data: MovieInput) {
   await ensureLearner()
-  const previous = await getMappings()
   await Promise.all([
     ...(data.actorName
       ? [
@@ -577,20 +435,6 @@ export async function saveMovieHandler(data: MovieInput) {
         }),
     ),
   ])
-  const changedCoordinates = [
-    ...(data.actorName && previous.actors.find((item) => item.actorKey === data.actorKey)?.actorName !== data.actorName
-      ? [{ kind: 'actor' as const, key: data.actorKey }]
-      : []),
-    ...(data.setName && previous.sets.find((item) => item.finalKey === data.finalKey)?.setName !== data.setName
-      ? [{ kind: 'set' as const, key: data.finalKey }]
-      : []),
-    ...(data.roomName && previous.rooms.find((item) => item.tone === data.tone)?.roomName !== data.roomName
-      ? [{ kind: 'tone' as const, key: String(data.tone) }]
-      : []),
-  ]
-  await Promise.all(changedCoordinates.map((coordinate) =>
-    resetCodebookCoordinate(coordinate.kind, coordinate.key),
-  ))
   return { saved: true }
 }
 

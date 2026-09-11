@@ -29,7 +29,7 @@ export const Route = createFileRoute('/')({
 function Home() {
   const { data } = useSuspenseQuery(dashboardQueryOptions)
   useOfflineSync(data)
-  const [view, setView] = useState<AppView>(() => data.codebookQueue.length + data.reviewQueue.length ? 'review' : 'lessons')
+  const [view, setView] = useState<AppView>(() => data.reviewQueue.length ? 'review' : 'lessons')
 
   return (
     <div className="app-layout">

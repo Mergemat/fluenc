@@ -48,12 +48,6 @@
 .review-character.cs-studio { min-height: 100%; height: 100%; }
 .review-character > .cs-prop-scene { flex: 1; min-height: 0; }
 .review-character .cs-character-drawing { width: min(100%, 32dvh, 300px); }
-.recall-code { max-width: 100%; font-size: clamp(44px, 8vw, 88px); line-height: 1.1; font-weight: 650; letter-spacing: -1.5px; overflow-wrap: anywhere; }
-.recall-association { font-size: clamp(26px, 4vw, 42px); line-height: 1.2; letter-spacing: -.5px; text-wrap: balance; }
-.mapping-answer { width: min(100%, 400px); margin-top: 12px; padding: 20px; border-radius: 13px 13px 3px 13px; background: #e6eeea; }
-.mapping-set { background: #e5edf4; }
-.mapping-tone { background: #efe8dd; }
-.mapping-answer h2 { margin: 12px 0 0; font-size: 30px; line-height: 1.2; font-weight: 650; overflow-wrap: anywhere; }
 .answer-sound { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .answer-sound strong { font-size: 30px; font-weight: 650; letter-spacing: -.5px; }
 .answer-meaning { font-size: 15px; color: var(--color-muted); }
@@ -145,9 +139,6 @@
   .recall-target { gap: 10px; padding-block: 10px; }
   .recall-frame { gap: 10px; }
   .review-character .cs-character-drawing { width: min(100%, 25dvh); }
-  .recall-code:not(.recall-association) { font-size: 42px; }
-  .mapping-answer { margin-top: 0; padding: 12px; }
-  .mapping-answer h2 { font-size: 25px; margin-top: 5px; }
 }
 @media (max-height: 610px) and (max-width: 767px) {
   .review-character .cs-prop-scene { grid-template-rows: minmax(185px, 1fr) auto; }

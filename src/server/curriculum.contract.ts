@@ -1,8 +1,10 @@
 import { z } from 'zod'
 
+import { studyItemTypes } from '../data/types'
+
 export const reviewInput = z.object({
   eventId: z.uuid(),
-  itemType: z.enum(['character', 'word', 'sentence', 'actor', 'set', 'tone']),
+  itemType: z.enum(studyItemTypes),
   itemId: z.string().min(1),
   rating: z.number().int().min(1).max(4),
   durationMs: z.number().int().min(0).max(3_600_000).default(0),
@@ -10,7 +12,7 @@ export const reviewInput = z.object({
 })
 
 export const enrollInput = z.object({
-  itemType: z.enum(['character', 'word', 'sentence']),
+  itemType: z.enum(studyItemTypes),
   itemId: z.string().min(1),
   enrolledAt: z.iso.datetime(),
 })

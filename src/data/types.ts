@@ -1,3 +1,9 @@
+export const studyItemTypes = ['character', 'word', 'sentence'] as const
+
+export function isStudyItemType(value: unknown): value is typeof studyItemTypes[number] {
+  return studyItemTypes.some(type => type === value)
+}
+
 export type Character = {
   id: string
   hanzi: string
