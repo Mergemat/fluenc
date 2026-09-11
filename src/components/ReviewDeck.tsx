@@ -1,7 +1,7 @@
 import { Eye } from 'lucide-react'
 
 import { useReveal } from '../hooks/useReveal'
-import { splitMeaning } from '../lib/meaning'
+import { getItemMeaning } from '../lib/meaning'
 import { getToneDetail } from '../lib/tones'
 import type { ReviewItem } from '../server/curriculum'
 import { MandarinAudioButton } from './MandarinAudioButton'
@@ -13,7 +13,7 @@ type RecallItem = Exclude<ReviewItem, { type: 'sentence' }>
 
 export function ReviewDeck({ item, pending, onRate }: { item: RecallItem; pending: boolean; onRate: (rating: number) => void }) {
   const { revealed, reveal } = useReveal({ pending, onRate })
-  const meaning = splitMeaning(item.meaning)
+  const meaning = getItemMeaning(item)
   const tone = item.type === 'character' ? getToneDetail(item.movie.tone) : null
 
   return (

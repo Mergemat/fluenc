@@ -20,6 +20,9 @@ const neutralToneExamples: Record<string, { text: string; pinyin: string }> = {
   嗎: { text: '好嗎', pinyin: 'hǎo ma' },
   着: { text: '看着', pinyin: 'kànzhe' },
   著: { text: '看著', pinyin: 'kànzhe' },
+  吧: { text: '走吧', pinyin: 'zǒu ba' },
+  嘛: { text: '对嘛', pinyin: 'duì ma' },
+  耶: { text: '好耶', pinyin: 'hǎo ye' },
 }
 
 export function getNeutralToneExample(text: string, pinyin: string) {

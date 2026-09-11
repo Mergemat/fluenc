@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Check, Link2 } from 'lucide-react'
 import { useState } from 'react'
 
-import { splitMeaning } from '../lib/meaning'
+import { getItemMeaning } from '../lib/meaning'
 import { saveEnrollment, saveLivingLinkOffline } from '../offline/progress'
 import type { BuildItem } from '../server/curriculum'
 import { MandarinAudioButton } from './MandarinAudioButton'
@@ -13,7 +13,7 @@ type WordItem = Extract<BuildItem, { type: 'word' }>
 
 export function WordStudio({ item }: { item: WordItem }) {
   const queryClient = useQueryClient()
-  const meaning = splitMeaning(item.meaning)
+  const meaning = getItemMeaning(item)
   const [story, setStory] = useState(item.livingLink)
   const [showLivingLink, setShowLivingLink] = useState(Boolean(item.livingLink))
   const [showValidation, setShowValidation] = useState(false)

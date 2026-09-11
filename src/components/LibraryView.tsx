@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useDeferredValue, useState } from 'react'
 
-import { splitMeaning } from '../lib/meaning'
+import { getItemMeaning } from '../lib/meaning'
 import { getOfflineLibrary } from '../offline/progress'
 import type { LibraryData } from '../server/curriculum'
 import { getHanziCompositions, type HanziCompositions } from '../server/hanzi'
@@ -25,9 +25,11 @@ export function LibraryView() {
   const deferredSearch = useDeferredValue(search.trim().toLocaleLowerCase())
   const libraryQuery = useQuery({ queryKey: ['library'], queryFn: () => getOfflineLibrary() })
 
-  const items = (libraryQuery.data?.[kind] ?? []).filter((item) =>
-    !deferredSearch || `${item.hanzi} ${item.pinyin} ${item.meaning}`.toLocaleLowerCase().includes(deferredSearch),
-  )
+  const items = (libraryQuery.data?.[kind] ?? []).filter((item) => {
+    if (!deferredSearch) return true
+    const meaning = getItemMeaning(item)
+    return `${item.hanzi} ${item.pinyin} ${meaning.primary} ${meaning.alternatives.join(' ')}`.toLocaleLowerCase().includes(deferredSearch)
+  })
   const visibleItems = items.slice(0, 120)
   const compositionCharacters = kind === 'characters'
     ? visibleItems.map((item) => item.hanzi)
@@ -79,6 +81,10 @@ export function LibraryView() {
           ) : null}
         </>
       ) : <Status title="Nothing found" />}
+      <p className="mt-6 text-center text-xs text-faint">
+        Definitions adapted from <a className="underline" href="https://www.mdbg.net/chinese/dictionary?page=cedict">CC-CEDICT</a>
+        {" · "}<a className="underline" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
+      </p>
     </Page>
   )
 }
@@ -99,7 +105,7 @@ function LibraryCard({ composition, item }: {
   composition?: HanziCompositions[string] | null
   item: LibraryItem
 }) {
-  const meaning = splitMeaning(item.meaning)
+  const meaning = getItemMeaning(item)
   return (
     <article className="grid min-h-[70px] grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3 border-b border-line px-4 py-2 last:border-b-0 md:grid-cols-[76px_120px_minmax(0,1fr)_110px_48px] md:gap-0 md:py-3">
       <span className="font-hanzi text-3xl leading-none font-semibold text-glaze" lang="zh-CN">{item.hanzi}</span>

@@ -178,7 +178,8 @@ function characterStudyItem(character: Character, mappings: MappingRows) {
     id: character.id,
     hanzi: character.hanzi,
     pinyin: character.pinyin,
-    meaning: character.meaningEn,
+    keyword: character.keyword,
+    dictionaryMeanings: character.dictionaryMeanings,
     rank: character.frequencyRank,
     unlocks: character.unlocks,
     movie: {
@@ -196,7 +197,7 @@ function characterStudyItem(character: Character, mappings: MappingRows) {
           propName: mappings.props.find((item) => item.component === component)?.propName ?? '',
           character: componentCharacter ? {
             pinyin: componentCharacter.pinyin,
-            meaning: componentCharacter.meaningEn,
+            keyword: componentCharacter.keyword,
           } : null,
         }
       }),
@@ -652,7 +653,8 @@ export async function getLibraryHandler() {
       id: character.id,
       hanzi: character.hanzi,
       pinyin: character.pinyin,
-      meaning: character.meaningEn,
+      keyword: character.keyword,
+      dictionaryMeanings: character.dictionaryMeanings,
       rank: character.frequencyRank,
       status: progress.get(`character:${character.id}`) ?? 'new' as const,
     })),

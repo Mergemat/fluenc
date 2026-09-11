@@ -1,0 +1,5826 @@
+[
+  {
+    "character": "我",
+    "pinyin": "wǒ",
+    "keyword": "I",
+    "sourcePinyin": "wo3",
+    "sourceSense": "I; me; my",
+    "note": "Chosen for the common modern I/me sense."
+  },
+  {
+    "character": "你",
+    "pinyin": "nǐ",
+    "keyword": "you",
+    "sourcePinyin": "ni3",
+    "sourceSense": "you (informal, as opposed to courteous 您[nin2])",
+    "note": "common informal second-person pronoun"
+  },
+  {
+    "character": "是",
+    "pinyin": "shì",
+    "keyword": "be",
+    "sourcePinyin": "shi4",
+    "sourceSense": "to be (followed by substantives only)",
+    "note": "Common beginner copula."
+  },
+  {
+    "character": "他",
+    "pinyin": "tā",
+    "keyword": "he",
+    "sourcePinyin": "ta1",
+    "sourceSense": "(third-person singular) (since the early 20th century, usu. male) he; him; his",
+    "note": "Chosen for the common modern he sense."
+  },
+  {
+    "character": "们",
+    "pinyin": "men",
+    "keyword": "plural marker",
+    "sourcePinyin": "men5",
+    "sourceSense": "plural marker for pronouns, and nouns referring to individuals",
+    "note": "neutral plural suffix for pronouns/nouns"
+  },
+  {
+    "character": "不",
+    "pinyin": "bù",
+    "keyword": "not",
+    "sourcePinyin": "bu4",
+    "sourceSense": "no; not so",
+    "note": "Core negation particle."
+  },
+  {
+    "character": "这",
+    "pinyin": "zhè",
+    "keyword": "this",
+    "sourcePinyin": "zhe4",
+    "sourceSense": "(pronoun) this; these",
+    "note": "Chosen for the common modern this sense."
+  },
+  {
+    "character": "好",
+    "pinyin": "hǎo",
+    "keyword": "good",
+    "sourcePinyin": "hao3",
+    "sourceSense": "good",
+    "note": "common positive adjective"
+  },
+  {
+    "character": "么",
+    "pinyin": "me",
+    "keyword": "question suffix",
+    "sourcePinyin": "me5",
+    "sourceSense": "suffix, used to form interrogative 什麼|什么[shen2 me5], what?, indefinite 這麼|这么[zhe4 me5] thus, etc",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "什",
+    "pinyin": "shén",
+    "keyword": "what",
+    "sourcePinyin": "shen2",
+    "sourceSense": "what",
+    "note": "Chosen for the common modern what sense."
+  },
+  {
+    "character": "就",
+    "pinyin": "jiù",
+    "keyword": "just",
+    "sourcePinyin": "jiu4",
+    "sourceSense": "(same as 就是[jiu4 shi4]) merely; nothing else but; simply; just; precisely; exactly",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "有",
+    "pinyin": "yǒu",
+    "keyword": "have",
+    "sourcePinyin": "you3",
+    "sourceSense": "to have; there is",
+    "note": "Core possession/existence verb."
+  },
+  {
+    "character": "她",
+    "pinyin": "tā",
+    "keyword": "she",
+    "sourcePinyin": "ta1",
+    "sourceSense": "she",
+    "note": "Chosen for the common modern she sense."
+  },
+  {
+    "character": "要",
+    "pinyin": "yào",
+    "keyword": "want",
+    "sourcePinyin": "yao4",
+    "sourceSense": "to want; to need; to ask for",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "说",
+    "pinyin": "shuō",
+    "keyword": "say",
+    "sourcePinyin": "shuo1",
+    "sourceSense": "to speak; to talk; to say",
+    "note": "Common speech verb."
+  },
+  {
+    "character": "道",
+    "pinyin": "dào",
+    "keyword": "way",
+    "sourcePinyin": "dao4",
+    "sourceSense": "(bound form) way; reason; principle",
+    "note": "Chosen for the common modern way sense."
+  },
+  {
+    "character": "知",
+    "pinyin": "zhī",
+    "keyword": "know",
+    "sourcePinyin": "zhi1",
+    "sourceSense": "to know",
+    "note": "common knowledge verb"
+  },
+  {
+    "character": "都",
+    "pinyin": "dōu",
+    "keyword": "all",
+    "sourcePinyin": "dou1",
+    "sourceSense": "all; both; entirely",
+    "note": "Core totality adverb."
+  },
+  {
+    "character": "会",
+    "pinyin": "huì",
+    "keyword": "can",
+    "sourcePinyin": "hui4",
+    "sourceSense": "can; to have the skill; to know how to",
+    "note": "Chosen for the common modern can sense."
+  },
+  {
+    "character": "去",
+    "pinyin": "qù",
+    "keyword": "go",
+    "sourcePinyin": "qu4",
+    "sourceSense": "to go",
+    "note": "basic motion verb"
+  },
+  {
+    "character": "人",
+    "pinyin": "rén",
+    "keyword": "person",
+    "sourcePinyin": "ren2",
+    "sourceSense": "person; people",
+    "note": "Common human reference."
+  },
+  {
+    "character": "那",
+    "pinyin": "nà",
+    "keyword": "that",
+    "sourcePinyin": "na4",
+    "sourceSense": "(specifier) that; the; those (colloquial pr. [nei4])",
+    "note": "Chosen for the common modern that sense."
+  },
+  {
+    "character": "也",
+    "pinyin": "yě",
+    "keyword": "also",
+    "sourcePinyin": "ye3",
+    "sourceSense": "also; too; as well; (not ...) either",
+    "note": "common additive particle"
+  },
+  {
+    "character": "想",
+    "pinyin": "xiǎng",
+    "keyword": "think",
+    "sourcePinyin": "xiang3",
+    "sourceSense": "to think (about)",
+    "note": "Common thought/desire verb."
+  },
+  {
+    "character": "来",
+    "pinyin": "lái",
+    "keyword": "come",
+    "sourcePinyin": "lai2",
+    "sourceSense": "to come",
+    "note": "Chosen for the common modern come sense."
+  },
+  {
+    "character": "做",
+    "pinyin": "zuò",
+    "keyword": "do",
+    "sourcePinyin": "zuo4",
+    "sourceSense": "to do; to engage in; to hold (a party etc)",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "一",
+    "pinyin": "yī",
+    "keyword": "one",
+    "sourcePinyin": "yi1",
+    "sourceSense": "one",
+    "note": "Basic numeral."
+  },
+  {
+    "character": "个",
+    "pinyin": "gè",
+    "keyword": "individual",
+    "sourcePinyin": "ge4",
+    "sourceSense": "(bound form) individual",
+    "note": "Use the individual cue for the general classifier; this also matches the curriculum standalone word."
+  },
+  {
+    "character": "没",
+    "pinyin": "méi",
+    "keyword": "not yet",
+    "sourcePinyin": "mei2",
+    "sourceSense": "(negative prefix for verbs) have not; not",
+    "note": "common negative prefix"
+  },
+  {
+    "character": "让",
+    "pinyin": "ràng",
+    "keyword": "let",
+    "sourcePinyin": "rang4",
+    "sourceSense": "to let sb do sth",
+    "note": "Common permission verb."
+  },
+  {
+    "character": "很",
+    "pinyin": "hěn",
+    "keyword": "very",
+    "sourcePinyin": "hen3",
+    "sourceSense": "very; quite",
+    "note": "Chosen for the common modern very sense."
+  },
+  {
+    "character": "能",
+    "pinyin": "néng",
+    "keyword": "can",
+    "sourcePinyin": "neng2",
+    "sourceSense": "can",
+    "note": "common ability/modal reading"
+  },
+  {
+    "character": "还",
+    "pinyin": "hái",
+    "keyword": "still",
+    "sourcePinyin": "hai2",
+    "sourceSense": "still",
+    "note": "Common aspect/adverb reading."
+  },
+  {
+    "character": "怎",
+    "pinyin": "zěn",
+    "keyword": "how",
+    "sourcePinyin": "zen3",
+    "sourceSense": "how",
+    "note": "Chosen for the common modern how sense."
+  },
+  {
+    "character": "到",
+    "pinyin": "dào",
+    "keyword": "arrive",
+    "sourcePinyin": "dao4",
+    "sourceSense": "to reach; to arrive",
+    "note": "basic arrival verb"
+  },
+  {
+    "character": "里",
+    "pinyin": "lǐ",
+    "keyword": "inside",
+    "sourcePinyin": "li3",
+    "sourceSense": "interior",
+    "note": "Common location element."
+  },
+  {
+    "character": "样",
+    "pinyin": "yàng",
+    "keyword": "manner",
+    "sourcePinyin": "yang4",
+    "sourceSense": "manner",
+    "note": "Chosen for the common modern manner sense."
+  },
+  {
+    "character": "走",
+    "pinyin": "zǒu",
+    "keyword": "walk",
+    "sourcePinyin": "zou3",
+    "sourceSense": "to walk",
+    "note": "basic motion verb"
+  },
+  {
+    "character": "事",
+    "pinyin": "shì",
+    "keyword": "matter",
+    "sourcePinyin": "shi4",
+    "sourceSense": "matter",
+    "note": "Common noun in 事情."
+  },
+  {
+    "character": "它",
+    "pinyin": "tā",
+    "keyword": "it",
+    "sourcePinyin": "ta1",
+    "sourceSense": "it",
+    "note": "Chosen for the common modern it sense."
+  },
+  {
+    "character": "自",
+    "pinyin": "zì",
+    "keyword": "self",
+    "sourcePinyin": "zi4",
+    "sourceSense": "(bound form) self; oneself",
+    "note": "common bound-form self"
+  },
+  {
+    "character": "己",
+    "pinyin": "jǐ",
+    "keyword": "self",
+    "sourcePinyin": "ji3",
+    "sourceSense": "self",
+    "note": "Used in 自己."
+  },
+  {
+    "character": "看",
+    "pinyin": "kàn",
+    "keyword": "see",
+    "sourcePinyin": "kan4",
+    "sourceSense": "to see; to look at",
+    "note": "Chosen for the common modern see sense."
+  },
+  {
+    "character": "谁",
+    "pinyin": "shéi",
+    "keyword": "who",
+    "sourcePinyin": "shei2",
+    "sourceSense": "who",
+    "note": "common interrogative pronoun"
+  },
+  {
+    "character": "为",
+    "pinyin": "wèi",
+    "keyword": "for",
+    "sourcePinyin": "wei4",
+    "sourceSense": "for",
+    "note": "Common 为了/为什么 reading family; chosen preposition."
+  },
+  {
+    "character": "真",
+    "pinyin": "zhēn",
+    "keyword": "real",
+    "sourcePinyin": "zhen1",
+    "sourceSense": "real",
+    "note": "Chosen for the common modern real sense."
+  },
+  {
+    "character": "的",
+    "pinyin": "de",
+    "keyword": "possessive particle",
+    "sourcePinyin": "de5",
+    "sourceSense": "of; ~'s (possessive particle)",
+    "note": "common possessive particle"
+  },
+  {
+    "character": "告",
+    "pinyin": "gào",
+    "keyword": "tell",
+    "sourcePinyin": "gao4",
+    "sourceSense": "(bound form) to say; to tell",
+    "note": "Common bound verb in 告诉."
+  },
+  {
+    "character": "诉",
+    "pinyin": "sù",
+    "keyword": "tell",
+    "sourcePinyin": "su4",
+    "sourceSense": "to tell",
+    "note": "Chosen for the common modern tell sense."
+  },
+  {
+    "character": "再",
+    "pinyin": "zài",
+    "keyword": "again",
+    "sourcePinyin": "zai4",
+    "sourceSense": "again; once more; re-",
+    "note": "common repetition adverb"
+  },
+  {
+    "character": "经",
+    "pinyin": "jīng",
+    "keyword": "pass through",
+    "sourcePinyin": "jing1",
+    "sourceSense": "to pass through",
+    "note": "Useful core verb/root."
+  },
+  {
+    "character": "已",
+    "pinyin": "yǐ",
+    "keyword": "already",
+    "sourcePinyin": "yi3",
+    "sourceSense": "already",
+    "note": "Chosen for the common modern already sense."
+  },
+  {
+    "character": "需",
+    "pinyin": "xū",
+    "keyword": "need",
+    "sourcePinyin": "xu1",
+    "sourceSense": "to need",
+    "note": "common need verb"
+  },
+  {
+    "character": "像",
+    "pinyin": "xiàng",
+    "keyword": "like",
+    "sourcePinyin": "xiang4",
+    "sourceSense": "to be like",
+    "note": "Common comparison verb."
+  },
+  {
+    "character": "可",
+    "pinyin": "kě",
+    "keyword": "can",
+    "sourcePinyin": "ke3",
+    "sourceSense": "(prefix) can; may; able to; -able",
+    "note": "Chosen for the common modern can sense."
+  },
+  {
+    "character": "谢",
+    "pinyin": "xiè",
+    "keyword": "thank",
+    "sourcePinyin": "xie4",
+    "sourceSense": "to thank",
+    "note": "common thanking sense"
+  },
+  {
+    "character": "生",
+    "pinyin": "shēng",
+    "keyword": "life",
+    "sourcePinyin": "sheng1",
+    "sourceSense": "life",
+    "note": "Common noun/root in 生活."
+  },
+  {
+    "character": "先",
+    "pinyin": "xiān",
+    "keyword": "first",
+    "sourcePinyin": "xian1",
+    "sourceSense": "beforehand; first; earlier",
+    "note": "Chosen for the common modern first sense."
+  },
+  {
+    "character": "得",
+    "pinyin": "dé",
+    "keyword": "obtain",
+    "sourcePinyin": "de2",
+    "sourceSense": "to obtain",
+    "note": "common obtain/get sense"
+  },
+  {
+    "character": "觉",
+    "pinyin": "jué",
+    "keyword": "feel",
+    "sourcePinyin": "jue2",
+    "sourceSense": "to feel",
+    "note": "Common reading in 觉得."
+  },
+  {
+    "character": "找",
+    "pinyin": "zhǎo",
+    "keyword": "find",
+    "sourcePinyin": "zhao3",
+    "sourceSense": "to find",
+    "note": "Chosen for the common modern find sense."
+  },
+  {
+    "character": "多",
+    "pinyin": "duō",
+    "keyword": "many",
+    "sourcePinyin": "duo1",
+    "sourceSense": "many; much; more; a lot of",
+    "note": "common quantity adjective"
+  },
+  {
+    "character": "快",
+    "pinyin": "kuài",
+    "keyword": "quick",
+    "sourcePinyin": "kuai4",
+    "sourceSense": "rapid",
+    "note": "Common speed adjective."
+  },
+  {
+    "character": "喜",
+    "pinyin": "xǐ",
+    "keyword": "like",
+    "sourcePinyin": "xi3",
+    "sourceSense": "to like",
+    "note": "Chosen for the common modern like sense."
+  },
+  {
+    "character": "欢",
+    "pinyin": "huān",
+    "keyword": "happy",
+    "sourcePinyin": "huan1",
+    "sourceSense": "happy",
+    "note": "common happiness sense"
+  },
+  {
+    "character": "听",
+    "pinyin": "tīng",
+    "keyword": "listen",
+    "sourcePinyin": "ting1",
+    "sourceSense": "to listen to; to hear",
+    "note": "Common perception verb."
+  },
+  {
+    "character": "该",
+    "pinyin": "gāi",
+    "keyword": "should",
+    "sourcePinyin": "gai1",
+    "sourceSense": "should",
+    "note": "Chosen for the common modern should sense."
+  },
+  {
+    "character": "应",
+    "pinyin": "yīng",
+    "keyword": "should",
+    "sourcePinyin": "ying1",
+    "sourceSense": "should",
+    "note": "common modal reading"
+  },
+  {
+    "character": "太",
+    "pinyin": "tài",
+    "keyword": "very",
+    "sourcePinyin": "tai4",
+    "sourceSense": "very",
+    "note": "Common degree adverb."
+  },
+  {
+    "character": "又",
+    "pinyin": "yòu",
+    "keyword": "again",
+    "sourcePinyin": "you4",
+    "sourceSense": "(once) again",
+    "note": "Chosen for the common modern again sense."
+  },
+  {
+    "character": "叫",
+    "pinyin": "jiào",
+    "keyword": "call",
+    "sourcePinyin": "jiao4",
+    "sourceSense": "to call",
+    "note": "common call/name verb"
+  },
+  {
+    "character": "时",
+    "pinyin": "shí",
+    "keyword": "time",
+    "sourcePinyin": "shi2",
+    "sourceSense": "time",
+    "note": "Common time noun/root."
+  },
+  {
+    "character": "候",
+    "pinyin": "hòu",
+    "keyword": "wait",
+    "sourcePinyin": "hou4",
+    "sourceSense": "to wait",
+    "note": "Chosen for the common modern wait sense."
+  },
+  {
+    "character": "才",
+    "pinyin": "cái",
+    "keyword": "only",
+    "sourcePinyin": "cai2",
+    "sourceSense": "(before an expression of quantity) only",
+    "note": "common restrictive adverb"
+  },
+  {
+    "character": "东",
+    "pinyin": "dōng",
+    "keyword": "east",
+    "sourcePinyin": "dong1",
+    "sourceSense": "east",
+    "note": "Basic direction."
+  },
+  {
+    "character": "西",
+    "pinyin": "xī",
+    "keyword": "west",
+    "sourcePinyin": "xi1",
+    "sourceSense": "west",
+    "note": "Chosen for the common modern west sense."
+  },
+  {
+    "character": "请",
+    "pinyin": "qǐng",
+    "keyword": "please",
+    "sourcePinyin": "qing3",
+    "sourceSense": "please (do sth)",
+    "note": "common polite request"
+  },
+  {
+    "character": "起",
+    "pinyin": "qǐ",
+    "keyword": "rise",
+    "sourcePinyin": "qi3",
+    "sourceSense": "to rise",
+    "note": "Common 起/起来 verb root."
+  },
+  {
+    "character": "死",
+    "pinyin": "sǐ",
+    "keyword": "die",
+    "sourcePinyin": "si3",
+    "sourceSense": "to die",
+    "note": "Chosen for the common modern die sense."
+  },
+  {
+    "character": "下",
+    "pinyin": "xià",
+    "keyword": "down",
+    "sourcePinyin": "xia4",
+    "sourceSense": "down",
+    "note": "basic directional sense"
+  },
+  {
+    "character": "些",
+    "pinyin": "xiē",
+    "keyword": "some",
+    "sourcePinyin": "xie1",
+    "sourceSense": "classifier indicating a small amount or small number greater than 1: some, a few, several",
+    "note": "Common quantity classifier."
+  },
+  {
+    "character": "子",
+    "pinyin": "zǐ",
+    "keyword": "child",
+    "sourcePinyin": "zi3",
+    "sourceSense": "child",
+    "note": "Standalone 子 uses full-tone child; neutral tone is reserved for noun suffixes."
+  },
+  {
+    "character": "孩",
+    "pinyin": "hái",
+    "keyword": "child",
+    "sourcePinyin": "hai2",
+    "sourceSense": "(bound form) child",
+    "note": "common bound-form child"
+  },
+  {
+    "character": "吃",
+    "pinyin": "chī",
+    "keyword": "eat",
+    "sourcePinyin": "chi1",
+    "sourceSense": "to eat; to consume",
+    "note": "Core daily verb."
+  },
+  {
+    "character": "问",
+    "pinyin": "wèn",
+    "keyword": "ask",
+    "sourcePinyin": "wen4",
+    "sourceSense": "to ask; to inquire",
+    "note": "Chosen for the common modern ask sense."
+  },
+  {
+    "character": "题",
+    "pinyin": "tí",
+    "keyword": "question",
+    "sourcePinyin": "ti2",
+    "sourceSense": "exam question",
+    "note": "common problem/exam sense"
+  },
+  {
+    "character": "开",
+    "pinyin": "kāi",
+    "keyword": "open",
+    "sourcePinyin": "kai1",
+    "sourceSense": "to open (transitive or intransitive)",
+    "note": "Core action verb."
+  },
+  {
+    "character": "始",
+    "pinyin": "shǐ",
+    "keyword": "begin",
+    "sourcePinyin": "shi3",
+    "sourceSense": "to begin",
+    "note": "Chosen for the common modern begin sense."
+  },
+  {
+    "character": "作",
+    "pinyin": "zuò",
+    "keyword": "compose",
+    "sourcePinyin": "zuo4",
+    "sourceSense": "to write; to compose",
+    "note": "writing/composition reading"
+  },
+  {
+    "character": "工",
+    "pinyin": "gōng",
+    "keyword": "work",
+    "sourcePinyin": "gong1",
+    "sourceSense": "work",
+    "note": "Common root in 工作."
+  },
+  {
+    "character": "帮",
+    "pinyin": "bāng",
+    "keyword": "help",
+    "sourcePinyin": "bang1",
+    "sourceSense": "to help",
+    "note": "Chosen for the common modern help sense."
+  },
+  {
+    "character": "只",
+    "pinyin": "zhǐ",
+    "keyword": "only",
+    "sourcePinyin": "zhi3",
+    "sourceSense": "only; merely; just",
+    "note": "corrected tone for restrictive sense"
+  },
+  {
+    "character": "定",
+    "pinyin": "dìng",
+    "keyword": "decide",
+    "sourcePinyin": "ding4",
+    "sourceSense": "to fix; to set; to make definite",
+    "note": "Common decision/fixing root."
+  },
+  {
+    "character": "望",
+    "pinyin": "wàng",
+    "keyword": "hope",
+    "sourcePinyin": "wang4",
+    "sourceSense": "to hope",
+    "note": "Chosen for the common modern hope sense."
+  },
+  {
+    "character": "希",
+    "pinyin": "xī",
+    "keyword": "hope",
+    "sourcePinyin": "xi1",
+    "sourceSense": "to hope",
+    "note": "common hope verb"
+  },
+  {
+    "character": "将",
+    "pinyin": "jiāng",
+    "keyword": "will",
+    "sourcePinyin": "jiang1",
+    "sourceSense": "will",
+    "note": "Common future/auxiliary reading."
+  },
+  {
+    "character": "直",
+    "pinyin": "zhí",
+    "keyword": "straight",
+    "sourcePinyin": "zhi2",
+    "sourceSense": "straight",
+    "note": "Chosen for the common modern straight sense."
+  },
+  {
+    "character": "别",
+    "pinyin": "bié",
+    "keyword": "don't",
+    "sourcePinyin": "bie2",
+    "sourceSense": "don't ...!",
+    "note": "common prohibition/other reading"
+  },
+  {
+    "character": "方",
+    "pinyin": "fāng",
+    "keyword": "square",
+    "sourcePinyin": "fang1",
+    "sourceSense": "square",
+    "note": "Basic shape/root sense."
+  },
+  {
+    "character": "地",
+    "pinyin": "de",
+    "keyword": "adverbial particle",
+    "sourcePinyin": "de5",
+    "sourceSense": "-ly",
+    "note": "Uses neutral adverbial particle rather than 地 earth/ground."
+  },
+  {
+    "character": "拿",
+    "pinyin": "ná",
+    "keyword": "hold",
+    "sourcePinyin": "na2",
+    "sourceSense": "to hold",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "友",
+    "pinyin": "yǒu",
+    "keyword": "friend",
+    "sourcePinyin": "you3",
+    "sourceSense": "friend",
+    "note": "Common root in 朋友."
+  },
+  {
+    "character": "朋",
+    "pinyin": "péng",
+    "keyword": "friend",
+    "sourcePinyin": "peng2",
+    "sourceSense": "friend",
+    "note": "Chosen for the common modern friend sense."
+  },
+  {
+    "character": "更",
+    "pinyin": "gèng",
+    "keyword": "more",
+    "sourcePinyin": "geng4",
+    "sourceSense": "more",
+    "note": "common comparative adverb"
+  },
+  {
+    "character": "妈",
+    "pinyin": "mā",
+    "keyword": "mom",
+    "sourcePinyin": "ma1",
+    "sourceSense": "ma",
+    "note": "Common family word."
+  },
+  {
+    "character": "然",
+    "pinyin": "rán",
+    "keyword": "thus",
+    "sourcePinyin": "ran2",
+    "sourceSense": "so",
+    "note": "Chosen for the common modern so/thus sense."
+  },
+  {
+    "character": "当",
+    "pinyin": "dāng",
+    "keyword": "when",
+    "sourcePinyin": "dang1",
+    "sourceSense": "when",
+    "note": "common when/serve-as reading"
+  },
+  {
+    "character": "哪",
+    "pinyin": "nǎ",
+    "keyword": "which",
+    "sourcePinyin": "na3",
+    "sourceSense": "which",
+    "note": "Common question word."
+  },
+  {
+    "character": "天",
+    "pinyin": "tiān",
+    "keyword": "sky",
+    "sourcePinyin": "tian1",
+    "sourceSense": "sky",
+    "note": "Chosen for the common modern sky sense."
+  },
+  {
+    "character": "回",
+    "pinyin": "huí",
+    "keyword": "return",
+    "sourcePinyin": "hui2",
+    "sourceSense": "to go back; to return; to turn back; to turn around",
+    "note": "common return verb"
+  },
+  {
+    "character": "大",
+    "pinyin": "dà",
+    "keyword": "big",
+    "sourcePinyin": "da4",
+    "sourceSense": "big; large; great",
+    "note": "Basic adjective."
+  },
+  {
+    "character": "最",
+    "pinyin": "zuì",
+    "keyword": "most",
+    "sourcePinyin": "zui4",
+    "sourceSense": "(before an adjective or verb) to the highest degree; (the) most ...; -est",
+    "note": "Chosen for the common modern most sense."
+  },
+  {
+    "character": "间",
+    "pinyin": "jiān",
+    "keyword": "between",
+    "sourcePinyin": "jian1",
+    "sourceSense": "between",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "歉",
+    "pinyin": "qiàn",
+    "keyword": "sorry",
+    "sourcePinyin": "qian4",
+    "sourceSense": "to apologize",
+    "note": "Common apology root."
+  },
+  {
+    "character": "抱",
+    "pinyin": "bào",
+    "keyword": "hug",
+    "sourcePinyin": "bao4",
+    "sourceSense": "to hug",
+    "note": "Chosen for the common modern hug sense."
+  },
+  {
+    "character": "切",
+    "pinyin": "qiē",
+    "keyword": "cut",
+    "sourcePinyin": "qie1",
+    "sourceSense": "to cut; to slice; to carve",
+    "note": "corrected first-tone cutting sense"
+  },
+  {
+    "character": "离",
+    "pinyin": "lí",
+    "keyword": "leave",
+    "sourcePinyin": "li2",
+    "sourceSense": "to leave",
+    "note": "Common movement verb."
+  },
+  {
+    "character": "点",
+    "pinyin": "diǎn",
+    "keyword": "point",
+    "sourcePinyin": "dian3",
+    "sourceSense": "point; dot; spot; speck",
+    "note": "Chosen for the common modern point sense."
+  },
+  {
+    "character": "必",
+    "pinyin": "bì",
+    "keyword": "must",
+    "sourcePinyin": "bi4",
+    "sourceSense": "must",
+    "note": "common necessity adverb"
+  },
+  {
+    "character": "须",
+    "pinyin": "xū",
+    "keyword": "must",
+    "sourcePinyin": "xu1",
+    "sourceSense": "must",
+    "note": "Common obligation word."
+  },
+  {
+    "character": "钱",
+    "pinyin": "qián",
+    "keyword": "money",
+    "sourcePinyin": "qian2",
+    "sourceSense": "money",
+    "note": "Chosen for the common modern money sense."
+  },
+  {
+    "character": "情",
+    "pinyin": "qíng",
+    "keyword": "feeling",
+    "sourcePinyin": "qing2",
+    "sourceSense": "(bound form) feelings; emotion; sentiment; passion",
+    "note": "common emotion sense"
+  },
+  {
+    "character": "发",
+    "pinyin": "fā",
+    "keyword": "send out",
+    "sourcePinyin": "fa1",
+    "sourceSense": "to send out",
+    "note": "Common verb in 发送/发生."
+  },
+  {
+    "character": "爸",
+    "pinyin": "bà",
+    "keyword": "father",
+    "sourcePinyin": "ba4",
+    "sourceSense": "father",
+    "note": "Chosen for the common modern father sense."
+  },
+  {
+    "character": "信",
+    "pinyin": "xìn",
+    "keyword": "trust",
+    "sourcePinyin": "xin4",
+    "sourceSense": "to trust",
+    "note": "common trust sense"
+  },
+  {
+    "character": "相",
+    "pinyin": "xiāng",
+    "keyword": "each other",
+    "sourcePinyin": "xiang1",
+    "sourceSense": "each other",
+    "note": "Common reciprocal prefix."
+  },
+  {
+    "character": "爱",
+    "pinyin": "ài",
+    "keyword": "love",
+    "sourcePinyin": "ai4",
+    "sourceSense": "to love; to be fond of; to like",
+    "note": "Chosen for the common modern love sense."
+  },
+  {
+    "character": "常",
+    "pinyin": "cháng",
+    "keyword": "often",
+    "sourcePinyin": "chang2",
+    "sourceSense": "often",
+    "note": "common frequency sense"
+  },
+  {
+    "character": "非",
+    "pinyin": "fēi",
+    "keyword": "not",
+    "sourcePinyin": "fei1",
+    "sourceSense": "to not be; not",
+    "note": "Common negative prefix/verb."
+  },
+  {
+    "character": "明",
+    "pinyin": "míng",
+    "keyword": "bright",
+    "sourcePinyin": "ming2",
+    "sourceSense": "bright",
+    "note": "Chosen for the common modern bright sense."
+  },
+  {
+    "character": "白",
+    "pinyin": "bái",
+    "keyword": "white",
+    "sourcePinyin": "bai2",
+    "sourceSense": "white",
+    "note": "basic color sense"
+  },
+  {
+    "character": "许",
+    "pinyin": "xǔ",
+    "keyword": "allow",
+    "sourcePinyin": "xu3",
+    "sourceSense": "to allow",
+    "note": "Common permission root."
+  },
+  {
+    "character": "打",
+    "pinyin": "dǎ",
+    "keyword": "hit",
+    "sourcePinyin": "da3",
+    "sourceSense": "to hit; to strike",
+    "note": "Chosen for the common modern hit sense."
+  },
+  {
+    "character": "带",
+    "pinyin": "dài",
+    "keyword": "carry",
+    "sourcePinyin": "dai4",
+    "sourceSense": "to carry",
+    "note": "common carry/bring sense"
+  },
+  {
+    "character": "們",
+    "pinyin": "men",
+    "keyword": "plural marker",
+    "sourcePinyin": "men5",
+    "sourceSense": "plural marker for pronouns, and nouns referring to individuals",
+    "note": "Neutral plural suffix."
+  },
+  {
+    "character": "意",
+    "pinyin": "yì",
+    "keyword": "meaning",
+    "sourcePinyin": "yi4",
+    "sourceSense": "(bound form) idea; thought; meaning; sense",
+    "note": "Chosen for the common modern meaning sense."
+  },
+  {
+    "character": "思",
+    "pinyin": "sī",
+    "keyword": "think",
+    "sourcePinyin": "si1",
+    "sourceSense": "to think",
+    "note": "common thought verb"
+  },
+  {
+    "character": "家",
+    "pinyin": "jiā",
+    "keyword": "home",
+    "sourcePinyin": "jia1",
+    "sourceSense": "home",
+    "note": "Common home/family word."
+  },
+  {
+    "character": "认",
+    "pinyin": "rèn",
+    "keyword": "recognize",
+    "sourcePinyin": "ren4",
+    "sourceSense": "to recognize",
+    "note": "Chosen for the common modern recognize sense."
+  },
+  {
+    "character": "杀",
+    "pinyin": "shā",
+    "keyword": "kill",
+    "sourcePinyin": "sha1",
+    "sourceSense": "to kill; to slay; to murder; to attack",
+    "note": "common action verb"
+  },
+  {
+    "character": "准",
+    "pinyin": "zhǔn",
+    "keyword": "allow",
+    "sourcePinyin": "zhun3",
+    "sourceSense": "to allow",
+    "note": "Common permission sense."
+  },
+  {
+    "character": "备",
+    "pinyin": "bèi",
+    "keyword": "prepare",
+    "sourcePinyin": "bei4",
+    "sourceSense": "(bound form) to prepare; to equip",
+    "note": "Chosen for the common modern prepare sense."
+  },
+  {
+    "character": "出",
+    "pinyin": "chū",
+    "keyword": "go out",
+    "sourcePinyin": "chu1",
+    "sourceSense": "to go out; to come out",
+    "note": "basic outward motion"
+  },
+  {
+    "character": "种",
+    "pinyin": "zhǒng",
+    "keyword": "kind",
+    "sourcePinyin": "zhong3",
+    "sourceSense": "kind",
+    "note": "Common classifier/noun in 这种."
+  },
+  {
+    "character": "见",
+    "pinyin": "jiàn",
+    "keyword": "see",
+    "sourcePinyin": "jian4",
+    "sourceSense": "to see",
+    "note": "Chosen for the common modern see sense."
+  },
+  {
+    "character": "喂",
+    "pinyin": "wèi",
+    "keyword": "hey",
+    "sourcePinyin": "wei4",
+    "sourceSense": "hey",
+    "note": "common attention-getting reading"
+  },
+  {
+    "character": "您",
+    "pinyin": "nín",
+    "keyword": "you",
+    "sourcePinyin": "nin2",
+    "sourceSense": "you (courteous, as opposed to informal 你[ni3])",
+    "note": "Honorific second-person form."
+  },
+  {
+    "character": "感",
+    "pinyin": "gǎn",
+    "keyword": "feel",
+    "sourcePinyin": "gan3",
+    "sourceSense": "to feel",
+    "note": "Chosen for the common modern feel sense."
+  },
+  {
+    "character": "错",
+    "pinyin": "cuò",
+    "keyword": "wrong",
+    "sourcePinyin": "cuo4",
+    "sourceSense": "wrong",
+    "note": "common mistake/wrong sense"
+  },
+  {
+    "character": "女",
+    "pinyin": "nǚ",
+    "keyword": "female",
+    "sourcePinyin": "nu:3",
+    "sourceSense": "female",
+    "note": "Common gender/family root."
+  },
+  {
+    "character": "次",
+    "pinyin": "cì",
+    "keyword": "occurrence counter",
+    "sourcePinyin": "ci4",
+    "sourceSense": "classifier for enumerated events: time",
+    "note": "Uses event-counting sense in 一次/这次."
+  },
+  {
+    "character": "任",
+    "pinyin": "rèn",
+    "keyword": "appoint",
+    "sourcePinyin": "ren4",
+    "sourceSense": "to appoint",
+    "note": "common assign/appoint sense"
+  },
+  {
+    "character": "何",
+    "pinyin": "hé",
+    "keyword": "what",
+    "sourcePinyin": "he2",
+    "sourceSense": "what",
+    "note": "Common formal question root."
+  },
+  {
+    "character": "會",
+    "pinyin": "huì",
+    "keyword": "can",
+    "sourcePinyin": "hui4",
+    "sourceSense": "can; to have the skill; to know how to",
+    "note": "Chosen for the common modern can sense."
+  },
+  {
+    "character": "现",
+    "pinyin": "xiàn",
+    "keyword": "present",
+    "sourcePinyin": "xian4",
+    "sourceSense": "present",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "两",
+    "pinyin": "liǎng",
+    "keyword": "two",
+    "sourcePinyin": "liang3",
+    "sourceSense": "two",
+    "note": "Basic counting form before classifiers."
+  },
+  {
+    "character": "活",
+    "pinyin": "huó",
+    "keyword": "live",
+    "sourcePinyin": "huo2",
+    "sourceSense": "to live",
+    "note": "Chosen for the common modern live sense."
+  },
+  {
+    "character": "肯",
+    "pinyin": "kěn",
+    "keyword": "willing",
+    "sourcePinyin": "ken3",
+    "sourceSense": "to be willing to",
+    "note": "common willingness sense"
+  },
+  {
+    "character": "用",
+    "pinyin": "yòng",
+    "keyword": "use",
+    "sourcePinyin": "yong4",
+    "sourceSense": "to use; to make use of; to employ",
+    "note": "Core utility verb."
+  },
+  {
+    "character": "心",
+    "pinyin": "xīn",
+    "keyword": "heart",
+    "sourcePinyin": "xin1",
+    "sourceSense": "heart",
+    "note": "Chosen for the common modern heart sense."
+  },
+  {
+    "character": "担",
+    "pinyin": "dān",
+    "keyword": "shoulder",
+    "sourcePinyin": "dan1",
+    "sourceSense": "to shoulder",
+    "note": "common carry-responsibility sense"
+  },
+  {
+    "character": "记",
+    "pinyin": "jì",
+    "keyword": "remember",
+    "sourcePinyin": "ji4",
+    "sourceSense": "to remember",
+    "note": "Common memory verb."
+  },
+  {
+    "character": "行",
+    "pinyin": "xíng",
+    "keyword": "go",
+    "sourcePinyin": "xing2",
+    "sourceSense": "(bound form) to walk; to go; to travel",
+    "note": "Chosen for the common modern go sense."
+  },
+  {
+    "character": "男",
+    "pinyin": "nán",
+    "keyword": "male",
+    "sourcePinyin": "nan2",
+    "sourceSense": "(bound form) male",
+    "note": "common gender bound form"
+  },
+  {
+    "character": "麼",
+    "pinyin": "me",
+    "keyword": "question suffix",
+    "sourcePinyin": "me5",
+    "sourceSense": "suffix, used to form interrogative 什麼|什么[shen2 me5], what?, indefinite 這麼|这么[zhe4 me5] thus, etc",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "世",
+    "pinyin": "shì",
+    "keyword": "world",
+    "sourcePinyin": "shi4",
+    "sourceSense": "world",
+    "note": "Chosen for the common modern world sense."
+  },
+  {
+    "character": "界",
+    "pinyin": "jiè",
+    "keyword": "boundary",
+    "sourcePinyin": "jie4",
+    "sourceSense": "(bound form) boundary; border",
+    "note": "common border sense"
+  },
+  {
+    "character": "住",
+    "pinyin": "zhù",
+    "keyword": "live",
+    "sourcePinyin": "zhu4",
+    "sourceSense": "to live; to reside; to stay",
+    "note": "Common residence verb."
+  },
+  {
+    "character": "名",
+    "pinyin": "míng",
+    "keyword": "name",
+    "sourcePinyin": "ming2",
+    "sourceSense": "name",
+    "note": "Chosen for the common modern name sense."
+  },
+  {
+    "character": "字",
+    "pinyin": "zì",
+    "keyword": "character",
+    "sourcePinyin": "zi4",
+    "sourceSense": "character",
+    "note": "common written-character sense"
+  },
+  {
+    "character": "小",
+    "pinyin": "xiǎo",
+    "keyword": "small",
+    "sourcePinyin": "xiao3",
+    "sourceSense": "small",
+    "note": "Basic adjective."
+  },
+  {
+    "character": "儿",
+    "pinyin": "ér",
+    "keyword": "child",
+    "sourcePinyin": "er2",
+    "sourceSense": "child",
+    "note": "Chosen for the common modern child sense."
+  },
+  {
+    "character": "干",
+    "pinyin": "gān",
+    "keyword": "dry",
+    "sourcePinyin": "gan1",
+    "sourceSense": "dry",
+    "note": "corrected first-tone dry sense"
+  },
+  {
+    "character": "亲",
+    "pinyin": "qīn",
+    "keyword": "parent",
+    "sourcePinyin": "qin1",
+    "sourceSense": "parent",
+    "note": "Common family root."
+  },
+  {
+    "character": "說",
+    "pinyin": "shuō",
+    "keyword": "say",
+    "sourcePinyin": "shuo1",
+    "sourceSense": "to speak; to talk; to say",
+    "note": "Chosen for the common modern say sense."
+  },
+  {
+    "character": "识",
+    "pinyin": "shí",
+    "keyword": "know",
+    "sourcePinyin": "shi2",
+    "sourceSense": "to know",
+    "note": "common know/knowledge reading"
+  },
+  {
+    "character": "重",
+    "pinyin": "zhòng",
+    "keyword": "heavy",
+    "sourcePinyin": "zhong4",
+    "sourceSense": "heavy",
+    "note": "Common adjective; avoids repeat reading."
+  },
+  {
+    "character": "底",
+    "pinyin": "dǐ",
+    "keyword": "bottom",
+    "sourcePinyin": "di3",
+    "sourceSense": "bottom; base",
+    "note": "Uses ordinary bottom/base reading of 底."
+  },
+  {
+    "character": "继",
+    "pinyin": "jì",
+    "keyword": "continue",
+    "sourcePinyin": "ji4",
+    "sourceSense": "to continue",
+    "note": "common continuation verb"
+  },
+  {
+    "character": "续",
+    "pinyin": "xù",
+    "keyword": "continue",
+    "sourcePinyin": "xu4",
+    "sourceSense": "to continue",
+    "note": "Common continuation root."
+  },
+  {
+    "character": "父",
+    "pinyin": "fù",
+    "keyword": "father",
+    "sourcePinyin": "fu4",
+    "sourceSense": "(bound form) father",
+    "note": "Chosen for the common modern father sense."
+  },
+  {
+    "character": "医",
+    "pinyin": "yī",
+    "keyword": "medicine",
+    "sourcePinyin": "yi1",
+    "sourceSense": "medicine",
+    "note": "common medical sense"
+  },
+  {
+    "character": "年",
+    "pinyin": "nián",
+    "keyword": "year",
+    "sourcePinyin": "nian2",
+    "sourceSense": "year",
+    "note": "Basic time noun."
+  },
+  {
+    "character": "新",
+    "pinyin": "xīn",
+    "keyword": "new",
+    "sourcePinyin": "xin1",
+    "sourceSense": "new",
+    "note": "Chosen for the common modern new sense."
+  },
+  {
+    "character": "這",
+    "pinyin": "zhè",
+    "keyword": "this",
+    "sourcePinyin": "zhe4",
+    "sourceSense": "(pronoun) this; these",
+    "note": "common demonstrative reading"
+  },
+  {
+    "character": "如",
+    "pinyin": "rú",
+    "keyword": "as",
+    "sourcePinyin": "ru2",
+    "sourceSense": "as",
+    "note": "Common comparison connector."
+  },
+  {
+    "character": "姐",
+    "pinyin": "jiě",
+    "keyword": "older sister",
+    "sourcePinyin": "jie3",
+    "sourceSense": "older sister",
+    "note": "Chosen for the common modern older sister sense."
+  },
+  {
+    "character": "上",
+    "pinyin": "shàng",
+    "keyword": "up",
+    "sourcePinyin": "shang4",
+    "sourceSense": "(bound form) up; upper; above; previous",
+    "note": "common upward/above reading"
+  },
+  {
+    "character": "马",
+    "pinyin": "mǎ",
+    "keyword": "horse",
+    "sourcePinyin": "ma3",
+    "sourceSense": "horse",
+    "note": "Basic animal noun."
+  },
+  {
+    "character": "买",
+    "pinyin": "mǎi",
+    "keyword": "buy",
+    "sourcePinyin": "mai3",
+    "sourceSense": "to buy",
+    "note": "Chosen for the common modern buy sense."
+  },
+  {
+    "character": "话",
+    "pinyin": "huà",
+    "keyword": "speech",
+    "sourcePinyin": "hua4",
+    "sourceSense": "speech",
+    "note": "common spoken-language sense"
+  },
+  {
+    "character": "电",
+    "pinyin": "diàn",
+    "keyword": "electricity",
+    "sourcePinyin": "dian4",
+    "sourceSense": "electricity",
+    "note": "Common modern noun/root."
+  },
+  {
+    "character": "托",
+    "pinyin": "tuō",
+    "keyword": "entrust",
+    "sourcePinyin": "tuo1",
+    "sourceSense": "to ask; to beg; to entrust (variant of 託|托[tuo1])",
+    "note": "Chosen for the common modern entrust sense."
+  },
+  {
+    "character": "拜",
+    "pinyin": "bài",
+    "keyword": "pay respects",
+    "sourcePinyin": "bai4",
+    "sourceSense": "to bow to; to pay one's respects",
+    "note": "common greeting/respect verb"
+  },
+  {
+    "character": "全",
+    "pinyin": "quán",
+    "keyword": "all",
+    "sourcePinyin": "quan2",
+    "sourceSense": "all",
+    "note": "Common totality adjective."
+  },
+  {
+    "character": "完",
+    "pinyin": "wán",
+    "keyword": "complete",
+    "sourcePinyin": "wan2",
+    "sourceSense": "complete",
+    "note": "Chosen for the common modern complete sense."
+  },
+  {
+    "character": "跑",
+    "pinyin": "pǎo",
+    "keyword": "run",
+    "sourcePinyin": "pao3",
+    "sourceSense": "to run",
+    "note": "common running verb"
+  },
+  {
+    "character": "少",
+    "pinyin": "shǎo",
+    "keyword": "few",
+    "sourcePinyin": "shao3",
+    "sourceSense": "few",
+    "note": "Common quantity adjective."
+  },
+  {
+    "character": "警",
+    "pinyin": "jǐng",
+    "keyword": "warn",
+    "sourcePinyin": "jing3",
+    "sourceSense": "to warn",
+    "note": "Chosen for the common modern warn sense."
+  },
+  {
+    "character": "察",
+    "pinyin": "chá",
+    "keyword": "examine",
+    "sourcePinyin": "cha2",
+    "sourceSense": "to examine",
+    "note": "common inspect/inquire verb"
+  },
+  {
+    "character": "况",
+    "pinyin": "kuàng",
+    "keyword": "situation",
+    "sourcePinyin": "kuang4",
+    "sourceSense": "situation",
+    "note": "Used in 情况."
+  },
+  {
+    "character": "其",
+    "pinyin": "qí",
+    "keyword": "its",
+    "sourcePinyin": "qi2",
+    "sourceSense": "its",
+    "note": "Chosen for the common modern its sense."
+  },
+  {
+    "character": "月",
+    "pinyin": "yuè",
+    "keyword": "month",
+    "sourcePinyin": "yue4",
+    "sourceSense": "month",
+    "note": "common calendar sense"
+  },
+  {
+    "character": "法",
+    "pinyin": "fǎ",
+    "keyword": "law",
+    "sourcePinyin": "fa3",
+    "sourceSense": "law",
+    "note": "Common law/method root."
+  },
+  {
+    "character": "无",
+    "pinyin": "wú",
+    "keyword": "no",
+    "sourcePinyin": "wu2",
+    "sourceSense": "no",
+    "note": "Chosen for the common modern no sense."
+  },
+  {
+    "character": "却",
+    "pinyin": "què",
+    "keyword": "but",
+    "sourcePinyin": "que4",
+    "sourceSense": "but",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "放",
+    "pinyin": "fàng",
+    "keyword": "put",
+    "sourcePinyin": "fang4",
+    "sourceSense": "to put",
+    "note": "Common placement verb."
+  },
+  {
+    "character": "远",
+    "pinyin": "yuǎn",
+    "keyword": "far",
+    "sourcePinyin": "yuan3",
+    "sourceSense": "far",
+    "note": "Chosen for the common modern far sense."
+  },
+  {
+    "character": "永",
+    "pinyin": "yǒng",
+    "keyword": "forever",
+    "sourcePinyin": "yong3",
+    "sourceSense": "forever",
+    "note": "common permanence sense"
+  },
+  {
+    "character": "喝",
+    "pinyin": "hē",
+    "keyword": "drink",
+    "sourcePinyin": "he1",
+    "sourceSense": "to drink",
+    "note": "Core daily verb."
+  },
+  {
+    "character": "成",
+    "pinyin": "chéng",
+    "keyword": "become",
+    "sourcePinyin": "cheng2",
+    "sourceSense": "to become",
+    "note": "Chosen for the common modern become sense."
+  },
+  {
+    "character": "写",
+    "pinyin": "xiě",
+    "keyword": "write",
+    "sourcePinyin": "xie3",
+    "sourceSense": "to write",
+    "note": "basic writing verb"
+  },
+  {
+    "character": "玩",
+    "pinyin": "wán",
+    "keyword": "play",
+    "sourcePinyin": "wan2",
+    "sourceSense": "to play",
+    "note": "Core leisure verb."
+  },
+  {
+    "character": "办",
+    "pinyin": "bàn",
+    "keyword": "manage",
+    "sourcePinyin": "ban4",
+    "sourceSense": "to establish; to set up; to manage; to run (an enterprise)",
+    "note": "Chosen for the common modern manage sense."
+  },
+  {
+    "character": "确",
+    "pinyin": "què",
+    "keyword": "true",
+    "sourcePinyin": "que4",
+    "sourceSense": "true",
+    "note": "common real/true sense"
+  },
+  {
+    "character": "帝",
+    "pinyin": "dì",
+    "keyword": "emperor",
+    "sourcePinyin": "di4",
+    "sourceSense": "(bound form) emperor; sovereign; supreme deity",
+    "note": "Bound historical/religious root."
+  },
+  {
+    "character": "伙",
+    "pinyin": "huǒ",
+    "keyword": "companion",
+    "sourcePinyin": "huo3",
+    "sourceSense": "companion",
+    "note": "Chosen for the common modern companion sense."
+  },
+  {
+    "character": "送",
+    "pinyin": "sòng",
+    "keyword": "send",
+    "sourcePinyin": "song4",
+    "sourceSense": "to send; to deliver; to transmit",
+    "note": "common sending verb"
+  },
+  {
+    "character": "结",
+    "pinyin": "jié",
+    "keyword": "knot",
+    "sourcePinyin": "jie2",
+    "sourceSense": "knot",
+    "note": "Common root in 结婚/结果."
+  },
+  {
+    "character": "束",
+    "pinyin": "shù",
+    "keyword": "bind",
+    "sourcePinyin": "shu4",
+    "sourceSense": "to bind",
+    "note": "Chosen for the common modern bind sense."
+  },
+  {
+    "character": "决",
+    "pinyin": "jué",
+    "keyword": "decide",
+    "sourcePinyin": "jue2",
+    "sourceSense": "to decide",
+    "note": "common decision verb"
+  },
+  {
+    "character": "了",
+    "pinyin": "le",
+    "keyword": "completed-action particle",
+    "sourcePinyin": "le5",
+    "sourceSense": "(completed action marker)",
+    "note": "Neutral aspect particle."
+  },
+  {
+    "character": "解",
+    "pinyin": "jiě",
+    "keyword": "explain",
+    "sourcePinyin": "jie3",
+    "sourceSense": "to explain",
+    "note": "Chosen for the common modern explain sense."
+  },
+  {
+    "character": "嘛",
+    "pinyin": "ma",
+    "keyword": "obviousness particle",
+    "sourcePinyin": "ma5",
+    "sourceSense": "modal particle indicating that sth is obvious",
+    "note": "neutral modal particle"
+  },
+  {
+    "character": "机",
+    "pinyin": "jī",
+    "keyword": "machine",
+    "sourcePinyin": "ji1",
+    "sourceSense": "(bound form) machine; mechanism",
+    "note": "Common bound root."
+  },
+  {
+    "character": "還",
+    "pinyin": "hái",
+    "keyword": "still",
+    "sourcePinyin": "hai2",
+    "sourceSense": "still",
+    "note": "Chosen for the common modern still sense."
+  },
+  {
+    "character": "公",
+    "pinyin": "gōng",
+    "keyword": "public",
+    "sourcePinyin": "gong1",
+    "sourceSense": "public",
+    "note": "common public sense"
+  },
+  {
+    "character": "司",
+    "pinyin": "sī",
+    "keyword": "manage",
+    "sourcePinyin": "si1",
+    "sourceSense": "to take charge of",
+    "note": "Common management root."
+  },
+  {
+    "character": "楚",
+    "pinyin": "chǔ",
+    "keyword": "clear",
+    "sourcePinyin": "chu3",
+    "sourceSense": "distinct",
+    "note": "Chosen for the common modern clear sense."
+  },
+  {
+    "character": "清",
+    "pinyin": "qīng",
+    "keyword": "clear",
+    "sourcePinyin": "qing1",
+    "sourceSense": "(of water etc) clear; clean",
+    "note": "common clear/clean sense"
+  },
+  {
+    "character": "美",
+    "pinyin": "měi",
+    "keyword": "beautiful",
+    "sourcePinyin": "mei3",
+    "sourceSense": "beautiful",
+    "note": "Common adjective."
+  },
+  {
+    "character": "国",
+    "pinyin": "guó",
+    "keyword": "country",
+    "sourcePinyin": "guo2",
+    "sourceSense": "country; nation; state",
+    "note": "Chosen for the common modern country sense."
+  },
+  {
+    "character": "实",
+    "pinyin": "shí",
+    "keyword": "real",
+    "sourcePinyin": "shi2",
+    "sourceSense": "real",
+    "note": "common real/true sense"
+  },
+  {
+    "character": "助",
+    "pinyin": "zhù",
+    "keyword": "help",
+    "sourcePinyin": "zhu4",
+    "sourceSense": "to help",
+    "note": "Common assistance root."
+  },
+  {
+    "character": "兄",
+    "pinyin": "xiōng",
+    "keyword": "elder brother",
+    "sourcePinyin": "xiong1",
+    "sourceSense": "elder brother",
+    "note": "Chosen for the common modern elder brother sense."
+  },
+  {
+    "character": "弟",
+    "pinyin": "dì",
+    "keyword": "younger brother",
+    "sourcePinyin": "di4",
+    "sourceSense": "younger brother",
+    "note": "common kinship sense"
+  },
+  {
+    "character": "蛋",
+    "pinyin": "dàn",
+    "keyword": "egg",
+    "sourcePinyin": "dan4",
+    "sourceSense": "egg",
+    "note": "Common noun/root."
+  },
+  {
+    "character": "混",
+    "pinyin": "hùn",
+    "keyword": "mix",
+    "sourcePinyin": "hun4",
+    "sourceSense": "to mix",
+    "note": "Chosen for the common modern mix sense."
+  },
+  {
+    "character": "本",
+    "pinyin": "běn",
+    "keyword": "source",
+    "sourcePinyin": "ben3",
+    "sourceSense": "(bound form) origin; source",
+    "note": "common root/basis sense"
+  },
+  {
+    "character": "根",
+    "pinyin": "gēn",
+    "keyword": "root",
+    "sourcePinyin": "gen1",
+    "sourceSense": "root",
+    "note": "Concrete and abstract root sense."
+  },
+  {
+    "character": "懂",
+    "pinyin": "dǒng",
+    "keyword": "understand",
+    "sourcePinyin": "dong3",
+    "sourceSense": "to understand",
+    "note": "Chosen for the common modern understand sense."
+  },
+  {
+    "character": "來",
+    "pinyin": "lái",
+    "keyword": "come",
+    "sourcePinyin": "lai2",
+    "sourceSense": "to come",
+    "note": "basic motion verb"
+  },
+  {
+    "character": "安",
+    "pinyin": "ān",
+    "keyword": "safe",
+    "sourcePinyin": "an1",
+    "sourceSense": "safe; secure; in good health",
+    "note": "Common 安全 sense."
+  },
+  {
+    "character": "坐",
+    "pinyin": "zuò",
+    "keyword": "sit",
+    "sourcePinyin": "zuo4",
+    "sourceSense": "to sit",
+    "note": "Chosen for the common modern sit sense."
+  },
+  {
+    "character": "搞",
+    "pinyin": "gǎo",
+    "keyword": "do",
+    "sourcePinyin": "gao3",
+    "sourceSense": "to do",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "着",
+    "pinyin": "zhe",
+    "keyword": "ongoing particle",
+    "sourcePinyin": "zhe5",
+    "sourceSense": "aspect particle indicating action in progress or ongoing state",
+    "note": "Neutral aspect particle."
+  },
+  {
+    "character": "计",
+    "pinyin": "jì",
+    "keyword": "calculate",
+    "sourcePinyin": "ji4",
+    "sourceSense": "to calculate",
+    "note": "Chosen for the common modern calculate sense."
+  },
+  {
+    "character": "划",
+    "pinyin": "huá",
+    "keyword": "row",
+    "sourcePinyin": "hua2",
+    "sourceSense": "to row",
+    "note": "corrected second-tone boating sense"
+  },
+  {
+    "character": "长",
+    "pinyin": "cháng",
+    "keyword": "long",
+    "sourcePinyin": "chang2",
+    "sourceSense": "long",
+    "note": "Common adjective; avoids zhǎng growth reading."
+  },
+  {
+    "character": "官",
+    "pinyin": "guān",
+    "keyword": "official",
+    "sourcePinyin": "guan1",
+    "sourceSense": "government official",
+    "note": "Chosen for the common modern official sense."
+  },
+  {
+    "character": "号",
+    "pinyin": "hào",
+    "keyword": "number",
+    "sourcePinyin": "hao4",
+    "sourceSense": "(after a numeral) number designation (e.g. 237號房間|237号房间[er4 san1 qi1 hao4 fang2 jian1] \"Room 237\")",
+    "note": "common label/number reading"
+  },
+  {
+    "character": "睡",
+    "pinyin": "shuì",
+    "keyword": "sleep",
+    "sourcePinyin": "shui4",
+    "sourceSense": "to sleep",
+    "note": "Core daily verb."
+  },
+  {
+    "character": "站",
+    "pinyin": "zhàn",
+    "keyword": "station",
+    "sourcePinyin": "zhan4",
+    "sourceSense": "station",
+    "note": "Chosen for the common modern station sense."
+  },
+  {
+    "character": "待",
+    "pinyin": "dài",
+    "keyword": "wait",
+    "sourcePinyin": "dai4",
+    "sourceSense": "to wait",
+    "note": "common waiting verb"
+  },
+  {
+    "character": "宝",
+    "pinyin": "bǎo",
+    "keyword": "treasure",
+    "sourcePinyin": "bao3",
+    "sourceSense": "jewel",
+    "note": "Common precious-object root."
+  },
+  {
+    "character": "贝",
+    "pinyin": "bèi",
+    "keyword": "shell",
+    "sourcePinyin": "bei4",
+    "sourceSense": "cowrie",
+    "note": "Chosen for the common modern shell sense."
+  },
+  {
+    "character": "愿",
+    "pinyin": "yuàn",
+    "keyword": "wish",
+    "sourcePinyin": "yuan4",
+    "sourceSense": "(bound form) wish; hope; desire",
+    "note": "common wish/desire sense"
+  },
+  {
+    "character": "房",
+    "pinyin": "fáng",
+    "keyword": "house",
+    "sourcePinyin": "fang2",
+    "sourceSense": "house",
+    "note": "Common residence noun."
+  },
+  {
+    "character": "进",
+    "pinyin": "jìn",
+    "keyword": "enter",
+    "sourcePinyin": "jin4",
+    "sourceSense": "to enter",
+    "note": "Chosen for the common modern enter sense."
+  },
+  {
+    "character": "边",
+    "pinyin": "biān",
+    "keyword": "side",
+    "sourcePinyin": "bian1",
+    "sourceSense": "side",
+    "note": "common side/edge sense"
+  },
+  {
+    "character": "母",
+    "pinyin": "mǔ",
+    "keyword": "mother",
+    "sourcePinyin": "mu3",
+    "sourceSense": "mother",
+    "note": "Common family noun."
+  },
+  {
+    "character": "正",
+    "pinyin": "zhèng",
+    "keyword": "correct",
+    "sourcePinyin": "zheng4",
+    "sourceSense": "proper",
+    "note": "Chosen for the common modern correct sense."
+  },
+  {
+    "character": "每",
+    "pinyin": "měi",
+    "keyword": "every",
+    "sourcePinyin": "mei3",
+    "sourceSense": "every",
+    "note": "common distributive determiner"
+  },
+  {
+    "character": "烦",
+    "pinyin": "fán",
+    "keyword": "bother",
+    "sourcePinyin": "fan2",
+    "sourceSense": "to bother",
+    "note": "Common feeling/action root."
+  },
+  {
+    "character": "麻",
+    "pinyin": "má",
+    "keyword": "hemp",
+    "sourcePinyin": "ma2",
+    "sourceSense": "generic name for hemp, flax etc",
+    "note": "Chosen for the common modern hemp sense."
+  },
+  {
+    "character": "件",
+    "pinyin": "jiàn",
+    "keyword": "item",
+    "sourcePinyin": "jian4",
+    "sourceSense": "item",
+    "note": "common item/classifier sense"
+  },
+  {
+    "character": "枪",
+    "pinyin": "qiāng",
+    "keyword": "gun",
+    "sourcePinyin": "qiang1",
+    "sourceSense": "gun",
+    "note": "Common concrete noun."
+  },
+  {
+    "character": "算",
+    "pinyin": "suàn",
+    "keyword": "calculate",
+    "sourcePinyin": "suan4",
+    "sourceSense": "to calculate; to figure out",
+    "note": "Chosen for the common modern calculate sense."
+  },
+  {
+    "character": "至",
+    "pinyin": "zhì",
+    "keyword": "arrive",
+    "sourcePinyin": "zhi4",
+    "sourceSense": "to arrive",
+    "note": "common reach/arrive sense"
+  },
+  {
+    "character": "甚",
+    "pinyin": "shèn",
+    "keyword": "very",
+    "sourcePinyin": "shen4",
+    "sourceSense": "very; extremely",
+    "note": "Common emphatic reading in 甚至."
+  },
+  {
+    "character": "刚",
+    "pinyin": "gāng",
+    "keyword": "just",
+    "sourcePinyin": "gang1",
+    "sourceSense": "just; only a short while ago",
+    "note": "Chooses common just-now adverbial sense over hard/strong."
+  },
+  {
+    "character": "手",
+    "pinyin": "shǒu",
+    "keyword": "hand",
+    "sourcePinyin": "shou3",
+    "sourceSense": "hand",
+    "note": "basic body-part sense"
+  },
+  {
+    "character": "关",
+    "pinyin": "guān",
+    "keyword": "close",
+    "sourcePinyin": "guan1",
+    "sourceSense": "to close; to shut; to turn off",
+    "note": "Core action verb."
+  },
+  {
+    "character": "系",
+    "pinyin": "xì",
+    "keyword": "system",
+    "sourcePinyin": "xi4",
+    "sourceSense": "system",
+    "note": "Chosen for the common modern system sense."
+  },
+  {
+    "character": "受",
+    "pinyin": "shòu",
+    "keyword": "receive",
+    "sourcePinyin": "shou4",
+    "sourceSense": "to receive",
+    "note": "common receive/accept sense"
+  },
+  {
+    "character": "接",
+    "pinyin": "jiē",
+    "keyword": "receive",
+    "sourcePinyin": "jie1",
+    "sourceSense": "to receive",
+    "note": "Common interaction verb."
+  },
+  {
+    "character": "变",
+    "pinyin": "biàn",
+    "keyword": "change",
+    "sourcePinyin": "bian4",
+    "sourceSense": "to change",
+    "note": "Chosen for the common modern change sense."
+  },
+  {
+    "character": "改",
+    "pinyin": "gǎi",
+    "keyword": "change",
+    "sourcePinyin": "gai3",
+    "sourceSense": "to change",
+    "note": "common change verb"
+  },
+  {
+    "character": "害",
+    "pinyin": "hài",
+    "keyword": "harm",
+    "sourcePinyin": "hai4",
+    "sourceSense": "to do harm to",
+    "note": "Common harm verb."
+  },
+  {
+    "character": "怕",
+    "pinyin": "pà",
+    "keyword": "fear",
+    "sourcePinyin": "pa4",
+    "sourceSense": "to be afraid",
+    "note": "Chosen for the common modern fear sense."
+  },
+  {
+    "character": "救",
+    "pinyin": "jiù",
+    "keyword": "save",
+    "sourcePinyin": "jiu4",
+    "sourceSense": "to save",
+    "note": "common rescue/help verb"
+  },
+  {
+    "character": "选",
+    "pinyin": "xuǎn",
+    "keyword": "choose",
+    "sourcePinyin": "xuan3",
+    "sourceSense": "to choose",
+    "note": "Core selection verb."
+  },
+  {
+    "character": "择",
+    "pinyin": "zé",
+    "keyword": "choose",
+    "sourcePinyin": "ze2",
+    "sourceSense": "to select",
+    "note": "Chosen for the common modern choose sense."
+  },
+  {
+    "character": "故",
+    "pinyin": "gù",
+    "keyword": "reason",
+    "sourcePinyin": "gu4",
+    "sourceSense": "reason",
+    "note": "common cause/reason sense"
+  },
+  {
+    "character": "弄",
+    "pinyin": "nòng",
+    "keyword": "do",
+    "sourcePinyin": "nong4",
+    "sourceSense": "to do",
+    "note": "Common colloquial verb."
+  },
+  {
+    "character": "车",
+    "pinyin": "chē",
+    "keyword": "car",
+    "sourcePinyin": "che1",
+    "sourceSense": "car",
+    "note": "Chosen for the common modern car sense."
+  },
+  {
+    "character": "原",
+    "pinyin": "yuán",
+    "keyword": "original",
+    "sourcePinyin": "yuan2",
+    "sourceSense": "original",
+    "note": "common former/original sense"
+  },
+  {
+    "character": "因",
+    "pinyin": "yīn",
+    "keyword": "cause",
+    "sourcePinyin": "yin1",
+    "sourceSense": "cause",
+    "note": "Common reason/cause root."
+  },
+  {
+    "character": "谈",
+    "pinyin": "tán",
+    "keyword": "talk",
+    "sourcePinyin": "tan2",
+    "sourceSense": "to talk",
+    "note": "Chosen for the common modern talk sense."
+  },
+  {
+    "character": "亮",
+    "pinyin": "liàng",
+    "keyword": "bright",
+    "sourcePinyin": "liang4",
+    "sourceSense": "bright; light",
+    "note": "basic light sense"
+  },
+  {
+    "character": "漂",
+    "pinyin": "piào",
+    "keyword": "pretty",
+    "sourcePinyin": "piao4",
+    "sourceSense": "used in 漂亮[piao4 liang5]",
+    "note": "Word-specific reading in 漂亮."
+  },
+  {
+    "character": "特",
+    "pinyin": "tè",
+    "keyword": "special",
+    "sourcePinyin": "te4",
+    "sourceSense": "special",
+    "note": "Chosen for the common modern special sense."
+  },
+  {
+    "character": "夫",
+    "pinyin": "fū",
+    "keyword": "husband",
+    "sourcePinyin": "fu1",
+    "sourceSense": "husband",
+    "note": "common husband/man sense"
+  },
+  {
+    "character": "士",
+    "pinyin": "shì",
+    "keyword": "honorific",
+    "sourcePinyin": "shi4",
+    "sourceSense": "honorific",
+    "note": "Useful role sense in 女士."
+  },
+  {
+    "character": "忙",
+    "pinyin": "máng",
+    "keyword": "busy",
+    "sourcePinyin": "mang2",
+    "sourceSense": "busy",
+    "note": "Chosen for the common modern busy sense."
+  },
+  {
+    "character": "怪",
+    "pinyin": "guài",
+    "keyword": "strange",
+    "sourcePinyin": "guai4",
+    "sourceSense": "odd; strange; uncanny",
+    "note": "common odd/strange sense"
+  },
+  {
+    "character": "奇",
+    "pinyin": "qí",
+    "keyword": "strange",
+    "sourcePinyin": "qi2",
+    "sourceSense": "strange",
+    "note": "Common adjective."
+  },
+  {
+    "character": "或",
+    "pinyin": "huò",
+    "keyword": "or",
+    "sourcePinyin": "huo4",
+    "sourceSense": "or",
+    "note": "Chosen for the common modern or sense."
+  },
+  {
+    "character": "几",
+    "pinyin": "jǐ",
+    "keyword": "how many",
+    "sourcePinyin": "ji3",
+    "sourceSense": "how many; how much",
+    "note": "corrected third-tone quantity reading"
+  },
+  {
+    "character": "功",
+    "pinyin": "gōng",
+    "keyword": "achievement",
+    "sourcePinyin": "gong1",
+    "sourceSense": "achievement",
+    "note": "Common success root."
+  },
+  {
+    "character": "对",
+    "pinyin": "duì",
+    "keyword": "correct",
+    "sourcePinyin": "dui4",
+    "sourceSense": "right; correct",
+    "note": "Chosen for the common modern correct sense."
+  },
+  {
+    "character": "绝",
+    "pinyin": "jué",
+    "keyword": "end",
+    "sourcePinyin": "jue2",
+    "sourceSense": "to cut short",
+    "note": "common terminate/extinct sense"
+  },
+  {
+    "character": "穿",
+    "pinyin": "chuān",
+    "keyword": "wear",
+    "sourcePinyin": "chuan1",
+    "sourceSense": "to wear; to put on (clothes, shoes etc.)",
+    "note": "Core clothing verb."
+  },
+  {
+    "character": "挺",
+    "pinyin": "tǐng",
+    "keyword": "quite",
+    "sourcePinyin": "ting3",
+    "sourceSense": "(coll.) quite",
+    "note": "Chosen for the common modern quite sense."
+  },
+  {
+    "character": "够",
+    "pinyin": "gòu",
+    "keyword": "enough",
+    "sourcePinyin": "gou4",
+    "sourceSense": "enough (sufficient)",
+    "note": "common sufficiency sense"
+  },
+  {
+    "character": "失",
+    "pinyin": "shī",
+    "keyword": "lose",
+    "sourcePinyin": "shi1",
+    "sourceSense": "to lose",
+    "note": "Common loss verb."
+  },
+  {
+    "character": "另",
+    "pinyin": "lìng",
+    "keyword": "another",
+    "sourcePinyin": "ling4",
+    "sourceSense": "another",
+    "note": "Chosen for the common modern another sense."
+  },
+  {
+    "character": "保",
+    "pinyin": "bǎo",
+    "keyword": "protect",
+    "sourcePinyin": "bao3",
+    "sourceSense": "to defend; to protect; to keep",
+    "note": "common protect/keep sense"
+  },
+  {
+    "character": "护",
+    "pinyin": "hù",
+    "keyword": "protect",
+    "sourcePinyin": "hu4",
+    "sourceSense": "to protect",
+    "note": "Common protection root."
+  },
+  {
+    "character": "位",
+    "pinyin": "wèi",
+    "keyword": "person classifier",
+    "sourcePinyin": "wei4",
+    "sourceSense": "classifier for people (honorific)",
+    "note": "Chosen for the common modern person classifier sense."
+  },
+  {
+    "character": "各",
+    "pinyin": "gè",
+    "keyword": "each",
+    "sourcePinyin": "ge4",
+    "sourceSense": "each",
+    "note": "common distributive determiner"
+  },
+  {
+    "character": "後",
+    "pinyin": "hòu",
+    "keyword": "after",
+    "sourcePinyin": "hou4",
+    "sourceSense": "after",
+    "note": "Traditional form; common time relation."
+  },
+  {
+    "character": "果",
+    "pinyin": "guǒ",
+    "keyword": "fruit",
+    "sourcePinyin": "guo3",
+    "sourceSense": "fruit",
+    "note": "Chosen for the common modern fruit sense."
+  },
+  {
+    "character": "婚",
+    "pinyin": "hūn",
+    "keyword": "marriage",
+    "sourcePinyin": "hun1",
+    "sourceSense": "(bound form) marriage; wedding",
+    "note": "common marriage sense"
+  },
+  {
+    "character": "理",
+    "pinyin": "lǐ",
+    "keyword": "reason",
+    "sourcePinyin": "li3",
+    "sourceSense": "reason",
+    "note": "Common abstract noun/root."
+  },
+  {
+    "character": "处",
+    "pinyin": "chù",
+    "keyword": "place",
+    "sourcePinyin": "chu4",
+    "sourceSense": "(bound form) place; locality",
+    "note": "Uses place reading in 到处; residence is separate."
+  },
+  {
+    "character": "从",
+    "pinyin": "cóng",
+    "keyword": "from",
+    "sourcePinyin": "cong2",
+    "sourceSense": "from; through; via",
+    "note": "common preposition/source reading"
+  },
+  {
+    "character": "服",
+    "pinyin": "fú",
+    "keyword": "clothes",
+    "sourcePinyin": "fu2",
+    "sourceSense": "clothes",
+    "note": "Common clothing noun."
+  },
+  {
+    "character": "衣",
+    "pinyin": "yī",
+    "keyword": "clothes",
+    "sourcePinyin": "yi1",
+    "sourceSense": "clothes",
+    "note": "Chosen for the common modern clothes sense."
+  },
+  {
+    "character": "否",
+    "pinyin": "fǒu",
+    "keyword": "no",
+    "sourcePinyin": "fou3",
+    "sourceSense": "to negate",
+    "note": "common negation reading"
+  },
+  {
+    "character": "笑",
+    "pinyin": "xiào",
+    "keyword": "laugh",
+    "sourcePinyin": "xiao4",
+    "sourceSense": "to laugh; to smile",
+    "note": "Core expression verb."
+  },
+  {
+    "character": "高",
+    "pinyin": "gāo",
+    "keyword": "tall",
+    "sourcePinyin": "gao1",
+    "sourceSense": "high",
+    "note": "Chosen for the common modern tall sense."
+  },
+  {
+    "character": "加",
+    "pinyin": "jiā",
+    "keyword": "add",
+    "sourcePinyin": "jia1",
+    "sourceSense": "to add",
+    "note": "common addition verb"
+  },
+  {
+    "character": "参",
+    "pinyin": "cān",
+    "keyword": "participate",
+    "sourcePinyin": "can1",
+    "sourceSense": "to take part in",
+    "note": "Common reading in 参加."
+  },
+  {
+    "character": "岁",
+    "pinyin": "suì",
+    "keyword": "years old",
+    "sourcePinyin": "sui4",
+    "sourceSense": "years old",
+    "note": "Chosen for the common modern years old sense."
+  },
+  {
+    "character": "老",
+    "pinyin": "lǎo",
+    "keyword": "old",
+    "sourcePinyin": "lao3",
+    "sourceSense": "old (of people)",
+    "note": "common age adjective"
+  },
+  {
+    "character": "学",
+    "pinyin": "xué",
+    "keyword": "learn",
+    "sourcePinyin": "xue2",
+    "sourceSense": "to learn",
+    "note": "Core study verb."
+  },
+  {
+    "character": "校",
+    "pinyin": "xiào",
+    "keyword": "school",
+    "sourcePinyin": "xiao4",
+    "sourceSense": "(bound form) school; college",
+    "note": "Chosen for the common modern school sense."
+  },
+  {
+    "character": "照",
+    "pinyin": "zhào",
+    "keyword": "according to",
+    "sourcePinyin": "zhao4",
+    "sourceSense": "according to",
+    "note": "common accordance reading"
+  },
+  {
+    "character": "片",
+    "pinyin": "piàn",
+    "keyword": "slice",
+    "sourcePinyin": "pian4",
+    "sourceSense": "a slice",
+    "note": "Common classifier/noun sense."
+  },
+  {
+    "character": "疯",
+    "pinyin": "fēng",
+    "keyword": "crazy",
+    "sourcePinyin": "feng1",
+    "sourceSense": "insane",
+    "note": "Chosen for the common modern crazy sense."
+  },
+  {
+    "character": "狗",
+    "pinyin": "gǒu",
+    "keyword": "dog",
+    "sourcePinyin": "gou3",
+    "sourceSense": "dog",
+    "note": "basic animal noun"
+  },
+  {
+    "character": "证",
+    "pinyin": "zhèng",
+    "keyword": "certificate",
+    "sourcePinyin": "zheng4",
+    "sourceSense": "certificate",
+    "note": "Common proof/certificate root."
+  },
+  {
+    "character": "第",
+    "pinyin": "dì",
+    "keyword": "ordinal prefix",
+    "sourcePinyin": "di4",
+    "sourceSense": "(prefix indicating ordinal number, as in 第六[di4 liu4] \"sixth\")",
+    "note": "Chosen for the common modern ordinal prefix sense."
+  },
+  {
+    "character": "注",
+    "pinyin": "zhù",
+    "keyword": "focus",
+    "sourcePinyin": "zhu4",
+    "sourceSense": "(bound form) to focus (one's spirit, gaze etc) on a single point; to concentrate",
+    "note": "common concentration sense"
+  },
+  {
+    "character": "音",
+    "pinyin": "yīn",
+    "keyword": "sound",
+    "sourcePinyin": "yin1",
+    "sourceSense": "sound",
+    "note": "Common sound noun/root."
+  },
+  {
+    "character": "声",
+    "pinyin": "shēng",
+    "keyword": "sound",
+    "sourcePinyin": "sheng1",
+    "sourceSense": "sound",
+    "note": "Chosen for the common modern sound sense."
+  },
+  {
+    "character": "难",
+    "pinyin": "nán",
+    "keyword": "difficult",
+    "sourcePinyin": "nan2",
+    "sourceSense": "difficult (to...)",
+    "note": "common difficulty adjective"
+  },
+  {
+    "character": "所",
+    "pinyin": "suǒ",
+    "keyword": "place",
+    "sourcePinyin": "suo3",
+    "sourceSense": "place",
+    "note": "Common location noun/root."
+  },
+  {
+    "character": "花",
+    "pinyin": "huā",
+    "keyword": "flower",
+    "sourcePinyin": "hua1",
+    "sourceSense": "flower",
+    "note": "Chosen for the common modern flower sense."
+  },
+  {
+    "character": "妻",
+    "pinyin": "qī",
+    "keyword": "wife",
+    "sourcePinyin": "qi1",
+    "sourceSense": "(bound form) wife",
+    "note": "common kinship sense"
+  },
+  {
+    "character": "突",
+    "pinyin": "tū",
+    "keyword": "sudden",
+    "sourcePinyin": "tu1",
+    "sourceSense": "sudden",
+    "note": "Common adjective/root."
+  },
+  {
+    "character": "讲",
+    "pinyin": "jiǎng",
+    "keyword": "speak",
+    "sourcePinyin": "jiang3",
+    "sourceSense": "to speak",
+    "note": "Chosen for the common modern speak sense."
+  },
+  {
+    "character": "忘",
+    "pinyin": "wàng",
+    "keyword": "forget",
+    "sourcePinyin": "wang4",
+    "sourceSense": "to forget",
+    "note": "common memory verb"
+  },
+  {
+    "character": "命",
+    "pinyin": "mìng",
+    "keyword": "life",
+    "sourcePinyin": "ming4",
+    "sourceSense": "life",
+    "note": "Common life/fate noun."
+  },
+  {
+    "character": "求",
+    "pinyin": "qiú",
+    "keyword": "seek",
+    "sourcePinyin": "qiu2",
+    "sourceSense": "to seek",
+    "note": "Chosen for the common modern seek sense."
+  },
+  {
+    "character": "同",
+    "pinyin": "tóng",
+    "keyword": "same",
+    "sourcePinyin": "tong2",
+    "sourceSense": "same",
+    "note": "common similarity sense"
+  },
+  {
+    "character": "三",
+    "pinyin": "sān",
+    "keyword": "three",
+    "sourcePinyin": "san1",
+    "sourceSense": "three",
+    "note": "Basic numeral."
+  },
+  {
+    "character": "危",
+    "pinyin": "wēi",
+    "keyword": "danger",
+    "sourcePinyin": "wei1",
+    "sourceSense": "danger",
+    "note": "Chosen for the common modern danger sense."
+  },
+  {
+    "character": "险",
+    "pinyin": "xiǎn",
+    "keyword": "danger",
+    "sourcePinyin": "xian3",
+    "sourceSense": "danger",
+    "note": "common danger sense"
+  },
+  {
+    "character": "嘴",
+    "pinyin": "zuǐ",
+    "keyword": "mouth",
+    "sourcePinyin": "zui3",
+    "sourceSense": "mouth",
+    "note": "Common body noun."
+  },
+  {
+    "character": "闭",
+    "pinyin": "bì",
+    "keyword": "close",
+    "sourcePinyin": "bi4",
+    "sourceSense": "to close",
+    "note": "Chosen for the common modern close sense."
+  },
+  {
+    "character": "讓",
+    "pinyin": "ràng",
+    "keyword": "let",
+    "sourcePinyin": "rang4",
+    "sourceSense": "to permit",
+    "note": "Same let cue as simplified 让."
+  },
+  {
+    "character": "师",
+    "pinyin": "shī",
+    "keyword": "teacher",
+    "sourcePinyin": "shi1",
+    "sourceSense": "teacher",
+    "note": "Common profession noun."
+  },
+  {
+    "character": "個",
+    "pinyin": "gè",
+    "keyword": "individual",
+    "sourcePinyin": "ge4",
+    "sourceSense": "(bound form) individual",
+    "note": "Use the individual cue for the general classifier; this also matches the curriculum standalone word."
+  },
+  {
+    "character": "沒",
+    "pinyin": "méi",
+    "keyword": "not yet",
+    "sourcePinyin": "mei2",
+    "sourceSense": "(negative prefix for verbs) have not; not",
+    "note": "common negative prefix"
+  },
+  {
+    "character": "影",
+    "pinyin": "yǐng",
+    "keyword": "picture",
+    "sourcePinyin": "ying3",
+    "sourceSense": "picture",
+    "note": "Common image/media root."
+  },
+  {
+    "character": "讨",
+    "pinyin": "tǎo",
+    "keyword": "discuss",
+    "sourcePinyin": "tao3",
+    "sourceSense": "to discuss or study",
+    "note": "Chosen for the common modern discuss sense."
+  },
+  {
+    "character": "厌",
+    "pinyin": "yàn",
+    "keyword": "dislike",
+    "sourcePinyin": "yan4",
+    "sourceSense": "(bound form) to loathe; to be fed up with",
+    "note": "common dislike sense"
+  },
+  {
+    "character": "式",
+    "pinyin": "shì",
+    "keyword": "type",
+    "sourcePinyin": "shi4",
+    "sourceSense": "type",
+    "note": "Common form/style root."
+  },
+  {
+    "character": "丈",
+    "pinyin": "zhàng",
+    "keyword": "husband",
+    "sourcePinyin": "zhang4",
+    "sourceSense": "husband",
+    "note": "Chosen for the common modern husband sense."
+  },
+  {
+    "character": "拉",
+    "pinyin": "lā",
+    "keyword": "pull",
+    "sourcePinyin": "la1",
+    "sourceSense": "to pull",
+    "note": "common pulling verb"
+  },
+  {
+    "character": "查",
+    "pinyin": "chá",
+    "keyword": "check",
+    "sourcePinyin": "cha2",
+    "sourceSense": "to check",
+    "note": "Common investigation verb."
+  },
+  {
+    "character": "调",
+    "pinyin": "diào",
+    "keyword": "tune",
+    "sourcePinyin": "diao4",
+    "sourceSense": "tune",
+    "note": "Chooses musical tune reading of 调 (diào)."
+  },
+  {
+    "character": "院",
+    "pinyin": "yuàn",
+    "keyword": "courtyard",
+    "sourcePinyin": "yuan4",
+    "sourceSense": "courtyard",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "力",
+    "pinyin": "lì",
+    "keyword": "power",
+    "sourcePinyin": "li4",
+    "sourceSense": "power",
+    "note": "Common ability/strength root."
+  },
+  {
+    "character": "努",
+    "pinyin": "nǔ",
+    "keyword": "strive",
+    "sourcePinyin": "nu3",
+    "sourceSense": "to strive",
+    "note": "Chosen for the common modern strive sense."
+  },
+  {
+    "character": "动",
+    "pinyin": "dòng",
+    "keyword": "move",
+    "sourcePinyin": "dong4",
+    "sourceSense": "(of sth) to move",
+    "note": "basic motion verb"
+  },
+  {
+    "character": "眼",
+    "pinyin": "yǎn",
+    "keyword": "eye",
+    "sourcePinyin": "yan3",
+    "sourceSense": "eye (CL:隻|只[zhi1],雙|双[shuang1])",
+    "note": "Common body noun."
+  },
+  {
+    "character": "睛",
+    "pinyin": "jīng",
+    "keyword": "eyeball",
+    "sourcePinyin": "jing1",
+    "sourceSense": "eye; eyeball",
+    "note": "Chosen for the common modern eyeball sense."
+  },
+  {
+    "character": "类",
+    "pinyin": "lèi",
+    "keyword": "type",
+    "sourcePinyin": "lei4",
+    "sourceSense": "kind; type; class; category",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "律",
+    "pinyin": "lǜ",
+    "keyword": "law",
+    "sourcePinyin": "lu:4",
+    "sourceSense": "law",
+    "note": "Common legal root."
+  },
+  {
+    "character": "顾",
+    "pinyin": "gù",
+    "keyword": "look after",
+    "sourcePinyin": "gu4",
+    "sourceSense": "to look after; to take into consideration; to attend to",
+    "note": "Chosen for the common modern look after sense."
+  },
+  {
+    "character": "迎",
+    "pinyin": "yíng",
+    "keyword": "welcome",
+    "sourcePinyin": "ying2",
+    "sourceSense": "to welcome; to meet",
+    "note": "common greeting verb"
+  },
+  {
+    "character": "比",
+    "pinyin": "bǐ",
+    "keyword": "compare",
+    "sourcePinyin": "bi3",
+    "sourceSense": "to compare",
+    "note": "Core comparison verb."
+  },
+  {
+    "character": "赛",
+    "pinyin": "sài",
+    "keyword": "compete",
+    "sourcePinyin": "sai4",
+    "sourceSense": "to compete",
+    "note": "Chosen for the common modern compete sense."
+  },
+  {
+    "character": "体",
+    "pinyin": "tǐ",
+    "keyword": "body",
+    "sourcePinyin": "ti3",
+    "sourceSense": "body",
+    "note": "common body/form sense"
+  },
+  {
+    "character": "身",
+    "pinyin": "shēn",
+    "keyword": "body",
+    "sourcePinyin": "shen1",
+    "sourceSense": "body",
+    "note": "Common body/person root."
+  },
+  {
+    "character": "收",
+    "pinyin": "shōu",
+    "keyword": "collect",
+    "sourcePinyin": "shou1",
+    "sourceSense": "to collect",
+    "note": "Chosen for the common modern collect sense."
+  },
+  {
+    "character": "赢",
+    "pinyin": "yíng",
+    "keyword": "win",
+    "sourcePinyin": "ying2",
+    "sourceSense": "to win",
+    "note": "common victory verb"
+  },
+  {
+    "character": "易",
+    "pinyin": "yì",
+    "keyword": "easy",
+    "sourcePinyin": "yi4",
+    "sourceSense": "easy",
+    "note": "Common adjective."
+  },
+  {
+    "character": "容",
+    "pinyin": "róng",
+    "keyword": "contain",
+    "sourcePinyin": "rong2",
+    "sourceSense": "to contain",
+    "note": "Chosen for the common modern contain sense."
+  },
+  {
+    "character": "伤",
+    "pinyin": "shāng",
+    "keyword": "injury",
+    "sourcePinyin": "shang1",
+    "sourceSense": "injury",
+    "note": "common injury sense"
+  },
+  {
+    "character": "息",
+    "pinyin": "xī",
+    "keyword": "breath",
+    "sourcePinyin": "xi1",
+    "sourceSense": "(bound form) breath",
+    "note": "Common root in 休息/消息."
+  },
+  {
+    "character": "消",
+    "pinyin": "xiāo",
+    "keyword": "diminish",
+    "sourcePinyin": "xiao1",
+    "sourceSense": "to diminish; to subside",
+    "note": "Chosen for the common modern diminish sense."
+  },
+  {
+    "character": "靠",
+    "pinyin": "kào",
+    "keyword": "depend",
+    "sourcePinyin": "kao4",
+    "sourceSense": "to depend on",
+    "note": "common reliance sense"
+  },
+  {
+    "character": "于",
+    "pinyin": "yú",
+    "keyword": "at",
+    "sourcePinyin": "yu2",
+    "sourceSense": "(of time or place) in; at; on",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "终",
+    "pinyin": "zhōng",
+    "keyword": "end",
+    "sourcePinyin": "zhong1",
+    "sourceSense": "end",
+    "note": "Chosen for the common modern end sense."
+  },
+  {
+    "character": "主",
+    "pinyin": "zhǔ",
+    "keyword": "owner",
+    "sourcePinyin": "zhu3",
+    "sourceSense": "owner",
+    "note": "common owner/main sense"
+  },
+  {
+    "character": "倒",
+    "pinyin": "dào",
+    "keyword": "invert",
+    "sourcePinyin": "dao4",
+    "sourceSense": "to invert; to place upside down or frontside back",
+    "note": "Chosen for input's dào reading."
+  },
+  {
+    "character": "趣",
+    "pinyin": "qù",
+    "keyword": "interesting",
+    "sourcePinyin": "qu4",
+    "sourceSense": "interesting",
+    "note": "Chosen for the common modern interesting sense."
+  },
+  {
+    "character": "抓",
+    "pinyin": "zhuā",
+    "keyword": "grab",
+    "sourcePinyin": "zhua1",
+    "sourceSense": "to grab",
+    "note": "common grasping verb"
+  },
+  {
+    "character": "俩",
+    "pinyin": "liǎ",
+    "keyword": "two",
+    "sourcePinyin": "lia3",
+    "sourceSense": "two (colloquial equivalent of 兩個|两个)",
+    "note": "Colloquial pair form."
+  },
+  {
+    "character": "入",
+    "pinyin": "rù",
+    "keyword": "enter",
+    "sourcePinyin": "ru4",
+    "sourceSense": "to enter; to go into",
+    "note": "Chosen for the common modern enter sense."
+  },
+  {
+    "character": "简",
+    "pinyin": "jiǎn",
+    "keyword": "simple",
+    "sourcePinyin": "jian3",
+    "sourceSense": "simple",
+    "note": "common simplicity adjective"
+  },
+  {
+    "character": "单",
+    "pinyin": "dān",
+    "keyword": "single",
+    "sourcePinyin": "dan1",
+    "sourceSense": "single",
+    "note": "Common basic adjective."
+  },
+  {
+    "character": "表",
+    "pinyin": "biǎo",
+    "keyword": "show",
+    "sourcePinyin": "biao3",
+    "sourceSense": "to show (one's opinion)",
+    "note": "Uses verb show sense in 表达/表示."
+  },
+  {
+    "character": "代",
+    "pinyin": "dài",
+    "keyword": "replace",
+    "sourcePinyin": "dai4",
+    "sourceSense": "to be a substitute for; to act on behalf of; to replace; to substitute",
+    "note": "common substitution sense"
+  },
+  {
+    "character": "拍",
+    "pinyin": "pāi",
+    "keyword": "pat",
+    "sourcePinyin": "pai1",
+    "sourceSense": "to pat",
+    "note": "Common touch/action verb."
+  },
+  {
+    "character": "哥",
+    "pinyin": "gē",
+    "keyword": "elder brother",
+    "sourcePinyin": "ge1",
+    "sourceSense": "elder brother",
+    "note": "Chosen for the common modern elder brother sense."
+  },
+  {
+    "character": "水",
+    "pinyin": "shuǐ",
+    "keyword": "water",
+    "sourcePinyin": "shui3",
+    "sourceSense": "water",
+    "note": "basic substance noun"
+  },
+  {
+    "character": "留",
+    "pinyin": "liú",
+    "keyword": "stay",
+    "sourcePinyin": "liu2",
+    "sourceSense": "to stay",
+    "note": "Common residence/retention verb."
+  },
+  {
+    "character": "休",
+    "pinyin": "xiū",
+    "keyword": "rest",
+    "sourcePinyin": "xiu1",
+    "sourceSense": "to rest",
+    "note": "Chosen for the common modern rest sense."
+  },
+  {
+    "character": "糕",
+    "pinyin": "gāo",
+    "keyword": "cake",
+    "sourcePinyin": "gao1",
+    "sourceSense": "cake",
+    "note": "common food noun"
+  },
+  {
+    "character": "糟",
+    "pinyin": "zāo",
+    "keyword": "rotten",
+    "sourcePinyin": "zao1",
+    "sourceSense": "rotten",
+    "note": "Common negative adjective/root."
+  },
+  {
+    "character": "猜",
+    "pinyin": "cāi",
+    "keyword": "guess",
+    "sourcePinyin": "cai1",
+    "sourceSense": "to guess",
+    "note": "Chosen for the common modern guess sense."
+  },
+  {
+    "character": "亡",
+    "pinyin": "wáng",
+    "keyword": "die",
+    "sourcePinyin": "wang2",
+    "sourceSense": "to die",
+    "note": "common death verb"
+  },
+  {
+    "character": "曾",
+    "pinyin": "céng",
+    "keyword": "once",
+    "sourcePinyin": "ceng2",
+    "sourceSense": "once",
+    "note": "Common past-time adverb."
+  },
+  {
+    "character": "在",
+    "pinyin": "zài",
+    "keyword": "located at",
+    "sourcePinyin": "zai4",
+    "sourceSense": "(of sb or sth) to be (located) at",
+    "note": "The locative verb cue matches the selected sense."
+  },
+  {
+    "character": "存",
+    "pinyin": "cún",
+    "keyword": "keep",
+    "sourcePinyin": "cun2",
+    "sourceSense": "to keep",
+    "note": "common keep/store sense"
+  },
+  {
+    "character": "释",
+    "pinyin": "shì",
+    "keyword": "explain",
+    "sourcePinyin": "shi4",
+    "sourceSense": "to explain",
+    "note": "Common explanation root."
+  },
+  {
+    "character": "概",
+    "pinyin": "gài",
+    "keyword": "approximately",
+    "sourcePinyin": "gai4",
+    "sourceSense": "(bound form) general; approximate",
+    "note": "Chosen for the common modern approximately sense."
+  },
+  {
+    "character": "务",
+    "pinyin": "wù",
+    "keyword": "affairs",
+    "sourcePinyin": "wu4",
+    "sourceSense": "affair",
+    "note": "common matters/business sense"
+  },
+  {
+    "character": "跳",
+    "pinyin": "tiào",
+    "keyword": "jump",
+    "sourcePinyin": "tiao4",
+    "sourceSense": "to jump",
+    "note": "Core movement verb."
+  },
+  {
+    "character": "头",
+    "pinyin": "tóu",
+    "keyword": "head",
+    "sourcePinyin": "tou2",
+    "sourceSense": "head",
+    "note": "Chosen for the common modern head sense."
+  },
+  {
+    "character": "久",
+    "pinyin": "jiǔ",
+    "keyword": "long",
+    "sourcePinyin": "jiu3",
+    "sourceSense": "(of a period of time) long",
+    "note": "common duration sense"
+  },
+  {
+    "character": "答",
+    "pinyin": "dá",
+    "keyword": "answer",
+    "sourcePinyin": "da2",
+    "sourceSense": "to answer",
+    "note": "Common response verb."
+  },
+  {
+    "character": "耶",
+    "pinyin": "ye",
+    "keyword": "enthusiasm particle",
+    "sourcePinyin": "ye5",
+    "sourceSense": "final particle indicating enthusiasm etc",
+    "note": "Uses neutral sentence-final enthusiasm particle; transliteration is separate."
+  },
+  {
+    "character": "日",
+    "pinyin": "rì",
+    "keyword": "day",
+    "sourcePinyin": "ri4",
+    "sourceSense": "day",
+    "note": "common calendar sense"
+  },
+  {
+    "character": "考",
+    "pinyin": "kǎo",
+    "keyword": "examine",
+    "sourcePinyin": "kao3",
+    "sourceSense": "to check",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "虑",
+    "pinyin": "lǜ",
+    "keyword": "consider",
+    "sourcePinyin": "lu:4",
+    "sourceSense": "to think over",
+    "note": "Chosen for the common modern consider sense."
+  },
+  {
+    "character": "持",
+    "pinyin": "chí",
+    "keyword": "hold",
+    "sourcePinyin": "chi2",
+    "sourceSense": "to hold",
+    "note": "common hold/support sense"
+  },
+  {
+    "character": "密",
+    "pinyin": "mì",
+    "keyword": "secret",
+    "sourcePinyin": "mi4",
+    "sourceSense": "(bound form) secret; confidential",
+    "note": "Common 秘密 sense."
+  },
+  {
+    "character": "秘",
+    "pinyin": "mì",
+    "keyword": "secret",
+    "sourcePinyin": "mi4",
+    "sourceSense": "secret",
+    "note": "Chosen for the common modern secret sense."
+  },
+  {
+    "character": "克",
+    "pinyin": "kè",
+    "keyword": "overcome",
+    "sourcePinyin": "ke4",
+    "sourceSense": "to overcome",
+    "note": "common overcome/restrain sense"
+  },
+  {
+    "character": "杰",
+    "pinyin": "jié",
+    "keyword": "hero",
+    "sourcePinyin": "jie2",
+    "sourceSense": "(bound form) hero",
+    "note": "Common positive root."
+  },
+  {
+    "character": "弃",
+    "pinyin": "qì",
+    "keyword": "abandon",
+    "sourcePinyin": "qi4",
+    "sourceSense": "to abandon",
+    "note": "Chosen for the common modern abandon sense."
+  },
+  {
+    "character": "派",
+    "pinyin": "pài",
+    "keyword": "group",
+    "sourcePinyin": "pai4",
+    "sourceSense": "clique; school; group; faction",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "部",
+    "pinyin": "bù",
+    "keyword": "part",
+    "sourcePinyin": "bu4",
+    "sourceSense": "part",
+    "note": "Common section/part noun."
+  },
+  {
+    "character": "联",
+    "pinyin": "lián",
+    "keyword": "join",
+    "sourcePinyin": "lian2",
+    "sourceSense": "(bound form) to ally oneself with; to unite; to combine; to join",
+    "note": "Chosen for the common modern join sense."
+  },
+  {
+    "character": "中",
+    "pinyin": "zhōng",
+    "keyword": "middle",
+    "sourcePinyin": "zhong1",
+    "sourceSense": "middle; center",
+    "note": "common center/within sense"
+  },
+  {
+    "character": "卖",
+    "pinyin": "mài",
+    "keyword": "sell",
+    "sourcePinyin": "mai4",
+    "sourceSense": "to sell",
+    "note": "Core commerce verb."
+  },
+  {
+    "character": "痛",
+    "pinyin": "tòng",
+    "keyword": "pain",
+    "sourcePinyin": "tong4",
+    "sourceSense": "ache",
+    "note": "Chosen for the common modern pain sense."
+  },
+  {
+    "character": "苦",
+    "pinyin": "kǔ",
+    "keyword": "bitter",
+    "sourcePinyin": "ku3",
+    "sourceSense": "bitter",
+    "note": "basic taste/adversity sense"
+  },
+  {
+    "character": "晚",
+    "pinyin": "wǎn",
+    "keyword": "evening",
+    "sourcePinyin": "wan3",
+    "sourceSense": "evening",
+    "note": "Common time noun."
+  },
+  {
+    "character": "二",
+    "pinyin": "èr",
+    "keyword": "two",
+    "sourcePinyin": "er4",
+    "sourceSense": "two",
+    "note": "Chosen for the common modern two sense."
+  },
+  {
+    "character": "制",
+    "pinyin": "zhì",
+    "keyword": "control",
+    "sourcePinyin": "zhi4",
+    "sourceSense": "to control",
+    "note": "common regulate/control sense"
+  },
+  {
+    "character": "控",
+    "pinyin": "kòng",
+    "keyword": "control",
+    "sourcePinyin": "kong4",
+    "sourceSense": "to control",
+    "note": "Common management verb."
+  },
+  {
+    "character": "冷",
+    "pinyin": "lěng",
+    "keyword": "cold",
+    "sourcePinyin": "leng3",
+    "sourceSense": "cold",
+    "note": "Chosen for the common modern cold sense."
+  },
+  {
+    "character": "静",
+    "pinyin": "jìng",
+    "keyword": "quiet",
+    "sourcePinyin": "jing4",
+    "sourceSense": "quiet",
+    "note": "common still/quiet sense"
+  },
+  {
+    "character": "鬼",
+    "pinyin": "guǐ",
+    "keyword": "ghost",
+    "sourcePinyin": "gui3",
+    "sourceSense": "disembodied spirit; ghost; devil",
+    "note": "Common concrete/cultural sense."
+  },
+  {
+    "character": "由",
+    "pinyin": "yóu",
+    "keyword": "from",
+    "sourcePinyin": "you2",
+    "sourceSense": "from",
+    "note": "Chosen for the common modern from sense."
+  },
+  {
+    "character": "厉",
+    "pinyin": "lì",
+    "keyword": "strict",
+    "sourcePinyin": "li4",
+    "sourceSense": "strict",
+    "note": "common severity adjective"
+  },
+  {
+    "character": "早",
+    "pinyin": "zǎo",
+    "keyword": "early",
+    "sourcePinyin": "zao3",
+    "sourceSense": "early",
+    "note": "Common time adjective."
+  },
+  {
+    "character": "负",
+    "pinyin": "fù",
+    "keyword": "carry",
+    "sourcePinyin": "fu4",
+    "sourceSense": "to bear",
+    "note": "Chosen for the common modern carry sense."
+  },
+  {
+    "character": "责",
+    "pinyin": "zé",
+    "keyword": "responsibility",
+    "sourcePinyin": "ze2",
+    "sourceSense": "responsibility",
+    "note": "common duty sense"
+  },
+  {
+    "character": "咱",
+    "pinyin": "zán",
+    "keyword": "we",
+    "sourcePinyin": "zan2",
+    "sourceSense": "we (including both the speaker and the person spoken to)",
+    "note": "Inclusive first-person pronoun."
+  },
+  {
+    "character": "路",
+    "pinyin": "lù",
+    "keyword": "road",
+    "sourcePinyin": "lu4",
+    "sourceSense": "road (CL:條|条[tiao2])",
+    "note": "Chosen for the common modern road sense."
+  },
+  {
+    "character": "戏",
+    "pinyin": "xì",
+    "keyword": "play",
+    "sourcePinyin": "xi4",
+    "sourceSense": "play",
+    "note": "common drama/play sense"
+  },
+  {
+    "character": "游",
+    "pinyin": "yóu",
+    "keyword": "swim",
+    "sourcePinyin": "you2",
+    "sourceSense": "to swim",
+    "note": "Common modern verb."
+  },
+  {
+    "character": "使",
+    "pinyin": "shǐ",
+    "keyword": "use",
+    "sourcePinyin": "shi3",
+    "sourceSense": "to use",
+    "note": "Chosen for the common modern use sense."
+  },
+  {
+    "character": "板",
+    "pinyin": "bǎn",
+    "keyword": "board",
+    "sourcePinyin": "ban3",
+    "sourceSense": "board",
+    "note": "basic object noun"
+  },
+  {
+    "character": "乐",
+    "pinyin": "lè",
+    "keyword": "happy",
+    "sourcePinyin": "le4",
+    "sourceSense": "happy",
+    "note": "Common 快乐 reading; distinct from music yue4."
+  },
+  {
+    "character": "统",
+    "pinyin": "tǒng",
+    "keyword": "unify",
+    "sourcePinyin": "tong3",
+    "sourceSense": "to unify",
+    "note": "Chosen for the common modern unify sense."
+  },
+  {
+    "character": "总",
+    "pinyin": "zǒng",
+    "keyword": "overall",
+    "sourcePinyin": "zong3",
+    "sourceSense": "(bound form) general; overall",
+    "note": "common general/overall sense"
+  },
+  {
+    "character": "教",
+    "pinyin": "jiāo",
+    "keyword": "teach",
+    "sourcePinyin": "jiao1",
+    "sourceSense": "to teach; to instruct",
+    "note": "Use the standalone teach reading; jiào is a separate bound form."
+  },
+  {
+    "character": "战",
+    "pinyin": "zhàn",
+    "keyword": "war",
+    "sourcePinyin": "zhan4",
+    "sourceSense": "war",
+    "note": "Chosen for the common modern war sense."
+  },
+  {
+    "character": "争",
+    "pinyin": "zhēng",
+    "keyword": "strive",
+    "sourcePinyin": "zheng1",
+    "sourceSense": "to strive for",
+    "note": "common compete/strive sense"
+  },
+  {
+    "character": "器",
+    "pinyin": "qì",
+    "keyword": "device",
+    "sourcePinyin": "qi4",
+    "sourceSense": "device",
+    "note": "Common tool/device noun."
+  },
+  {
+    "character": "武",
+    "pinyin": "wǔ",
+    "keyword": "military",
+    "sourcePinyin": "wu3",
+    "sourceSense": "military",
+    "note": "Chosen for the common modern military sense."
+  },
+  {
+    "character": "哭",
+    "pinyin": "kū",
+    "keyword": "cry",
+    "sourcePinyin": "ku1",
+    "sourceSense": "to cry; to weep",
+    "note": "basic crying verb"
+  },
+  {
+    "character": "婆",
+    "pinyin": "pó",
+    "keyword": "grandmother",
+    "sourcePinyin": "po2",
+    "sourceSense": "(bound form) grandmother",
+    "note": "Common family root."
+  },
+  {
+    "character": "乎",
+    "pinyin": "hū",
+    "keyword": "final particle",
+    "sourcePinyin": "hu1",
+    "sourceSense": "(classical final particle similar to 嗎|吗[ma5], 吧[ba5], 呢[ne5], expressing question, doubt or astonishment)",
+    "note": "Uses final-particle reading found in 似乎."
+  },
+  {
+    "character": "似",
+    "pinyin": "sì",
+    "keyword": "resemble",
+    "sourcePinyin": "si4",
+    "sourceSense": "to resemble",
+    "note": "corrected fourth-tone resemblance reading"
+  },
+  {
+    "character": "遇",
+    "pinyin": "yù",
+    "keyword": "encounter",
+    "sourcePinyin": "yu4",
+    "sourceSense": "(bound form) to encounter; to happen upon; to meet unplanned",
+    "note": "Common encounter root."
+  },
+  {
+    "character": "据",
+    "pinyin": "jù",
+    "keyword": "according to",
+    "sourcePinyin": "ju4",
+    "sourceSense": "according to",
+    "note": "Chosen for the common modern according to sense."
+  },
+  {
+    "character": "室",
+    "pinyin": "shì",
+    "keyword": "room",
+    "sourcePinyin": "shi4",
+    "sourceSense": "room",
+    "note": "common room sense"
+  },
+  {
+    "character": "轻",
+    "pinyin": "qīng",
+    "keyword": "light",
+    "sourcePinyin": "qing1",
+    "sourceSense": "light",
+    "note": "Common adjective."
+  },
+  {
+    "character": "庭",
+    "pinyin": "tíng",
+    "keyword": "courtyard",
+    "sourcePinyin": "ting2",
+    "sourceSense": "front courtyard",
+    "note": "Chosen for the common modern courtyard sense."
+  },
+  {
+    "character": "酒",
+    "pinyin": "jiǔ",
+    "keyword": "alcohol",
+    "sourcePinyin": "jiu3",
+    "sourceSense": "alcoholic beverage",
+    "note": "common alcoholic-drink sense"
+  },
+  {
+    "character": "樣",
+    "pinyin": "yàng",
+    "keyword": "manner",
+    "sourcePinyin": "yang4",
+    "sourceSense": "manner",
+    "note": "Traditional form; common 这样 root."
+  },
+  {
+    "character": "棒",
+    "pinyin": "bàng",
+    "keyword": "excellent",
+    "sourcePinyin": "bang4",
+    "sourceSense": "wonderful",
+    "note": "Chosen for the common modern excellent sense."
+  },
+  {
+    "character": "反",
+    "pinyin": "fǎn",
+    "keyword": "opposite",
+    "sourcePinyin": "fan3",
+    "sourceSense": "opposite",
+    "note": "common reverse/opposite sense"
+  },
+  {
+    "character": "飞",
+    "pinyin": "fēi",
+    "keyword": "fly",
+    "sourcePinyin": "fei1",
+    "sourceSense": "to fly",
+    "note": "Core movement verb."
+  },
+  {
+    "character": "止",
+    "pinyin": "zhǐ",
+    "keyword": "stop",
+    "sourcePinyin": "zhi3",
+    "sourceSense": "to stop",
+    "note": "Chosen for the common modern stop sense."
+  },
+  {
+    "character": "阻",
+    "pinyin": "zǔ",
+    "keyword": "block",
+    "sourcePinyin": "zu3",
+    "sourceSense": "to block",
+    "note": "common obstructing verb"
+  },
+  {
+    "character": "戴",
+    "pinyin": "dài",
+    "keyword": "wear",
+    "sourcePinyin": "dai4",
+    "sourceSense": "to put on or wear (glasses, hat, gloves etc)",
+    "note": "Common clothing/accessory verb."
+  },
+  {
+    "character": "场",
+    "pinyin": "chǎng",
+    "keyword": "event counter",
+    "sourcePinyin": "chang3",
+    "sourceSense": "classifier for sporting or recreational activities",
+    "note": "Uses 场 as event/activity counter."
+  },
+  {
+    "character": "聪",
+    "pinyin": "cōng",
+    "keyword": "clever",
+    "sourcePinyin": "cong1",
+    "sourceSense": "(bound form) clever; intelligent; sharp",
+    "note": "common intelligence sense"
+  },
+  {
+    "character": "气",
+    "pinyin": "qì",
+    "keyword": "air",
+    "sourcePinyin": "qi4",
+    "sourceSense": "gas; air",
+    "note": "Common physical noun/root."
+  },
+  {
+    "character": "停",
+    "pinyin": "tíng",
+    "keyword": "stop",
+    "sourcePinyin": "ting2",
+    "sourceSense": "to stop",
+    "note": "Chosen for the common modern stop sense."
+  },
+  {
+    "character": "较",
+    "pinyin": "jiào",
+    "keyword": "relatively",
+    "sourcePinyin": "jiao4",
+    "sourceSense": "(before an adjective) relatively; comparatively; rather",
+    "note": "common comparison adverb"
+  },
+  {
+    "character": "拥",
+    "pinyin": "yōng",
+    "keyword": "embrace",
+    "sourcePinyin": "yong1",
+    "sourceSense": "to hold in one's arms; to embrace",
+    "note": "Common physical/social verb."
+  },
+  {
+    "character": "油",
+    "pinyin": "yóu",
+    "keyword": "oil",
+    "sourcePinyin": "you2",
+    "sourceSense": "oil",
+    "note": "Chosen for the common modern oil sense."
+  },
+  {
+    "character": "陪",
+    "pinyin": "péi",
+    "keyword": "accompany",
+    "sourcePinyin": "pei2",
+    "sourceSense": "to accompany",
+    "note": "common companionship verb"
+  },
+  {
+    "character": "脸",
+    "pinyin": "liǎn",
+    "keyword": "face",
+    "sourcePinyin": "lian3",
+    "sourceSense": "face",
+    "note": "Common body noun."
+  },
+  {
+    "character": "量",
+    "pinyin": "liàng",
+    "keyword": "amount",
+    "sourcePinyin": "liang4",
+    "sourceSense": "amount",
+    "note": "Uses quantity/amount (liàng), distinct from measure (liáng)."
+  },
+  {
+    "character": "置",
+    "pinyin": "zhì",
+    "keyword": "place",
+    "sourcePinyin": "zhi4",
+    "sourceSense": "to place",
+    "note": "common put/place verb"
+  },
+  {
+    "character": "吗",
+    "pinyin": "ma",
+    "keyword": "question particle",
+    "sourcePinyin": "ma5",
+    "sourceSense": "(question particle for \"yes-no\" questions)",
+    "note": "Neutral final particle."
+  },
+  {
+    "character": "尸",
+    "pinyin": "shī",
+    "keyword": "corpse",
+    "sourcePinyin": "shi1",
+    "sourceSense": "(bound form) corpse",
+    "note": "Chosen for the common modern corpse sense."
+  },
+  {
+    "character": "试",
+    "pinyin": "shì",
+    "keyword": "try",
+    "sourcePinyin": "shi4",
+    "sourceSense": "to try",
+    "note": "common testing verb"
+  },
+  {
+    "character": "操",
+    "pinyin": "cāo",
+    "keyword": "operate",
+    "sourcePinyin": "cao1",
+    "sourceSense": "to operate",
+    "note": "Chosen standard verb reading; avoids vulgar cao4."
+  },
+  {
+    "character": "坏",
+    "pinyin": "huài",
+    "keyword": "bad",
+    "sourcePinyin": "huai4",
+    "sourceSense": "bad",
+    "note": "Chosen for the common modern bad sense."
+  },
+  {
+    "character": "姑",
+    "pinyin": "gū",
+    "keyword": "aunt",
+    "sourcePinyin": "gu1",
+    "sourceSense": "paternal aunt",
+    "note": "common paternal-aunt sense"
+  },
+  {
+    "character": "娘",
+    "pinyin": "niáng",
+    "keyword": "mother",
+    "sourcePinyin": "niang2",
+    "sourceSense": "mother",
+    "note": "Common family noun/root."
+  },
+  {
+    "character": "报",
+    "pinyin": "bào",
+    "keyword": "report",
+    "sourcePinyin": "bao4",
+    "sourceSense": "to report; to inform; to announce",
+    "note": "Chosen for the common modern report sense."
+  },
+  {
+    "character": "张",
+    "pinyin": "zhāng",
+    "keyword": "spread",
+    "sourcePinyin": "zhang1",
+    "sourceSense": "to spread",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "紧",
+    "pinyin": "jǐn",
+    "keyword": "tight",
+    "sourcePinyin": "jin3",
+    "sourceSense": "tight",
+    "note": "Common adjective."
+  },
+  {
+    "character": "约",
+    "pinyin": "yuē",
+    "keyword": "appointment",
+    "sourcePinyin": "yue1",
+    "sourceSense": "to make an appointment",
+    "note": "Uses appointment reading of 约 (yuē), not weighing."
+  },
+  {
+    "character": "翰",
+    "pinyin": "hàn",
+    "keyword": "writing",
+    "sourcePinyin": "han4",
+    "sourceSense": "writing",
+    "note": "common brush/writing sense"
+  },
+  {
+    "character": "交",
+    "pinyin": "jiāo",
+    "keyword": "hand over",
+    "sourcePinyin": "jiao1",
+    "sourceSense": "to hand over; to deliver; to pay (money); to turn over",
+    "note": "Common transfer verb."
+  },
+  {
+    "character": "给",
+    "pinyin": "gěi",
+    "keyword": "give",
+    "sourcePinyin": "gei3",
+    "sourceSense": "to give",
+    "note": "Chosen for the common modern give sense."
+  },
+  {
+    "character": "支",
+    "pinyin": "zhī",
+    "keyword": "support",
+    "sourcePinyin": "zhi1",
+    "sourceSense": "to support",
+    "note": "common support/branch sense"
+  },
+  {
+    "character": "目",
+    "pinyin": "mù",
+    "keyword": "eye",
+    "sourcePinyin": "mu4",
+    "sourceSense": "eye",
+    "note": "Classical/basic eye root."
+  },
+  {
+    "character": "标",
+    "pinyin": "biāo",
+    "keyword": "mark",
+    "sourcePinyin": "biao1",
+    "sourceSense": "mark",
+    "note": "Chosen for the common modern mark sense."
+  },
+  {
+    "character": "球",
+    "pinyin": "qiú",
+    "keyword": "ball",
+    "sourcePinyin": "qiu2",
+    "sourceSense": "ball",
+    "note": "basic object noun"
+  },
+  {
+    "character": "妹",
+    "pinyin": "mèi",
+    "keyword": "younger sister",
+    "sourcePinyin": "mei4",
+    "sourceSense": "younger sister",
+    "note": "Common family noun."
+  },
+  {
+    "character": "过",
+    "pinyin": "guò",
+    "keyword": "pass",
+    "sourcePinyin": "guo4",
+    "sourceSense": "to pass (time)",
+    "note": "Uses pass-through verb reading, not neutral experienced-action marker."
+  },
+  {
+    "character": "物",
+    "pinyin": "wù",
+    "keyword": "thing",
+    "sourcePinyin": "wu4",
+    "sourceSense": "(bound form) thing",
+    "note": "common thing/object sense"
+  },
+  {
+    "character": "食",
+    "pinyin": "shí",
+    "keyword": "food",
+    "sourcePinyin": "shi2",
+    "sourceSense": "food",
+    "note": "Common food noun/root."
+  },
+  {
+    "character": "神",
+    "pinyin": "shén",
+    "keyword": "spirit",
+    "sourcePinyin": "shen2",
+    "sourceSense": "spirit; mind; energy",
+    "note": "Chosen for the common modern spirit sense."
+  },
+  {
+    "character": "条",
+    "pinyin": "tiáo",
+    "keyword": "strip",
+    "sourcePinyin": "tiao2",
+    "sourceSense": "strip",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "便",
+    "pinyin": "biàn",
+    "keyword": "convenient",
+    "sourcePinyin": "bian4",
+    "sourceSense": "convenient",
+    "note": "Common modern adjective/adverb."
+  },
+  {
+    "character": "随",
+    "pinyin": "suí",
+    "keyword": "follow",
+    "sourcePinyin": "sui2",
+    "sourceSense": "to follow",
+    "note": "Chosen for the common modern follow sense."
+  },
+  {
+    "character": "检",
+    "pinyin": "jiǎn",
+    "keyword": "check",
+    "sourcePinyin": "jian3",
+    "sourceSense": "to check",
+    "note": "common inspect verb"
+  },
+  {
+    "character": "偷",
+    "pinyin": "tōu",
+    "keyword": "steal",
+    "sourcePinyin": "tou1",
+    "sourceSense": "to steal",
+    "note": "Core action verb."
+  },
+  {
+    "character": "案",
+    "pinyin": "àn",
+    "keyword": "case",
+    "sourcePinyin": "an4",
+    "sourceSense": "(legal) case",
+    "note": "Chosen for the common modern case sense."
+  },
+  {
+    "character": "狂",
+    "pinyin": "kuáng",
+    "keyword": "wild",
+    "sourcePinyin": "kuang2",
+    "sourceSense": "wild",
+    "note": "common wild/violent sense"
+  },
+  {
+    "character": "门",
+    "pinyin": "mén",
+    "keyword": "door",
+    "sourcePinyin": "men2",
+    "sourceSense": "gate; door; doorway; gateway; opening (CL:扇[shan4])",
+    "note": "Common concrete noun."
+  },
+  {
+    "character": "排",
+    "pinyin": "pái",
+    "keyword": "arrange",
+    "sourcePinyin": "pai2",
+    "sourceSense": "to arrange in order; to line up",
+    "note": "Chosen for the common modern arrange sense."
+  },
+  {
+    "character": "狱",
+    "pinyin": "yù",
+    "keyword": "prison",
+    "sourcePinyin": "yu4",
+    "sourceSense": "prison",
+    "note": "common jail sense"
+  },
+  {
+    "character": "监",
+    "pinyin": "jiān",
+    "keyword": "supervise",
+    "sourcePinyin": "jian1",
+    "sourceSense": "to supervise",
+    "note": "Common control/inspection root."
+  },
+  {
+    "character": "博",
+    "pinyin": "bó",
+    "keyword": "broad",
+    "sourcePinyin": "bo2",
+    "sourceSense": "(bound form) abundant; plentiful; extensive; wide",
+    "note": "Chosen for the common modern broad sense."
+  },
+  {
+    "character": "船",
+    "pinyin": "chuán",
+    "keyword": "boat",
+    "sourcePinyin": "chuan2",
+    "sourceSense": "boat",
+    "note": "basic vessel noun"
+  },
+  {
+    "character": "等",
+    "pinyin": "děng",
+    "keyword": "wait",
+    "sourcePinyin": "deng3",
+    "sourceSense": "to wait for; to await",
+    "note": "Core time/action verb."
+  },
+  {
+    "character": "分",
+    "pinyin": "fēn",
+    "keyword": "divide",
+    "sourcePinyin": "fen1",
+    "sourceSense": "to divide; to separate",
+    "note": "Chosen for the common modern divide sense."
+  },
+  {
+    "character": "钟",
+    "pinyin": "zhōng",
+    "keyword": "clock",
+    "sourcePinyin": "zhong1",
+    "sourceSense": "clock (CL:座[zuo4])",
+    "note": "common clock/bell sense"
+  },
+  {
+    "character": "书",
+    "pinyin": "shū",
+    "keyword": "book",
+    "sourcePinyin": "shu1",
+    "sourceSense": "book",
+    "note": "Basic noun."
+  },
+  {
+    "character": "象",
+    "pinyin": "xiàng",
+    "keyword": "elephant",
+    "sourcePinyin": "xiang4",
+    "sourceSense": "elephant",
+    "note": "Uses ordinary elephant sense; image/appearance is separate bound use."
+  },
+  {
+    "character": "啥",
+    "pinyin": "shá",
+    "keyword": "what",
+    "sourcePinyin": "sha2",
+    "sourceSense": "dialectal equivalent of 什麼|什么[shen2 me5]",
+    "note": "common dialectal interrogative"
+  },
+  {
+    "character": "居",
+    "pinyin": "jū",
+    "keyword": "reside",
+    "sourcePinyin": "ju1",
+    "sourceSense": "(literary) to reside; to live",
+    "note": "Common residence root."
+  },
+  {
+    "character": "历",
+    "pinyin": "lì",
+    "keyword": "history",
+    "sourcePinyin": "li4",
+    "sourceSense": "history",
+    "note": "Chosen for the common modern history sense."
+  },
+  {
+    "character": "咖",
+    "pinyin": "kā",
+    "keyword": "coffee",
+    "sourcePinyin": "ka1",
+    "sourceSense": "(bound form) coffee; café (abbr. for 咖啡[ka1 fei1])",
+    "note": "bound-form coffee reading"
+  },
+  {
+    "character": "啡",
+    "pinyin": "fēi",
+    "keyword": "loanword syllable",
+    "sourcePinyin": "fei1",
+    "sourceSense": "(used in loanwords for its phonetic value)",
+    "note": "Character reading is learned through 咖啡."
+  },
+  {
+    "character": "跟",
+    "pinyin": "gēn",
+    "keyword": "follow",
+    "sourcePinyin": "gen1",
+    "sourceSense": "to follow closely",
+    "note": "Chosen for the common modern follow sense."
+  },
+  {
+    "character": "叔",
+    "pinyin": "shū",
+    "keyword": "uncle",
+    "sourcePinyin": "shu1",
+    "sourceSense": "uncle",
+    "note": "common kinship sense"
+  },
+  {
+    "character": "敢",
+    "pinyin": "gǎn",
+    "keyword": "dare",
+    "sourcePinyin": "gan3",
+    "sourceSense": "to dare",
+    "note": "Common modal/action verb."
+  },
+  {
+    "character": "令",
+    "pinyin": "lìng",
+    "keyword": "command",
+    "sourcePinyin": "ling4",
+    "sourceSense": "to command",
+    "note": "Chosen for the common modern command sense."
+  },
+  {
+    "character": "怜",
+    "pinyin": "lián",
+    "keyword": "pity",
+    "sourcePinyin": "lian2",
+    "sourceSense": "to pity",
+    "note": "common sympathy verb"
+  },
+  {
+    "character": "城",
+    "pinyin": "chéng",
+    "keyword": "city",
+    "sourcePinyin": "cheng2",
+    "sourceSense": "city",
+    "note": "Common place noun."
+  },
+  {
+    "character": "市",
+    "pinyin": "shì",
+    "keyword": "market",
+    "sourcePinyin": "shi4",
+    "sourceSense": "market",
+    "note": "Chosen for the common modern market sense."
+  },
+  {
+    "character": "府",
+    "pinyin": "fǔ",
+    "keyword": "seat of government",
+    "sourcePinyin": "fu3",
+    "sourceSense": "seat of government",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "政",
+    "pinyin": "zhèng",
+    "keyword": "politics",
+    "sourcePinyin": "zheng4",
+    "sourceSense": "politics",
+    "note": "Common government root."
+  },
+  {
+    "character": "提",
+    "pinyin": "tí",
+    "keyword": "carry",
+    "sourcePinyin": "ti2",
+    "sourceSense": "to carry (hanging down from the hand)",
+    "note": "Chosen for the common modern carry sense."
+  },
+  {
+    "character": "供",
+    "pinyin": "gōng",
+    "keyword": "supply",
+    "sourcePinyin": "gong1",
+    "sourceSense": "to provide; to supply",
+    "note": "common provide/supply sense"
+  },
+  {
+    "character": "唱",
+    "pinyin": "chàng",
+    "keyword": "sing",
+    "sourcePinyin": "chang4",
+    "sourceSense": "to sing",
+    "note": "Core music verb."
+  },
+  {
+    "character": "面",
+    "pinyin": "miàn",
+    "keyword": "face",
+    "sourcePinyin": "mian4",
+    "sourceSense": "face",
+    "note": "Chosen for the common modern face sense."
+  },
+  {
+    "character": "礼",
+    "pinyin": "lǐ",
+    "keyword": "courtesy",
+    "sourcePinyin": "li3",
+    "sourceSense": "courtesy",
+    "note": "common manners/etiquette sense"
+  },
+  {
+    "character": "研",
+    "pinyin": "yán",
+    "keyword": "study",
+    "sourcePinyin": "yan2",
+    "sourceSense": "study",
+    "note": "Common research root."
+  },
+  {
+    "character": "究",
+    "pinyin": "jiū",
+    "keyword": "investigate",
+    "sourcePinyin": "jiu1",
+    "sourceSense": "to investigate",
+    "note": "Chosen for the common modern investigate sense."
+  },
+  {
+    "character": "授",
+    "pinyin": "shòu",
+    "keyword": "teach",
+    "sourcePinyin": "shou4",
+    "sourceSense": "(bound form) to teach; to instruct",
+    "note": "common instruction sense"
+  },
+  {
+    "character": "饭",
+    "pinyin": "fàn",
+    "keyword": "meal",
+    "sourcePinyin": "fan4",
+    "sourceSense": "meal",
+    "note": "Core daily noun."
+  },
+  {
+    "character": "拒",
+    "pinyin": "jù",
+    "keyword": "refuse",
+    "sourcePinyin": "ju4",
+    "sourceSense": "to refuse",
+    "note": "Chosen for the common modern refuse sense."
+  },
+  {
+    "character": "合",
+    "pinyin": "hé",
+    "keyword": "join",
+    "sourcePinyin": "he2",
+    "sourceSense": "to join",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "适",
+    "pinyin": "shì",
+    "keyword": "suitable",
+    "sourcePinyin": "shi4",
+    "sourceSense": "suitable",
+    "note": "Common adjective/root."
+  },
+  {
+    "character": "利",
+    "pinyin": "lì",
+    "keyword": "benefit",
+    "sourcePinyin": "li4",
+    "sourceSense": "benefit",
+    "note": "Chosen for the common modern benefit sense."
+  },
+  {
+    "character": "建",
+    "pinyin": "jiàn",
+    "keyword": "build",
+    "sourcePinyin": "jian4",
+    "sourceSense": "to build",
+    "note": "common construction verb"
+  },
+  {
+    "character": "议",
+    "pinyin": "yì",
+    "keyword": "discuss",
+    "sourcePinyin": "yi4",
+    "sourceSense": "to discuss",
+    "note": "Common discussion root."
+  },
+  {
+    "character": "击",
+    "pinyin": "jī",
+    "keyword": "strike",
+    "sourcePinyin": "ji1",
+    "sourceSense": "to hit",
+    "note": "Chosen for the common modern strike sense."
+  },
+  {
+    "character": "攻",
+    "pinyin": "gōng",
+    "keyword": "attack",
+    "sourcePinyin": "gong1",
+    "sourceSense": "to attack",
+    "note": "common attack verb"
+  },
+  {
+    "character": "怀",
+    "pinyin": "huái",
+    "keyword": "bosom",
+    "sourcePinyin": "huai2",
+    "sourceSense": "bosom",
+    "note": "Literal/common root in 怀疑."
+  },
+  {
+    "character": "疑",
+    "pinyin": "yí",
+    "keyword": "doubt",
+    "sourcePinyin": "yi2",
+    "sourceSense": "(bound form) to doubt; to suspect",
+    "note": "Chosen for the common modern doubt sense."
+  },
+  {
+    "character": "梦",
+    "pinyin": "mèng",
+    "keyword": "dream",
+    "sourcePinyin": "meng4",
+    "sourceSense": "dream (CL:場|场[chang2])",
+    "note": "common dream noun/verb"
+  },
+  {
+    "character": "管",
+    "pinyin": "guǎn",
+    "keyword": "manage",
+    "sourcePinyin": "guan3",
+    "sourceSense": "to manage",
+    "note": "Common management verb."
+  },
+  {
+    "character": "呆",
+    "pinyin": "dāi",
+    "keyword": "foolish",
+    "sourcePinyin": "dai1",
+    "sourceSense": "foolish; stupid",
+    "note": "Chosen for the common modern foolish sense."
+  },
+  {
+    "character": "味",
+    "pinyin": "wèi",
+    "keyword": "taste",
+    "sourcePinyin": "wei4",
+    "sourceSense": "taste",
+    "note": "basic taste sense"
+  },
+  {
+    "character": "演",
+    "pinyin": "yǎn",
+    "keyword": "perform",
+    "sourcePinyin": "yan3",
+    "sourceSense": "to perform (a play etc); to stage (a show)",
+    "note": "Common performance verb."
+  },
+  {
+    "character": "谅",
+    "pinyin": "liàng",
+    "keyword": "excuse",
+    "sourcePinyin": "liang4",
+    "sourceSense": "to excuse",
+    "note": "Chosen for the common modern excuse sense."
+  },
+  {
+    "character": "別",
+    "pinyin": "bié",
+    "keyword": "don't",
+    "sourcePinyin": "bie2",
+    "sourceSense": "don't ...!",
+    "note": "common prohibition/other reading"
+  },
+  {
+    "character": "誓",
+    "pinyin": "shì",
+    "keyword": "oath",
+    "sourcePinyin": "shi4",
+    "sourceSense": "oath",
+    "note": "Common root in 发誓."
+  },
+  {
+    "character": "坚",
+    "pinyin": "jiān",
+    "keyword": "firm",
+    "sourcePinyin": "jian1",
+    "sourceSense": "strong",
+    "note": "Chosen for the common modern firm sense."
+  },
+  {
+    "character": "份",
+    "pinyin": "fèn",
+    "keyword": "portion",
+    "sourcePinyin": "fen4",
+    "sourceSense": "classifier for gifts, newspaper, magazine, papers, reports, contracts etc",
+    "note": "common share/classifier sense"
+  },
+  {
+    "character": "首",
+    "pinyin": "shǒu",
+    "keyword": "head",
+    "sourcePinyin": "shou3",
+    "sourceSense": "head",
+    "note": "Common head/first root."
+  },
+  {
+    "character": "斯",
+    "pinyin": "sī",
+    "keyword": "this",
+    "sourcePinyin": "si1",
+    "sourceSense": "this",
+    "note": "The demonstrative sense matches the curriculum standalone word; it is a literary use, while modern 斯 also appears in transliterations."
+  },
+  {
+    "character": "話",
+    "pinyin": "huà",
+    "keyword": "speech",
+    "sourcePinyin": "hua4",
+    "sourceSense": "speech",
+    "note": "common spoken-language sense"
+  },
+  {
+    "character": "连",
+    "pinyin": "lián",
+    "keyword": "join",
+    "sourcePinyin": "lian2",
+    "sourceSense": "to join",
+    "note": "Common connection verb."
+  },
+  {
+    "character": "卡",
+    "pinyin": "kǎ",
+    "keyword": "card",
+    "sourcePinyin": "ka3",
+    "sourceSense": "(loanword) card",
+    "note": "Chosen for the common modern card sense."
+  },
+  {
+    "character": "病",
+    "pinyin": "bìng",
+    "keyword": "illness",
+    "sourcePinyin": "bing4",
+    "sourceSense": "illness",
+    "note": "common disease sense"
+  },
+  {
+    "character": "扰",
+    "pinyin": "rǎo",
+    "keyword": "disturb",
+    "sourcePinyin": "rao3",
+    "sourceSense": "to disturb",
+    "note": "Common disturbance verb."
+  },
+  {
+    "character": "严",
+    "pinyin": "yán",
+    "keyword": "strict",
+    "sourcePinyin": "yan2",
+    "sourceSense": "strict",
+    "note": "Chosen for the common modern strict sense."
+  },
+  {
+    "character": "陛",
+    "pinyin": "bì",
+    "keyword": "throne steps",
+    "sourcePinyin": "bi4",
+    "sourceSense": "the steps to the throne",
+    "note": "literal court term retained by source"
+  },
+  {
+    "character": "掉",
+    "pinyin": "diào",
+    "keyword": "fall",
+    "sourcePinyin": "diao4",
+    "sourceSense": "to fall",
+    "note": "Common movement/result verb."
+  },
+  {
+    "character": "王",
+    "pinyin": "wáng",
+    "keyword": "king",
+    "sourcePinyin": "wang2",
+    "sourceSense": "king or monarch",
+    "note": "Chosen for the common modern king sense."
+  },
+  {
+    "character": "承",
+    "pinyin": "chéng",
+    "keyword": "undertake",
+    "sourcePinyin": "cheng2",
+    "sourceSense": "to undertake",
+    "note": "common bear/undertake sense"
+  },
+  {
+    "character": "伟",
+    "pinyin": "wěi",
+    "keyword": "great",
+    "sourcePinyin": "wei3",
+    "sourceSense": "big",
+    "note": "Common positive adjective."
+  },
+  {
+    "character": "响",
+    "pinyin": "xiǎng",
+    "keyword": "sound",
+    "sourcePinyin": "xiang3",
+    "sourceSense": "to make a sound",
+    "note": "Chosen for the common modern sound sense."
+  },
+  {
+    "character": "属",
+    "pinyin": "shǔ",
+    "keyword": "belong",
+    "sourcePinyin": "shu3",
+    "sourceSense": "to belong to",
+    "note": "common category/belonging sense"
+  },
+  {
+    "character": "腿",
+    "pinyin": "tuǐ",
+    "keyword": "leg",
+    "sourcePinyin": "tui3",
+    "sourceSense": "leg",
+    "note": "Common body noun."
+  },
+  {
+    "character": "幸",
+    "pinyin": "xìng",
+    "keyword": "lucky",
+    "sourcePinyin": "xing4",
+    "sourceSense": "fortunate",
+    "note": "Chosen for the common modern lucky sense."
+  },
+  {
+    "character": "福",
+    "pinyin": "fú",
+    "keyword": "good fortune",
+    "sourcePinyin": "fu2",
+    "sourceSense": "good fortune",
+    "note": "common blessing/luck sense"
+  },
+  {
+    "character": "之",
+    "pinyin": "zhī",
+    "keyword": "possessive particle",
+    "sourcePinyin": "zhi1",
+    "sourceSense": "(possessive particle, literary equivalent of 的[de5])",
+    "note": "Literary possessive role."
+  },
+  {
+    "character": "仍",
+    "pinyin": "réng",
+    "keyword": "still",
+    "sourcePinyin": "reng2",
+    "sourceSense": "still; yet",
+    "note": "Chosen for the common modern still sense."
+  },
+  {
+    "character": "误",
+    "pinyin": "wù",
+    "keyword": "mistake",
+    "sourcePinyin": "wu4",
+    "sourceSense": "mistake",
+    "note": "common error sense"
+  },
+  {
+    "character": "丢",
+    "pinyin": "diū",
+    "keyword": "lose",
+    "sourcePinyin": "diu1",
+    "sourceSense": "to lose",
+    "note": "Core action verb."
+  },
+  {
+    "character": "骗",
+    "pinyin": "piàn",
+    "keyword": "cheat",
+    "sourcePinyin": "pian4",
+    "sourceSense": "to cheat",
+    "note": "Chosen for the common modern cheat sense."
+  },
+  {
+    "character": "逼",
+    "pinyin": "bī",
+    "keyword": "force",
+    "sourcePinyin": "bi1",
+    "sourceSense": "to force (sb to do sth)",
+    "note": "common compel/pressure sense"
+  },
+  {
+    "character": "寻",
+    "pinyin": "xún",
+    "keyword": "search",
+    "sourcePinyin": "xun2",
+    "sourceSense": "to search",
+    "note": "Common search verb."
+  },
+  {
+    "character": "运",
+    "pinyin": "yùn",
+    "keyword": "move",
+    "sourcePinyin": "yun4",
+    "sourceSense": "to move",
+    "note": "Chosen for the common modern move sense."
+  },
+  {
+    "character": "血",
+    "pinyin": "xuè",
+    "keyword": "blood",
+    "sourcePinyin": "xue4",
+    "sourceSense": "blood",
+    "note": "common blood sense"
+  },
+  {
+    "character": "奶",
+    "pinyin": "nǎi",
+    "keyword": "milk",
+    "sourcePinyin": "nai3",
+    "sourceSense": "milk",
+    "note": "Common food/family root."
+  },
+  {
+    "character": "舒",
+    "pinyin": "shū",
+    "keyword": "relax",
+    "sourcePinyin": "shu1",
+    "sourceSense": "to relax",
+    "note": "Chosen for the common modern relax sense."
+  },
+  {
+    "character": "外",
+    "pinyin": "wài",
+    "keyword": "outside",
+    "sourcePinyin": "wai4",
+    "sourceSense": "outside",
+    "note": "basic spatial sense"
+  },
+  {
+    "character": "刻",
+    "pinyin": "kè",
+    "keyword": "quarter-hour",
+    "sourcePinyin": "ke4",
+    "sourceSense": "quarter (hour)",
+    "note": "Common time unit."
+  },
+  {
+    "character": "立",
+    "pinyin": "lì",
+    "keyword": "stand",
+    "sourcePinyin": "li4",
+    "sourceSense": "to stand",
+    "note": "Chosen for the common modern stand sense."
+  },
+  {
+    "character": "内",
+    "pinyin": "nèi",
+    "keyword": "inside",
+    "sourcePinyin": "nei4",
+    "sourceSense": "inside",
+    "note": "basic spatial sense"
+  },
+  {
+    "character": "匙",
+    "pinyin": "chí",
+    "keyword": "spoon",
+    "sourcePinyin": "chi2",
+    "sourceSense": "spoon",
+    "note": "Concrete character lesson; neutral shi remains available in the word 钥匙."
+  },
+  {
+    "character": "钥",
+    "pinyin": "yào",
+    "keyword": "key",
+    "sourcePinyin": "yue4",
+    "sourceSense": "key",
+    "note": "Modern 钥匙 is yào; CC-CEDICT keys record under yuè and gives yào alternate."
+  },
+  {
+    "character": "剩",
+    "pinyin": "shèng",
+    "keyword": "remain",
+    "sourcePinyin": "sheng4",
+    "sourceSense": "to remain",
+    "note": "common remainder verb"
+  },
+  {
+    "character": "显",
+    "pinyin": "xiǎn",
+    "keyword": "reveal",
+    "sourcePinyin": "xian3",
+    "sourceSense": "to reveal",
+    "note": "Common visibility verb."
+  },
+  {
+    "character": "松",
+    "pinyin": "sōng",
+    "keyword": "pine",
+    "sourcePinyin": "song1",
+    "sourceSense": "pine",
+    "note": "Chosen for the common modern pine sense."
+  },
+  {
+    "character": "舞",
+    "pinyin": "wǔ",
+    "keyword": "dance",
+    "sourcePinyin": "wu3",
+    "sourceSense": "to dance",
+    "note": "common movement verb"
+  },
+  {
+    "character": "药",
+    "pinyin": "yào",
+    "keyword": "medicine",
+    "sourcePinyin": "yao4",
+    "sourceSense": "medicine",
+    "note": "Common health noun."
+  },
+  {
+    "character": "丽",
+    "pinyin": "lì",
+    "keyword": "beautiful",
+    "sourcePinyin": "li4",
+    "sourceSense": "beautiful",
+    "note": "Chosen for the common modern beautiful sense."
+  },
+  {
+    "character": "通",
+    "pinyin": "tōng",
+    "keyword": "go through",
+    "sourcePinyin": "tong1",
+    "sourceSense": "to go through",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "灵",
+    "pinyin": "líng",
+    "keyword": "spirit",
+    "sourcePinyin": "ling2",
+    "sourceSense": "spirit",
+    "note": "Common 灵魂 root."
+  },
+  {
+    "character": "魂",
+    "pinyin": "hún",
+    "keyword": "soul",
+    "sourcePinyin": "hun2",
+    "sourceSense": "soul; spirit; immortal soul (that can be detached from the body)",
+    "note": "Chosen for the common modern soul sense."
+  },
+  {
+    "character": "屁",
+    "pinyin": "pì",
+    "keyword": "nonsense",
+    "sourcePinyin": "pi4",
+    "sourceSense": "nonsense",
+    "note": "common colloquial sense"
+  },
+  {
+    "character": "股",
+    "pinyin": "gǔ",
+    "keyword": "portion",
+    "sourcePinyin": "gu3",
+    "sourceSense": "part of a whole; portion of a sum",
+    "note": "Common abstract portion sense."
+  },
+  {
+    "character": "竟",
+    "pinyin": "jìng",
+    "keyword": "unexpectedly",
+    "sourcePinyin": "jing4",
+    "sourceSense": "unexpectedly",
+    "note": "Chosen for the common modern unexpectedly sense."
+  },
+  {
+    "character": "足",
+    "pinyin": "zú",
+    "keyword": "foot",
+    "sourcePinyin": "zu2",
+    "sourceSense": "(bound form) foot; leg",
+    "note": "basic body-part sense"
+  },
+  {
+    "character": "裡",
+    "pinyin": "lǐ",
+    "keyword": "inside",
+    "sourcePinyin": "li3",
+    "sourceSense": "interior",
+    "note": "Traditional inside form."
+  },
+  {
+    "character": "黑",
+    "pinyin": "hēi",
+    "keyword": "black",
+    "sourcePinyin": "hei1",
+    "sourceSense": "black",
+    "note": "Chosen for the common modern black sense."
+  },
+  {
+    "character": "录",
+    "pinyin": "lù",
+    "keyword": "record",
+    "sourcePinyin": "lu4",
+    "sourceSense": "record",
+    "note": "common record/copy sense"
+  },
+  {
+    "character": "恭",
+    "pinyin": "gōng",
+    "keyword": "respectful",
+    "sourcePinyin": "gong1",
+    "sourceSense": "respectful",
+    "note": "Common polite root."
+  },
+  {
+    "character": "值",
+    "pinyin": "zhí",
+    "keyword": "worth",
+    "sourcePinyin": "zhi2",
+    "sourceSense": "(to be) worth",
+    "note": "Chosen for the common modern worth sense."
+  },
+  {
+    "character": "义",
+    "pinyin": "yì",
+    "keyword": "justice",
+    "sourcePinyin": "yi4",
+    "sourceSense": "justice",
+    "note": "common righteousness sense"
+  },
+  {
+    "character": "碰",
+    "pinyin": "pèng",
+    "keyword": "touch",
+    "sourcePinyin": "peng4",
+    "sourceSense": "to touch",
+    "note": "Common contact verb."
+  },
+  {
+    "character": "读",
+    "pinyin": "dú",
+    "keyword": "read",
+    "sourcePinyin": "du2",
+    "sourceSense": "to read",
+    "note": "Chosen for the common modern read sense."
+  },
+  {
+    "character": "辛",
+    "pinyin": "xīn",
+    "keyword": "hardship",
+    "sourcePinyin": "xin1",
+    "sourceSense": "suffering",
+    "note": "common labor/suffering sense"
+  },
+  {
+    "character": "允",
+    "pinyin": "yǔn",
+    "keyword": "allow",
+    "sourcePinyin": "yun3",
+    "sourceSense": "to allow",
+    "note": "Common permission root."
+  },
+  {
+    "character": "享",
+    "pinyin": "xiǎng",
+    "keyword": "enjoy",
+    "sourcePinyin": "xiang3",
+    "sourceSense": "to enjoy",
+    "note": "Chosen for the common modern enjoy sense."
+  },
+  {
+    "character": "银",
+    "pinyin": "yín",
+    "keyword": "silver",
+    "sourcePinyin": "yin2",
+    "sourceSense": "silver",
+    "note": "basic material noun"
+  },
+  {
+    "character": "闻",
+    "pinyin": "wén",
+    "keyword": "news",
+    "sourcePinyin": "wen2",
+    "sourceSense": "news",
+    "note": "Common 新闻 reading."
+  },
+  {
+    "character": "饿",
+    "pinyin": "è",
+    "keyword": "hungry",
+    "sourcePinyin": "e4",
+    "sourceSense": "hungry",
+    "note": "Chosen for the common modern hungry sense."
+  },
+  {
+    "character": "痴",
+    "pinyin": "chī",
+    "keyword": "foolish",
+    "sourcePinyin": "chi1",
+    "sourceSense": "foolish",
+    "note": "common foolishness sense"
+  },
+  {
+    "character": "英",
+    "pinyin": "yīng",
+    "keyword": "hero",
+    "sourcePinyin": "ying1",
+    "sourceSense": "hero",
+    "note": "Common 英雄 reading."
+  },
+  {
+    "character": "雄",
+    "pinyin": "xióng",
+    "keyword": "male",
+    "sourcePinyin": "xiong2",
+    "sourceSense": "male",
+    "note": "Chosen for the common modern male sense."
+  },
+  {
+    "character": "凶",
+    "pinyin": "xiōng",
+    "keyword": "fierce",
+    "sourcePinyin": "xiong1",
+    "sourceSense": "fierce",
+    "note": "common dangerous/fierce sense"
+  },
+  {
+    "character": "换",
+    "pinyin": "huàn",
+    "keyword": "exchange",
+    "sourcePinyin": "huan4",
+    "sourceSense": "to exchange",
+    "note": "Common change/exchange verb."
+  },
+  {
+    "character": "纽",
+    "pinyin": "niǔ",
+    "keyword": "button",
+    "sourcePinyin": "niu3",
+    "sourceSense": "button",
+    "note": "Chosen for the common modern button sense."
+  },
+  {
+    "character": "邀",
+    "pinyin": "yāo",
+    "keyword": "invite",
+    "sourcePinyin": "yao1",
+    "sourceSense": "to invite",
+    "note": "common invitation verb"
+  },
+  {
+    "character": "客",
+    "pinyin": "kè",
+    "keyword": "guest",
+    "sourcePinyin": "ke4",
+    "sourceSense": "customer; visitor; guest",
+    "note": "Common person noun."
+  },
+  {
+    "character": "吸",
+    "pinyin": "xī",
+    "keyword": "inhale",
+    "sourcePinyin": "xi1",
+    "sourceSense": "to inhale",
+    "note": "Chosen for the common modern inhale sense."
+  },
+  {
+    "character": "呼",
+    "pinyin": "hū",
+    "keyword": "call",
+    "sourcePinyin": "hu1",
+    "sourceSense": "to call",
+    "note": "common calling verb"
+  },
+  {
+    "character": "获",
+    "pinyin": "huò",
+    "keyword": "obtain",
+    "sourcePinyin": "huo4",
+    "sourceSense": "(literary) to get; to obtain; to win",
+    "note": "Common obtain root."
+  },
+  {
+    "character": "挂",
+    "pinyin": "guà",
+    "keyword": "hang",
+    "sourcePinyin": "gua4",
+    "sourceSense": "to hang; to suspend (from a hook etc)",
+    "note": "Chosen for the common modern hang sense."
+  },
+  {
+    "character": "军",
+    "pinyin": "jūn",
+    "keyword": "military",
+    "sourcePinyin": "jun1",
+    "sourceSense": "military",
+    "note": "common army bound form"
+  },
+  {
+    "character": "欠",
+    "pinyin": "qiàn",
+    "keyword": "owe",
+    "sourcePinyin": "qian4",
+    "sourceSense": "to owe",
+    "note": "Common obligation verb."
+  },
+  {
+    "character": "介",
+    "pinyin": "jiè",
+    "keyword": "introduce",
+    "sourcePinyin": "jie4",
+    "sourceSense": "to introduce",
+    "note": "Chosen for the common modern introduce sense."
+  },
+  {
+    "character": "绍",
+    "pinyin": "shào",
+    "keyword": "continue",
+    "sourcePinyin": "shao4",
+    "sourceSense": "to continue",
+    "note": "common continuation sense"
+  },
+  {
+    "character": "威",
+    "pinyin": "wēi",
+    "keyword": "power",
+    "sourcePinyin": "wei1",
+    "sourceSense": "power",
+    "note": "Common strength/prestige root."
+  },
+  {
+    "character": "胁",
+    "pinyin": "xié",
+    "keyword": "threaten",
+    "sourcePinyin": "xie2",
+    "sourceSense": "to threaten",
+    "note": "Chosen for the common modern threaten sense."
+  },
+  {
+    "character": "精",
+    "pinyin": "jīng",
+    "keyword": "essence",
+    "sourcePinyin": "jing1",
+    "sourceSense": "essence",
+    "note": "common core/essence sense"
+  },
+  {
+    "character": "图",
+    "pinyin": "tú",
+    "keyword": "picture",
+    "sourcePinyin": "tu2",
+    "sourceSense": "picture",
+    "note": "Common image/map noun."
+  },
+  {
+    "character": "斗",
+    "pinyin": "dòu",
+    "keyword": "fight",
+    "sourcePinyin": "dou4",
+    "sourceSense": "to fight",
+    "note": "Chosen for the common modern fight sense."
+  },
+  {
+    "character": "微",
+    "pinyin": "wēi",
+    "keyword": "tiny",
+    "sourcePinyin": "wei1",
+    "sourceSense": "tiny",
+    "note": "common smallness sense"
+  },
+  {
+    "character": "软",
+    "pinyin": "ruǎn",
+    "keyword": "soft",
+    "sourcePinyin": "ruan3",
+    "sourceSense": "soft",
+    "note": "Common adjective."
+  },
+  {
+    "character": "练",
+    "pinyin": "liàn",
+    "keyword": "practice",
+    "sourcePinyin": "lian4",
+    "sourceSense": "to practice",
+    "note": "Chosen for the common modern practice sense."
+  },
+  {
+    "character": "训",
+    "pinyin": "xùn",
+    "keyword": "teach",
+    "sourcePinyin": "xun4",
+    "sourceSense": "to teach; to train; to admonish",
+    "note": "common teaching/training sense"
+  },
+  {
+    "character": "组",
+    "pinyin": "zǔ",
+    "keyword": "group",
+    "sourcePinyin": "zu3",
+    "sourceSense": "group",
+    "note": "Common organization noun/root."
+  },
+  {
+    "character": "织",
+    "pinyin": "zhī",
+    "keyword": "weave",
+    "sourcePinyin": "zhi1",
+    "sourceSense": "to weave",
+    "note": "Chosen for the common modern weave sense."
+  },
+  {
+    "character": "队",
+    "pinyin": "duì",
+    "keyword": "team",
+    "sourcePinyin": "dui4",
+    "sourceSense": "team",
+    "note": "common group/team sense"
+  },
+  {
+    "character": "笨",
+    "pinyin": "bèn",
+    "keyword": "stupid",
+    "sourcePinyin": "ben4",
+    "sourceSense": "stupid",
+    "note": "Common adjective."
+  },
+  {
+    "character": "祝",
+    "pinyin": "zhù",
+    "keyword": "wish",
+    "sourcePinyin": "zhu4",
+    "sourceSense": "to wish (sb bon voyage, happy birthday etc)",
+    "note": "Chosen for the common modern wish sense."
+  },
+  {
+    "character": "敌",
+    "pinyin": "dí",
+    "keyword": "enemy",
+    "sourcePinyin": "di2",
+    "sourceSense": "(bound form) enemy",
+    "note": "common opponent sense"
+  },
+  {
+    "character": "雅",
+    "pinyin": "yǎ",
+    "keyword": "elegant",
+    "sourcePinyin": "ya3",
+    "sourceSense": "elegant",
+    "note": "Common adjective."
+  },
+  {
+    "character": "寓",
+    "pinyin": "yù",
+    "keyword": "residence",
+    "sourcePinyin": "yu4",
+    "sourceSense": "(bound form) residence; dwelling",
+    "note": "Chosen for the common modern residence sense."
+  },
+  {
+    "character": "誰",
+    "pinyin": "shéi",
+    "keyword": "who",
+    "sourcePinyin": "shei2",
+    "sourceSense": "who",
+    "note": "common interrogative pronoun"
+  },
+  {
+    "character": "訴",
+    "pinyin": "sù",
+    "keyword": "tell",
+    "sourcePinyin": "su4",
+    "sourceSense": "to tell",
+    "note": "Traditional form; common 告訴 reading."
+  },
+  {
+    "character": "治",
+    "pinyin": "zhì",
+    "keyword": "govern",
+    "sourcePinyin": "zhi4",
+    "sourceSense": "to govern",
+    "note": "Chosen for the common modern govern sense."
+  },
+  {
+    "character": "疗",
+    "pinyin": "liáo",
+    "keyword": "treat",
+    "sourcePinyin": "liao2",
+    "sourceSense": "to treat",
+    "note": "common medical-treatment sense"
+  },
+  {
+    "character": "造",
+    "pinyin": "zào",
+    "keyword": "make",
+    "sourcePinyin": "zao4",
+    "sourceSense": "to make",
+    "note": "Common creation verb."
+  },
+  {
+    "character": "該",
+    "pinyin": "gāi",
+    "keyword": "should",
+    "sourcePinyin": "gai1",
+    "sourceSense": "should",
+    "note": "Chosen for the common modern should sense."
+  },
+  {
+    "character": "尝",
+    "pinyin": "cháng",
+    "keyword": "taste",
+    "sourcePinyin": "chang2",
+    "sourceSense": "to taste; to try (food)",
+    "note": "common food-testing sense"
+  },
+  {
+    "character": "愚",
+    "pinyin": "yú",
+    "keyword": "stupid",
+    "sourcePinyin": "yu2",
+    "sourceSense": "to be stupid",
+    "note": "Common adjective/root."
+  },
+  {
+    "character": "蠢",
+    "pinyin": "chǔn",
+    "keyword": "stupid",
+    "sourcePinyin": "chun3",
+    "sourceSense": "stupid",
+    "note": "Chosen for the common modern stupid sense."
+  },
+  {
+    "character": "歡",
+    "pinyin": "huān",
+    "keyword": "happy",
+    "sourcePinyin": "huan1",
+    "sourceSense": "happy",
+    "note": "common happiness sense"
+  },
+  {
+    "character": "装",
+    "pinyin": "zhuāng",
+    "keyword": "pretend",
+    "sourcePinyin": "zhuang1",
+    "sourceSense": "to pretend",
+    "note": "Common modern verb."
+  },
+  {
+    "character": "文",
+    "pinyin": "wén",
+    "keyword": "writing",
+    "sourcePinyin": "wen2",
+    "sourceSense": "writing",
+    "note": "Chosen for the common modern writing sense."
+  },
+  {
+    "character": "乔",
+    "pinyin": "qiáo",
+    "keyword": "tall",
+    "sourcePinyin": "qiao2",
+    "sourceSense": "tall",
+    "note": "common height adjective"
+  },
+  {
+    "character": "般",
+    "pinyin": "bān",
+    "keyword": "kind",
+    "sourcePinyin": "ban1",
+    "sourceSense": "kind",
+    "note": "Common 一般 root."
+  },
+  {
+    "character": "餐",
+    "pinyin": "cān",
+    "keyword": "meal",
+    "sourcePinyin": "can1",
+    "sourceSense": "meal",
+    "note": "Chosen for the common modern meal sense."
+  },
+  {
+    "character": "画",
+    "pinyin": "huà",
+    "keyword": "draw",
+    "sourcePinyin": "hua4",
+    "sourceSense": "to draw; to paint",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "聽",
+    "pinyin": "tīng",
+    "keyword": "listen",
+    "sourcePinyin": "ting1",
+    "sourceSense": "to listen to; to hear",
+    "note": "Traditional form of common verb."
+  },
+  {
+    "character": "見",
+    "pinyin": "jiàn",
+    "keyword": "see",
+    "sourcePinyin": "jian4",
+    "sourceSense": "to see",
+    "note": "Chosen for the common modern see sense."
+  },
+  {
+    "character": "族",
+    "pinyin": "zú",
+    "keyword": "ethnicity",
+    "sourcePinyin": "zu2",
+    "sourceSense": "ethnicity",
+    "note": "common group/lineage sense"
+  },
+  {
+    "character": "论",
+    "pinyin": "lùn",
+    "keyword": "discuss",
+    "sourcePinyin": "lun4",
+    "sourceSense": "to discuss",
+    "note": "Common discussion reading."
+  },
+  {
+    "character": "旦",
+    "pinyin": "dàn",
+    "keyword": "dawn",
+    "sourcePinyin": "dan4",
+    "sourceSense": "(literary) dawn; daybreak",
+    "note": "Chosen for the common modern dawn sense."
+  },
+  {
+    "character": "傻",
+    "pinyin": "shǎ",
+    "keyword": "foolish",
+    "sourcePinyin": "sha3",
+    "sourceSense": "foolish",
+    "note": "common adjective"
+  },
+  {
+    "character": "败",
+    "pinyin": "bài",
+    "keyword": "fail",
+    "sourcePinyin": "bai4",
+    "sourceSense": "to fail",
+    "note": "Common outcome verb."
+  },
+  {
+    "character": "赶",
+    "pinyin": "gǎn",
+    "keyword": "hurry",
+    "sourcePinyin": "gan3",
+    "sourceSense": "to hurry; to rush",
+    "note": "Chosen for the common modern hurry sense."
+  },
+  {
+    "character": "娜",
+    "pinyin": "nà",
+    "keyword": "name syllable",
+    "sourcePinyin": "na4",
+    "sourceSense": "(phonetic na)",
+    "note": "common phonetic name use"
+  },
+  {
+    "character": "瞧",
+    "pinyin": "qiáo",
+    "keyword": "look at",
+    "sourcePinyin": "qiao2",
+    "sourceSense": "to look at",
+    "note": "Common colloquial verb."
+  },
+  {
+    "character": "謝",
+    "pinyin": "xiè",
+    "keyword": "thank",
+    "sourcePinyin": "xie4",
+    "sourceSense": "to thank",
+    "note": "Chosen for the common modern thank sense."
+  },
+  {
+    "character": "半",
+    "pinyin": "bàn",
+    "keyword": "half",
+    "sourcePinyin": "ban4",
+    "sourceSense": "half",
+    "note": "common quantity sense"
+  },
+  {
+    "character": "恶",
+    "pinyin": "è",
+    "keyword": "evil",
+    "sourcePinyin": "e4",
+    "sourceSense": "evil",
+    "note": "Default evil reading; 可恶 has wù in the compound."
+  },
+  {
+    "character": "恨",
+    "pinyin": "hèn",
+    "keyword": "hate",
+    "sourcePinyin": "hen4",
+    "sourceSense": "to hate",
+    "note": "Chosen for the common modern hate sense."
+  },
+  {
+    "character": "迟",
+    "pinyin": "chí",
+    "keyword": "late",
+    "sourcePinyin": "chi2",
+    "sourceSense": "late",
+    "note": "common lateness sense"
+  },
+  {
+    "character": "达",
+    "pinyin": "dá",
+    "keyword": "reach",
+    "sourcePinyin": "da2",
+    "sourceSense": "to reach",
+    "note": "Common attain/reach verb."
+  },
+  {
+    "character": "未",
+    "pinyin": "wèi",
+    "keyword": "not yet",
+    "sourcePinyin": "wei4",
+    "sourceSense": "not yet",
+    "note": "Chosen for the common modern not yet sense."
+  },
+  {
+    "character": "扔",
+    "pinyin": "rēng",
+    "keyword": "throw",
+    "sourcePinyin": "reng1",
+    "sourceSense": "to throw",
+    "note": "common throwing verb"
+  },
+  {
+    "character": "捕",
+    "pinyin": "bǔ",
+    "keyword": "catch",
+    "sourcePinyin": "bu3",
+    "sourceSense": "to catch; to seize; to capture",
+    "note": "Common capture verb."
+  },
+  {
+    "character": "逮",
+    "pinyin": "dǎi",
+    "keyword": "catch",
+    "sourcePinyin": "dai3",
+    "sourceSense": "(coll.) to catch; to seize; to capture",
+    "note": "Uses colloquial dǎi catch/seize; literary dài is separate."
+  },
+  {
+    "character": "借",
+    "pinyin": "jiè",
+    "keyword": "borrow",
+    "sourcePinyin": "jie4",
+    "sourceSense": "to borrow",
+    "note": "common borrowing verb"
+  },
+  {
+    "character": "谋",
+    "pinyin": "móu",
+    "keyword": "plan",
+    "sourcePinyin": "mou2",
+    "sourceSense": "to plan",
+    "note": "Common planning root."
+  },
+  {
+    "character": "金",
+    "pinyin": "jīn",
+    "keyword": "gold",
+    "sourcePinyin": "jin1",
+    "sourceSense": "gold",
+    "note": "Chosen for the common modern gold sense."
+  },
+  {
+    "character": "吧",
+    "pinyin": "ba",
+    "keyword": "suggestion particle",
+    "sourcePinyin": "ba5",
+    "sourceSense": "(modal particle indicating suggestion or surmise)",
+    "note": "neutral suggestion particle"
+  },
+  {
+    "character": "节",
+    "pinyin": "jié",
+    "keyword": "segment",
+    "sourcePinyin": "jie2",
+    "sourceSense": "(bound form) section; segment",
+    "note": "Common 节目/section root."
+  },
+  {
+    "character": "恩",
+    "pinyin": "ēn",
+    "keyword": "kindness",
+    "sourcePinyin": "en1",
+    "sourceSense": "favor; grace; kindness",
+    "note": "Chosen for the common modern kindness sense."
+  },
+  {
+    "character": "万",
+    "pinyin": "wàn",
+    "keyword": "ten thousand",
+    "sourcePinyin": "wan4",
+    "sourceSense": "ten thousand",
+    "note": "common numeral"
+  },
+  {
+    "character": "惜",
+    "pinyin": "xī",
+    "keyword": "pity",
+    "sourcePinyin": "xi1",
+    "sourceSense": "to pity",
+    "note": "Common 可惜 root."
+  },
+  {
+    "character": "追",
+    "pinyin": "zhuī",
+    "keyword": "chase",
+    "sourcePinyin": "zhui1",
+    "sourceSense": "to chase",
+    "note": "Chosen for the common modern chase sense."
+  },
+  {
+    "character": "躺",
+    "pinyin": "tǎng",
+    "keyword": "lie down",
+    "sourcePinyin": "tang3",
+    "sourceSense": "to lie down",
+    "note": "common posture verb"
+  },
+  {
+    "character": "近",
+    "pinyin": "jìn",
+    "keyword": "near",
+    "sourcePinyin": "jin4",
+    "sourceSense": "near",
+    "note": "Common distance adjective."
+  },
+  {
+    "character": "店",
+    "pinyin": "diàn",
+    "keyword": "shop",
+    "sourcePinyin": "dian4",
+    "sourceSense": "(bound form) shop; store",
+    "note": "Chosen for the common modern shop sense."
+  },
+  {
+    "character": "步",
+    "pinyin": "bù",
+    "keyword": "step",
+    "sourcePinyin": "bu4",
+    "sourceSense": "a step",
+    "note": "common step/process sense"
+  },
+  {
+    "character": "拯",
+    "pinyin": "zhěng",
+    "keyword": "rescue",
+    "sourcePinyin": "zheng3",
+    "sourceSense": "to rescue",
+    "note": "Common rescue root."
+  },
+  {
+    "character": "吓",
+    "pinyin": "xià",
+    "keyword": "scare",
+    "sourcePinyin": "xia4",
+    "sourceSense": "to frighten",
+    "note": "Uses verb xià frighten/scare; he4 is separate interjection/threat."
+  },
+  {
+    "character": "杯",
+    "pinyin": "bēi",
+    "keyword": "cup",
+    "sourcePinyin": "bei1",
+    "sourceSense": "cup",
+    "note": "common container/classifier sense"
+  },
+  {
+    "character": "差",
+    "pinyin": "chà",
+    "keyword": "different",
+    "sourcePinyin": "cha4",
+    "sourceSense": "different",
+    "note": "Chosen chà reading; 差点 is a compound meaning almost."
+  },
+  {
+    "character": "越",
+    "pinyin": "yuè",
+    "keyword": "exceed",
+    "sourcePinyin": "yue4",
+    "sourceSense": "to exceed",
+    "note": "Chosen for the common modern exceed sense."
+  },
+  {
+    "character": "遍",
+    "pinyin": "biàn",
+    "keyword": "all over",
+    "sourcePinyin": "bian4",
+    "sourceSense": "all over",
+    "note": "common everywhere/classifier sense"
+  },
+  {
+    "character": "哈",
+    "pinyin": "hā",
+    "keyword": "laughter",
+    "sourcePinyin": "ha1",
+    "sourceSense": "(interj.) ha!",
+    "note": "One cue selected from the documented sense."
+  },
+  {
+    "character": "聊",
+    "pinyin": "liáo",
+    "keyword": "chat",
+    "sourcePinyin": "liao2",
+    "sourceSense": "(coll.) to chat",
+    "note": "Chosen for the common modern chat sense."
+  },
+  {
+    "character": "班",
+    "pinyin": "bān",
+    "keyword": "class",
+    "sourcePinyin": "ban1",
+    "sourceSense": "team; class; grade",
+    "note": "common class/team sense"
+  },
+  {
+    "character": "史",
+    "pinyin": "shǐ",
+    "keyword": "history",
+    "sourcePinyin": "shi3",
+    "sourceSense": "history",
+    "note": "Common history noun."
+  },
+  {
+    "character": "幫",
+    "pinyin": "bāng",
+    "keyword": "help",
+    "sourcePinyin": "bang1",
+    "sourceSense": "to help",
+    "note": "Chosen for the common modern help sense."
+  },
+  {
+    "character": "踪",
+    "pinyin": "zōng",
+    "keyword": "footprint",
+    "sourcePinyin": "zong1",
+    "sourceSense": "(bound form) footprint; trace; tracks",
+    "note": "common trace/track sense"
+  }
+]

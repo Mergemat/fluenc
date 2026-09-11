@@ -5,7 +5,7 @@ import { useNavigate, useSearch } from '@tanstack/react-router'
 import { ArrowRight, Check, RotateCcw, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { splitMeaning } from '../lib/meaning'
+import { getItemMeaning } from '../lib/meaning'
 import { getHanziCompositions } from '../server/hanzi'
 import { PrototypeSwitcher } from './ui/PrototypeSwitcher'
 import { ClueForm } from './character-studio-prototype/ClueForm'
@@ -46,7 +46,7 @@ export function CharacterStudioPrototype({ items, example }: { items: CharacterI
     ...item.movie.components.map((part, partIndex): Cue => ({ id: `prop-${partIndex}`, kind: 'prop', code: part.hanzi, name: part.propName, count: part.count, role: 'Prop' })),
   ]
   const cues = initialCues.map((cue) => ({ ...cue, name: names[cueKey(cue)] ?? cue.name }))
-  const studio: Studio = { item, cues, layout, meaning: splitMeaning(item.meaning).primary }
+  const studio: Studio = { item, cues, layout, meaning: getItemMeaning(item).primary }
   const next = () => {
     if (index + 1 < queue.length) setIndex(index + 1)
     else setFinished(true)

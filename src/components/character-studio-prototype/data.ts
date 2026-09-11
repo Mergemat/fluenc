@@ -25,22 +25,22 @@ export const variants = [
 // The first-party walkthrough teaches these directly, while still assigning props.
 export const directCharacters = new Set(['一', '二', '三'])
 export const directCharacter: CharacterItem = {
-  type: 'character', queueKind: 'new', id: '一', hanzi: '一', pinyin: 'yī', meaning: 'one', rank: 2, unlocks: 1,
+  type: 'character', queueKind: 'new', id: '一', hanzi: '一', pinyin: 'yī', keyword: 'one', dictionaryMeanings: [], rank: 2, unlocks: 1,
   movie: {
     ...getMovieCoordinates('yī'), actorName: '', setName: '', roomName: 'Outside entrance',
     componentNote: null, isPrimitive: true, configured: false,
-    components: [{ count: 1, hanzi: '一', propName: '', character: { pinyin: 'yī', meaning: 'one' } }],
+    components: [{ count: 1, hanzi: '一', propName: '', character: { pinyin: 'yī', keyword: 'one' } }],
   },
 }
 
 export const exampleCharacter: CharacterItem = {
-  type: 'character', queueKind: 'new', id: '明', hanzi: '明', pinyin: 'míng', meaning: 'bright', rank: 137, unlocks: 3,
+  type: 'character', queueKind: 'new', id: '明', hanzi: '明', pinyin: 'míng', keyword: 'bright', dictionaryMeanings: [], rank: 137, unlocks: 3,
   movie: {
     ...getMovieCoordinates('míng'), actorName: 'Michelle Yeoh', setName: 'My primary school', roomName: 'Kitchen',
     componentNote: null, isPrimitive: false, configured: true,
     components: [
-      { count: 1, hanzi: '日', propName: 'Sun', character: { pinyin: 'rì', meaning: 'sun' } },
-      { count: 1, hanzi: '月', propName: 'Moon', character: { pinyin: 'yuè', meaning: 'moon' } },
+      { count: 1, hanzi: '日', propName: 'Sun', character: { pinyin: 'rì', keyword: 'sun' } },
+      { count: 1, hanzi: '月', propName: 'Moon', character: { pinyin: 'yuè', keyword: 'moon' } },
     ],
   },
 }
@@ -48,29 +48,29 @@ export const exampleCharacter: CharacterItem = {
 export const exampleCharacters: CharacterItem[] = [
   exampleCharacter,
   {
-    type: 'character', queueKind: 'new', id: '休', hanzi: '休', pinyin: 'xiū', meaning: 'rest', rank: 475, unlocks: 1,
+    type: 'character', queueKind: 'new', id: '休', hanzi: '休', pinyin: 'xiū', keyword: 'rest', dictionaryMeanings: [], rank: 475, unlocks: 1,
     movie: {
       ...getMovieCoordinates('xiū'), actorName: '', setName: '', roomName: 'Outside entrance', componentNote: null, isPrimitive: false, configured: false,
       components: [
         { count: 1, hanzi: '亻', propName: 'Toy soldier', character: null },
-        { count: 1, hanzi: '木', propName: 'Tree', character: { pinyin: 'mù', meaning: 'tree' } },
+        { count: 1, hanzi: '木', propName: 'Tree', character: { pinyin: 'mù', keyword: 'tree' } },
       ],
     },
   },
   {
-    type: 'character', queueKind: 'new', id: '好', hanzi: '好', pinyin: 'hǎo', meaning: 'good', rank: 8, unlocks: 16,
+    type: 'character', queueKind: 'new', id: '好', hanzi: '好', pinyin: 'hǎo', keyword: 'good', dictionaryMeanings: [], rank: 8, unlocks: 16,
     movie: {
       ...getMovieCoordinates('hǎo'), actorName: 'Harrison Ford', setName: 'Childhood home', roomName: 'Bedroom', componentNote: null, isPrimitive: false, configured: true,
       components: [
-        { count: 1, hanzi: '女', propName: 'Doll', character: { pinyin: 'nǚ', meaning: 'woman' } },
-        { count: 1, hanzi: '子', propName: 'Child', character: { pinyin: 'zǐ', meaning: 'child' } },
+        { count: 1, hanzi: '女', propName: 'Doll', character: { pinyin: 'nǚ', keyword: 'woman' } },
+        { count: 1, hanzi: '子', propName: 'Child', character: { pinyin: 'zǐ', keyword: 'child' } },
       ],
     },
   },
 ]
 
 export const denseCharacter: CharacterItem = {
-  type: 'character', queueKind: 'new', id: '聽', hanzi: '聽', pinyin: 'tīng', meaning: 'listen', rank: 400, unlocks: 1,
+  type: 'character', queueKind: 'new', id: '聽', hanzi: '聽', pinyin: 'tīng', keyword: 'listen', dictionaryMeanings: [], rank: 400, unlocks: 1,
   movie: {
     ...getMovieCoordinates('tīng'), actorName: 'Tina Fey', setName: 'My university library', roomName: 'Outside entrance',
     componentNote: null, isPrimitive: false, configured: true,
@@ -86,15 +86,15 @@ export const denseCharacter: CharacterItem = {
 }
 
 export const repeatedCharacter: CharacterItem = {
-  ...exampleCharacter, id: '朋', hanzi: '朋', pinyin: 'péng', meaning: 'friend',
+  ...exampleCharacter, id: '朋', hanzi: '朋', pinyin: 'péng', keyword: 'friend',
   movie: {
     ...exampleCharacter.movie, ...getMovieCoordinates('péng'), actorName: 'Patrick Stewart',
-    components: [{ hanzi: '月', count: 2, propName: 'Moon', character: { pinyin: 'yuè', meaning: 'moon' } }],
+    components: [{ hanzi: '月', count: 2, propName: 'Moon', character: { pinyin: 'yuè', keyword: 'moon' } }],
   },
 }
 
 export const shapeCharacter: CharacterItem = {
-  ...exampleCharacter, id: '马', hanzi: '马', pinyin: 'mǎ', meaning: 'horse',
+  ...exampleCharacter, id: '马', hanzi: '马', pinyin: 'mǎ', keyword: 'horse',
   movie: {
     ...exampleCharacter.movie, ...getMovieCoordinates('mǎ'), actorName: 'Matt Damon', roomName: 'Bedroom',
     componentNote: 'The first two bent strokes interlock. Place the horizontal stroke across the lower part, as shown in 马.',

@@ -34,11 +34,13 @@ type OutboxEntry = ProgressOperation & {
 }
 
 type CacheKey = 'dashboard' | 'library' | 'palace'
+const cacheKey = (key: CacheKey) => `keywords-v1:${key}` as const
+type StoredCacheKey = ReturnType<typeof cacheKey>
 
 interface FluencOfflineDatabase extends DBSchema {
   cache: {
-    key: CacheKey
-    value: { key: CacheKey; value: unknown }
+    key: StoredCacheKey
+    value: { key: StoredCacheKey; value: unknown }
   }
   outbox: {
     key: number
@@ -262,13 +264,13 @@ function applyPalaceOperation(data: PalaceData, operation: ProgressOperation) {
 
 async function readCache<T>(key: CacheKey) {
   if (!isBrowser()) return null
-  const cached = await (await getDatabase()).get('cache', key)
+  const cached = await (await getDatabase()).get('cache', cacheKey(key))
   return cached?.value as T | undefined ?? null
 }
 
 async function writeCache(key: CacheKey, value: unknown) {
   if (!isBrowser()) return
-  await (await getDatabase()).put('cache', { key, value })
+  await (await getDatabase()).put('cache', { key: cacheKey(key), value })
 }
 
 export async function persistDashboard(data: DashboardData) {
@@ -322,24 +324,24 @@ export function getOfflinePalace() {
 async function enqueue(operation: ProgressOperation) {
   const database = await getDatabase()
   const transaction = database.transaction(['cache', 'outbox'], 'readwrite')
-  const cached = await transaction.objectStore('cache').get('dashboard')
+  const cached = await transaction.objectStore('cache').get(cacheKey('dashboard'))
   if (!cached) throw new Error('Open Fluenc online once before saving progress offline')
   const nextDashboard = applyOperation(cached.value as DashboardData, operation)
   await transaction.objectStore('cache').put({
-    key: 'dashboard',
+    key: cacheKey('dashboard'),
     value: nextDashboard,
   })
-  const library = await transaction.objectStore('cache').get('library')
+  const library = await transaction.objectStore('cache').get(cacheKey('library'))
   if (library) {
     await transaction.objectStore('cache').put({
-      key: 'library',
+      key: cacheKey('library'),
       value: applyLibraryOperation(library.value as LibraryData, nextDashboard, operation),
     })
   }
-  const palace = await transaction.objectStore('cache').get('palace')
+  const palace = await transaction.objectStore('cache').get(cacheKey('palace'))
   if (palace) {
     await transaction.objectStore('cache').put({
-      key: 'palace',
+      key: cacheKey('palace'),
       value: applyPalaceOperation(palace.value as PalaceData, operation),
     })
   }

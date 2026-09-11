@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Check, Pencil, X } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 
-import { splitMeaning } from '../lib/meaning'
+import { getItemMeaning } from '../lib/meaning'
 import { getToneDetail } from '../lib/tones'
 import { saveEnrollment, saveMovieOffline } from '../offline/progress'
 import type { BuildItem } from '../server/curriculum'
@@ -16,7 +16,7 @@ type CharacterItem = Extract<BuildItem, { type: 'character' }>
 
 export function CharacterStudio({ item }: { item: CharacterItem }) {
   const queryClient = useQueryClient()
-  const meaning = splitMeaning(item.meaning)
+  const meaning = getItemMeaning(item)
   const tone = getToneDetail(item.movie.tone)
   const [actorName, setActorName] = useState(item.movie.actorName)
   const [setName, setSetName] = useState(item.movie.setName)

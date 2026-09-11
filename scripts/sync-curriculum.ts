@@ -1,6 +1,10 @@
 import { parse } from 'csv-parse/sync'
 
+import characterDictionary from '../src/data/character-dictionary.source.json'
+import keywordReviews from '../src/data/character-keywords.reviewed.json'
 import reviewedJson from '../src/data/reviewed-compositions.json'
+import wordCorrections from '../src/data/word-corrections.reviewed.json'
+import { resolveCharacterKeywords, verifyDictionaryReading } from '../src/lib/curriculum-readings'
 import { findHanziComposition, type HanziIndex, type ReviewedComposition } from '../src/lib/hanzi'
 
 const WORDS_URL =
@@ -17,8 +21,6 @@ type CsvWord = {
 
 type DictionaryEntry = {
   character: string
-  definition?: string
-  pinyin: string[]
   decomposition: string
   radical: string
 }
@@ -72,11 +74,15 @@ const words = uniqueRecords.map((record) => ({
   characterIds: [...new Set(splitHanzi(record.word))],
 }))
 
-const firstStandaloneWord = new Map(
-  words
-    .filter((word) => word.characterIds.length === 1 && word.hanzi.length === 1)
-    .map((word) => [word.hanzi, word]),
-)
+const correctedWords = new Set<number>()
+for (const correction of wordCorrections) {
+  const word = words.find(word => word.id === correction.id && word.hanzi === correction.hanzi)
+  if (!word || correctedWords.has(correction.id)) throw new Error(`Unexpected or duplicate word correction: ${correction.id}`)
+  verifyDictionaryReading(word.hanzi, correction, characterDictionary.entries)
+  word.pinyin = correction.pinyin
+  word.meaningEn = correction.meaningEn
+  correctedWords.add(word.id)
+}
 
 const stats = new Map<string, { rank: number; unlocks: number }>()
 for (const word of words) {
@@ -93,17 +99,17 @@ const compositions = new Map([...stats.keys()].map(hanzi => [hanzi, findHanziCom
 const incomplete = [...compositions].filter(([, composition]) => !composition).map(([hanzi]) => hanzi)
 if (incomplete.length) throw new Error(`Incomplete decompositions (${incomplete.length}): ${incomplete.join(' ')}. Review these before generating the curriculum.`)
 
+const keywords = resolveCharacterKeywords([...stats.keys()], keywordReviews, characterDictionary.entries)
+
 const characters = [...stats.entries()]
   .map(([hanzi, characterStats]) => {
-    const dictionaryEntry = dictionary.get(hanzi)
-    const standalone = firstStandaloneWord.get(hanzi)
+    const keyword = keywords.get(hanzi)!
     const composition = compositions.get(hanzi)!
 
     return {
       id: hanzi,
       hanzi,
-      pinyin: dictionaryEntry?.pinyin.at(0) ?? standalone?.pinyin ?? '',
-      meaningEn: dictionaryEntry?.definition ?? standalone?.meaningEn ?? '',
+      ...keyword,
       components: composition.components,
       componentStructure: composition.structure,
       componentNote: composition.glyphVariation || reviewed.get(hanzi)?.confidence === 'editorial' ? composition.note : null,
@@ -124,6 +130,9 @@ const curriculum = {
     words: WORDS_URL,
     characters: CHARACTERS_URL,
     decompositionReviews: 'src/data/reviewed-compositions.json',
+    keywordReviews: 'src/data/character-keywords.reviewed.json',
+    dictionary: characterDictionary.url,
+    wordCorrections: 'src/data/word-corrections.reviewed.json',
   },
   words,
   characters,
