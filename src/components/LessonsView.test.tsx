@@ -6,6 +6,7 @@ import type { Root } from 'react-dom/client'
 
 import type { BuildItem, DashboardData } from '../server/curriculum'
 import { getMovieCoordinates } from '../lib/pinyin'
+import { applyOperation } from '../offline/progress-state'
 
 const browser = new Window()
 const globals = ['window', 'document', 'navigator', 'HTMLElement', 'HTMLInputElement', 'IS_REACT_ACT_ENVIRONMENT'] as const
@@ -51,18 +52,19 @@ function character(id: string, pinyin: string): Extract<BuildItem, { type: 'char
   }
 }
 
-const word: BuildItem = {
+const word: Extract<BuildItem, { type: 'word' }> = {
   type: 'word', id: '5', hanzi: '我们', pinyin: 'wǒmen', meaning: 'we',
   dictionaryMeanings: [], rank: 5, characterIds: ['我', '们'], livingLink: '', queueKind: 'new',
 }
 
-async function show(buildQueue: BuildItem[]) {
+async function show(buildQueue: BuildItem[], lockedWords: DashboardData['lockedWords'] = []) {
   const data: DashboardData = {
     curriculum: { version: 'test', characters: 2, words: 1 },
     progress: { introducedCharacters: 0, introducedWords: 0 },
-    reviewQueue: [], scheduledQueue: [], nextReviewAt: null, getQueue: [], buildQueue,
+    reviewQueue: [], scheduledQueue: [], nextReviewAt: null, getQueue: [], lockedWords, buildQueue,
   }
   await act(async () => root.render(<QueryClientProvider client={client}><LessonsView data={data} /></QueryClientProvider>))
+  return data
 }
 
 async function click(text: string) {
@@ -102,4 +104,36 @@ test('sync unlocks a word without replacing the next character or discarding its
   expect(host.textContent).toContain('All lessons complete')
   await show([first])
   expect(host.querySelector('.cs-target-hanzi')?.textContent).toBe('太')
+})
+
+test('learning the final prerequisite opens a word immediately without a server refresh', async () => {
+  await show([])
+  const first = character('我', 'wǒ')
+  const second = character('们', 'men')
+  const next = character('了', 'le')
+  let data = await show([first, next, second], [word])
+  const enroll = (id: string) => {
+    data = applyOperation(data, {
+      kind: 'enroll', data: { itemType: 'character', itemId: id, enrolledAt: new Date().toISOString() },
+    })
+  }
+
+  enroll('我')
+  await show(data.buildQueue)
+  expect(host.querySelector('.cs-target-hanzi')?.textContent).toBe('们')
+  expect(data.lockedWords.map(item => item.hanzi)).toEqual(['我们'])
+
+  enroll('们')
+  await show(data.buildQueue)
+  expect(host.querySelector('.recall-word')?.textContent).toBe('我们')
+  expect(data.lockedWords).toHaveLength(0)
+
+  data = applyOperation(data, {
+    kind: 'enroll', data: { itemType: 'word', itemId: word.id, enrolledAt: new Date().toISOString() },
+  })
+  await show(data.buildQueue)
+  expect(host.querySelector('.cs-target-hanzi')?.textContent).toBe('了')
+  enroll('了')
+  expect(data.buildQueue).toHaveLength(0)
+  expect(data.reviewQueue.filter(item => item.type === 'word' && item.id === word.id)).toHaveLength(1)
 })

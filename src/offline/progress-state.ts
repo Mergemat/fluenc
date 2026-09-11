@@ -2,6 +2,7 @@ import { createEmptyCard, fsrs, State, type Card, type Grade } from 'ts-fsrs'
 
 import { isStudyItemType } from '../data/types'
 import { characterForWord, characterIsWord, studyIdentity } from '../lib/character-words'
+import { nextWordCharacters } from '../lib/word-prerequisites'
 import type { EnrollInput, LivingLinkInput, MovieInput, ReviewInput } from '../server/curriculum.contract'
 import type { DashboardData, LibraryData, PalaceData } from '../server/curriculum'
 
@@ -121,6 +122,20 @@ function applyEnrollment(data: DashboardData, operation: Extract<ProgressOperati
     card: toSnapshot(card),
   } as ReviewQueueItem]
 
+  if (target.itemType === 'character') {
+    const introduced = new Set([...next.reviewQueue, ...next.scheduledQueue]
+      .filter(item => item.type === 'character').map(item => item.id))
+    const unlocked = next.lockedWords.filter(word => word.characterIds.every(id => introduced.has(id)))
+    const unlockedIds = new Set(unlocked.map(word => word.id))
+    next.lockedWords = next.lockedWords.filter(word => !unlockedIds.has(word.id))
+    const words = [...next.buildQueue.filter(item => item.type === 'word'), ...unlocked]
+      .sort((left, right) => left.rank - right.rank)
+    const nextWordParts = nextWordCharacters(next.lockedWords, introduced)
+    const characters = next.buildQueue.filter(item => item.type === 'character')
+      .sort((left, right) => Number(nextWordParts.has(right.id)) - Number(nextWordParts.has(left.id)))
+    next.buildQueue = [...words, ...characters]
+  }
+
   next.progress = { ...data.progress }
   if (target.itemType === 'character') {
     next.progress.introducedCharacters += 1
@@ -205,4 +220,3 @@ export function applyPalaceOperation(data: PalaceData, operation: ProgressOperat
   )
   return next
 }
-

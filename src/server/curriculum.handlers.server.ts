@@ -19,6 +19,7 @@ import {
   type LearnerItem,
 } from '../db/schema'
 import { characterForWord, characterIsWord, studyIdentity } from '../lib/character-words'
+import { nextWordCharacters } from '../lib/word-prerequisites'
 import { directCharacters } from '../lib/character-props'
 import { groupHanziComponents } from '../lib/hanzi'
 import { defaultToneRooms, getMovieCoordinates } from '../lib/pinyin'
@@ -241,6 +242,14 @@ export async function getDashboardHandler() {
     })
     .filter((item) => item !== null)
 
+  const unintroducedWords = uniqueWords
+    .filter(item => !characterForWord(String(item.id)) &&
+      !introduced.has(itemKey('word', String(item.id))) && !learnedWords.has(item.hanzi))
+    .map(item => ({ ...wordStudyItem(item, mappings), queueKind: 'new' as const }))
+  const wordReady = (item: typeof unintroducedWords[number]) => item.characterIds.every(character => introducedCharacters.has(character))
+  const newWords = unintroducedWords.filter(wordReady)
+  const lockedWords = unintroducedWords.filter(item => !wordReady(item))
+  const nextWordParts = nextWordCharacters(lockedWords, introducedCharacters)
   const knownProps = new Set(mappings.props.map((item) => item.component))
   const newCharacters = curriculum.characters
     .filter((item) => !introduced.has(itemKey('character', item.id)))
@@ -249,6 +258,8 @@ export async function getDashboardHandler() {
       missingProps: [...new Set(character.components)].filter((component) => !knownProps.has(component)).length,
     }))
     .sort(({ character: left, missingProps: leftMissing }, { character: right, missingProps: rightMissing }) => {
+      const wordPriority = Number(nextWordParts.has(right.id)) - Number(nextWordParts.has(left.id))
+      if (wordPriority) return wordPriority
       const leftStarter = starterCharacterIds.indexOf(left.id)
       const rightStarter = starterCharacterIds.indexOf(right.id)
       if (leftStarter >= 0 || rightStarter >= 0) {
@@ -259,16 +270,6 @@ export async function getDashboardHandler() {
       return leftMissing - rightMissing || left.frequencyRank - right.frequencyRank
     })
     .map(({ character }) => ({ ...characterStudyItem(character, mappings), queueKind: 'new' as const }))
-
-  const newWords = uniqueWords
-    .filter(
-      (item) =>
-        !characterForWord(String(item.id)) &&
-        !introduced.has(itemKey('word', String(item.id))) &&
-        !learnedWords.has(item.hanzi) &&
-        item.characterIds.every((character) => introducedCharacters.has(character)),
-    )
-    .map((item) => ({ ...wordStudyItem(item, mappings), queueKind: 'new' as const }))
 
   const getQueue = sentences
     .filter((sentence) => !introducedSentences.has(sentence.id))
@@ -323,6 +324,7 @@ export async function getDashboardHandler() {
     },
     reviewQueue: dueItems,
     buildQueue: [...newWords, ...newCharacters],
+    lockedWords,
     getQueue,
     scheduledQueue,
     nextReviewAt: nextDue?.toISOString() ?? null,

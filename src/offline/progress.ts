@@ -27,7 +27,7 @@ type OutboxEntry = ProgressOperation & {
 }
 
 type CacheKey = 'dashboard' | 'library' | 'palace'
-const cacheKey = (key: CacheKey) => `meanings-v2:${key}` as const
+const cacheKey = (key: CacheKey) => `lessons-v3:${key}` as const
 type StoredCacheKey = ReturnType<typeof cacheKey>
 
 interface FluencOfflineDatabase extends DBSchema {

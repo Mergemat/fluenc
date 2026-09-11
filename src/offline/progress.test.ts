@@ -29,7 +29,7 @@ function fixture(): DashboardData {
   return {
     curriculum: { version: 'test', characters: 0, words: 0 },
     progress: { introducedCharacters: 0, introducedWords: 0 },
-    reviewQueue: [], buildQueue: [], scheduledQueue: [], nextReviewAt: null,
+    reviewQueue: [], buildQueue: [], lockedWords: [], scheduledQueue: [], nextReviewAt: null,
     getQueue: ['s01', 's02'].map((id) => ({
       id, hanzi: '你好。', pinyin: 'Nǐ hǎo.', meaning: 'Hi.', words: ['你', '好'],
       coverage: 1, missingWords: [], missingCharacters: [],
