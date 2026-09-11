@@ -124,9 +124,9 @@
 .cs-clue-form button:disabled { opacity: .6; cursor: wait; }
 
 @media (max-width: 767px) {
-  .cs-host { display: flex; flex-direction: column; height: auto; min-height: calc(100dvh - 60px - env(safe-area-inset-top)); padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
-  .cs-studio { flex: 1; height: auto; }
+  .cs-host { display: flex; flex-direction: column; height: calc(100dvh - 84px - env(safe-area-inset-top)); min-height: 0; padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .cs-studio { flex: 1; height: auto; min-height: 0; }
   .cs-workspace { display: flex; flex-direction: column; }
-  .cs-prop-scene { flex: 1; height: auto; grid-template-rows: minmax(min-content, 1fr) auto; }
+  .cs-prop-scene { flex: 1; height: auto; grid-template-rows: minmax(0, 1fr) auto; }
   .cs-prop-column { max-height: none; overflow: visible; overscroll-behavior: auto; }
 }
