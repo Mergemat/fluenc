@@ -1,7 +1,9 @@
 import { generateSW } from 'workbox-build'
 import { rm } from 'node:fs/promises'
+import { resolve } from 'node:path'
 
-await rm('.output', { recursive: true, force: true })
+const outputDirectory = process.env.VERCEL ? '.vercel/output' : '.output'
+await rm(outputDirectory, { recursive: true, force: true })
 
 const viteBuild = Bun.spawn(['bunx', 'vite', 'build'], {
   stdin: 'inherit',
@@ -11,9 +13,11 @@ const viteBuild = Bun.spawn(['bunx', 'vite', 'build'], {
 const exitCode = await viteBuild.exited
 if (exitCode !== 0) process.exit(exitCode)
 
+const manifest = await Bun.file(`${outputDirectory}/nitro.json`).json() as { publicDir: string }
+const publicDirectory = resolve(outputDirectory, manifest.publicDir)
 const result = await generateSW({
-  swDest: '.output/public/sw.js',
-  globDirectory: '.output/public',
+  swDest: resolve(publicDirectory, 'sw.js'),
+  globDirectory: publicDirectory,
   globPatterns: [
     'assets/**/*.{css,js}',
     'fonts/**/*.woff2',
@@ -49,4 +53,5 @@ const result = await generateSW({
   ],
 })
 
+if (!result.count) throw new Error('Service worker has no assets to precache')
 console.info(`Service worker: ${result.count} files, ${result.size} bytes precached`)
