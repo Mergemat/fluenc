@@ -1,10 +1,10 @@
-type Rating = { value: number; label: string; description: string }
+type Rating = { value: number; label: string }
 
 const reviewRatings: Rating[] = [
-  { value: 1, label: 'Missed something', description: 'Forgot or got part wrong' },
-  { value: 2, label: 'With effort', description: 'Correct, but took a long time' },
-  { value: 3, label: 'After a pause', description: 'Correct, after a little thought' },
-  { value: 4, label: 'Instantly', description: 'Correct, without hesitation' },
+  { value: 1, label: 'Missed something' },
+  { value: 2, label: 'With effort' },
+  { value: 3, label: 'After a pause' },
+  { value: 4, label: 'Instantly' },
 ]
 
 export function SrsRatingButtons({
@@ -25,7 +25,6 @@ export function SrsRatingButtons({
           onClick={() => onRate(rating.value)}
         >
           <span className="rating-label">{rating.label}<span className="key-hint" aria-hidden="true">{rating.value}</span></span>
-          <span className="rating-description">{rating.description}</span>
         </button>
       ))}
     </div>

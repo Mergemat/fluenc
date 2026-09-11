@@ -45,9 +45,8 @@
 .key-hint { font-size: 10px; font-weight: 450; opacity: .55; }
 .recall-footer > .ui-button > .key-hint { position: absolute; right: 16px; }
 .rating-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.rating-button { display: flex; flex-direction: column; min-height: 76px; padding: 12px 8px; align-items: center; justify-content: center; gap: 6px; border: 1px solid transparent; border-radius: 9px; font-size: 13px; font-weight: 650; text-align: center; }
+.rating-button { display: flex; min-height: 48px; padding: 12px 8px; align-items: center; justify-content: center; border: 1px solid transparent; border-radius: 9px; font-size: 13px; font-weight: 650; text-align: center; }
 .rating-label { display: flex; align-items: center; justify-content: center; gap: 8px; }
-.rating-description { font-size: 11px; font-weight: 450; line-height: 1.4; }
 .rating-button:hover { border-color: currentColor; }
 .rating-1 { color: #98534a; background: #f0e1dc; }
 .rating-2 { color: #856a3d; background: #efe8dd; }
@@ -136,7 +135,7 @@
 @media (max-width: 380px) {
   .study-page { padding-inline: 12px; }
   .rating-buttons { gap: 5px; }
-  .rating-button { gap: 5px; font-size: 12px; }
+  .rating-button { font-size: 12px; }
   .key-hint { display: none; }
   .library-row { grid-template-columns: 49px minmax(0,1fr) auto; gap: 10px; }
   .library-status { flex-direction: column; gap: 2px; }
