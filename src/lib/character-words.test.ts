@@ -10,15 +10,15 @@ function wordId(hanzi: string) {
   return String(word.id)
 }
 
-test('person and be use their character memory instead of a second word card', () => {
-  for (const hanzi of ['人', '是']) {
+test('single characters share a memory across vocabulary meanings of the same pronunciation', () => {
+  for (const hanzi of ['人', '是', '太', '信', '本', '天']) {
     expect(studyIdentity('word', wordId(hanzi))).toEqual({ itemType: 'character', itemId: hanzi })
     expect(characterIsWord(hanzi)).toBeTrue()
   }
 })
 
-test('another reading or sense remains a word lesson even with one character', () => {
-  for (const hanzi of ['干', '待', '长', '信', '本', '天']) {
+test('another pronunciation remains a separate reading lesson', () => {
+  for (const hanzi of ['干', '待', '长']) {
     const id = wordId(hanzi)
     expect(characterForWord(id)).toBeUndefined()
     expect(studyIdentity('word', id)).toEqual({ itemType: 'word', itemId: id })
@@ -26,9 +26,10 @@ test('another reading or sense remains a word lesson even with one character', (
   expect(characterForWord(wordId('我们'))).toBeUndefined()
 })
 
-test('a vocabulary definition change removes an earlier character equivalence', () => {
+test('character equivalence depends on pronunciation, not the chosen English gloss', () => {
   const person = curriculum.characters.find(character => character.hanzi === '人')!
   const word = curriculum.words.find(word => word.hanzi === '人')!
-  expect(characterWordEquivalences([person], [{ ...word, meaning: 'somebody else' }])).toEqual({})
+  const reworded = { ...word, meaning: 'a person' }
+  expect(characterWordEquivalences([person], [reworded])).toEqual({ [word.id]: person.id })
   expect(characterWordEquivalences([person], [{ ...word, pinyin: 'rěn' }])).toEqual({})
 })

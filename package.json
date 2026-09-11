@@ -52,6 +52,7 @@
     "@vitejs/plugin-react": "^6.1.0",
     "drizzle-kit": "^0.31.10",
     "fake-indexeddb": "^6.2.5",
+    "happy-dom": "^20.14.3",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vite": "^8.2.2",

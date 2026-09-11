@@ -13,6 +13,7 @@ import { ErrorNote } from './ui/Layout'
 type WordItem = Extract<BuildItem, { type: 'word' }>
 
 export function WordStudio({ item }: { item: WordItem }) {
+  const singleCharacter = Array.from(item.hanzi).length === 1
   const meaning = getItemMeaning(item)
   const [story, setStory] = useState(item.livingLink)
   const [showLivingLink, setShowLivingLink] = useState(Boolean(item.livingLink))
@@ -26,7 +27,7 @@ export function WordStudio({ item }: { item: WordItem }) {
 
   return <article className="word-studio">
     <div className="word-target recall-target">
-      <p className="study-label">Word {item.rank}</p>
+      <p className="study-label">{singleCharacter ? 'Character reading' : 'Word'} {item.rank}</p>
       <p className="recall-hanzi recall-word font-hanzi" lang="zh-CN">{item.hanzi}</p>
       <div className="answer-sound"><strong>{item.pinyin}</strong><MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} /></div>
       <p className="answer-meaning">{meaning.primary}</p>

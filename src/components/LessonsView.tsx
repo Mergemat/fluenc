@@ -1,10 +1,17 @@
+import { useState } from 'react'
+
 import type { DashboardData } from '../server/curriculum'
 import { CharacterStudio } from './CharacterStudio'
 import { WordStudio } from './WordStudio'
 import { Empty, Page, PageHeader } from './ui/Layout'
 
 export function LessonsView({ data }: { data: DashboardData }) {
-  const lesson = data.buildQueue[0]
+  const [selected, setSelected] = useState(() => data.buildQueue[0])
+  // Sync can unlock words and reorder characters while a lesson is open.
+  // Advance only when the selected lesson has left the build queue.
+  const lesson = data.buildQueue.find(item => item.type === selected?.type && item.id === selected.id)
+    ?? data.buildQueue[0]
+  if (lesson?.type !== selected?.type || lesson?.id !== selected?.id) setSelected(lesson)
   const character = lesson?.type === 'character' ? lesson : null
 
   if (character) {
