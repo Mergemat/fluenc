@@ -10,6 +10,10 @@
 .cs-example-switch button { min-height: 25px; padding: 3px 8px; font-size: 10px; font-weight: 650; border-radius: 4px; color: var(--color-muted); }
 .cs-example-switch [aria-pressed=true] { background: var(--color-paper); color: var(--color-ink); }
 .cs-workspace { flex: 1; min-height: 0; }
+.cs-direct-character { height: 100%; display: grid; grid-template-rows: minmax(120px, 1fr) auto; gap: 12px; }
+.cs-direct-prop { display: grid; justify-items: center; text-align: center; gap: 10px; }
+.cs-direct-prop p { max-width: 36ch; font-size: 12px; line-height: 1.5; color: var(--color-muted); }
+.cs-direct-lesson .cs-field-prop { grid-column: 1 / -1; }
 .cs-character-target { min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; text-align: center; }
 .cs-target-hanzi { font-size: clamp(100px, 18dvh, 170px); line-height: 1; font-weight: 500; }
 .cs-target-pinyin { position: relative; display: flex; align-items: center; justify-content: center; }
@@ -84,8 +88,8 @@
 .cs-script .cs-components .cs-clue { flex-direction: row; align-items: baseline; max-width: none; gap: 5px; }
 .cs-script .cs-components .cs-clue small { display: none; }
 .cs-script-line { text-align: center; font-size: 18px; color: #858075; line-height: 1.85; }
-.cs-annotation { display: inline-block; position: relative; line-height: 1.3; padding-top: 13px; vertical-align: baseline; }
-.cs-annotation > small { position: absolute; top: 0; left: 0; font: 10px monospace; color: var(--cs-blue); }
+.cs-annotation { display: inline-block; line-height: 1.3; vertical-align: baseline; }
+.cs-annotation > small { display: block; text-align: left; font: 10px monospace; color: var(--cs-blue); }
 .cs-annotation > strong { font-weight: 650; color: var(--color-ink); }
 .cs-annotation-room > small { color: var(--cs-green); }
 .cs-annotation-room > strong { color: var(--cs-green); }
@@ -104,6 +108,7 @@
 .prototype-options-below { bottom: auto; top: calc(100% + 8px); }
 .prototype-options > strong { font-size: 11px; }
 .prototype-options > div { display: flex; gap: 5px; }
+.prototype-options > .prototype-samples { display: grid; grid-template-columns: 1fr 1fr; }
 .prototype-options button { flex: 1; padding: 7px 8px; border: 1px solid #ffffff30; border-radius: 5px; font-size: 10px; }
 .prototype-options button[aria-pressed=true] { background: #e4f1ed; color: #173d37; border-color: #e4f1ed; }
 .prototype-options > small { font-size: 10px; color: #c1d4dd; }

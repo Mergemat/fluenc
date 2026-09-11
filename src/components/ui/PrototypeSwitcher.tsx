@@ -44,10 +44,10 @@ export function PrototypeSwitcher({ onShowState, screen, onScreenChange, sample,
 
   if (!import.meta.env.DEV) return null
   return <nav ref={panel} className="prototype-switcher" aria-label="Prototype variants" style={position ? { left: position.x, top: position.y, right: 'auto', bottom: 'auto' } : undefined}>
-    {expanded ? <div className={`prototype-options ${position && position.y < 170 ? 'prototype-options-below' : ''}`}>
+    {expanded ? <div className={`prototype-options ${position && position.y < 240 ? 'prototype-options-below' : ''}`}>
       <strong>Round 1 · Overall layout</strong>
       <div aria-label="Prototype screen">{(['scene', 'fill'] as const).map(value => <button key={value} type="button" aria-pressed={screen === value} onClick={() => onScreenChange(value)}>{value === 'scene' ? 'All clues' : 'Fill'}</button>)}</div>
-      {example ? <div aria-label="Example state">{([{ id: 'sequence', label: 'Example' }, { id: 'missing', label: 'Missing' }, { id: 'dense', label: '6 parts' }] as const).map(value => <button key={value.id} type="button" aria-pressed={sample === value.id} onClick={() => onSampleChange(value.id)}>{value.label}</button>)}</div> : <small>Use Example to try mock states.</small>}
+      {example ? <div className="prototype-samples" aria-label="Example state">{([{ id: 'sequence', label: 'Example' }, { id: 'missing', label: 'Missing' }, { id: 'dense', label: '6 parts' }, { id: 'direct', label: 'Prop only' }] as const).map(value => <button key={value.id} type="button" aria-pressed={sample === value.id} onClick={() => onSampleChange(value.id)}>{value.label}</button>)}</div> : <small>Use Example to try mock states.</small>}
       <div><button type="button" onClick={onShowState}>Inspect state</button><button type="button" onClick={() => setPosition(null)}>Reset position</button></div>
     </div> : null}
     <button type="button" data-drag-handle aria-label="Move prototype picker" className="prototype-grip"

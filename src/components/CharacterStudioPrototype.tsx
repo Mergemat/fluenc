@@ -9,15 +9,17 @@ import { splitMeaning } from '../lib/meaning'
 import { getHanziCompositions } from '../server/hanzi'
 import { PrototypeSwitcher } from './ui/PrototypeSwitcher'
 import { ClueForm } from './character-studio-prototype/ClueForm'
-import { denseCharacter, exampleCharacters, type CharacterItem, type Cue, type Sample } from './character-studio-prototype/data'
-import { CharacterTarget, OpenCanvas, Notebook, Cinema, SideNotes, SceneScript, type Studio } from './character-studio-prototype/SceneVariants'
+import { denseCharacter, directCharacter, directCharacters, exampleCharacters, type CharacterItem, type Cue, type Sample } from './character-studio-prototype/data'
+import { CharacterTarget, DirectCharacter, OpenCanvas, Notebook, Cinema, SideNotes, SceneScript, type Studio } from './character-studio-prototype/SceneVariants'
 import './character-studio-prototype/studio.css'
 
 const cueKey = (cue: Cue) => `${cue.kind}:${cue.code}`
+const actorLabels = { male: 'Male actor', female: 'Female actor', fictional: 'Fictional actor', wildcard: 'Wildcard actor' }
 
 export function CharacterStudioPrototype({ items, example }: { items: CharacterItem[]; example: boolean }) {
   const [sample, setSample] = useState<Sample>('sequence')
-  const queue = example ? sample === 'dense' ? [denseCharacter] : sample === 'missing' ? [exampleCharacters[1]] : exampleCharacters : items
+  const samples = { sequence: exampleCharacters, dense: [denseCharacter], missing: [exampleCharacters[1]], direct: [directCharacter] }
+  const queue = example ? samples[sample] : items
   const { variant = 'a' } = useSearch({ from: '/' })
   const navigate = useNavigate({ from: '/' })
   const [index, setIndex] = useState(0)
@@ -26,6 +28,7 @@ export function CharacterStudioPrototype({ items, example }: { items: CharacterI
   const [finished, setFinished] = useState(false)
   const [showState, setShowState] = useState(false)
   const item = queue[index]
+  const direct = directCharacters.has(item.hanzi)
   const { data: compositions } = useQuery({
     queryKey: ['hanzi-compositions', item.hanzi],
     queryFn: () => getHanziCompositions({ data: { characters: [item.hanzi] } }),
@@ -34,9 +37,11 @@ export function CharacterStudioPrototype({ items, example }: { items: CharacterI
   const simpleParts = item.movie.components.length === 2 && decomposition?.slice(1) === item.movie.components.map((part) => part.hanzi).join('')
   const layout = simpleParts && decomposition?.startsWith('⿰') ? 'horizontal' : simpleParts && decomposition?.startsWith('⿱') ? 'vertical' : undefined
   const positions = layout === 'horizontal' ? ['Left', 'Right'] : layout === 'vertical' ? ['Top', 'Bottom'] : []
-  const initialCues: Cue[] = [
-    { id: 'actor', kind: 'actor', code: item.movie.actorKey, name: item.movie.actorName, role: 'Initial · Actor' },
-    { id: 'set', kind: 'set', code: item.movie.finalKey, name: item.movie.setName, role: 'Final · Place' },
+  const initialCues: Cue[] = direct ? [
+    { id: 'prop', kind: 'prop', code: item.hanzi, name: item.movie.components.find(part => part.hanzi === item.hanzi)?.propName ?? '', role: 'Reusable prop' },
+  ] : [
+    { id: 'actor', kind: 'actor', code: item.movie.actorKey, name: item.movie.actorName, role: actorLabels[item.movie.actorCategory] },
+    { id: 'set', kind: 'set', code: item.movie.finalKey, name: item.movie.setName, role: 'Place code' },
     { id: 'room', kind: 'room', code: String(item.movie.tone), name: item.movie.roomName, role: 'Tone room' },
     ...item.movie.components.map((part, partIndex): Cue => ({ id: `prop-${partIndex}`, kind: 'prop', code: part.hanzi, name: part.propName, role: 'Prop', position: positions[partIndex] })),
   ]
@@ -52,17 +57,19 @@ export function CharacterStudioPrototype({ items, example }: { items: CharacterI
     console.info('Character Studio prototype', { variant, example, sample, screen, character: item.hanzi, pinyin: item.pinyin, meaning: studio.meaning, cues, index, finished })
   }, [variant, example, sample, screen, item.hanzi, names, index, finished, decomposition])
 
-  return <article className={`cs-prototype cs-variant-${variant} cs-screen-${screen} ${cues.length > 5 ? 'cs-dense' : ''}`}>
+  return <article className={`cs-prototype cs-variant-${variant} cs-screen-${screen} ${direct ? 'cs-direct-lesson' : ''} ${cues.length > 5 ? 'cs-dense' : ''}`}>
     <header className="cs-toolbar"><span>Character studio <small>{index + 1}/{queue.length}</small></span><div className="cs-example-switch" aria-label="Prototype content"><button type="button" aria-pressed={!example} onClick={() => void navigate({ search: (previous) => ({ ...previous, variant, example: undefined }), replace: true })}>Yours</button><button type="button" aria-pressed={example} onClick={() => void navigate({ search: (previous) => ({ ...previous, variant, example: 'ming' }), replace: true })}>Example</button></div></header>
     {screen === 'scene' ? <>
       <div className="cs-workspace" aria-label="Character and all clues">
-        {variant === 'a' ? <OpenCanvas {...studio} /> : null}
-        {variant === 'b' ? <Notebook {...studio} /> : null}
-        {variant === 'c' ? <Cinema {...studio} /> : null}
-        {variant === 'd' ? <SideNotes {...studio} /> : null}
-        {variant === 'e' ? <SceneScript {...studio} /> : null}
+        {direct ? <DirectCharacter {...studio} /> : <>
+          {variant === 'a' ? <OpenCanvas {...studio} /> : null}
+          {variant === 'b' ? <Notebook {...studio} /> : null}
+          {variant === 'c' ? <Cinema {...studio} /> : null}
+          {variant === 'd' ? <SideNotes {...studio} /> : null}
+          {variant === 'e' ? <SceneScript {...studio} /> : null}
+        </>}
       </div>
-      <footer className="cs-scene-actions"><p><span>1 / 2</span>{item.movie.isPrimitive ? 'Picture this prop.' : 'Picture the scene.'}</p><button className="cs-next" type="button" onClick={() => setScreen('fill')}>Fill in clues <ArrowRight size={18} /></button></footer>
+      <footer className="cs-scene-actions"><p><span>1 / 2</span>{direct ? 'Picture your prop.' : 'Picture the scene.'}</p><button className="cs-next" type="button" onClick={() => setScreen('fill')}>{direct ? 'Choose a prop' : 'Fill in clues'} <ArrowRight size={18} /></button></footer>
     </> : <div className="cs-fill-screen">
       <CharacterTarget studio={studio} />
       <ClueForm cues={cues} onChange={(cue, value) => setNames((previous) => ({ ...previous, [cueKey(cue)]: value }))} onBack={() => setScreen('scene')} onNext={next} />

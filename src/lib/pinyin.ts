@@ -30,7 +30,7 @@ export const defaultToneRooms: Record<number, string> = {
 }
 
 function getActorCategory(actorKey: string): MovieCoordinates['actorCategory'] {
-  if (actorKey.includes('ü')) return 'wildcard'
+  if (actorKey.includes('ü') || /^[jqx]u$/.test(actorKey)) return 'wildcard'
   if (actorKey.includes('u') || actorKey === 'w') return 'fictional'
   if (actorKey.includes('i') || actorKey === 'y') return 'female'
   return 'male'
@@ -68,7 +68,7 @@ export function getMovieCoordinates(pinyin: string): MovieCoordinates {
     if (final === 'u') final = ''
     else if (final === 'ei') final = 'ei'
   } else if (initial === 'y') {
-    if (final === 'i') final = ''
+    if (final.startsWith('i')) final = final.slice(1)
     else if (final.startsWith('u')) {
       actorKey = 'yü'
       final = final.slice(1)

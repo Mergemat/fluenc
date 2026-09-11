@@ -22,6 +22,17 @@ export const variants = [
   { id: 'e', name: 'Scene script' },
 ] as const
 
+// The first-party walkthrough teaches these directly, while still assigning props.
+export const directCharacters = new Set(['一', '二', '三'])
+export const directCharacter: CharacterItem = {
+  type: 'character', queueKind: 'new', id: '一', hanzi: '一', pinyin: 'yī', meaning: 'one', rank: 2, unlocks: 1,
+  movie: {
+    ...getMovieCoordinates('yī'), actorName: '', setName: '', roomName: 'Outside entrance',
+    isPrimitive: true, configured: false,
+    components: [{ hanzi: '一', propName: '', character: { pinyin: 'yī', meaning: 'one' } }],
+  },
+}
+
 export const exampleCharacter: CharacterItem = {
   type: 'character', queueKind: 'new', id: '明', hanzi: '明', pinyin: 'míng', meaning: 'bright', rank: 137, unlocks: 3,
   movie: {
@@ -74,4 +85,4 @@ export const denseCharacter: CharacterItem = {
   },
 }
 
-export type Sample = 'sequence' | 'missing' | 'dense'
+export type Sample = 'sequence' | 'missing' | 'dense' | 'direct'

@@ -32,6 +32,13 @@ function Components({ studio }: { studio: Studio }) {
   return <div className={`cs-components ${studio.layout === 'vertical' ? 'cs-vertical' : ''}`} aria-label="Character components">{studio.cues.filter(cue => cue.kind === 'prop').map(cue => <Clue key={cue.id} cue={cue} />)}</div>
 }
 
+export function DirectCharacter(studio: Studio) {
+  return <div className="cs-direct-character">
+    <CharacterTarget studio={studio} />
+    <div className="cs-direct-prop"><Clue cue={studio.cues[0]} /><p>Learn this simple character directly. Choose an object to represent it when it appears inside other characters.</p></div>
+  </div>
+}
+
 export function OpenCanvas(studio: Studio) {
   const [actor, set, room] = studio.cues
   return <div className="cs-open-canvas">
@@ -65,7 +72,7 @@ export function SideNotes(studio: Studio) {
 }
 
 function Annotation({ cue }: { cue: Cue }) {
-  return <span className={`cs-annotation cs-annotation-${cue.kind}`}><small>{cue.kind === 'room' ? `Tone ${cue.code}` : cue.code}</small><strong className={cue.name ? '' : 'cs-missing'}>{cue.name || `your ${cue.kind}`}</strong></span>
+  return <span className={`cs-annotation cs-annotation-${cue.kind}`}><small>{cue.kind === 'room' ? `Tone ${cue.code}` : `${cue.role} · ${cue.code}`}</small><strong className={cue.name ? '' : 'cs-missing'}>{cue.name || `your ${cue.kind}`}</strong></span>
 }
 
 export function SceneScript(studio: Studio) {
