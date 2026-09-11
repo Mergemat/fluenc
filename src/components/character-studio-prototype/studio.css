@@ -1,121 +1,103 @@
 @import './fill.css';
-@import './clue-groups.css';
-/* Round 2 keeps Notebook's character area and compares the clue groups. */
-.cs-host { height: calc(100dvh - 128px - env(safe-area-inset-bottom)); padding: 8px 16px; box-sizing: border-box; max-width: 580px; margin-inline: auto; }
-.cs-prototype { --cs-blue: #315b79; --cs-green: #337465; --cs-gold: #987031; position: relative; height: 100%; display: flex; flex-direction: column; gap: 10px; padding-bottom: 52px; color: var(--color-ink); }
+/* Selected prototype A. Character and selectable props share the main area. */
+.cs-host { height: calc(100dvh - 128px - env(safe-area-inset-bottom)); padding: 8px 16px; box-sizing: border-box; max-width: 760px; margin-inline: auto; }
+.cs-prototype { --cs-blue: #315b79; --cs-green: #337465; --cs-gold: #987031; position: relative; height: 100%; display: flex; flex-direction: column; gap: 12px; color: var(--color-ink); }
 .cs-prototype h1, .cs-prototype h2, .cs-prototype h3, .cs-prototype p { margin: 0; }
-.cs-toolbar { display: flex; align-items: center; justify-content: space-between; height: 27px; gap: 8px; flex-shrink: 0; }
+.cs-toolbar { display: flex; align-items: center; justify-content: space-between; min-height: 27px; gap: 8px; flex-shrink: 0; }
 .cs-toolbar > span { font-size: 12px; font-weight: 750; }
 .cs-toolbar small { margin-left: 5px; font: 10px monospace; color: var(--color-muted); }
 .cs-example-switch { display: flex; gap: 2px; padding: 2px; background: #e5e1d7; border-radius: 6px; }
 .cs-example-switch button { min-height: 25px; padding: 3px 8px; font-size: 10px; font-weight: 650; border-radius: 4px; color: var(--color-muted); }
 .cs-example-switch [aria-pressed=true] { background: var(--color-paper); color: var(--color-ink); }
 .cs-workspace { flex: 1; min-height: 0; }
-.cs-direct-character { height: 100%; display: grid; grid-template-rows: minmax(120px, 1fr) auto; gap: 12px; }
-.cs-direct-prop { display: grid; justify-items: center; text-align: center; gap: 10px; }
-.cs-direct-prop p { max-width: 36ch; font-size: 12px; line-height: 1.5; color: var(--color-muted); }
-.cs-direct-lesson .cs-field-prop { grid-column: 1 / -1; }
+.cs-prop-scene { height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 14px; }
+.cs-character-and-props { display: grid; grid-template-columns: minmax(0, 1fr) 110px; align-items: center; gap: 18px; min-height: 0; }
 .cs-character-target { min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; text-align: center; }
+.cs-character-drawing { width: min(100%, 30dvh, 300px); position: relative; display: grid; justify-items: center; }
+.cs-interactive-hanzi { display: block; width: 100%; aspect-ratio: 1; overflow: visible; }
+.cs-character-part { fill: var(--color-ink); stroke: transparent; stroke-width: 20; cursor: pointer; transition: fill 140ms; pointer-events: visiblePainted; outline: none; -webkit-tap-highlight-color: transparent; }
+.cs-character-part:focus { outline: none; }
+.cs-character-part.cs-part-selected { fill: var(--cs-gold); }
+.cs-character-part:focus-visible { outline: none; stroke: var(--cs-gold); stroke-width: 9; }
+.cs-selected-prop-label { min-height: 20px; max-width: 100%; font-size: 13px; font-weight: 650; line-height: 20px; color: var(--cs-gold); overflow-wrap: anywhere; }
+.cs-prop-column { display: flex; flex-direction: column; gap: 5px; min-height: 0; max-height: 100%; padding: 5px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; border-radius: 12px; background: #fcf9ed; }
+.cs-prop-choice { display: flex; flex-shrink: 0; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 72px; width: 100%; padding: 9px 5px; border: 1px solid transparent; border-radius: 8px; text-align: center; }
+.cs-prop-choice:hover:not(:disabled) { background: #f2ead6; }
+.cs-prop-choice[aria-pressed=true] { background: #f1e6cb; border-color: var(--cs-gold); }
+.cs-prop-choice:focus-visible { outline: 2px solid var(--cs-gold); outline-offset: 1px; }
+.cs-prop-choice:disabled { opacity: .5; }
+.cs-prop-glyph { font-size: 34px; font-weight: 400; color: var(--cs-gold); line-height: 1.1; }
+.cs-prop-name { font-size: 12px; line-height: 1.3; font-weight: 650; overflow-wrap: anywhere; }
+.cs-prop-count { font-family: var(--font-sans); font-size: 10px; margin-left: 3px; vertical-align: super; }
 .cs-target-hanzi { font-size: clamp(100px, 18dvh, 170px); line-height: 1; font-weight: 500; }
 .cs-target-pinyin { position: relative; display: flex; align-items: center; justify-content: center; }
 .cs-target-pinyin > strong { font-size: 34px; line-height: 1.15; font-weight: 750; letter-spacing: -.5px; }
-.cs-target-pinyin > button { position: absolute; left: calc(100% + 6px); width: 28px; height: 28px; }
+.cs-target-pinyin > button { position: absolute; left: calc(100% + 5px); width: 28px; height: 28px; }
 .cs-target-details { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 5px 10px; }
 .cs-target-details h2 { font-size: 14px; font-weight: 500; color: var(--color-muted); }
 .cs-tone { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: var(--cs-green); white-space: nowrap; }
 .cs-tone b { font-size: 19px; font-weight: 500; }
-.cs-clue { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.cs-clue small, .cs-note > small { font-size: 9px; font-weight: 550; color: var(--color-muted); }
-.cs-clue > b { font-size: 26px; color: var(--cs-blue); line-height: 1.1; font-weight: 650; }
-.cs-clue > strong { font-size: 13px; font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
-.cs-clue-prop > b { font-size: 34px; font-weight: 400; color: var(--cs-gold); }
-.cs-clue-room > b { color: var(--cs-green); }
-.cs-missing { color: #817c70; font-weight: 450 !important; }
-.cs-components { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.cs-components .cs-clue { min-width: 42px; max-width: 110px; align-items: center; text-align: center; }
-.cs-vertical { flex-direction: column; align-items: center; gap: 6px; }
-/* B: a character above four compact notes, as in the selected reference. */
-.cs-notebook { height: 100%; display: grid; grid-template-rows: minmax(115px, 1fr) auto; gap: 16px; }
-.cs-note-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-.cs-note { min-width: 0; padding: 12px 14px; background: #fcf9ed; border-radius: 13px 13px 13px 3px; }
+.cs-shelf-sound { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 9px; }
+.cs-note { min-width: 0; padding: 12px 14px; border-radius: 13px 13px 13px 3px; }
 .cs-note-actor { background: #e6eeea; border-radius: 13px 13px 3px 13px; }
 .cs-note-set { background: #e5edf4; }
 .cs-note-room { background: #efe8dd; border-radius: 13px 13px 3px 13px; }
-.cs-note .cs-clue { gap: 3px; }
-.cs-note .cs-clue > b { font-size: 30px; }
-.cs-note .cs-clue > strong { font-size: 14px; }
-.cs-note-parts > .cs-components { margin-top: 5px; gap: 12px; }
-.cs-note-parts .cs-components .cs-clue { flex: 1; min-width: 0; max-width: none; }
-.cs-note-parts .cs-clue > b { font-size: 32px; }
+.cs-clue { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.cs-clue small { font-size: 9px; font-weight: 550; color: var(--color-muted); }
+.cs-clue > b { font-size: 30px; color: var(--cs-blue); line-height: 1.1; font-weight: 650; }
+.cs-clue-room > b { color: var(--cs-green); }
+.cs-clue > strong { font-size: 14px; font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
+.cs-missing { color: #817c70; font-weight: 450 !important; }
+.cs-direct-caption { text-align: center; max-width: 40ch; justify-self: center; font-size: 12px; line-height: 1.5; color: var(--color-muted); }
+.cs-direct-lesson .cs-field-prop { grid-column: 1 / -1; }
+.cs-shape-status { text-align: center; font-size: 12px; color: var(--color-muted); }
+.cs-shape-status button { text-decoration: underline; }
 .cs-scene-actions { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 6px; }
 .cs-scene-actions p { display: flex; flex-direction: column; gap: 3px; font-size: 11px; color: var(--color-muted); }
 .cs-scene-actions p > span { font: 10px monospace; }
-/* The picker is anchored bottom-right. Dragging moves only the prototype controls. */
-.prototype-switcher { position: fixed; bottom: calc(72px + env(safe-area-inset-bottom)); right: 12px; z-index: 30; display: flex; align-items: center; height: 40px; padding: 3px; background: #233c4b; color: #fff; border-radius: 12px; box-shadow: 0 3px 14px #102b3b25; user-select: none; }
-.prototype-switcher > button { display: grid; place-items: center; width: 31px; height: 34px; border-radius: 8px; }
-.prototype-switcher > button:hover, .prototype-switcher > button[aria-expanded=true] { background: #ffffff20; }
-.prototype-switcher > span { min-width: 111px; font-size: 11px; text-align: center; }
-.prototype-switcher > span b { color: #b5d5db; margin-right: 5px; }
-.prototype-switcher .prototype-grip { width: 22px; cursor: grab; touch-action: none; color: #adcad7; }
-.prototype-grip:active { cursor: grabbing; }
-.prototype-options { position: absolute; bottom: calc(100% + 8px); right: 0; width: 100%; padding: 12px; display: grid; gap: 10px; border-radius: 12px; background: #233c4b; box-shadow: 0 4px 22px #102b3b30; }
-.prototype-options-below { bottom: auto; top: calc(100% + 8px); }
-.prototype-options > strong { font-size: 11px; }
-.prototype-options > div { display: flex; gap: 5px; }
-.prototype-options > .prototype-samples { display: grid; grid-template-columns: 1fr 1fr; }
-.prototype-options button { flex: 1; padding: 7px 8px; border: 1px solid #ffffff30; border-radius: 5px; font-size: 10px; }
-.prototype-options button[aria-pressed=true] { background: #e4f1ed; color: #173d37; border-color: #e4f1ed; }
-.prototype-options > small { font-size: 10px; color: #c1d4dd; }
-.cs-finished { position: absolute; inset: 36px 0 52px; z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; padding: 25px; background: var(--color-canvas); text-align: center; }
+.cs-finished { position: absolute; inset: 36px 0 0; z-index: 10; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; padding: 25px; background: var(--color-canvas); text-align: center; }
 .cs-finished > svg { color: #52726a; }
 .cs-finished h2 { font-size: 24px; font-weight: 750; }
 .cs-finished p { max-width: 30ch; font-size: 13px; line-height: 1.6; color: var(--color-muted); }
 .cs-state-panel { position: absolute; inset: 0; z-index: 40; display: flex; flex-direction: column; padding: 15px; background: var(--color-paper); border: 1px solid var(--color-line); border-radius: 9px; }
 .cs-state-panel > header { display: flex; align-items: center; justify-content: space-between; font-size: 13px; }
 .cs-state-close { display: grid; place-items: center; width: 30px; height: 30px; }
-.cs-state-panel pre { font-size: 10px; white-space: pre-wrap; overflow-wrap: anywhere; min-height: 0; overflow-y: auto; }
-.cs-dense .cs-components { gap: 6px 10px; }
-.cs-dense .cs-components .cs-clue { min-width: 35px; max-width: 64px; }
-.cs-dense .cs-components .cs-clue > b { font-size: 26px; }
-.cs-dense .cs-components .cs-clue > strong { font-size: 10px; }
-.cs-dense .cs-components .cs-clue { gap: 2px; }
-.cs-dense .cs-note-parts .cs-components .cs-clue { flex: 0 0 26%; min-width: 0; }
-.cs-dense .cs-note-parts .cs-components .cs-clue > b { font-size: 22px; }
+.cs-shape-note-button { border: 0; padding: 0; background: none; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
+.cs-shape-note p { padding: 16px; font-size: 14px; line-height: 1.6; }
+@media (max-width: 380px) {
+  .cs-character-and-props { grid-template-columns: minmax(0, 1fr) 86px; gap: 10px; }
+  .cs-prop-choice { min-height: 64px; padding-block: 7px; }
+  .cs-prop-glyph { font-size: 30px; }
+  .cs-prop-name { font-size: 11px; }
+}
 @media (max-height: 710px) {
-  .cs-prototype { gap: 7px; }
-  .cs-target-hanzi { font-size: 108px; }
+  .cs-prototype { gap: 8px; }
+  .cs-prop-scene { gap: 9px; }
   .cs-target-pinyin > strong { font-size: 29px; }
   .cs-character-target { gap: 5px; }
-  .cs-clue { gap: 3px; }
-  .cs-clue > strong { font-size: 12px; }
   .cs-note { padding: 8px 10px; }
-  .cs-note .cs-clue > b { font-size: 25px; }
-  .cs-note .cs-clue > strong { font-size: 12px; }
-  .cs-notebook { gap: 10px; }
+  .cs-clue > b { font-size: 25px; }
+  .cs-clue > strong { font-size: 12px; }
   .cs-fill-screen { gap: 10px; }
   .cs-fill-screen .cs-character-target { padding-block: 2px; }
   .cs-fill-screen .cs-target-hanzi { font-size: 42px; }
   .cs-field-entry { padding-block: 3px; }
   .cs-clue-form { gap: 8px; }
+  .cs-dense .cs-prop-choice { min-height: 44px; padding-block: 4px; }
+  .cs-dense .cs-prop-glyph { font-size: 23px; }
+  .cs-dense .cs-prop-name { font-size: 10px; }
 }
 @media (max-height: 610px) and (max-width: 767px) {
   .cs-host { padding: 4px 12px; }
   .cs-prototype { gap: 5px; }
-  .cs-toolbar { height: 24px; }
-  .cs-target-hanzi { font-size: 82px; }
+  .cs-character-drawing { width: min(100%, 26dvh); }
   .cs-target-pinyin > strong { font-size: 25px; }
   .cs-target-details { gap: 3px 7px; }
   .cs-target-details h2 { font-size: 12px; }
   .cs-tone { font-size: 9px; }
-  .cs-clue > b { font-size: 21px; }
-  .cs-clue-prop > b { font-size: 27px; }
+  .cs-note { padding: 7px 8px; }
+  .cs-clue > b { font-size: 23px; }
   .cs-clue > strong { font-size: 11px; }
-  .cs-note-grid { gap: 5px; }
-  .cs-note { padding: 5px 8px; }
-  .cs-note .cs-clue > b { font-size: 21px; }
-  .cs-note .cs-clue > strong { font-size: 11px; }
-  .cs-notebook { gap: 5px; }
-  .cs-note-parts .cs-clue > b { font-size: 25px; }
   .cs-fill-screen { gap: 5px; }
   .cs-fill-screen .cs-character-target { gap: 1px; padding: 0; }
   .cs-fill-screen .cs-target-hanzi { font-size: 32px; }
@@ -132,25 +114,13 @@
   .cs-dense .cs-field-entry input { height: 22px; line-height: 22px; }
   .cs-dense .cs-field-actor, .cs-dense .cs-field-set { grid-column: auto; }
   .cs-dense .cs-field-code { width: 32px; }
-  .cs-dense .cs-workspace .cs-target-hanzi { font-size: 62px; }
-  .cs-dense .cs-workspace .cs-target-pinyin > strong { font-size: 23px; }
-  .cs-dense .cs-workspace .cs-character-target { gap: 3px; }
-  .cs-dense .cs-workspace .cs-tone b { line-height: 1; }
-  .cs-dense .cs-components .cs-clue > b { font-size: 23px; }
-  .cs-dense .cs-note-parts .cs-components .cs-clue > b { font-size: 19px; }
-  .cs-dense .cs-note-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .cs-dense .cs-note-parts { grid-column: 1 / -1; }
-  .cs-dense .cs-note-parts .cs-components { gap: 4px; }
-  .cs-dense .cs-note-parts .cs-components .cs-clue { flex: 1; min-width: 0; max-width: none; }
 }
 @media (min-width: 768px) {
   .cs-host { height: 100dvh; padding: 22px; }
-  .cs-prototype { gap: 15px; }
+  .cs-prototype { gap: 18px; }
   .cs-toolbar > span { font-size: 14px; }
-  .prototype-switcher { bottom: 16px; right: 16px; }
+  .cs-character-and-props { grid-template-columns: minmax(0, 1fr) 140px; gap: 24px; }
+  .cs-prop-choice { min-height: 82px; }
+  .cs-prop-name { font-size: 14px; }
 }
-
-.cs-prop-count { font-family: var(--font-sans); font-size: 10px; margin-left: 3px; vertical-align: super; }
-
-.cs-shape-note-button { border: 0; padding: 0; background: none; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
-.cs-shape-note p { padding: 16px; font-size: 14px; line-height: 1.6; }
+@media (prefers-reduced-motion: reduce) { .cs-character-part { transition: none; } }

@@ -3,7 +3,6 @@ import type { BuildItem } from '../../server/curriculum'
 import { getMovieCoordinates } from '../../lib/pinyin'
 
 export type CharacterItem = Extract<BuildItem, { type: 'character' }>
-export type Variant = 'a' | 'b' | 'c' | 'd' | 'e'
 export type CueKind = 'actor' | 'set' | 'room' | 'prop'
 export type Cue = {
   id: string
@@ -13,14 +12,6 @@ export type Cue = {
   role: string
   count?: number
 }
-
-export const variants = [
-  { id: 'a', name: 'Prop shelf' },
-  { id: 'b', name: 'Notebook' },
-  { id: 'c', name: 'Sound / shape' },
-  { id: 'd', name: 'Scene cast' },
-  { id: 'e', name: 'Clue strip' },
-] as const
 
 // The first-party walkthrough teaches these directly, while still assigning props.
 export const directCharacters = new Set(['一', '二', '三'])
@@ -106,4 +97,13 @@ export const shapeCharacter: CharacterItem = {
   },
 }
 
-export type Sample = 'sequence' | 'missing' | 'dense' | 'direct' | 'repeated' | 'shape'
+export const exampleQueues = {
+  ming: exampleCharacters,
+  xiu: [exampleCharacters[1]],
+  hao: [exampleCharacters[2]],
+  ting: [denseCharacter],
+  yi: [directCharacter],
+  peng: [repeatedCharacter],
+  ma: [shapeCharacter],
+}
+export type Example = keyof typeof exampleQueues
