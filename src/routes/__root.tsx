@@ -40,8 +40,9 @@ function RootComponent() {
   return (
     <RootDocument>
       <QueryClientProvider client={queryClient}>
-        <PullToRefresh />
-        <Outlet />
+        <PullToRefresh>
+          <Outlet />
+        </PullToRefresh>
       </QueryClientProvider>
     </RootDocument>
   )

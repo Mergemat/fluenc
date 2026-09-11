@@ -1,6 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { ArrowDown, RotateCw } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 
 const threshold = 64
 
@@ -16,10 +15,11 @@ function canStart(target: EventTarget | null) {
   return !window.visualViewport || window.visualViewport.scale === 1
 }
 
-export function PullToRefresh() {
+export function PullToRefresh({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
   const [distance, setDistance] = useState(0)
   const [refreshing, setRefreshing] = useState(false)
+  const [dragging, setDragging] = useState(false)
 
   useEffect(() => {
     if (!window.matchMedia('(display-mode: standalone)').matches) return
@@ -27,16 +27,19 @@ export function PullToRefresh() {
     let start: { x: number; y: number } | undefined
     let pull = 0
     let reloading = false
+    let reloadFrame = 0
     const reset = () => {
       start = undefined
       pull = 0
       setDistance(0)
+      setDragging(false)
     }
     const onStart = (event: TouchEvent) => {
       reset()
       if (reloading || event.touches.length !== 1 || queryClient.isMutating() || !canStart(event.target)) return
       const touch = event.touches[0]!
       start = { x: touch.clientX, y: touch.clientY }
+      setDragging(true)
     }
     const onMove = (event: TouchEvent) => {
       if (!start) return
@@ -55,8 +58,12 @@ export function PullToRefresh() {
       start = undefined
       reloading = true
       setRefreshing(true)
+      setDragging(false)
       setDistance(threshold)
-      window.location.reload()
+      // Let the settled spinner paint before navigation starts.
+      reloadFrame = requestAnimationFrame(() => {
+        reloadFrame = requestAnimationFrame(() => window.location.reload())
+      })
     }
 
     document.addEventListener('touchstart', onStart, { passive: true })
@@ -64,6 +71,7 @@ export function PullToRefresh() {
     document.addEventListener('touchend', onEnd, { passive: true })
     document.addEventListener('touchcancel', reset, { passive: true })
     return () => {
+      cancelAnimationFrame(reloadFrame)
       document.removeEventListener('touchstart', onStart)
       document.removeEventListener('touchmove', onMove)
       document.removeEventListener('touchend', onEnd)
@@ -71,15 +79,33 @@ export function PullToRefresh() {
     }
   }, [queryClient])
 
-  const ready = distance >= threshold
+  const progress = Math.min(1, distance / threshold)
   return (
     <div
-      className="pull-to-refresh"
-      role="status"
-      style={{ opacity: distance > 0 ? 1 : 0, transform: `translate(-50%, ${distance - 48}px)` }}
+      className="pull-refresh-shell"
+      data-dragging={dragging}
+      style={{ '--refresh-distance': `${distance}px` } as CSSProperties}
     >
-      {refreshing ? <RotateCw size={16} className="animate-spin" aria-hidden="true" /> : <ArrowDown size={16} style={{ transform: `rotate(${ready ? 180 : 0}deg)` }} aria-hidden="true" />}
-      <span>{refreshing ? 'Refreshing…' : ready ? 'Release to refresh' : distance > 0 ? 'Pull to refresh' : ''}</span>
+      <div className="pull-to-refresh" role="status">
+        <span className="sr-only">{refreshing ? 'Refreshing…' : distance >= threshold ? 'Release to refresh' : ''}</span>
+        <svg
+          className="pull-refresh-spinner"
+          data-spinning={refreshing}
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          style={{ opacity: Math.min(1, distance / 24) }}
+        >
+          {Array.from({ length: 12 }, (_, index) => (
+            <rect
+              key={index}
+              x="11" y="1" width="2" height="6" rx="1"
+              transform={`rotate(${index * 30} 12 12)`}
+              opacity={refreshing ? (index + 1) / 12 : Math.max(0, Math.min(1, progress * 12 - index))}
+            />
+          ))}
+        </svg>
+      </div>
+      {children}
     </div>
   )
 }
