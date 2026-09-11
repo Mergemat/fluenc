@@ -2,7 +2,7 @@ import { initialize } from '@ionic/core/components'
 import { IonContent as Content, defineCustomElement as defineContent } from '@ionic/core/components/ion-content.js'
 import { IonRefresher as Refresher, defineCustomElement as defineRefresher } from '@ionic/core/components/ion-refresher.js'
 import { IonRefresherContent as RefresherContent, defineCustomElement as defineRefresherContent } from '@ionic/core/components/ion-refresher-content.js'
-import type { RefresherCustomEvent, RefresherPullEndCustomEvent } from '@ionic/core'
+import type { RefresherCustomEvent } from '@ionic/core'
 import { createComponent, type EventName } from '@lit/react'
 import * as React from 'react'
 
@@ -22,6 +22,5 @@ export const IonRefresher = createComponent({
   elementClass: Refresher,
   events: {
     onIonRefresh: 'ionRefresh' as EventName<RefresherCustomEvent>,
-    onIonPullEnd: 'ionPullEnd' as EventName<RefresherPullEndCustomEvent>,
   },
 })

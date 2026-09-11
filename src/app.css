@@ -1,7 +1,7 @@
 /* Shared shell and controls follow Character Studio's canvas and clue colors. */
-.app-viewport { height: 100dvh; overflow: hidden; }
-.app-scroll { --background: var(--color-canvas); --color: var(--color-ink); --padding-top: env(safe-area-inset-top); }
-.app-scroll-placeholder { height: 100%; overflow-y: auto; padding-top: env(safe-area-inset-top); }
+.app-viewport { height: 100dvh; box-sizing: border-box; overflow: hidden; padding-top: env(safe-area-inset-top); background: var(--color-canvas); }
+.app-scroll { --background: var(--color-canvas); --color: var(--color-ink); }
+.app-scroll-placeholder { height: 100%; overflow-y: auto; }
 .app-layout { min-height: calc(100dvh - env(safe-area-inset-top)); }
 .app-header { height: 60px; display: flex; align-items: center; padding: 0 18px; background: var(--color-canvas); }
 .app-brand { display: flex; align-items: center; min-height: 44px; }
