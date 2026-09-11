@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { z } from 'zod'
 
 import { AppHeader, AppTabBar, type AppView } from '../components/AppNav'
 import { LessonsView } from '../components/LessonsView'
@@ -16,6 +17,9 @@ import { useOfflineSync } from '../offline/useOfflineSync'
 import { useOfflineDownload } from '../offline/useOfflineDownload'
 
 export const Route = createFileRoute('/')({
+  validateSearch: z.object({
+    view: z.enum(['review', 'lessons', 'reading', 'library', 'palace', 'settings']).optional().catch(undefined),
+  }),
   loader: ({ context }) => loadDashboard(context.queryClient),
   pendingComponent: () => <Status title="Opening Fluenc…" />,
   pendingMinMs: 0,
@@ -27,7 +31,15 @@ function Home() {
   const { data } = useSuspenseQuery(dashboardQueryOptions)
   useOfflineSync(data)
   const offline = useOfflineDownload()
-  const [view, setView] = useState<AppView>(() => data.reviewQueue.length ? 'review' : 'lessons')
+  const [initialView] = useState<AppView>(() => data.reviewQueue.length ? 'review' : 'lessons')
+  const search = Route.useSearch()
+  const navigate = Route.useNavigate()
+  const view = search.view ?? initialView
+  const setView = (view: AppView) => { void navigate({ search: { view }, replace: true }) }
+
+  useEffect(() => {
+    if (!search.view) void navigate({ search: { view: initialView }, replace: true, resetScroll: false })
+  }, [initialView, navigate, search.view])
 
   return (
     <div className="app-layout">
