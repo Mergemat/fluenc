@@ -1,4 +1,4 @@
-import { generateSW } from 'workbox-build'
+import { injectManifest } from 'workbox-build'
 import { rm } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
@@ -15,36 +15,32 @@ if (exitCode !== 0) process.exit(exitCode)
 
 const manifest = await Bun.file(`${outputDirectory}/nitro.json`).json() as { publicDir: string }
 const publicDirectory = resolve(outputDirectory, manifest.publicDir)
-const result = await generateSW({
+const workerBuild = await Bun.build({
+  entrypoints: ['scripts/service-worker.ts'],
+  target: 'browser',
+  format: 'iife',
+  minify: true,
+  define: { 'process.env.NODE_ENV': '"production"' },
+})
+if (!workerBuild.success) throw new AggregateError(workerBuild.logs, 'Service worker build failed')
+const workerSource = resolve(outputDirectory, 'service-worker.js')
+await Bun.write(workerSource, workerBuild.outputs[0])
+
+const result = await injectManifest({
+  swSrc: workerSource,
   swDest: resolve(publicDirectory, 'sw.js'),
   globDirectory: publicDirectory,
   globPatterns: [
     'offline.html',
+    'audio/pinyin/**/*.mp3',
     'assets/**/*.{css,js}',
     'fonts/**/*.woff2',
-    'audio/**/*.mp3',
-    'hanzi/**/*.json',
     'brand/**/*.png',
     'manifest.webmanifest',
   ],
   maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-  cleanupOutdatedCaches: true,
-  clientsClaim: true,
-  skipWaiting: true,
-  navigateFallback: '/offline.html',
-  navigateFallbackAllowlist: [/^\/(?:\?.*)?$/],
-  runtimeCaching: [
-    {
-      urlPattern: /\.mp3(?:\?.*)?$/,
-      handler: 'CacheFirst',
-      options: {
-        cacheName: 'fluenc-audio',
-        expiration: { maxEntries: 700, maxAgeSeconds: 365 * 24 * 60 * 60 },
-        cacheableResponse: { statuses: [0, 200] },
-      },
-    },
-  ],
 })
+await rm(workerSource)
 
 if (!(await Bun.file(resolve(publicDirectory, 'offline.html')).exists())) {
   throw new Error('Offline startup shell was not generated')

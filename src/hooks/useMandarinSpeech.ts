@@ -36,7 +36,9 @@ export function useMandarinSpeech() {
       }
       if (requestRef.current !== requestId) return
 
-      const audio = new Audio(source)
+      const audio = new Audio()
+      audio.crossOrigin = 'anonymous'
+      audio.src = source
       audioRef.current = audio
       audio.onplaying = () => setStatus('speaking')
       audio.onended = () => setStatus('idle')

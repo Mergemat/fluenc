@@ -54,5 +54,5 @@ export function getRecordedPinyinPath(pinyin: string) {
   if (!tone) return null
 
   const recording = `${syllable.replaceAll('ü', 'uu')}${tone}`
-  return `/audio/pinyin/${recording}.mp3?v=allset-3`
+  return `/audio/pinyin/${recording}.mp3`
 }
