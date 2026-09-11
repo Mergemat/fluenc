@@ -23,7 +23,7 @@ const result = await generateSW({
     'fonts/**/*.woff2',
     'audio/**/*.mp3',
     'hanzi/**/*.json',
-    'icon.svg',
+    'brand/**/*.png',
     'manifest.webmanifest',
   ],
   maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
