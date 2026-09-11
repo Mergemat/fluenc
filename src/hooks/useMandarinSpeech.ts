@@ -4,7 +4,7 @@ import { getNeutralToneExample, getRecordedPinyinPath } from '../lib/pinyinAudio
 import { getPronunciationAudio } from '../server/audio'
 
 const audioSourceCache = new Map<string, string>()
-const AUDIO_CACHE_VERSION = 7
+const AUDIO_CACHE_VERSION = 8
 
 export function useMandarinSpeech() {
   const audioRef = useRef<HTMLAudioElement | null>(null)

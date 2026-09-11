@@ -5,14 +5,25 @@ import { createHash } from 'node:crypto'
 
 import type { PronunciationInput } from './audio.contract'
 
-const MODEL_ID = 'eleven_multilingual_v2'
 const OUTPUT_FORMAT = 'mp3_44100_128'
-const PRONUNCIATION_VERSION = 6
+const PRONUNCIATION_VERSION = 7
 const CACHE_MAX_AGE_SECONDS = 31_536_000
+const SPEECH_SETTINGS = {
+  model_id: 'eleven_v3',
+  language_code: 'zh',
+  seed: 42,
+  voice_settings: {
+    stability: 0.5,
+    similarity_boost: 0.78,
+    style: 0,
+    use_speaker_boost: true,
+    speed: 0.85,
+  },
+}
 
 function getCacheKey(data: PronunciationInput, voiceId: string) {
   return createHash('sha256')
-    .update(JSON.stringify({ ...data, voiceId, model: MODEL_ID, output: OUTPUT_FORMAT, pronunciation: PRONUNCIATION_VERSION }))
+    .update(JSON.stringify({ ...data, voiceId, settings: SPEECH_SETTINGS, output: OUTPUT_FORMAT, pronunciation: PRONUNCIATION_VERSION }))
     .digest('hex')
 }
 
@@ -45,16 +56,8 @@ export async function getPronunciationAudioHandler(data: PronunciationInput) {
         'xi-api-key': apiKey,
       },
       body: JSON.stringify({
+        ...SPEECH_SETTINGS,
         text: spokenText,
-        model_id: MODEL_ID,
-        language_code: 'zh',
-        seed: 42,
-        voice_settings: {
-          stability: 0.72,
-          similarity_boost: 0.78,
-          style: 0,
-          use_speaker_boost: true,
-        },
       }),
       signal: AbortSignal.timeout(30_000),
     },
