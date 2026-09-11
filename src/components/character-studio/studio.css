@@ -56,11 +56,14 @@
 .cs-state-close { display: grid; place-items: center; width: 30px; height: 30px; }
 .cs-shape-note-button { border: 0; padding: 0; background: none; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
 .cs-shape-note p { padding: 16px; font-size: 14px; line-height: 1.6; }
-@media (max-width: 380px) {
-  .cs-character-and-props { grid-template-columns: minmax(0, 1fr) 86px; gap: 10px; }
+@media (max-width: 767px) {
+  .cs-character-and-props { grid-template-columns: minmax(0, 1fr) 94px; gap: 14px; }
   .cs-prop-choice { min-height: 64px; padding-block: 7px; }
   .cs-prop-glyph { font-size: 30px; }
   .cs-prop-name { font-size: 11px; }
+}
+@media (max-width: 380px) {
+  .cs-character-and-props { grid-template-columns: minmax(0, 1fr) 80px; gap: 10px; }
 }
 @media (max-height: 710px) {
   .cs-studio { gap: 8px; }

@@ -14,7 +14,7 @@ type RecallItem = Exclude<ReviewItem, { type: 'sentence' }>
 export function ReviewDeck({ item, pending, onRate }: { item: RecallItem; pending: boolean; onRate: (rating: number) => void }) {
   const { revealed, reveal } = useReveal({ pending, onRate })
   const meaning = getItemMeaning(item)
-  return <RecallFrame revealed={revealed} reveal={reveal} pending={pending} onRate={onRate} ratingHint="Before revealing, did you recall both meaning and pronunciation? If either was missing or wrong, choose Missed something.">
+  return <RecallFrame revealed={revealed} reveal={reveal} pending={pending} onRate={onRate}>
     {revealed && item.type === 'character' ? <div className="review-character cs-studio">
       <CharacterScene studio={{ item, meaning: meaning.primary, cues: characterCues(item) }} direct={directCharacters.has(item.hanzi)} reviewing />
     </div> : <div className="recall-target">
