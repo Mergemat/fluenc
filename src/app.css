@@ -135,15 +135,17 @@
   .word-studio, .reading-lesson { min-height: calc(100dvh - 113px); }
   .rating-buttons { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
-/* Mobile pages grow with their content and share the app's native scroll. */
+/* Mobile review reserves space for the header, safe areas, and navigation. */
 @media (max-width: 767px) {
   .app-viewport { padding-top: calc(env(safe-area-inset-top) + 24px); }
   .app-layout { min-height: calc(100dvh - env(safe-area-inset-top) - 24px); }
-  .session-page { height: auto; min-height: calc(100dvh - 84px - env(safe-area-inset-top)); padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
-  .recall-frame, .recall-content { min-height: auto; }
+  .session-page { height: calc(100dvh - 84px - env(safe-area-inset-top)); min-height: 0; padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .recall-frame, .recall-content { min-height: 0; }
   .recall-content { display: flex; flex-direction: column; overflow: visible; }
   .recall-target { flex: 1; min-height: auto; }
-  .review-character.cs-studio { flex: 1; height: auto; min-height: auto; }
+  .review-character.cs-studio { flex: 1; height: auto; min-height: 0; }
+  .review-character .cs-character-and-props { container-type: size; }
+  .review-character .cs-character-drawing { max-width: max(0px, calc(100cqh - 110px)); }
 }
 @media (max-width: 380px) {
   .study-page { padding-inline: 12px; }
@@ -161,7 +163,6 @@
   .review-character .cs-character-drawing { width: min(90%, 22.5dvh); }
 }
 @media (max-height: 610px) and (max-width: 767px) {
-  .review-character .cs-prop-scene { grid-template-rows: minmax(185px, 1fr) auto; }
   .review-character .cs-character-drawing { width: min(90%, 18dvh); }
   .review-character .cs-target-pinyin > strong { font-size: 25px; }
 }
