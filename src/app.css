@@ -1,6 +1,7 @@
 /* Shared shell and controls follow Character Studio's canvas and clue colors. */
 .app-layout { min-height: 100dvh; }
-.pull-refresh-shell > .app-layout > :is(.app-header, main) { translate: 0 var(--refresh-distance); transition: translate 220ms ease-out; }
+.pull-refresh-shell > .app-layout > :is(.app-header, main) { transition: translate 220ms ease-out; }
+.pull-refresh-shell[data-refresh-active=true] > .app-layout > :is(.app-header, main) { translate: 0 var(--refresh-distance); }
 .pull-refresh-shell[data-dragging=true] > .app-layout > :is(.app-header, main) { transition: none; }
 .pull-to-refresh { position: fixed; top: env(safe-area-inset-top); left: 50%; z-index: 11; width: 24px; height: 24px; margin-left: -12px; translate: 0 calc(var(--refresh-distance) / 2 - 12px); transition: translate 220ms ease-out; pointer-events: none; }
 .pull-refresh-shell[data-dragging=true] > .pull-to-refresh { transition: none; }

@@ -84,9 +84,10 @@ export function PullToRefresh({ children }: { children: ReactNode }) {
     <div
       className="pull-refresh-shell"
       data-dragging={dragging}
+      data-refresh-active={distance > 0}
       style={{ '--refresh-distance': `${distance}px` } as CSSProperties}
     >
-      <div className="pull-to-refresh" role="status">
+      {distance > 0 ? <div className="pull-to-refresh" role="status">
         <span className="sr-only">{refreshing ? 'Refreshing…' : distance >= threshold ? 'Release to refresh' : ''}</span>
         <svg
           className="pull-refresh-spinner"
@@ -104,7 +105,7 @@ export function PullToRefresh({ children }: { children: ReactNode }) {
             />
           ))}
         </svg>
-      </div>
+      </div> : null}
       {children}
     </div>
   )
