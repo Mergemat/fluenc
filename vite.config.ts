@@ -6,6 +6,15 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   resolve: { tsconfigPaths: true },
+  optimizeDeps: {
+    include: [
+      '@ionic/core/components',
+      '@ionic/core/components/ion-content.js',
+      '@ionic/core/components/ion-refresher.js',
+      '@ionic/core/components/ion-refresher-content.js',
+      '@lit/react',
+    ],
+  },
   plugins: [
     tailwindcss(),
     tanstackStart({

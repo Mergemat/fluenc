@@ -122,3 +122,11 @@
 
 .cs-write-button { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border: 1px solid var(--color-line); border-radius: 6px; font-size: 11px; color: var(--color-muted); }
 .cs-clue-form button:disabled { opacity: .6; cursor: wait; }
+
+@media (max-width: 767px) {
+  .cs-host { display: flex; flex-direction: column; height: auto; min-height: calc(100dvh - 60px - env(safe-area-inset-top)); padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .cs-studio { flex: 1; height: auto; }
+  .cs-workspace { display: flex; flex-direction: column; }
+  .cs-prop-scene { flex: 1; height: auto; grid-template-rows: minmax(min-content, 1fr) auto; }
+  .cs-prop-column { max-height: none; overflow: visible; overscroll-behavior: auto; }
+}

@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { useIsMutating, useQueryClient } from '@tanstack/react-query'
 import { Check, Download, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 
@@ -12,6 +12,7 @@ type SyncStatus = 'idle' | 'syncing' | 'done' | 'offline' | 'error'
 
 export function SettingsView({ offline }: { offline: OfflineDownload }) {
   const queryClient = useQueryClient()
+  const saving = useIsMutating() > 0
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle')
   const { status, progress, download } = offline
   const downloading = status === 'downloading' || status === 'checking'
@@ -39,7 +40,9 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
   }
 
   return <Page>
-    <PageHeader title="Settings" />
+    <PageHeader title="Settings" meta={<Button variant="ghost" disabled={saving} onClick={() => {
+      if (!queryClient.isMutating()) window.location.reload()
+    }}><RefreshCw size={16} />Refresh app</Button>} />
     <div className="settings-sections">
       <section className="settings-section" aria-labelledby="offline-heading">
         <div className="settings-copy">

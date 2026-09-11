@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { z } from 'zod'
 
 import { AppHeader, AppTabBar, type AppView } from '../components/AppNav'
+import { AppScroll } from '../components/AppScroll'
 import { LessonsView } from '../components/LessonsView'
 import { LibraryView } from '../components/LibraryView'
 import { PalaceView } from '../components/PalaceView'
@@ -42,15 +43,19 @@ function Home() {
   }, [initialView, navigate, search.view])
 
   return (
-    <div className="app-layout">
-      <AppHeader data={data} view={view} onViewChange={setView} />
-      <main className="min-w-0">
-        {view === 'review' ? <ReviewView data={data} />
-          : view === 'lessons' ? <LessonsView data={data} />
-            : view === 'reading' ? <ReadingView data={data} />
-              : view === 'library' ? <LibraryView />
-                : view === 'palace' ? <PalaceView /> : <SettingsView offline={offline} />}
-      </main>
+    <div className="app-viewport">
+      <AppScroll view={view}>
+        <div className="app-layout">
+          <AppHeader data={data} view={view} onViewChange={setView} />
+          <div className="min-w-0">
+            {view === 'review' ? <ReviewView data={data} />
+              : view === 'lessons' ? <LessonsView data={data} />
+                : view === 'reading' ? <ReadingView data={data} />
+                  : view === 'library' ? <LibraryView />
+                    : view === 'palace' ? <PalaceView /> : <SettingsView offline={offline} />}
+          </div>
+        </div>
+      </AppScroll>
       <AppTabBar data={data} view={view} onViewChange={setView} />
     </div>
   )

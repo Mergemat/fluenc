@@ -1,14 +1,9 @@
 /* Shared shell and controls follow Character Studio's canvas and clue colors. */
-.app-layout { min-height: 100dvh; }
-.pull-refresh-shell > .app-layout > :is(.app-header, main) { transition: translate 220ms ease-out; }
-.pull-refresh-shell[data-refresh-active=true] > .app-layout > :is(.app-header, main) { translate: 0 var(--refresh-distance); }
-.pull-refresh-shell[data-dragging=true] > .app-layout > :is(.app-header, main) { transition: none; }
-.pull-to-refresh { position: fixed; top: env(safe-area-inset-top); left: 50%; z-index: 11; width: 24px; height: 24px; margin-left: -12px; translate: 0 calc(var(--refresh-distance) / 2 - 12px); transition: translate 220ms ease-out; pointer-events: none; }
-.pull-refresh-shell[data-dragging=true] > .pull-to-refresh { transition: none; }
-.pull-refresh-spinner { display: block; width: 24px; height: 24px; fill: var(--color-muted); }
-.pull-refresh-spinner[data-spinning=true] { animation: refresh-spin 800ms steps(12) infinite; }
-@keyframes refresh-spin { to { rotate: 360deg; } }
-.app-header { height: 60px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; padding: 0 18px; background: var(--color-canvas); }
+.app-viewport { height: 100dvh; overflow: hidden; }
+.app-scroll { --background: var(--color-canvas); --color: var(--color-ink); --padding-top: env(safe-area-inset-top); }
+.app-scroll-placeholder { height: 100%; overflow-y: auto; padding-top: env(safe-area-inset-top); }
+.app-layout { min-height: calc(100dvh - env(safe-area-inset-top)); }
+.app-header { height: 60px; display: flex; align-items: center; padding: 0 18px; background: var(--color-canvas); }
 .app-brand { display: flex; align-items: center; min-height: 44px; }
 .app-brand > img { display: block; width: 132px; height: auto; filter: brightness(1.04); mix-blend-mode: darken; }
 .nav-day, .desktop-nav { display: none; }
@@ -121,7 +116,7 @@
 @media (min-width: 640px) { .word-connections { grid-template-columns: 1fr 1.5fr; } }
 @media (min-width: 768px) {
   .app-layout { display: grid; grid-template-columns: 184px minmax(0,1fr); }
-  .app-header { height: 100dvh; flex-direction: column; align-items: stretch; padding: 24px 14px; border-right: 1px solid var(--color-line); }
+  .app-header { position: sticky; top: 0; z-index: 10; height: 100dvh; flex-direction: column; align-items: stretch; padding: 24px 14px; border-right: 1px solid var(--color-line); }
   .app-brand { padding-inline: 10px; }
   .nav-day { display: block; margin: 44px 10px 24px; }
   .nav-day > span { font-size: 10px; color: var(--color-muted); }
@@ -139,6 +134,14 @@
   .session-page > .page-header { margin-bottom: 18px; }
   .word-studio, .reading-lesson { min-height: calc(100dvh - 113px); }
   .rating-buttons { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+/* Mobile pages grow with their content and share the app's native scroll. */
+@media (max-width: 767px) {
+  .session-page { height: auto; min-height: calc(100dvh - 60px - env(safe-area-inset-top)); padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+  .recall-frame, .recall-content { min-height: auto; }
+  .recall-content { display: flex; flex-direction: column; overflow: visible; }
+  .recall-target { flex: 1; min-height: auto; }
+  .review-character.cs-studio { flex: 1; height: auto; min-height: auto; }
 }
 @media (max-width: 380px) {
   .study-page { padding-inline: 12px; }
