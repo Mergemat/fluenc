@@ -156,3 +156,9 @@
   .sentence-answer { padding: 14px; gap: 8px; }
   .sentence-answer > p { font-size: 26px; }
 }
+
+.offline-status { margin-left: auto; padding-left: 12px; color: var(--color-muted); font-size: 10px; line-height: 1.5; text-align: right; }
+.offline-status button { cursor: pointer; text-decoration: underline; }
+@media (min-width: 768px) {
+  .offline-status { margin: auto 10px 0; padding: 16px 0 0; text-align: left; }
+}

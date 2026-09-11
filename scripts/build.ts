@@ -19,6 +19,7 @@ const result = await generateSW({
   swDest: resolve(publicDirectory, 'sw.js'),
   globDirectory: publicDirectory,
   globPatterns: [
+    'offline.html',
     'assets/**/*.{css,js}',
     'fonts/**/*.woff2',
     'audio/**/*.mp3',
@@ -30,17 +31,9 @@ const result = await generateSW({
   cleanupOutdatedCaches: true,
   clientsClaim: true,
   skipWaiting: true,
+  navigateFallback: '/offline.html',
+  navigateFallbackAllowlist: [/^\/(?:\?.*)?$/],
   runtimeCaching: [
-    {
-      urlPattern: /^https?:\/\/[^/]+\/(?:\?.*)?$/,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'fluenc-pages',
-        networkTimeoutSeconds: 4,
-        expiration: { maxEntries: 4, maxAgeSeconds: 30 * 24 * 60 * 60 },
-        cacheableResponse: { statuses: [0, 200] },
-      },
-    },
     {
       urlPattern: /\.mp3(?:\?.*)?$/,
       handler: 'CacheFirst',
@@ -52,6 +45,10 @@ const result = await generateSW({
     },
   ],
 })
+
+if (!(await Bun.file(resolve(publicDirectory, 'offline.html')).exists())) {
+  throw new Error('Offline startup shell was not generated')
+}
 
 if (!result.count) throw new Error('Service worker has no assets to precache')
 console.info(`Service worker: ${result.count} files, ${result.size} bytes precached`)

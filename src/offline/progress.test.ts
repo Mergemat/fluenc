@@ -1,6 +1,7 @@
 import { afterAll, beforeEach, expect, mock, test } from 'bun:test'
 import 'fake-indexeddb/auto'
 import { openDB } from 'idb'
+import { QueryClient } from '@tanstack/react-query'
 
 import type { DashboardData } from '../server/curriculum'
 
@@ -18,6 +19,7 @@ mock.module('../server/curriculum', () => ({
 }))
 
 const { flushProgress, getCachedDashboard, getOfflineDashboard, hasPendingProgress, persistDashboard, saveEnrollment, saveReview } = await import('./progress')
+const { loadDashboard, dashboardQueryOptions } = await import('./queries')
 const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window')
 const originalNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator')
 Object.defineProperty(globalThis, 'window', { configurable: true, value: {} })
@@ -140,4 +142,42 @@ test('cancelled requests cannot write their response into the offline cache', as
   response.resolve({ ...fixture(), getQueue: [] })
   expect(await rejected).toBeInstanceOf(Error)
   expect((await getCachedDashboard())?.getQueue).toHaveLength(2)
+})
+
+test('cold offline startup restores the last synced snapshot without contacting the server', async () => {
+  await saveEnrollment({ itemType: 'sentence', itemId: 's01' })
+  await saveReview({ itemType: 'sentence', itemId: 's01', rating: 3, durationMs: 100 })
+  await flushProgress()
+  expect(await hasPendingProgress()).toBe(false)
+  Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { onLine: false } })
+  const client = new QueryClient()
+  try {
+    await loadDashboard(client)
+    const dashboard = client.getQueryData(dashboardQueryOptions.queryKey)
+    expect(dashboard?.reviewQueue).toHaveLength(0)
+    expect(dashboard?.scheduledQueue[0]?.id).toBe('s01')
+    expect(dashboard?.getQueue.map(item => item.id)).toEqual(['s02'])
+    expect(dashboardRequest).not.toHaveBeenCalled()
+  } finally {
+    client.clear()
+  }
+})
+
+test('cold startup opens cached lessons while a network refresh is still pending', async () => {
+  const started = Promise.withResolvers<void>()
+  const response = Promise.withResolvers<DashboardData>()
+  dashboardRequest.mockImplementationOnce(() => { started.resolve(); return response.promise })
+  const client = new QueryClient()
+  try {
+    await loadDashboard(client)
+    await started.promise
+    expect(client.getQueryData(dashboardQueryOptions.queryKey)?.getQueue).toHaveLength(2)
+    expect(client.isFetching()).toBe(1)
+    response.resolve({ ...fixture(), getQueue: [] })
+    await client.fetchQuery(dashboardQueryOptions)
+    expect(client.getQueryData(dashboardQueryOptions.queryKey)?.getQueue).toHaveLength(0)
+  } finally {
+    response.resolve(fixture())
+    client.clear()
+  }
 })

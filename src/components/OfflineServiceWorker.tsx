@@ -1,30 +1,73 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-async function waitForController() {
-  if (navigator.serviceWorker.controller) return
-  await new Promise<void>((resolve) => {
-    const timeout = window.setTimeout(resolve, 3_000)
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      window.clearTimeout(timeout)
-      resolve()
-    }, { once: true })
-  })
-}
+import { getCachedDashboard } from '../offline/progress'
+
+type OfflineStatus = 'preparing' | 'ready' | 'error' | 'unsupported'
 
 export function OfflineServiceWorker() {
-  useEffect(() => {
-    if (!import.meta.env.PROD || !('serviceWorker' in navigator)) return
+  const [status, setStatus] = useState<OfflineStatus | null>(null)
+  const [attempt, setAttempt] = useState(0)
 
-    const prepareOfflineApp = async () => {
-      await navigator.serviceWorker.register('/sw.js')
-      await navigator.serviceWorker.ready
-      await waitForController()
-      await fetch('/', { cache: 'reload', credentials: 'same-origin' })
-      await navigator.storage?.persist?.()
+  useEffect(() => {
+    if (!import.meta.env.PROD) return
+    if (!('serviceWorker' in navigator) || !('caches' in window)) {
+      setStatus('unsupported')
+      return
     }
 
-    void prepareOfflineApp().catch(() => undefined)
-  }, [])
+    let active = true
+    let cleanup = () => {}
+    setStatus('preparing')
 
-  return null
+    const checkReady = async () => {
+      const [shell, dashboard] = await Promise.all([
+        caches.match('/offline.html', { ignoreSearch: true }),
+        getCachedDashboard(),
+      ])
+      const ready = Boolean(navigator.serviceWorker.controller && shell && dashboard)
+      if (active && ready) setStatus('ready')
+      return ready
+    }
+    const failed = async () => {
+      if (!await checkReady().catch(() => false) && active) setStatus('error')
+    }
+    const retry = () => setAttempt(value => value + 1)
+
+    const prepare = async () => {
+      await checkReady()
+      const { Workbox } = await import('workbox-window')
+      if (!active) return
+      const workbox = new Workbox('/sw.js')
+      const ready = () => void checkReady().catch(failed)
+      const error = () => void failed()
+      workbox.addEventListener('activated', ready)
+      workbox.addEventListener('controlling', ready)
+      workbox.addEventListener('redundant', error)
+      cleanup = () => {
+        workbox.removeEventListener('activated', ready)
+        workbox.removeEventListener('controlling', ready)
+        workbox.removeEventListener('redundant', error)
+      }
+      await workbox.register()
+      await workbox.controlling
+      await checkReady()
+      void navigator.storage?.persist?.().catch(() => undefined)
+    }
+
+    void prepare().catch(failed)
+    window.addEventListener('online', retry)
+    return () => {
+      active = false
+      cleanup()
+      window.removeEventListener('online', retry)
+    }
+  }, [attempt])
+
+  if (!status) return null
+  return <div className="offline-status" role="status">
+    {status === 'ready' ? 'Available offline'
+      : status === 'preparing' ? 'Preparing offline…'
+        : status === 'unsupported' ? 'Offline storage unavailable'
+          : <>Offline setup failed. <button type="button" onClick={() => setAttempt(value => value + 1)}>Retry</button></>}
+  </div>
 }

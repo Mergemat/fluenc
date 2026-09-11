@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { AppHeader, AppTabBar, type AppView } from '../components/AppNav'
@@ -8,13 +8,16 @@ import { LibraryView } from '../components/LibraryView'
 import { PalaceView } from '../components/PalaceView'
 import { ReadingView } from '../components/ReadingView'
 import { ReviewView } from '../components/ReviewView'
-import { dashboardQueryOptions } from '../offline/queries'
+import { Status } from '../components/ui/Layout'
+import { Button } from '../components/ui/Button'
+import { dashboardQueryOptions, loadDashboard } from '../offline/queries'
 import { useOfflineSync } from '../offline/useOfflineSync'
 
 export const Route = createFileRoute('/')({
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(dashboardQueryOptions)
-  },
+  loader: ({ context }) => loadDashboard(context.queryClient),
+  pendingComponent: () => <Status title="Opening Fluenc…" />,
+  pendingMinMs: 0,
+  errorComponent: StartupError,
   component: Home,
 })
 
@@ -36,4 +39,12 @@ function Home() {
       <AppTabBar data={data} view={view} onViewChange={setView} />
     </div>
   )
+}
+
+function StartupError() {
+  const router = useRouter()
+  return <Status
+    title="Could not open your lessons. Connect to the internet to prepare Fluenc for offline use."
+    action={<Button type="button" onClick={() => void router.invalidate()}>Try again</Button>}
+  />
 }

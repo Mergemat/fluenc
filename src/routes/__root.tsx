@@ -7,7 +7,6 @@ import {
 } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 
-import { OfflineServiceWorker } from '../components/OfflineServiceWorker'
 import appCss from '../styles.css?url'
 
 type RouterContext = { queryClient: QueryClient }
@@ -41,7 +40,6 @@ function RootComponent() {
     <RootDocument>
       <QueryClientProvider client={queryClient}>
         <Outlet />
-        <OfflineServiceWorker />
       </QueryClientProvider>
     </RootDocument>
   )

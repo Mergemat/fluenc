@@ -11,11 +11,13 @@ export function useOfflineSync(data: DashboardData) {
   useEffect(() => {
     let active = true
     const initialize = async () => {
-      const dashboard = queryClient.getQueryData(dashboardQueryOptions.queryKey)
-      if (dashboard) await persistDashboard(dashboard)
-      if (await hasPendingProgress()) {
+      const restoreLocal = !navigator.onLine || await hasPendingProgress()
+      if (restoreLocal) {
         const cached = await getCachedDashboard()
         if (active && cached) queryClient.setQueryData(dashboardQueryOptions.queryKey, cached)
+      } else {
+        const dashboard = queryClient.getQueryData(dashboardQueryOptions.queryKey)
+        if (dashboard) await persistDashboard(dashboard)
       }
       if (active) {
         void queryClient.prefetchQuery(libraryQueryOptions)

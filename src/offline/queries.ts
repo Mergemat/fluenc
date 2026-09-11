@@ -1,6 +1,6 @@
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions, type QueryClient } from '@tanstack/react-query'
 
-import { getOfflineDashboard, getOfflineLibrary, getOfflinePalace } from './progress'
+import { getCachedDashboard, getOfflineDashboard, getOfflineLibrary, getOfflinePalace } from './progress'
 
 export const dashboardQueryOptions = queryOptions({
   queryKey: ['dashboard'],
@@ -26,3 +26,11 @@ export const palaceQueryOptions = queryOptions({
   networkMode: 'always',
   staleTime: 5 * 60_000,
 })
+
+export async function loadDashboard(queryClient: QueryClient) {
+  if (!queryClient.getQueryData(dashboardQueryOptions.queryKey)) {
+    const cached = await getCachedDashboard()
+    if (cached) queryClient.setQueryData(dashboardQueryOptions.queryKey, cached, { updatedAt: 0 })
+  }
+  await queryClient.ensureQueryData({ ...dashboardQueryOptions, revalidateIfStale: true })
+}
