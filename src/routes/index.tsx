@@ -8,10 +8,12 @@ import { LibraryView } from '../components/LibraryView'
 import { PalaceView } from '../components/PalaceView'
 import { ReadingView } from '../components/ReadingView'
 import { ReviewView } from '../components/ReviewView'
+import { SettingsView } from '../components/SettingsView'
 import { Status } from '../components/ui/Layout'
 import { Button } from '../components/ui/Button'
 import { dashboardQueryOptions, loadDashboard } from '../offline/queries'
 import { useOfflineSync } from '../offline/useOfflineSync'
+import { useOfflineDownload } from '../offline/useOfflineDownload'
 
 export const Route = createFileRoute('/')({
   loader: ({ context }) => loadDashboard(context.queryClient),
@@ -24,6 +26,7 @@ export const Route = createFileRoute('/')({
 function Home() {
   const { data } = useSuspenseQuery(dashboardQueryOptions)
   useOfflineSync(data)
+  const offline = useOfflineDownload()
   const [view, setView] = useState<AppView>(() => data.reviewQueue.length ? 'review' : 'lessons')
 
   return (
@@ -34,7 +37,7 @@ function Home() {
           : view === 'lessons' ? <LessonsView data={data} />
             : view === 'reading' ? <ReadingView data={data} />
               : view === 'library' ? <LibraryView />
-                : <PalaceView />}
+                : view === 'palace' ? <PalaceView /> : <SettingsView offline={offline} />}
       </main>
       <AppTabBar data={data} view={view} onViewChange={setView} />
     </div>

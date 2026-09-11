@@ -159,8 +159,22 @@
   .sentence-answer > p { font-size: 26px; }
 }
 
-.offline-status { margin-left: auto; padding-left: 12px; color: var(--color-muted); font-size: 10px; line-height: 1.5; text-align: right; }
-.offline-status button { cursor: pointer; text-decoration: underline; }
+.settings-nav { display: flex; align-items: center; justify-content: center; gap: 11px; margin-left: auto; width: 44px; height: 44px; border-radius: 9px; color: var(--color-muted); }
+.settings-nav > span { display: none; }
+.settings-nav:hover, .settings-nav[aria-current] { background: #e6eeea; color: var(--color-glaze); }
+.settings-sections { display: grid; gap: 32px; }
+.settings-section { display: grid; justify-items: start; gap: 20px; padding-bottom: 28px; border-bottom: 1px solid var(--color-line); }
+.settings-copy h2 { margin: 0 0 8px; font-size: 16px; font-weight: 650; }
+.settings-copy p, .settings-note { margin: 0; max-width: 52ch; color: var(--color-muted); font-size: 13px; line-height: 1.65; }
+.settings-note { font-size: 11px; }
+.settings-download { display: grid; gap: 14px; width: 100%; max-width: 360px; justify-items: start; }
+.settings-state { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 12px; line-height: 1.6; }
+.settings-progress-label { display: flex; width: 100%; justify-content: space-between; gap: 12px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.settings-progress { width: 100%; height: 6px; border: 0; border-radius: 3px; overflow: hidden; accent-color: var(--color-glaze); background: var(--color-line); }
+.settings-progress::-webkit-progress-bar { background: var(--color-line); }
+.settings-progress::-webkit-progress-value { background: var(--color-glaze); }
+.settings-progress::-moz-progress-bar { background: var(--color-glaze); }
 @media (min-width: 768px) {
-  .offline-status { margin: auto 10px 0; padding: 16px 0 0; text-align: left; }
+  .settings-nav { width: 100%; margin: auto 0 0; justify-content: flex-start; padding: 0 11px; font-size: 13px; }
+  .settings-nav > span { display: inline; }
 }
