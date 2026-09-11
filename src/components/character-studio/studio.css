@@ -14,13 +14,12 @@
 .cs-interactive-hanzi { display: block; width: 100%; aspect-ratio: 1; overflow: visible; }
 .cs-character-part { fill: var(--color-ink); stroke: transparent; stroke-width: 20; cursor: pointer; transition: fill 140ms; pointer-events: visiblePainted; outline: none; -webkit-tap-highlight-color: transparent; }
 .cs-character-part:focus { outline: none; }
-.cs-character-part.cs-part-selected { fill: var(--cs-gold); }
+.cs-character-part.cs-part-highlighted { fill: var(--cs-gold); }
 .cs-character-part:focus-visible { outline: none; stroke: var(--cs-gold); stroke-width: 9; }
 .cs-selected-prop-label { min-height: 20px; max-width: 100%; font-size: 13px; font-weight: 650; line-height: 20px; color: var(--cs-gold); overflow-wrap: anywhere; }
 .cs-prop-column { display: flex; flex-direction: column; gap: 5px; min-height: 0; max-height: 100%; padding: 5px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; border-radius: 12px; background: #fcf9ed; }
 .cs-prop-choice { display: flex; flex-shrink: 0; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 72px; width: 100%; padding: 9px 5px; border: 1px solid transparent; border-radius: 8px; text-align: center; }
-.cs-prop-choice:hover:not(:disabled) { background: #f2ead6; }
-.cs-prop-choice[aria-pressed=true] { background: #f1e6cb; border-color: var(--cs-gold); }
+.cs-prop-choice[data-highlighted=true] { background: #f1e6cb; border-color: var(--cs-gold); }
 .cs-prop-choice:focus-visible { outline: 2px solid var(--cs-gold); outline-offset: 1px; }
 .cs-prop-choice:disabled { opacity: .5; }
 .cs-prop-glyph { font-size: 34px; font-weight: 400; color: var(--cs-gold); line-height: 1.1; }

@@ -27,6 +27,8 @@ function SoundClue({ cue }: { cue: Cue }) {
 export function CharacterScene({ studio, direct }: { studio: Studio; direct: boolean }) {
   const { item, cues } = studio
   const [selected, setSelected] = useState<string | null>(null)
+  const [hovered, setHovered] = useState<string | null>(null)
+  const highlighted = hovered ?? selected
   const propButtons = useRef<Record<string, HTMLButtonElement | null>>({})
   const props = cues.filter(cue => cue.kind === 'prop')
   const shape = useQuery({
@@ -46,7 +48,7 @@ export function CharacterScene({ studio, direct }: { studio: Studio; direct: boo
     setSelected(previous => previous === code ? null : code)
     propButtons.current[code]?.scrollIntoView({ block: 'nearest' })
   }
-  const selectedName = props.find(prop => prop.code === selected)?.name.trim()
+  const highlightedName = props.find(prop => prop.code === highlighted)?.name.trim()
 
   return <div className="cs-prop-scene">
     <div className="cs-character-and-props">
@@ -56,22 +58,29 @@ export function CharacterScene({ studio, direct }: { studio: Studio; direct: boo
             <g transform={shape.data.transform}>{props.map(prop => <path
               key={prop.code}
               d={shape.data!.strokes.filter((_, index) => owners![index] === prop.code).join(' ')}
-              className={`cs-character-part ${selected === prop.code ? 'cs-part-selected' : ''}`}
+              className={`cs-character-part ${highlighted === prop.code ? 'cs-part-highlighted' : ''}`}
               role="button" tabIndex={0} aria-pressed={selected === prop.code}
               aria-label={`Select ${prop.code} inside ${item.hanzi}${prop.name.trim() ? `: ${prop.name.trim()}` : ''}`}
               onClick={() => select(prop.code)}
+              onPointerEnter={event => { if (event.pointerType !== 'touch') setHovered(prop.code) }}
+              onPointerLeave={() => setHovered(null)}
+              onPointerCancel={() => setHovered(null)}
               onKeyDown={event => {
                 if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(prop.code) }
               }}
             />)}</g>
           </svg> : <span className="cs-target-hanzi font-hanzi" lang="zh-CN">{item.hanzi}</span>}
-          <span className="cs-selected-prop-label" aria-live="polite">{selectedName || ''}</span>
+          <span className="cs-selected-prop-label" aria-live="polite">{highlightedName || ''}</span>
         </div>
       </CharacterTarget>
       <aside className="cs-prop-column" aria-label="Props">
         {props.map(prop => <button key={prop.id} type="button" className="cs-prop-choice" ref={element => { propButtons.current[prop.code] = element }}
           aria-label={`Select ${prop.code} prop${prop.name.trim() ? `: ${prop.name.trim()}` : ''}`}
-          aria-pressed={selected === prop.code} disabled={!mapped} onClick={() => select(prop.code)}>
+          aria-pressed={selected === prop.code} data-highlighted={highlighted === prop.code} disabled={!mapped}
+          onClick={() => select(prop.code)}
+          onPointerEnter={event => { if (event.pointerType !== 'touch') setHovered(prop.code) }}
+          onPointerLeave={() => setHovered(null)}
+          onPointerCancel={() => setHovered(null)}>
           <span className="cs-prop-glyph font-hanzi" lang="zh-CN">{prop.code}{prop.count && prop.count > 1 ? <sup className="cs-prop-count">×{prop.count}</sup> : null}</span>
           <span className={`cs-prop-name ${prop.name.trim() ? '' : 'cs-missing'}`}>{prop.name.trim() || 'Your prop'}</span>
         </button>)}
