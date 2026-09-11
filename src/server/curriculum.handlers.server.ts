@@ -18,6 +18,7 @@ import {
   type ItemType,
   type LearnerItem,
 } from '../db/schema'
+import { characterForWord, characterIsWord, studyIdentity } from '../lib/character-words'
 import { directCharacters } from '../lib/character-props'
 import { groupHanziComponents } from '../lib/hanzi'
 import { defaultToneRooms, getMovieCoordinates } from '../lib/pinyin'
@@ -195,10 +196,12 @@ export async function getDashboardHandler() {
   await ensureLearner()
   const mappings = await getMappings()
   const now = new Date()
-  const items = await db.select().from(learnerItems).where(and(
+  const rows = await db.select().from(learnerItems).where(and(
     eq(learnerItems.learnerId, LEARNER_ID),
     inArray(learnerItems.itemType, studyItemTypes),
   ))
+
+  const items = rows.filter(item => item.itemType !== 'word' || !characterForWord(item.itemId))
 
   const itemKey = (type: ItemType, id: string) => `${type}:${id}`
   const introduced = new Set(items.map((item) => itemKey(item.itemType, item.itemId)))
@@ -206,7 +209,10 @@ export async function getDashboardHandler() {
     items.filter((item) => item.itemType === 'character').map((item) => item.itemId),
   )
   const wordItems = items.filter((item) => item.itemType === 'word')
-  const learnedWords = new Set(wordItems.map((item) => wordsById.get(item.itemId)?.hanzi))
+  const learnedWords = new Set([
+    ...wordItems.flatMap(item => { const word = wordsById.get(item.itemId); return word ? [word.hanzi] : [] }),
+    ...[...introducedCharacters].filter(characterIsWord),
+  ])
   const introducedSentences = new Set(
     items.filter((item) => item.itemType === 'sentence').map((item) => item.itemId),
   )
@@ -245,6 +251,7 @@ export async function getDashboardHandler() {
   const newWords = uniqueWords
     .filter(
       (item) =>
+        !characterForWord(String(item.id)) &&
         !introduced.has(itemKey('word', String(item.id))) &&
         !learnedWords.has(item.hanzi) &&
         item.characterIds.every((character) => introducedCharacters.has(character)),
@@ -310,7 +317,8 @@ export async function getDashboardHandler() {
   }
 }
 
-export async function enrollItemHandler(data: EnrollInput) {
+export async function enrollItemHandler(input: EnrollInput) {
+  const data = { ...input, ...studyIdentity(input.itemType, input.itemId) }
   await ensureLearner()
 
   if (data.itemType === 'character' && !charactersById.has(data.itemId)) {
@@ -333,7 +341,8 @@ export async function enrollItemHandler(data: EnrollInput) {
   return { due: card.due.toISOString(), state: card.state }
 }
 
-export async function reviewItemHandler(data: ReviewInput) {
+export async function reviewItemHandler(input: ReviewInput) {
+  const data = { ...input, ...studyIdentity(input.itemType, input.itemId) }
   await ensureLearner()
   return db.transaction(async (transaction) => {
     const claimed = await transaction
@@ -492,7 +501,9 @@ export async function getLibraryHandler() {
       pinyin: word.pinyin,
       meaning: word.meaningEn,
       rank: word.rank,
-      status: wordProgress.get(word.hanzi) ?? 'new' as const,
+      status: (characterForWord(String(word.id))
+        ? progress.get(`character:${characterForWord(String(word.id))}`)
+        : wordProgress.get(word.hanzi)) ?? 'new' as const,
     })),
   }
 }

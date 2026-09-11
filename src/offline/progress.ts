@@ -2,6 +2,7 @@ import { createEmptyCard, fsrs, State, type Card, type Grade } from 'ts-fsrs'
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
 
 import { isStudyItemType } from '../data/types'
+import { characterForWord, characterIsWord, studyIdentity } from '../lib/character-words'
 
 import type {
   EnrollInput,
@@ -111,8 +112,10 @@ function itemKey(item: { type: string; id: string }) {
 
 function refreshDueQueues(data: DashboardData, now = new Date()) {
   const next = structuredClone(data)
-  next.reviewQueue = next.reviewQueue.filter(item => isStudyItemType(item.type))
-  next.scheduledQueue = next.scheduledQueue.filter(item => isStudyItemType(item.type))
+  const independent = (item: { type: string; id: string }) => isStudyItemType(item.type) && (item.type !== 'word' || !characterForWord(item.id))
+  next.reviewQueue = next.reviewQueue.filter(independent)
+  next.scheduledQueue = next.scheduledQueue.filter(independent)
+  next.buildQueue = next.buildQueue.filter(independent)
   const due = next.scheduledQueue.filter((item) => Date.parse(item.card.due) <= now.getTime())
   next.scheduledQueue = next.scheduledQueue.filter((item) => Date.parse(item.card.due) > now.getTime())
 
@@ -127,7 +130,8 @@ function refreshDueQueues(data: DashboardData, now = new Date()) {
 }
 
 function applyReview(data: DashboardData, operation: Extract<ProgressOperation, { kind: 'review' }>) {
-  const key = `${operation.data.itemType}:${operation.data.itemId}`
+  const target = studyIdentity(operation.data.itemType, operation.data.itemId)
+  const key = `${target.itemType}:${target.itemId}`
   const item = data.reviewQueue.find((candidate) => itemKey(candidate) === key)
   if (!item) return data
 
@@ -149,7 +153,8 @@ function applyReview(data: DashboardData, operation: Extract<ProgressOperation, 
 }
 
 function applyEnrollment(data: DashboardData, operation: Extract<ProgressOperation, { kind: 'enroll' }>) {
-  const key = `${operation.data.itemType}:${operation.data.itemId}`
+  const target = studyIdentity(operation.data.itemType, operation.data.itemId)
+  const key = `${target.itemType}:${target.itemId}`
   const buildItem = data.buildQueue.find((item) => itemKey(item) === key)
   const readingItem = operation.data.itemType === 'sentence'
     ? data.getQueue.find((item) => item.id === operation.data.itemId)
@@ -163,16 +168,17 @@ function applyEnrollment(data: DashboardData, operation: Extract<ProgressOperati
   next.getQueue = next.getQueue.filter((item) => item.id !== operation.data.itemId)
   next.reviewQueue.push({
     ...source,
-    type: operation.data.itemType,
+    type: target.itemType,
     queueKind: 'review',
     srsState: card.state,
     reps: card.reps,
     card: toSnapshot(card),
   } as ReviewQueueItem)
 
-  if (operation.data.itemType === 'character') {
+  if (target.itemType === 'character') {
     next.progress.introducedCharacters += 1
-  } else if (operation.data.itemType === 'word') {
+    if (characterIsWord(target.itemId)) next.progress.introducedWords += 1
+  } else if (target.itemType === 'word') {
     next.progress.introducedWords += 1
   }
   return next
@@ -216,16 +222,18 @@ function applyOperation(data: DashboardData, operation: ProgressOperation) {
 function applyLibraryOperation(data: LibraryData, dashboard: DashboardData, operation: ProgressOperation) {
   if (operation.kind !== 'enroll' && operation.kind !== 'review') return data
   if (operation.data.itemType !== 'character' && operation.data.itemType !== 'word') return data
-  const collection = operation.data.itemType === 'character' ? 'characters' : 'words'
+  const target = studyIdentity(operation.data.itemType, operation.data.itemId)
   const reviewedItem = dashboard.scheduledQueue.find(
-    (item) => item.type === operation.data.itemType && item.id === operation.data.itemId,
+    item => item.type === target.itemType && item.id === target.itemId,
   )
   const status = reviewedItem?.srsState === State.Review ? 'review' as const : 'learning' as const
   return {
     ...structuredClone(data),
-    [collection]: data[collection].map((item) =>
-      item.id === operation.data.itemId ? { ...item, status } : item,
-    ),
+    characters: data.characters.map(item => target.itemType === 'character' && item.id === target.itemId ? { ...item, status } : item),
+    words: data.words.map(item => {
+      const identity = studyIdentity('word', item.id)
+      return identity.itemType === target.itemType && identity.itemId === target.itemId ? { ...item, status } : item
+    }),
   }
 }
 

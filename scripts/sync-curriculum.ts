@@ -1,5 +1,7 @@
 import { parse } from 'csv-parse/sync'
 
+import { characterWordEquivalences } from '../src/lib/character-word-equivalence'
+
 import characterDictionary from '../src/data/character-dictionary.source.json'
 import keywordReviews from '../src/data/character-keywords.reviewed.json'
 import reviewedJson from '../src/data/reviewed-compositions.json'
@@ -139,6 +141,10 @@ const curriculum = {
 }
 
 await Promise.all([
+  Bun.write(
+    new URL('../src/data/character-words.generated.json', import.meta.url),
+    `${JSON.stringify(characterWordEquivalences(characters, words))}\n`,
+  ),
   Bun.write(
     new URL('../src/data/curriculum.generated.json', import.meta.url),
     `${JSON.stringify(curriculum)}\n`,
