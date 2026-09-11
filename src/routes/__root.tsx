@@ -17,7 +17,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
-      { name: 'theme-color', content: '#a4452f' },
+      { name: 'theme-color', content: '#f1eee5' },
       { title: 'Fluenc — learn Mandarin characters' },
       {
         name: 'description',

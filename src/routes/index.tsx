@@ -34,7 +34,7 @@ function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
-    <div className="min-h-dvh md:grid md:grid-cols-[228px_minmax(0,1fr)]">
+    <div className="app-layout">
       <AppHeader data={data} view={view} onOpenSettings={() => setSettingsOpen(true)} onViewChange={setView} />
       <main className="min-w-0">
         {view === 'review' ? <ReviewView data={data} />

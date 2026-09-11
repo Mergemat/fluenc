@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { getItemMeaning } from '../lib/meaning'
 import { directCharacters } from '../lib/character-props'
 import { saveEnrollment, saveMovieOffline } from '../offline/progress'
+import { characterCues } from './character-studio/cues'
 import { ClueForm } from './character-studio/ClueForm'
 import type { CharacterItem, Cue } from './character-studio/types'
 import { WritingModal } from './character-studio/WritingModal'
@@ -12,7 +13,6 @@ import { CharacterTarget, CharacterScene, type Studio } from './character-studio
 import './character-studio/studio.css'
 
 const cueKey = (cue: Cue) => `${cue.kind}:${cue.code}`
-const actorLabels = { male: 'Male actor', female: 'Female actor', fictional: 'Fictional actor', wildcard: 'Wildcard actor' }
 
 export function CharacterStudio({ item }: { item: CharacterItem }) {
   const queryClient = useQueryClient()
@@ -21,15 +21,7 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
   const [screen, setScreen] = useState<'scene' | 'fill'>('scene')
   const [showShapeNote, setShowShapeNote] = useState(false)
   const direct = directCharacters.has(item.hanzi)
-  const initialCues: Cue[] = direct ? [
-    { id: 'prop', kind: 'prop', code: item.hanzi, name: item.movie.components.find(part => part.hanzi === item.hanzi)?.propName ?? '', role: 'Reusable prop' },
-  ] : [
-    { id: 'actor', kind: 'actor', code: item.movie.actorKey, name: item.movie.actorName, role: actorLabels[item.movie.actorCategory] },
-    { id: 'set', kind: 'set', code: item.movie.finalKey, name: item.movie.setName, role: 'Place code' },
-    { id: 'room', kind: 'room', code: String(item.movie.tone), name: item.movie.roomName, role: 'Tone room' },
-    ...item.movie.components.map((part, partIndex): Cue => ({ id: `prop-${partIndex}`, kind: 'prop', code: part.hanzi, name: part.propName, count: part.count, role: 'Prop' })),
-  ]
-  const cues = initialCues.map((cue) => ({ ...cue, name: names[cueKey(cue)] ?? cue.name }))
+  const cues = characterCues(item).map((cue) => ({ ...cue, name: names[cueKey(cue)] ?? cue.name }))
   const studio: Studio = { item, cues, meaning: getItemMeaning(item).primary }
   const finishMutation = useMutation({
     mutationFn: async () => {

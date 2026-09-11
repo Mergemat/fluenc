@@ -25,26 +25,26 @@ export function ProfileDialog({ learner, onClose }: { learner: DashboardData['le
       onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}
     >
       <section
-        className="w-full max-w-md rounded-t-2xl border border-line bg-paper px-6 pb-8 pt-6 sm:rounded-2xl"
+        className="settings-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="profile-title"
       >
-        <h2 className="m-0 mb-7 text-2xl font-black tracking-tight" id="profile-title">Study settings</h2>
+        <h2 className="m-0 mb-7 text-xl font-semibold tracking-tight" id="profile-title">Study settings</h2>
 
         <label className="grid gap-1.5">
-          <span className="text-[10px] uppercase tracking-wide text-faint">Name</span>
+          <span className="text-xs text-muted">Name</span>
           <input
-            className="h-11 w-full rounded-lg border border-line bg-canvas px-3.5 text-[15px] font-medium focus:border-ink"
+            className="h-11 w-full rounded-lg border border-line bg-paper px-3.5 text-[15px] font-medium focus:border-ink"
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
           />
         </label>
         <div className="mt-6 grid grid-cols-2 gap-6">
           <label className="grid gap-1.5">
-            <span className="text-[10px] uppercase tracking-wide text-faint">Characters / day</span>
+            <span className="text-xs text-muted">Characters / day</span>
             <input
-              className="h-11 w-full rounded-lg border border-line bg-canvas px-3.5 text-[15px] font-medium focus:border-ink"
+              className="h-11 w-full rounded-lg border border-line bg-paper px-3.5 text-[15px] font-medium focus:border-ink"
               type="number"
               min="1"
               max="20"
@@ -53,9 +53,9 @@ export function ProfileDialog({ learner, onClose }: { learner: DashboardData['le
             />
           </label>
           <label className="grid gap-1.5">
-            <span className="text-[10px] uppercase tracking-wide text-faint">Words / day</span>
+            <span className="text-xs text-muted">Words / day</span>
             <input
-              className="h-11 w-full rounded-lg border border-line bg-canvas px-3.5 text-[15px] font-medium focus:border-ink"
+              className="h-11 w-full rounded-lg border border-line bg-paper px-3.5 text-[15px] font-medium focus:border-ink"
               type="number"
               min="1"
               max="30"

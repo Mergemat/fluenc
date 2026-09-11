@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./app.css";
 
 @font-face {
   font-family: "Fluenc Hanzi";
@@ -14,7 +15,7 @@
   --color-paper: #fffdf7;
   --color-canvas: #f1eee5;
   --color-danger: #c43b27;
-  --color-glaze: #ef4c2f;
+  --color-glaze: #337465;
   --font-ui: "Arial Nova", "Helvetica Neue", Arial, "Fluenc Hanzi", system-ui, sans-serif;
   --font-hanzi: "Fluenc Hanzi", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
   --animate-pop: pop .2s ease-out;
@@ -38,8 +39,7 @@
 }
 
 @layer components {
-  .study-card { background: var(--color-paper); border: 1px solid var(--color-line); border-radius: 18px; }
-  .study-label { color: var(--color-muted); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .study-label { color: var(--color-muted); font-size: 11px; font-weight: 500; }
 }
 
 .writing-pad svg > g > path { filter: url(#fluenc-ink); }

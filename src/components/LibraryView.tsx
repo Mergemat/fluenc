@@ -46,14 +46,15 @@ export function LibraryView() {
       <PageHeader title="Library" meta="In learning order" />
 
       <input
-        className="mb-6 h-12 w-full rounded-xl border border-line bg-paper px-4 text-[15px] placeholder:text-faint focus:border-ink"
+        className="library-search"
+        aria-label="Search library"
         type="search"
         value={search}
         onChange={(event) => setSearch(event.target.value)}
-        placeholder="Search"
+        placeholder="Search characters, pinyin, or meaning"
       />
 
-      <div className="mb-4 flex gap-5" aria-label="Library section">
+      <div className="library-tabs" aria-label="Library section">
         <TabButton active={kind === 'characters'} count={libraryQuery.data?.characters.length} label="Characters" onClick={() => setKind('characters')} />
         <TabButton active={kind === 'words'} count={libraryQuery.data?.words.length} label="Words" onClick={() => setKind('words')} />
       </div>
@@ -64,10 +65,7 @@ export function LibraryView() {
         <Status title="Could not load the library" action={<Button variant="secondary" type="button" onClick={() => libraryQuery.refetch()}>Retry</Button>} />
       ) : visibleItems.length ? (
         <>
-          <div className="overflow-hidden rounded-2xl border border-line bg-paper">
-            <div className="hidden grid-cols-[76px_120px_minmax(0,1fr)_110px_48px] border-b border-line bg-canvas/70 px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-faint md:grid">
-              <span>Hanzi</span><span>Pinyin</span><span>Meaning and parts</span><span>Status</span><span />
-            </div>
+          <div className={`library-list library-${kind}`}>
             {visibleItems.map((item) => (
               <LibraryCard
                 key={item.id}
@@ -92,7 +90,8 @@ export function LibraryView() {
 function TabButton({ active, count, label, onClick }: { active: boolean; count?: number; label: string; onClick: () => void }) {
   return (
     <button
-      className={`inline-flex items-center gap-1.5 border-b-2 px-1 py-2 text-sm font-bold transition ${active ? 'border-glaze text-ink' : 'border-transparent text-faint'}`}
+      className="library-tab"
+      aria-pressed={active}
       type="button"
       onClick={onClick}
     >
@@ -107,27 +106,27 @@ function LibraryCard({ composition, item }: {
 }) {
   const meaning = getItemMeaning(item)
   return (
-    <article className="grid min-h-[70px] grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-3 border-b border-line px-4 py-2 last:border-b-0 md:grid-cols-[76px_120px_minmax(0,1fr)_110px_48px] md:gap-0 md:py-3">
-      <span className="font-hanzi text-3xl leading-none font-semibold text-glaze" lang="zh-CN">{item.hanzi}</span>
-      <div className="flex min-w-0 flex-col gap-0.5 md:contents">
+    <article className="library-row">
+      <span className="library-glyph font-hanzi" lang="zh-CN">{item.hanzi}</span>
+      <div className="library-definition">
         <div className="flex items-center gap-1.5">
           <strong className="text-sm font-medium">{item.pinyin}</strong>
           <NeutralToneBadge text={item.hanzi} pinyin={item.pinyin} />
         </div>
-        <div className="flex min-w-0 items-center gap-1.5 overflow-hidden text-xs whitespace-nowrap text-muted md:pr-4">
-          <span className="overflow-hidden text-ellipsis">{meaning.primary}</span>
+        <div className="library-meaning">
+          <span className="library-meaning-text">{meaning.primary}</span>
           {composition?.components.length ? (
             <>
               <span className="text-faint">·</span>
-              <span className="font-hanzi text-glaze" lang="zh-CN">
+              <span className="font-hanzi text-[#987031]" lang="zh-CN">
                 {composition.components.join(' + ')}
               </span>
             </>
           ) : null}
         </div>
       </div>
-      <div className="flex items-center gap-2 md:contents">
-        <span className={`text-[10px] uppercase tracking-wide ${item.status === 'review' ? 'text-ink' : item.status === 'learning' ? 'text-muted' : 'text-faint'}`}>
+      <div className="library-status">
+        <span className={`status-tag status-${item.status}`}>
           {statusLabels[item.status]}
         </span>
         <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} />

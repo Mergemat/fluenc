@@ -15,18 +15,16 @@ export function SrsRatingButtons({
   onRate: (rating: number) => void
 }) {
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Rate your recall">
+    <div className="rating-buttons" aria-label="Rate your recall">
       {reviewRatings.map((rating) => (
         <button
-          className={`flex h-13 items-center justify-center rounded-xl border bg-paper text-sm font-bold transition hover:border-ink ${
-            rating.value === 1 ? 'border-danger/30 text-danger' : 'border-line text-ink'
-          }`}
+          className={`rating-button rating-${rating.value}`}
           key={rating.value}
           type="button"
           disabled={pending}
           onClick={() => onRate(rating.value)}
         >
-          {rating.label}
+          {rating.label}<span className="key-hint">{rating.value}</span>
         </button>
       ))}
     </div>

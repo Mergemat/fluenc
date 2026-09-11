@@ -5,7 +5,7 @@ import { getToneDetail } from '../../lib/tones'
 import { MandarinAudioButton } from '../MandarinAudioButton'
 import type { CharacterItem, Cue } from './types'
 
-export type Studio = { item: CharacterItem; meaning: string; cues: Cue[] }
+export type Studio = { item: Pick<CharacterItem, 'hanzi' | 'pinyin' | 'movie'>; meaning: string; cues: Cue[] }
 
 export function CharacterTarget({ studio, children }: { studio: Studio; children?: ReactNode }) {
   const tone = getToneDetail(studio.item.movie.tone)
@@ -24,7 +24,7 @@ function SoundClue({ cue }: { cue: Cue }) {
   </div></section>
 }
 
-export function CharacterScene({ studio, direct }: { studio: Studio; direct: boolean }) {
+export function CharacterScene({ studio, direct, reviewing = false }: { studio: Studio; direct: boolean; reviewing?: boolean }) {
   const { item, cues } = studio
   const [selected, setSelected] = useState<string | null>(null)
   const [hovered, setHovered] = useState<string | null>(null)
@@ -87,6 +87,6 @@ export function CharacterScene({ studio, direct }: { studio: Studio; direct: boo
       </aside>
     </div>
     {shape.isError ? <p className="cs-shape-status" role="status">Could not load strokes. <button type="button" onClick={() => void shape.refetch()}>Retry</button></p> : shape.data && !mapped ? <p className="cs-shape-status" role="status">Character parts could not be loaded.</p> : null}
-    {direct ? <p className="cs-direct-caption">Learn this simple character directly. Choose an object to represent it inside other characters.</p> : <div className="cs-shelf-sound">{cues.filter(cue => cue.kind !== 'prop').map(cue => <SoundClue key={cue.id} cue={cue} />)}</div>}
+    {direct && reviewing ? null : direct ? <p className="cs-direct-caption">Learn this simple character directly. Choose an object to represent it inside other characters.</p> : <div className="cs-shelf-sound">{cues.filter(cue => cue.kind !== 'prop').map(cue => <SoundClue key={cue.id} cue={cue} />)}</div>}
   </div>
 }
