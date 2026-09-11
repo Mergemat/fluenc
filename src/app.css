@@ -137,7 +137,9 @@
 }
 /* Mobile pages grow with their content and share the app's native scroll. */
 @media (max-width: 767px) {
-  .session-page { height: auto; min-height: calc(100dvh - 60px - env(safe-area-inset-top)); padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+  .app-viewport { padding-top: calc(env(safe-area-inset-top) + 24px); }
+  .app-layout { min-height: calc(100dvh - env(safe-area-inset-top) - 24px); }
+  .session-page { height: auto; min-height: calc(100dvh - 84px - env(safe-area-inset-top)); padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
   .recall-frame, .recall-content { min-height: auto; }
   .recall-content { display: flex; flex-direction: column; overflow: visible; }
   .recall-target { flex: 1; min-height: auto; }
