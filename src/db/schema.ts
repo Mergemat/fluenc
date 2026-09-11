@@ -10,9 +10,6 @@ import {
 
 export const learners = sqliteTable('learners', {
   id: text('id').primaryKey(),
-  displayName: text('display_name').notNull().default('Learner'),
-  dailyCharacterGoal: integer('daily_character_goal').notNull().default(5),
-  dailyWordGoal: integer('daily_word_goal').notNull().default(8),
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .notNull()
     .default(sql`(unixepoch() * 1000)`),

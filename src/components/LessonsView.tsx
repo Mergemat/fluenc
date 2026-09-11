@@ -26,8 +26,8 @@ export function LessonsView({ data }: { data: DashboardData }) {
         <WordStudio key={`word:${lesson.id}`} item={lesson} />
       ) : (
         <Empty
-          title="Done for today"
-          detail="Keep going with reading, or adjust your daily volume in settings."
+          title="All lessons complete"
+          detail="You’ve worked through the available characters and words. Keep practicing with reviews and reading."
         />
       )}
     </Page>

@@ -34,7 +34,6 @@ import type {
   EnrollInput,
   LivingLinkInput,
   MovieInput,
-  PreferencesInput,
   ReviewInput,
 } from './curriculum.contract'
 
@@ -287,7 +286,7 @@ export async function getDashboardHandler() {
   startOfToday.setHours(0, 0, 0, 0)
   const now = new Date()
 
-  const [items, todayLogs, learner] = await Promise.all([
+  const [items, todayLogs] = await Promise.all([
     db.select().from(learnerItems).where(eq(learnerItems.learnerId, LEARNER_ID)),
     db
       .select()
@@ -298,7 +297,6 @@ export async function getDashboardHandler() {
           gte(reviewLogs.reviewedAt, startOfToday),
         ),
       ),
-    db.select().from(learners).where(eq(learners.id, LEARNER_ID)).limit(1),
   ])
 
   const itemKey = (type: ItemType, id: string) => `${type}:${id}`
@@ -333,16 +331,6 @@ export async function getDashboardHandler() {
     .sort((left, right) => left.due.getTime() - right.due.getTime())
     .map((item) => resolveCodebookItem(item, mappings))
     .filter((item) => item !== null)
-  const profile = learner[0]
-  const introducedToday = items.filter(
-    (item) =>
-      (item.itemType === 'character' || item.itemType === 'word') &&
-      item.introducedAt >= startOfToday,
-  )
-  const introducedCharactersToday = introducedToday.filter((item) => item.itemType === 'character').length
-  const introducedWordsToday = introducedToday.filter((item) => item.itemType === 'word').length
-  const remainingCharacterGoal = Math.max(0, profile.dailyCharacterGoal - introducedCharactersToday)
-  const remainingWordGoal = Math.max(0, profile.dailyWordGoal - introducedWordsToday)
   const knownProps = new Set(mappings.props.map((item) => item.component))
   const newCharacters = curriculum.characters
     .filter((item) => !introduced.has(itemKey('character', item.id)))
@@ -358,7 +346,6 @@ export async function getDashboardHandler() {
       const rightMissing = [...new Set(right.components)].filter((component) => !knownProps.has(component)).length
       return leftMissing - rightMissing || left.frequencyRank - right.frequencyRank
     })
-    .slice(0, remainingCharacterGoal)
     .map((item) => ({ ...characterStudyItem(item, mappings), queueKind: 'new' as const }))
 
   const newWords = uniqueWords
@@ -368,7 +355,6 @@ export async function getDashboardHandler() {
         !learnedWords.has(item.hanzi) &&
         item.characterIds.every((character) => introducedCharacters.has(character)),
     )
-    .slice(0, remainingWordGoal)
     .map((item) => ({ ...wordStudyItem(item, mappings), queueKind: 'new' as const }))
 
   const activeCharacter = newCharacters[0]
@@ -447,7 +433,6 @@ export async function getDashboardHandler() {
     .filter((item) => item !== null)
 
   return {
-    learner: profile,
     curriculum: {
       version: curriculum.version,
       characters: curriculum.characters.length,
@@ -456,8 +441,6 @@ export async function getDashboardHandler() {
     progress: {
       introducedCharacters: introducedCharacters.size,
       introducedWords: learnedWords.size,
-      introducedCharactersToday,
-      introducedWordsToday,
     },
     reviewQueue: dueItems,
     codebookQueue,
@@ -691,13 +674,4 @@ export async function getPalaceHandler() {
       .map(({ component, propName }) => ({ key: component, name: propName }))
       .sort((left, right) => left.key.localeCompare(right.key)),
   }
-}
-
-export async function savePreferencesHandler(data: PreferencesInput) {
-  await ensureLearner()
-  await db
-    .update(learners)
-    .set(data)
-    .where(eq(learners.id, LEARNER_ID))
-  return { saved: true }
 }

@@ -4,9 +4,6 @@
 .app-brand { display: flex; align-items: center; gap: 9px; font-size: 19px; letter-spacing: -.6px; font-weight: 650; }
 .app-brand > span { color: var(--color-glaze); font-size: 29px; font-weight: 400; }
 .nav-day, .desktop-nav { display: none; }
-.settings-button { margin-left: auto; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--color-muted); border-radius: 8px; }
-.settings-button > span { display: none; }
-.settings-button:hover { background: var(--color-paper); }
 .mobile-nav { position: fixed; inset: auto 0 0; z-index: 10; display: flex; height: calc(68px + env(safe-area-inset-bottom)); padding: 5px 8px calc(5px + env(safe-area-inset-bottom)); background: var(--color-canvas); border-top: 1px solid var(--color-line); }
 .mobile-nav > button { display: flex; flex: 1; min-width: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; border-radius: 10px; font-size: 10px; color: var(--color-muted); }
 .mobile-nav > button[aria-current] { color: var(--color-glaze); background: #e6eeea; }
@@ -28,7 +25,6 @@
 .empty-state { display: flex; min-height: 55dvh; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; }
 .empty-mark { display: grid; place-items: center; width: 100px; height: 100px; margin-bottom: 10px; border-radius: 28px 28px 5px 28px; background: #e6eeea; color: var(--color-glaze); font-size: 60px; }
 .status-panel { display: grid; min-height: 200px; place-content: center; justify-items: center; gap: 14px; color: var(--color-muted); }
-.settings-dialog { width: 100%; max-width: 420px; padding: 26px; border-radius: 16px 16px 0 0; background: var(--color-canvas); box-shadow: 0 12px 70px #15151520; }
 /* Recall keeps the prompt on the canvas and places the response controls below it. */
 .recall-frame { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 16px; }
 .recall-content { flex: 1; min-height: 0; overflow-y: auto; }
@@ -113,7 +109,7 @@
 .palace-prop > b { color: #987031; font-weight: 400; }
 .palace-empty { display: grid; gap: 6px; padding: 22px; border-radius: 12px; background: #e6eeea; }
 .palace-set .palace-empty { background: #e5edf4; }
-@media (min-width: 640px) { .settings-dialog { border-radius: 16px; } .word-connections { grid-template-columns: 1fr 1.5fr; } }
+@media (min-width: 640px) { .word-connections { grid-template-columns: 1fr 1.5fr; } }
 @media (min-width: 768px) {
   .app-layout { display: grid; grid-template-columns: 184px minmax(0,1fr); }
   .app-header { height: 100dvh; flex-direction: column; align-items: stretch; padding: 24px 14px; border-right: 1px solid var(--color-line); }
@@ -126,8 +122,6 @@
   .nav-item[aria-current] { background: #e6eeea; color: #337465; font-weight: 650; }
   .nav-item:hover { background: #e6eeea; }
   .nav-item > small { margin-left: auto; font-size: 10px; }
-  .settings-button { margin: auto 0 0; width: 100%; justify-content: flex-start; gap: 11px; padding-inline: 11px; font-size: 13px; }
-  .settings-button > span { display: inline; }
   .mobile-nav { display: none; }
   .study-page { padding: 22px 22px 36px; }
   .page-title { font-size: 14px; }

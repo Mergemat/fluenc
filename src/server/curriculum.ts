@@ -4,7 +4,6 @@ import {
   enrollInput,
   livingLinkInput,
   movieInput,
-  preferencesInput,
   reviewInput,
 } from './curriculum.contract'
 
@@ -50,13 +49,6 @@ export const getPalace = createServerFn({ method: 'GET' }).handler(async () => {
   const { getPalaceHandler } = await import('./curriculum.handlers.server')
   return getPalaceHandler()
 })
-
-export const savePreferences = createServerFn({ method: 'POST' })
-  .validator(preferencesInput)
-  .handler(async ({ data }) => {
-    const { savePreferencesHandler } = await import('./curriculum.handlers.server')
-    return savePreferencesHandler(data)
-  })
 
 export type DashboardData = Awaited<ReturnType<typeof getDashboard>>
 export type BuildItem = DashboardData['buildQueue'][number]

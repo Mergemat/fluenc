@@ -1,4 +1,4 @@
-import { BookOpen, Brain, Clapperboard, GraduationCap, LibraryBig, Settings2 } from 'lucide-react'
+import { BookOpen, Brain, Clapperboard, GraduationCap, LibraryBig } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import type { DashboardData } from '../server/curriculum'
@@ -14,13 +14,12 @@ const navigation: Array<{ id: AppView; label: string; icon: ReactNode }> = [
 
 type NavigationProps = { data: DashboardData; view: AppView; onViewChange: (view: AppView) => void }
 
-export function AppHeader({ data, onOpenSettings, onViewChange, view }: NavigationProps & { onOpenSettings: () => void }) {
+export function AppHeader({ data, onViewChange, view }: NavigationProps) {
   const dueCount = data.codebookQueue.length + data.reviewQueue.length
   return <header className="app-header">
     <button className="app-brand" type="button" onClick={() => onViewChange('lessons')} aria-label="Fluenc home"><span className="font-hanzi" aria-hidden="true">文</span>fluenc</button>
     <div className="nav-day"><span>Your practice</span><p>{dueCount ? `${dueCount} cards to revisit` : 'A little, every day.'}</p></div>
     <nav aria-label="Main" className="desktop-nav">{navigation.map(item => <button key={item.id} type="button" className="nav-item" aria-current={view === item.id ? 'page' : undefined} onClick={() => onViewChange(item.id)}>{item.icon}<span>{item.label}</span>{item.id === 'review' && dueCount ? <small>{dueCount}</small> : null}</button>)}</nav>
-    <button aria-label="Settings" className="settings-button" type="button" onClick={onOpenSettings}><Settings2 size={18} /><span>Settings</span></button>
   </header>
 }
 

@@ -5,7 +5,6 @@ import type {
   EnrollInput,
   LivingLinkInput,
   MovieInput,
-  PreferencesInput,
   ReviewInput,
 } from '../server/curriculum.contract'
 import {
@@ -16,7 +15,6 @@ import {
   reviewItem,
   saveLivingLink,
   saveMovie,
-  savePreferences,
   type DashboardData,
   type LibraryData,
   type PalaceData,
@@ -26,7 +24,6 @@ type ProgressOperation =
   | { kind: 'enroll'; data: EnrollInput }
   | { kind: 'livingLink'; data: LivingLinkInput }
   | { kind: 'movie'; data: MovieInput }
-  | { kind: 'preferences'; data: PreferencesInput }
   | { kind: 'review'; data: ReviewInput }
 
 type OutboxEntry = ProgressOperation & {
@@ -178,10 +175,8 @@ function applyEnrollment(data: DashboardData, operation: Extract<ProgressOperati
 
   if (operation.data.itemType === 'character') {
     next.progress.introducedCharacters += 1
-    next.progress.introducedCharactersToday += 1
   } else if (operation.data.itemType === 'word') {
     next.progress.introducedWords += 1
-    next.progress.introducedWordsToday += 1
   }
   return next
 }
@@ -212,9 +207,6 @@ function applyOperation(data: DashboardData, operation: ProgressOperation) {
   if (operation.kind === 'review') return applyReview(data, operation)
   if (operation.kind === 'enroll') return applyEnrollment(data, operation)
   if (operation.kind === 'movie') return applyMovie(data, operation)
-  if (operation.kind === 'preferences') {
-    return { ...structuredClone(data), learner: { ...data.learner, ...operation.data } }
-  }
   const next = structuredClone(data)
   next.buildQueue = next.buildQueue.map((item) =>
     item.type === 'word' && item.id === operation.data.wordId
@@ -353,8 +345,7 @@ async function sendOperation(operation: ProgressOperation) {
   if (operation.kind === 'review') return reviewItem({ data: operation.data })
   if (operation.kind === 'enroll') return enrollItem({ data: operation.data })
   if (operation.kind === 'movie') return saveMovie({ data: operation.data })
-  if (operation.kind === 'livingLink') return saveLivingLink({ data: operation.data })
-  return savePreferences({ data: operation.data })
+  return saveLivingLink({ data: operation.data })
 }
 
 async function performFlush() {
@@ -404,10 +395,6 @@ export function saveLivingLinkOffline(data: LivingLinkInput) {
 
 export function saveMovieOffline(data: MovieInput) {
   return saveOperation({ kind: 'movie', data })
-}
-
-export function savePreferencesOffline(data: PreferencesInput) {
-  return saveOperation({ kind: 'preferences', data })
 }
 
 export function saveReview(data: Omit<ReviewInput, 'eventId' | 'reviewedAt'>) {

@@ -36,14 +36,7 @@ export const livingLinkInput = z.object({
   story: z.string().trim().min(4),
 })
 
-export const preferencesInput = z.object({
-  displayName: z.string().trim().min(1).max(40),
-  dailyCharacterGoal: z.number().int().min(1).max(20),
-  dailyWordGoal: z.number().int().min(1).max(30),
-})
-
 export type ReviewInput = z.infer<typeof reviewInput>
 export type EnrollInput = z.infer<typeof enrollInput>
 export type MovieInput = z.infer<typeof movieInput>
 export type LivingLinkInput = z.infer<typeof livingLinkInput>
-export type PreferencesInput = z.infer<typeof preferencesInput>

@@ -6,7 +6,6 @@ import { AppHeader, AppTabBar, type AppView } from '../components/AppNav'
 import { LessonsView } from '../components/LessonsView'
 import { LibraryView } from '../components/LibraryView'
 import { PalaceView } from '../components/PalaceView'
-import { ProfileDialog } from '../components/ProfileDialog'
 import { ReadingView } from '../components/ReadingView'
 import { ReviewView } from '../components/ReviewView'
 import { getOfflineDashboard } from '../offline/progress'
@@ -31,11 +30,10 @@ function Home() {
   const { data } = useSuspenseQuery(dashboardQueryOptions)
   useOfflineSync(data)
   const [view, setView] = useState<AppView>(() => data.codebookQueue.length + data.reviewQueue.length ? 'review' : 'lessons')
-  const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
     <div className="app-layout">
-      <AppHeader data={data} view={view} onOpenSettings={() => setSettingsOpen(true)} onViewChange={setView} />
+      <AppHeader data={data} view={view} onViewChange={setView} />
       <main className="min-w-0">
         {view === 'review' ? <ReviewView data={data} />
           : view === 'lessons' ? <LessonsView data={data} />
@@ -44,7 +42,6 @@ function Home() {
                 : <PalaceView />}
       </main>
       <AppTabBar data={data} view={view} onViewChange={setView} />
-      {settingsOpen ? <ProfileDialog learner={data.learner} onClose={() => setSettingsOpen(false)} /> : null}
     </div>
   )
 }
