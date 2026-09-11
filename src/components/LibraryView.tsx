@@ -119,7 +119,7 @@ function LibraryCard({ composition, item }: {
           {composition?.components.length ? (
             <>
               <span className="text-faint">·</span>
-              <span className="font-hanzi text-[#987031]" lang="zh-CN">
+              <span className="font-hanzi-modern text-[#987031]" lang="zh-CN">
                 {composition.components.join(' + ')}
               </span>
             </>

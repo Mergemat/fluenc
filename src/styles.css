@@ -18,6 +18,7 @@
   --color-glaze: #337465;
   --font-ui: "Arial Nova", "Helvetica Neue", Arial, "Fluenc Hanzi", system-ui, sans-serif;
   --font-hanzi: "Fluenc Hanzi", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  --font-hanzi-modern: "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
   --animate-pop: pop .2s ease-out;
 
   @keyframes pop { from { scale: .8; opacity: 0; } }

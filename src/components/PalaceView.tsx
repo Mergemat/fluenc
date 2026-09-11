@@ -120,7 +120,7 @@ function Props({ items }: { items: PalaceData['props'] }) {
               className="palace-prop"
               key={item.key}
             >
-              <b className="font-hanzi text-2xl leading-none" lang="zh-CN">{item.key}</b>
+              <b className="font-hanzi-modern text-2xl font-medium leading-none" lang="zh-CN">{item.key}</b>
               <span className="min-w-0 text-xs [overflow-wrap:anywhere]">{item.name}</span>
             </div>
           ))}
