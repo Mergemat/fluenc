@@ -1,5 +1,5 @@
 import { and, eq, inArray } from 'drizzle-orm'
-import { createEmptyCard, fsrs, State, type Card, type Grade } from 'ts-fsrs'
+import { createEmptyCard, State, type Card, type Grade } from 'ts-fsrs'
 
 import curriculumJson from '../data/curriculum.generated.json'
 import { sentences } from '../data/sentences'
@@ -20,6 +20,7 @@ import {
 } from '../db/schema'
 import { characterForWord, characterIsWord, studyIdentity } from '../lib/character-words'
 import { nextWordCharacters } from '../lib/word-prerequisites'
+import { compareReviewOrder, reviewDueAt, scheduleReview } from '../lib/review-schedule'
 import { directCharacters } from '../lib/character-props'
 import { groupHanziComponents } from '../lib/hanzi'
 import { defaultToneRooms, getMovieCoordinates } from '../lib/pinyin'
@@ -39,12 +40,6 @@ const uniqueWords = [...curriculum.words.reduce((items, item) => {
   if (!items.has(item.hanzi)) items.set(item.hanzi, item)
   return items
 }, new Map<string, Word>()).values()]
-const scheduler = fsrs({
-  request_retention: 0.9,
-  enable_short_term: true,
-  learning_steps: ['10m'],
-  relearning_steps: ['10m'],
-})
 const starterCharacterIds = ['一', '人', '个', '大', '太', '了', '也', '他', '不', '在', '有', '是', '马', '吗']
 
 let learnerReady: Promise<unknown> | undefined
@@ -217,7 +212,9 @@ export async function getDashboardHandler() {
   ])
   const now = new Date()
 
-  const items = rows.filter(item => item.itemType !== 'word' || !characterForWord(item.itemId))
+  const items = rows
+    .filter(item => item.itemType !== 'word' || !characterForWord(item.itemId))
+    .map(item => ({ ...item, due: reviewDueAt(item.due, item.lastReview, item.state) }))
 
   const itemKey = (type: ItemType, id: string) => `${type}:${id}`
   const introduced = new Set(items.map((item) => itemKey(item.itemType, item.itemId)))
@@ -234,7 +231,7 @@ export async function getDashboardHandler() {
   )
   const dueItems = items
     .filter((item) => item.due <= now)
-    .sort((left, right) => left.due.getTime() - right.due.getTime())
+    .sort(compareReviewOrder)
     .map((progress) => {
       const item = resolveStudyItem(progress.itemType, progress.itemId, mappings)
       return item ? {
@@ -390,7 +387,7 @@ export async function reviewItemHandler(input: ReviewInput) {
       ? new Date(existing[0].lastReview.getTime() + 1)
       : requestedReviewTime
     const currentCard = fromLearnerItem(existing[0])
-    const nextCard = scheduler.next(currentCard, reviewedAt, data.rating as Grade).card
+    const nextCard = scheduleReview(currentCard, reviewedAt, data.rating as Grade)
     const values = learnerItemValues(data.itemType, data.itemId, nextCard)
 
     await transaction

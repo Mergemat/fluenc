@@ -124,7 +124,7 @@ test('offline saves advance locally and can be synchronized after reconnecting',
   await saveEnrollment({ itemType: 'sentence', itemId: 's01' })
   await saveReview({ itemType: 'sentence', itemId: 's01', rating: 1, durationMs: 100 })
   expect(await flushProgress()).toBe(0)
-  expect((await getOfflineDashboard()).scheduledQueue).toHaveLength(1)
+  expect((await getOfflineDashboard()).reviewQueue.map(item => item.id)).toEqual(['s01'])
   expect(enrollRequest).not.toHaveBeenCalled()
   Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { onLine: true } })
   expect(await flushProgress()).toBe(2)

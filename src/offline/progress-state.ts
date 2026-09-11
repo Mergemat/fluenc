@@ -1,8 +1,9 @@
-import { createEmptyCard, fsrs, State, type Card, type Grade } from 'ts-fsrs'
+import { createEmptyCard, State, type Card, type Grade } from 'ts-fsrs'
 
 import { isStudyItemType } from '../data/types'
 import { characterForWord, characterIsWord, studyIdentity } from '../lib/character-words'
 import { nextWordCharacters } from '../lib/word-prerequisites'
+import { compareReviewOrder, reviewDueAt, scheduleReview } from '../lib/review-schedule'
 import type { EnrollInput, LivingLinkInput, MovieInput, ReviewInput } from '../server/curriculum.contract'
 import type { DashboardData, LibraryData, PalaceData } from '../server/curriculum'
 
@@ -15,13 +16,6 @@ export type ProgressOperation =
 type CardSnapshot = DashboardData['scheduledQueue'][number]['card']
 type ReviewQueueItem = DashboardData['reviewQueue'][number]
 type ScheduledQueueItem = DashboardData['scheduledQueue'][number]
-
-const scheduler = fsrs({
-  request_retention: 0.9,
-  enable_short_term: true,
-  learning_steps: ['10m'],
-  relearning_steps: ['10m'],
-})
 
 function toCard(snapshot: CardSnapshot): Card {
   return {
@@ -60,16 +54,18 @@ function itemKey(item: { type: string; id: string }) {
 export function refreshDueQueues(data: DashboardData, now = new Date()) {
   const next = { ...data }
   const independent = (item: { type: string; id: string }) => isStudyItemType(item.type) && (item.type !== 'word' || !characterForWord(item.id))
-  next.reviewQueue = next.reviewQueue.filter(independent)
-  next.scheduledQueue = next.scheduledQueue.filter(independent)
   next.buildQueue = next.buildQueue.filter(independent)
-  const due = next.scheduledQueue.filter((item) => Date.parse(item.card.due) <= now.getTime())
-  next.scheduledQueue = next.scheduledQueue.filter((item) => Date.parse(item.card.due) > now.getTime())
-
-  const reviewKeys = new Set(next.reviewQueue.map(itemKey))
-  for (const item of due) {
-    if (!reviewKeys.has(itemKey(item))) next.reviewQueue.push(item)
+  const items = new Map([...data.reviewQueue, ...data.scheduledQueue]
+    .filter(independent).map(item => [itemKey(item), item]))
+  next.reviewQueue = []
+  next.scheduledQueue = []
+  for (const item of items.values()) {
+    const due = reviewDueAt(new Date(item.card.due), item.card.lastReview ? new Date(item.card.lastReview) : null, item.card.state)
+    const scheduled = { ...item, card: { ...item.card, due: due.toISOString() } }
+    if (due <= now) next.reviewQueue.push(scheduled)
+    else next.scheduledQueue.push(scheduled)
   }
+  next.reviewQueue.sort((left, right) => compareReviewOrder(left.card, right.card))
 
   next.nextReviewAt = next.scheduledQueue
     .reduce<string | null>((earliest, item) => !earliest || item.card.due < earliest ? item.card.due : earliest, null)
@@ -83,7 +79,7 @@ function applyReview(data: DashboardData, operation: Extract<ProgressOperation, 
   if (!item) return data
 
   const reviewedAt = new Date(operation.data.reviewedAt)
-  const nextCard = scheduler.next(toCard(item.card), reviewedAt, operation.data.rating as Grade).card
+  const nextCard = scheduleReview(toCard(item.card), reviewedAt, operation.data.rating as Grade)
   const scheduled = {
     ...item,
     card: toSnapshot(nextCard),
