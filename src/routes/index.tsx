@@ -1,4 +1,4 @@
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 
@@ -8,21 +8,13 @@ import { LibraryView } from '../components/LibraryView'
 import { PalaceView } from '../components/PalaceView'
 import { ReadingView } from '../components/ReadingView'
 import { ReviewView } from '../components/ReviewView'
-import { getOfflineDashboard } from '../offline/progress'
+import { dashboardQueryOptions } from '../offline/queries'
 import { useOfflineSync } from '../offline/useOfflineSync'
 
-const dashboardQueryOptions = queryOptions({
-  queryKey: ['dashboard'],
-  queryFn: () => getOfflineDashboard(),
-  refetchInterval: (query) => {
-    const nextReviewAt = query.state.data?.nextReviewAt
-    if (!nextReviewAt) return false
-    return Math.max(1_000, Math.min(Date.parse(nextReviewAt) - Date.now(), 2_147_000_000))
-  },
-})
-
 export const Route = createFileRoute('/')({
-  loader: ({ context }) => context.queryClient.ensureQueryData(dashboardQueryOptions),
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(dashboardQueryOptions)
+  },
   component: Home,
 })
 

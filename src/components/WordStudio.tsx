@@ -1,8 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowRight, Link2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { getItemMeaning } from '../lib/meaning'
+import { useProgressMutation } from '../offline/useProgressMutation'
 import { saveEnrollment, saveLivingLinkOffline } from '../offline/progress'
 import type { BuildItem } from '../server/curriculum'
 import { MandarinAudioButton } from './MandarinAudioButton'
@@ -13,22 +13,15 @@ import { ErrorNote } from './ui/Layout'
 type WordItem = Extract<BuildItem, { type: 'word' }>
 
 export function WordStudio({ item }: { item: WordItem }) {
-  const queryClient = useQueryClient()
   const meaning = getItemMeaning(item)
   const [story, setStory] = useState(item.livingLink)
   const [showLivingLink, setShowLivingLink] = useState(Boolean(item.livingLink))
   const [showValidation, setShowValidation] = useState(false)
   const linkTooShort = story.trim().length > 0 && story.trim().length < 4
-  const finishMutation = useMutation({
-    mutationFn: async () => {
-      const trimmedStory = story.trim()
-      if (trimmedStory) await saveLivingLinkOffline({ wordId: item.id, story: trimmedStory })
-      return saveEnrollment({ itemType: 'word', itemId: item.id })
-    },
-    onSuccess: async () => {
-      setShowValidation(false)
-      await queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-    },
+  const finishMutation = useProgressMutation(async () => {
+    const trimmedStory = story.trim()
+    if (trimmedStory) await saveLivingLinkOffline({ wordId: item.id, story: trimmedStory })
+    return saveEnrollment({ itemType: 'word', itemId: item.id })
   })
 
   return <article className="word-studio">

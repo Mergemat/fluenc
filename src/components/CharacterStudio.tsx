@@ -1,9 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowRight, Pencil, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { getItemMeaning } from '../lib/meaning'
 import { directCharacters } from '../lib/character-props'
+import { useProgressMutation } from '../offline/useProgressMutation'
 import { saveEnrollment, saveMovieOffline } from '../offline/progress'
 import { characterCues } from './character-studio/cues'
 import { ClueForm } from './character-studio/ClueForm'
@@ -15,7 +15,6 @@ import './character-studio/studio.css'
 const cueKey = (cue: Cue) => `${cue.kind}:${cue.code}`
 
 export function CharacterStudio({ item }: { item: CharacterItem }) {
-  const queryClient = useQueryClient()
   const [writeOpen, setWriteOpen] = useState(false)
   const [names, setNames] = useState<Record<string, string>>({})
   const [screen, setScreen] = useState<'scene' | 'fill'>('scene')
@@ -23,17 +22,15 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
   const direct = directCharacters.has(item.hanzi)
   const cues = characterCues(item).map((cue) => ({ ...cue, name: names[cueKey(cue)] ?? cue.name }))
   const studio: Studio = { item, cues, meaning: getItemMeaning(item).primary }
-  const finishMutation = useMutation({
-    mutationFn: async () => {
-      const name = (kind: Cue['kind']) => cues.find(cue => cue.kind === kind)?.name.trim() ?? ''
-      await saveMovieOffline({
-        characterId: item.id, actorKey: item.movie.actorKey, actorName: name('actor'),
-        finalKey: item.movie.finalKey, setName: name('set'), tone: item.movie.tone, roomName: name('room'),
-        props: cues.filter(cue => cue.kind === 'prop').map(cue => ({ component: cue.code, propName: cue.name.trim() })),
-      })
-      await saveEnrollment({ itemType: 'character', itemId: item.id })
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
+  const finishMutation = useProgressMutation(async () => {
+    const name = (kind: Cue['kind']) => cues.find(cue => cue.kind === kind)?.name.trim() ?? ''
+    const movie = await saveMovieOffline({
+      characterId: item.id, actorKey: item.movie.actorKey, actorName: name('actor'),
+      finalKey: item.movie.finalKey, setName: name('set'), tone: item.movie.tone, roomName: name('room'),
+      props: cues.filter(cue => cue.kind === 'prop').map(cue => ({ component: cue.code, propName: cue.name.trim() })),
+    })
+    const enrollment = await saveEnrollment({ itemType: 'character', itemId: item.id })
+    return { ...enrollment, palace: movie.palace }
   })
 
   return <article className={`cs-studio cs-screen-${screen} ${direct ? 'cs-direct-lesson' : ''} ${cues.length > 5 ? 'cs-dense' : ''}`}>

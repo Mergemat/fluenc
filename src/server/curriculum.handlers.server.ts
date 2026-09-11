@@ -46,8 +46,16 @@ const scheduler = fsrs({
 })
 const starterCharacterIds = ['一', '人', '个', '大', '太', '了', '也', '他', '不', '在', '有', '是', '马', '吗']
 
-async function ensureLearner() {
-  await db.insert(learners).values({ id: LEARNER_ID }).onConflictDoNothing()
+let learnerReady: Promise<unknown> | undefined
+
+function ensureLearner() {
+  learnerReady ??= db.insert(learners).values({ id: LEARNER_ID }).onConflictDoNothing()
+    .then(() => undefined)
+    .catch((error: unknown) => {
+      learnerReady = undefined
+      throw error
+    })
+  return learnerReady
 }
 
 function fromLearnerItem(item: LearnerItem): Card {
@@ -102,7 +110,7 @@ function scheduledCard(item: LearnerItem) {
 type MappingRows = Awaited<ReturnType<typeof getMappings>>
 
 async function getMappings() {
-  const [actors, sets, rooms, props, stories] = await Promise.all([
+  const [actors, sets, rooms, props, stories] = await db.batch([
     db.select().from(palaceActors).where(eq(palaceActors.learnerId, LEARNER_ID)),
     db.select().from(palaceSets).where(eq(palaceSets.learnerId, LEARNER_ID)),
     db.select().from(toneRooms).where(eq(toneRooms.learnerId, LEARNER_ID)),
@@ -194,13 +202,14 @@ function resolveStudyItem(type: ItemType, id: string, mappings: MappingRows) {
 }
 
 export async function getDashboardHandler() {
-  await ensureLearner()
-  const mappings = await getMappings()
+  const [mappings, rows] = await Promise.all([
+    getMappings(),
+    db.select().from(learnerItems).where(and(
+      eq(learnerItems.learnerId, LEARNER_ID),
+      inArray(learnerItems.itemType, studyItemTypes),
+    )),
+  ])
   const now = new Date()
-  const rows = await db.select().from(learnerItems).where(and(
-    eq(learnerItems.learnerId, LEARNER_ID),
-    inArray(learnerItems.itemType, studyItemTypes),
-  ))
 
   const items = rows.filter(item => item.itemType !== 'word' || !characterForWord(item.itemId))
 
@@ -235,7 +244,11 @@ export async function getDashboardHandler() {
   const knownProps = new Set(mappings.props.map((item) => item.component))
   const newCharacters = curriculum.characters
     .filter((item) => !introduced.has(itemKey('character', item.id)))
-    .sort((left, right) => {
+    .map((character) => ({
+      character,
+      missingProps: [...new Set(character.components)].filter((component) => !knownProps.has(component)).length,
+    }))
+    .sort(({ character: left, missingProps: leftMissing }, { character: right, missingProps: rightMissing }) => {
       const leftStarter = starterCharacterIds.indexOf(left.id)
       const rightStarter = starterCharacterIds.indexOf(right.id)
       if (leftStarter >= 0 || rightStarter >= 0) {
@@ -243,11 +256,9 @@ export async function getDashboardHandler() {
         if (rightStarter < 0) return -1
         return leftStarter - rightStarter
       }
-      const leftMissing = [...new Set(left.components)].filter((component) => !knownProps.has(component)).length
-      const rightMissing = [...new Set(right.components)].filter((component) => !knownProps.has(component)).length
       return leftMissing - rightMissing || left.frequencyRank - right.frequencyRank
     })
-    .map((item) => ({ ...characterStudyItem(item, mappings), queueKind: 'new' as const }))
+    .map(({ character }) => ({ ...characterStudyItem(character, mappings), queueKind: 'new' as const }))
 
   const newWords = uniqueWords
     .filter(
@@ -467,7 +478,6 @@ export async function saveLivingLinkHandler(data: LivingLinkInput) {
 }
 
 export async function getLibraryHandler() {
-  await ensureLearner()
   const items = await db
     .select()
     .from(learnerItems)
@@ -511,7 +521,6 @@ export async function getLibraryHandler() {
 }
 
 export async function getPalaceHandler() {
-  await ensureLearner()
   const mappings = await getMappings()
   return {
     actors: mappings.actors

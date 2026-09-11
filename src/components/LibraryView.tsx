@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useDeferredValue, useState } from 'react'
 
 import { getItemMeaning } from '../lib/meaning'
-import { getOfflineLibrary } from '../offline/progress'
+import { libraryQueryOptions } from '../offline/queries'
 import type { LibraryData } from '../server/curriculum'
 import { getHanziCompositions, type HanziCompositions } from '../server/hanzi'
 import { MandarinAudioButton } from './MandarinAudioButton'
@@ -24,7 +24,7 @@ export function LibraryView() {
   const [kind, setKind] = useState<LibraryKind>('characters')
   const [search, setSearch] = useState('')
   const deferredSearch = useDeferredValue(search.trim().toLocaleLowerCase())
-  const libraryQuery = useQuery({ queryKey: ['library'], queryFn: () => getOfflineLibrary() })
+  const libraryQuery = useQuery(libraryQueryOptions)
 
   const items = (libraryQuery.data?.[kind] ?? []).filter((item) => {
     if (!deferredSearch) return true

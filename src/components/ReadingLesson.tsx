@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 
+import { useProgressMutation } from '../offline/useProgressMutation'
 import { saveEnrollment } from '../offline/progress'
 import type { DashboardData } from '../server/curriculum'
 import { MandarinAudioButton } from './MandarinAudioButton'
@@ -11,12 +11,8 @@ import { ErrorNote } from './ui/Layout'
 type ReadingItem = DashboardData['getQueue'][number]
 
 export function ReadingLesson({ item }: { item: ReadingItem }) {
-  const queryClient = useQueryClient()
   const [revealed, setRevealed] = useState(false)
-  const mutation = useMutation({
-    mutationFn: () => saveEnrollment({ itemType: 'sentence', itemId: item.id }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['dashboard'] }),
-  })
+  const mutation = useProgressMutation(() => saveEnrollment({ itemType: 'sentence', itemId: item.id }))
 
   return <article className="reading-lesson">
     <div className="reading-content">
