@@ -34,8 +34,8 @@ export async function handleReviewReminder(request: Request, options: ReminderOp
         'Idempotency-Key': `fluenc-review-${reviewDay(options.now ?? new Date())}`,
       },
       // Keep the payload stable so a retried daily job cannot create another push.
-      // The Hark service supplies the avatar and destination URL.
-      body: JSON.stringify({ title: 'Fluenc', body: 'Your Mandarin reviews are ready. Start with recent cards, then catch up at your pace.' }),
+      // Override the destination so notifications always open the current Review route.
+      body: JSON.stringify({ title: 'Fluenc', body: 'Your Mandarin reviews are ready. Start with recent cards, then catch up at your pace.', url: 'https://example.com/review' }),
       signal: AbortSignal.timeout(10_000),
       redirect: 'error',
     })

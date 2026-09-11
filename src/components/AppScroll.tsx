@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type ReactNode, type TouchEvent } from 're
 import { IonContent, IonRefresher, IonRefresherContent, initializeScroll } from './ui/ionic-scroll'
 import '@ionic/core/css/core.css'
 
-export function AppScroll({ children, view }: { children: ReactNode; view: string }) {
+export function AppScroll({ children, pathname }: { children: ReactNode; pathname: string }) {
   const queryClient = useQueryClient()
   const pending = useIsMutating() > 0
   const content = useRef<HTMLIonContentElement>(null)
@@ -26,7 +26,7 @@ export function AppScroll({ children, view }: { children: ReactNode; view: strin
 
   useEffect(() => {
     if (ready) void content.current?.scrollToTop(0)
-  }, [ready, view])
+  }, [ready, pathname])
 
   const scheduleReload = () => {
     clearTimeout(reloadTimer.current)

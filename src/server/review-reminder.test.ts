@@ -40,6 +40,7 @@ test('repeated runs use the same Hark event key and payload, with a new key the 
   expect(calls[0]).toEqual(calls[1])
   expect(calls[0]!.key).not.toBe(calls[2]!.key)
   expect(JSON.parse(calls[0]!.body as string).title).toBe('Fluenc')
+  expect(JSON.parse(calls[0]!.body as string).url).toBe('https://example.com/review')
 })
 
 test('invalid endpoints, missing devices, upstream failures, and secret-bearing errors are handled', async () => {
