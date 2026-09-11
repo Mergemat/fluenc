@@ -16,6 +16,7 @@ const result = await generateSW({
   globDirectory: '.output/public',
   globPatterns: [
     'assets/**/*.{css,js}',
+    'fonts/**/*.woff2',
     'audio/**/*.mp3',
     'icon.svg',
     'manifest.webmanifest',

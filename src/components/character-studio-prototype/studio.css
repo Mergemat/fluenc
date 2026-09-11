@@ -1,5 +1,6 @@
 @import './fill.css';
-/* Five throwaway compositions. All visual clues are glyphs, names, and CSS. */
+@import './clue-groups.css';
+/* Round 2 keeps Notebook's character area and compares the clue groups. */
 .cs-host { height: calc(100dvh - 128px - env(safe-area-inset-bottom)); padding: 8px 16px; box-sizing: border-box; max-width: 580px; margin-inline: auto; }
 .cs-prototype { --cs-blue: #315b79; --cs-green: #337465; --cs-gold: #987031; position: relative; height: 100%; display: flex; flex-direction: column; gap: 10px; padding-bottom: 52px; color: var(--color-ink); }
 .cs-prototype h1, .cs-prototype h2, .cs-prototype h3, .cs-prototype p { margin: 0; }
@@ -34,13 +35,6 @@
 .cs-components .cs-clue { min-width: 42px; max-width: 110px; align-items: center; text-align: center; }
 .cs-components .cs-clue small { order: 3; font-size: 8px; }
 .cs-vertical { flex-direction: column; align-items: center; gap: 6px; }
-/* A: an open canvas around the existing central target. */
-.cs-open-canvas { display: grid; height: 100%; grid-template-rows: auto minmax(120px, 1fr) auto auto; gap: 14px; }
-.cs-open-sound { display: flex; justify-content: space-between; gap: 28px; padding: 8px 6px 0; }
-.cs-open-sound > .cs-clue { flex: 1; }
-.cs-open-sound > .cs-clue:last-child { text-align: right; }
-.cs-open-room .cs-clue { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 8px; padding-top: 8px; }
-.cs-open-room .cs-clue small { order: 3; }
 /* B: a character above four compact notes, as in the selected reference. */
 .cs-notebook { height: 100%; display: grid; grid-template-rows: minmax(115px, 1fr) auto; gap: 16px; }
 .cs-note-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
@@ -52,47 +46,9 @@
 .cs-note .cs-clue > b { font-size: 30px; }
 .cs-note .cs-clue > strong { font-size: 14px; }
 .cs-note-parts > .cs-components { margin-top: 5px; gap: 12px; }
+.cs-note-parts .cs-components .cs-clue { flex: 1; min-width: 0; max-width: none; }
 .cs-note-parts .cs-clue small { display: none; }
 .cs-note-parts .cs-clue > b { font-size: 32px; }
-/* C: the props belong to the stage; sound associations form its lower caption. */
-.cs-cinema { height: 100%; display: flex; flex-direction: column; background: #18334a; border-radius: 20px; color: #fff; padding: 16px 12px; }
-.cs-cinema-stage { min-height: 0; flex: 1; display: flex; flex-direction: column-reverse; justify-content: space-evenly; gap: 12px; background: radial-gradient(ellipse at 50% 30%, #45677775, transparent 65%); }
-.cs-cinema-stage .cs-character-target { flex: 1; }
-.cs-cinema .cs-target-details h2 { color: #d0dce1; }
-.cs-cinema .cs-tone { color: #9ccebd; }
-.cs-cinema .cs-target-pinyin > button { background: transparent; color: #e9f1f5; }
-.cs-cinema .cs-clue small { color: #b4c8d3; }
-.cs-cinema .cs-clue > b { color: #bbd4e8; }
-.cs-cinema .cs-clue-prop > b { color: #edcf92; }
-.cs-cinema .cs-clue-room > b { color: #a6dbc8; }
-.cs-cinema .cs-missing { color: #b2bfca; }
-.cs-cinema-cast { display: grid; grid-template-columns: 1fr 1.25fr 1fr; gap: 12px; margin-top: 18px; }
-.cs-cinema-cast .cs-clue { gap: 7px; }
-.cs-cinema-cast .cs-clue > strong { font-size: 12px; }
-/* D: margin annotations flank a central character, no boxes or stacked sections. */
-.cs-side-notes { display: grid; height: 100%; grid-template-columns: 75px minmax(0, 1fr) 75px; align-items: center; gap: 5px; }
-.cs-side-notes .cs-target-hanzi { font-size: clamp(85px, 14dvh, 125px); }
-.cs-side-notes .cs-target-pinyin > strong { font-size: 29px; }
-.cs-side-notes .cs-target-pinyin > button { left: calc(100% + 2px); width: 23px; }
-.cs-side-notes .cs-target-details { flex-direction: column; gap: 2px; }
-.cs-shape-notes .cs-components { flex-direction: column; gap: 22px; }
-.cs-shape-notes .cs-clue { align-items: flex-start; text-align: left; position: relative; }
-.cs-shape-notes .cs-clue::after { content: ''; position: absolute; top: 21px; right: -10px; width: 18px; border-top: 1px solid #cbb995; }
-.cs-sound-notes { display: flex; flex-direction: column; gap: 28px; }
-.cs-sound-notes .cs-clue { position: relative; }
-.cs-sound-notes .cs-clue::before { content: ''; position: absolute; left: -15px; top: 28px; width: 10px; border-top: 1px solid #a8b7bc; }
-.cs-side-notes .cs-clue > strong { font-size: 12px; }
-/* E: a short scene brief reads as a sentence rather than a list of attributes. */
-.cs-script { display: grid; height: 100%; grid-template-rows: auto minmax(120px, 1fr) auto; gap: 12px; padding: 8px 4px; }
-.cs-script > .cs-components { gap: 26px; }
-.cs-script .cs-components .cs-clue { flex-direction: row; align-items: baseline; max-width: none; gap: 5px; }
-.cs-script .cs-components .cs-clue small { display: none; }
-.cs-script-line { text-align: center; font-size: 18px; color: #858075; line-height: 1.85; }
-.cs-annotation { display: inline-block; line-height: 1.3; vertical-align: baseline; }
-.cs-annotation > small { display: block; text-align: left; font: 10px monospace; color: var(--cs-blue); }
-.cs-annotation > strong { font-weight: 650; color: var(--color-ink); }
-.cs-annotation-room > small { color: var(--cs-green); }
-.cs-annotation-room > strong { color: var(--cs-green); }
 .cs-scene-actions { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 6px; }
 .cs-scene-actions p { display: flex; flex-direction: column; gap: 3px; font-size: 11px; color: var(--color-muted); }
 .cs-scene-actions p > span { font: 10px monospace; }
@@ -128,29 +84,17 @@
 .cs-dense .cs-components .cs-clue { gap: 2px; }
 .cs-dense .cs-note-parts .cs-components .cs-clue { flex: 0 0 26%; min-width: 0; }
 .cs-dense .cs-note-parts .cs-components .cs-clue > b { font-size: 22px; }
-.cs-dense .cs-shape-notes .cs-components { gap: 6px; }
-.cs-dense .cs-shape-notes .cs-clue { gap: 1px; }
-.cs-dense .cs-script > .cs-components { gap: 3px 10px; }
-.cs-dense .cs-script > .cs-components .cs-clue { flex-basis: 28%; max-width: 100px; }
-.cs-dense .cs-script > .cs-components .cs-clue { flex-direction: column; align-items: center; }
 @media (max-height: 710px) {
   .cs-prototype { gap: 7px; }
   .cs-target-hanzi { font-size: 108px; }
   .cs-target-pinyin > strong { font-size: 29px; }
   .cs-character-target { gap: 5px; }
-  .cs-open-canvas { gap: 8px; }
   .cs-clue { gap: 3px; }
   .cs-clue > strong { font-size: 12px; }
   .cs-note { padding: 8px 10px; }
   .cs-note .cs-clue > b { font-size: 25px; }
   .cs-note .cs-clue > strong { font-size: 12px; }
   .cs-notebook { gap: 10px; }
-  .cs-cinema { padding: 10px; }
-  .cs-cinema-cast { margin-top: 12px; gap: 9px; }
-  .cs-cinema-stage { gap: 6px; }
-  .cs-side-notes .cs-target-hanzi { font-size: 94px; }
-  .cs-script { gap: 6px; }
-  .cs-script-line { font-size: 17px; }
   .cs-fill-screen { gap: 10px; }
   .cs-fill-screen .cs-character-target { padding-block: 2px; }
   .cs-fill-screen .cs-target-hanzi { font-size: 42px; }
@@ -169,21 +113,12 @@
   .cs-clue > b { font-size: 21px; }
   .cs-clue-prop > b { font-size: 27px; }
   .cs-clue > strong { font-size: 11px; }
-  .cs-open-canvas { gap: 3px; }
-  .cs-open-sound { padding-top: 0; }
-  .cs-open-room .cs-clue { padding-top: 2px; }
   .cs-note-grid { gap: 5px; }
   .cs-note { padding: 5px 8px; }
   .cs-note .cs-clue > b { font-size: 21px; }
   .cs-note .cs-clue > strong { font-size: 11px; }
   .cs-notebook { gap: 5px; }
   .cs-note-parts .cs-clue > b { font-size: 25px; }
-  .cs-side-notes { grid-template-columns: 66px minmax(0, 1fr) 66px; }
-  .cs-side-notes .cs-target-hanzi { font-size: 80px; }
-  .cs-side-notes .cs-target-pinyin > strong { font-size: 24px; }
-  .cs-side-notes .cs-clue > strong { font-size: 11px; }
-  .cs-sound-notes { gap: 18px; }
-  .cs-script-line { font-size: 14px; }
   .cs-fill-screen { gap: 5px; }
   .cs-fill-screen .cs-character-target { gap: 1px; padding: 0; }
   .cs-fill-screen .cs-target-hanzi { font-size: 32px; }
@@ -209,8 +144,7 @@
   .cs-dense .cs-note-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .cs-dense .cs-note-parts { grid-column: 1 / -1; }
   .cs-dense .cs-note-parts .cs-components { gap: 4px; }
-  .cs-dense .cs-note-parts .cs-components .cs-clue,
-  .cs-dense .cs-cinema-stage > .cs-components .cs-clue { flex: 1; min-width: 0; max-width: none; }
+  .cs-dense .cs-note-parts .cs-components .cs-clue { flex: 1; min-width: 0; max-width: none; }
 }
 @media (min-width: 768px) {
   .cs-host { height: 100dvh; padding: 22px; }
@@ -218,3 +152,8 @@
   .cs-toolbar > span { font-size: 14px; }
   .prototype-switcher { bottom: 16px; right: 16px; }
 }
+
+.cs-prop-count { font-family: var(--font-sans); font-size: 10px; margin-left: 3px; vertical-align: super; }
+
+.cs-shape-note-button { border: 0; padding: 0; background: none; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
+.cs-shape-note p { padding: 16px; font-size: 14px; line-height: 1.6; }

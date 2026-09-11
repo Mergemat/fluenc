@@ -11,15 +11,16 @@ export type Cue = {
   code: string
   name: string
   role: string
+  count?: number
   position?: string
 }
 
 export const variants = [
-  { id: 'a', name: 'Open canvas' },
+  { id: 'a', name: 'Prop shelf' },
   { id: 'b', name: 'Notebook' },
-  { id: 'c', name: 'Cinema' },
-  { id: 'd', name: 'Side notes' },
-  { id: 'e', name: 'Scene script' },
+  { id: 'c', name: 'Sound / shape' },
+  { id: 'd', name: 'Scene cast' },
+  { id: 'e', name: 'Clue strip' },
 ] as const
 
 // The first-party walkthrough teaches these directly, while still assigning props.
@@ -28,8 +29,8 @@ export const directCharacter: CharacterItem = {
   type: 'character', queueKind: 'new', id: '一', hanzi: '一', pinyin: 'yī', meaning: 'one', rank: 2, unlocks: 1,
   movie: {
     ...getMovieCoordinates('yī'), actorName: '', setName: '', roomName: 'Outside entrance',
-    isPrimitive: true, configured: false,
-    components: [{ hanzi: '一', propName: '', character: { pinyin: 'yī', meaning: 'one' } }],
+    componentNote: null, isPrimitive: true, configured: false,
+    components: [{ count: 1, hanzi: '一', propName: '', character: { pinyin: 'yī', meaning: 'one' } }],
   },
 }
 
@@ -37,10 +38,10 @@ export const exampleCharacter: CharacterItem = {
   type: 'character', queueKind: 'new', id: '明', hanzi: '明', pinyin: 'míng', meaning: 'bright', rank: 137, unlocks: 3,
   movie: {
     ...getMovieCoordinates('míng'), actorName: 'Michelle Yeoh', setName: 'My primary school', roomName: 'Kitchen',
-    isPrimitive: false, configured: true,
+    componentNote: null, isPrimitive: false, configured: true,
     components: [
-      { hanzi: '日', propName: 'Sun', character: { pinyin: 'rì', meaning: 'sun' } },
-      { hanzi: '月', propName: 'Moon', character: { pinyin: 'yuè', meaning: 'moon' } },
+      { count: 1, hanzi: '日', propName: 'Sun', character: { pinyin: 'rì', meaning: 'sun' } },
+      { count: 1, hanzi: '月', propName: 'Moon', character: { pinyin: 'yuè', meaning: 'moon' } },
     ],
   },
 }
@@ -50,20 +51,20 @@ export const exampleCharacters: CharacterItem[] = [
   {
     type: 'character', queueKind: 'new', id: '休', hanzi: '休', pinyin: 'xiū', meaning: 'rest', rank: 475, unlocks: 1,
     movie: {
-      ...getMovieCoordinates('xiū'), actorName: '', setName: '', roomName: 'Outside entrance', isPrimitive: false, configured: false,
+      ...getMovieCoordinates('xiū'), actorName: '', setName: '', roomName: 'Outside entrance', componentNote: null, isPrimitive: false, configured: false,
       components: [
-        { hanzi: '亻', propName: 'Toy soldier', character: null },
-        { hanzi: '木', propName: 'Tree', character: { pinyin: 'mù', meaning: 'tree' } },
+        { count: 1, hanzi: '亻', propName: 'Toy soldier', character: null },
+        { count: 1, hanzi: '木', propName: 'Tree', character: { pinyin: 'mù', meaning: 'tree' } },
       ],
     },
   },
   {
     type: 'character', queueKind: 'new', id: '好', hanzi: '好', pinyin: 'hǎo', meaning: 'good', rank: 8, unlocks: 16,
     movie: {
-      ...getMovieCoordinates('hǎo'), actorName: 'Harrison Ford', setName: 'Childhood home', roomName: 'Bedroom', isPrimitive: false, configured: true,
+      ...getMovieCoordinates('hǎo'), actorName: 'Harrison Ford', setName: 'Childhood home', roomName: 'Bedroom', componentNote: null, isPrimitive: false, configured: true,
       components: [
-        { hanzi: '女', propName: 'Doll', character: { pinyin: 'nǚ', meaning: 'woman' } },
-        { hanzi: '子', propName: 'Child', character: { pinyin: 'zǐ', meaning: 'child' } },
+        { count: 1, hanzi: '女', propName: 'Doll', character: { pinyin: 'nǚ', meaning: 'woman' } },
+        { count: 1, hanzi: '子', propName: 'Child', character: { pinyin: 'zǐ', meaning: 'child' } },
       ],
     },
   },
@@ -73,16 +74,37 @@ export const denseCharacter: CharacterItem = {
   type: 'character', queueKind: 'new', id: '聽', hanzi: '聽', pinyin: 'tīng', meaning: 'listen', rank: 400, unlocks: 1,
   movie: {
     ...getMovieCoordinates('tīng'), actorName: 'Tina Fey', setName: 'My university library', roomName: 'Outside entrance',
-    isPrimitive: false, configured: true,
+    componentNote: null, isPrimitive: false, configured: true,
     components: [
-      { hanzi: '耳', propName: 'Headphones', character: null },
-      { hanzi: '王', propName: 'Crown', character: null },
-      { hanzi: '十', propName: 'Cross', character: null },
-      { hanzi: '罒', propName: 'Fishing net', character: null },
-      { hanzi: '一', propName: 'Pencil', character: null },
-      { hanzi: '心', propName: 'Heart', character: null },
+      { count: 1, hanzi: '耳', propName: 'Headphones', character: null },
+      { count: 1, hanzi: '王', propName: 'Crown', character: null },
+      { count: 1, hanzi: '十', propName: 'Cross', character: null },
+      { count: 1, hanzi: '罒', propName: 'Fishing net', character: null },
+      { count: 1, hanzi: '一', propName: 'Pencil', character: null },
+      { count: 1, hanzi: '心', propName: 'Heart', character: null },
     ],
   },
 }
 
-export type Sample = 'sequence' | 'missing' | 'dense' | 'direct'
+export const repeatedCharacter: CharacterItem = {
+  ...exampleCharacter, id: '朋', hanzi: '朋', pinyin: 'péng', meaning: 'friend',
+  movie: {
+    ...exampleCharacter.movie, ...getMovieCoordinates('péng'), actorName: 'Patrick Stewart',
+    components: [{ hanzi: '月', count: 2, propName: 'Moon', character: { pinyin: 'yuè', meaning: 'moon' } }],
+  },
+}
+
+export const shapeCharacter: CharacterItem = {
+  ...exampleCharacter, id: '马', hanzi: '马', pinyin: 'mǎ', meaning: 'horse',
+  movie: {
+    ...exampleCharacter.movie, ...getMovieCoordinates('mǎ'), actorName: 'Matt Damon', roomName: 'Bedroom',
+    componentNote: 'The first two bent strokes interlock. Place the horizontal stroke across the lower part, as shown in 马.',
+    components: [
+      { hanzi: '㇕', count: 1, propName: 'Coat hanger', character: null },
+      { hanzi: '㇉', count: 1, propName: 'Fishing hook', character: null },
+      { hanzi: '一', count: 1, propName: 'Pencil', character: null },
+    ],
+  },
+}
+
+export type Sample = 'sequence' | 'missing' | 'dense' | 'direct' | 'repeated' | 'shape'

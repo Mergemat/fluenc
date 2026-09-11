@@ -1,6 +1,7 @@
 import { parse } from 'csv-parse/sync'
 
-import { findHanziComposition, type HanziIndex } from '../src/lib/hanzi'
+import reviewedJson from '../src/data/reviewed-compositions.json'
+import { findHanziComposition, type HanziIndex, type ReviewedComposition } from '../src/lib/hanzi'
 
 const WORDS_URL =
   'https://adsonant.com/word-frequency-lists/Adsonant-1000-most-common-chinese-words.csv'
@@ -52,6 +53,7 @@ const hanziIndex = Object.fromEntries(
     [entry.radical, entry.decomposition],
   ]),
 ) as HanziIndex
+const reviewed = new Map((reviewedJson as ReviewedComposition[]).map(entry => [entry.character, entry]))
 
 const isHanzi = (value: string) => /[\p{Script=Han}\u2e80-\u2eff\u31c0-\u31ef]/u.test(value)
 const splitHanzi = (value: string) => Array.from(value).filter(isHanzi)
@@ -87,17 +89,24 @@ for (const word of words) {
   }
 }
 
+const compositions = new Map([...stats.keys()].map(hanzi => [hanzi, findHanziComposition(hanziIndex, hanzi, reviewed.get(hanzi))]))
+const incomplete = [...compositions].filter(([, composition]) => !composition).map(([hanzi]) => hanzi)
+if (incomplete.length) throw new Error(`Incomplete decompositions (${incomplete.length}): ${incomplete.join(' ')}. Review these before generating the curriculum.`)
+
 const characters = [...stats.entries()]
   .map(([hanzi, characterStats]) => {
     const dictionaryEntry = dictionary.get(hanzi)
     const standalone = firstStandaloneWord.get(hanzi)
+    const composition = compositions.get(hanzi)!
 
     return {
       id: hanzi,
       hanzi,
       pinyin: dictionaryEntry?.pinyin.at(0) ?? standalone?.pinyin ?? '',
       meaningEn: dictionaryEntry?.definition ?? standalone?.meaningEn ?? '',
-      components: findHanziComposition(hanziIndex, hanzi)?.components ?? [],
+      components: composition.components,
+      componentStructure: composition.structure,
+      componentNote: composition.glyphVariation || reviewed.get(hanzi)?.confidence === 'editorial' ? composition.note : null,
       frequencyRank: characterStats.rank,
       unlocks: characterStats.unlocks,
     }
@@ -110,10 +119,11 @@ const characters = [...stats.entries()]
   )
 
 const curriculum = {
-  version: '2026-08-27',
+  version: '2026-09-11',
   sources: {
     words: WORDS_URL,
     characters: CHARACTERS_URL,
+    decompositionReviews: 'src/data/reviewed-compositions.json',
   },
   words,
   characters,

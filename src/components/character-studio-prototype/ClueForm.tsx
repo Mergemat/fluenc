@@ -25,7 +25,7 @@ export function ClueForm({ cues, onChange, onBack, onNext }: {
     <div className="cs-fill-heading"><h2>Fill your clues</h2><span>2 / 2</span></div>
     <div className="cs-fields">
       {cues.map((cue, index) => <label key={cue.id} className={`cs-fill-field cs-field-${cue.kind}`}>
-        <span className={`cs-field-code ${cue.kind === 'prop' ? 'font-hanzi' : ''}`} lang={cue.kind === 'prop' ? 'zh-CN' : undefined}>{cue.code}</span>
+        <span className={`cs-field-code ${cue.kind === 'prop' ? 'font-hanzi' : ''}`} lang={cue.kind === 'prop' ? 'zh-CN' : undefined}>{cue.code}{cue.count && cue.count > 1 ? <sup className="cs-prop-count">×{cue.count}</sup> : null}</span>
         <span className="cs-field-entry"><span>{cue.position ? `${cue.position} prop` : cue.role}</span><input
           ref={(element) => { if (element) inputs.current.set(cue.id, element); else inputs.current.delete(cue.id) }}
           aria-label={`${cue.role} for ${cue.code}`}

@@ -26,6 +26,7 @@ import {
   parseCodebookItemId,
   type CodebookKind,
 } from '../lib/codebook'
+import { groupHanziComponents } from '../lib/hanzi'
 import { defaultToneRooms, getMovieCoordinates } from '../lib/pinyin'
 import { getToneSyllable } from '../lib/tones'
 import type {
@@ -171,7 +172,7 @@ function characterStudyItem(character: Character, mappings: MappingRows) {
   const actor = mappings.actors.find((item) => item.actorKey === coordinates.actorKey)
   const set = mappings.sets.find((item) => item.finalKey === coordinates.finalKey)
   const room = mappings.rooms.find((item) => item.tone === coordinates.tone)
-  const movieComponents = character.components.length ? character.components : [character.hanzi]
+  const movieComponents = groupHanziComponents(character.components)
   return {
     type: 'character' as const,
     id: character.id,
@@ -185,11 +186,13 @@ function characterStudyItem(character: Character, mappings: MappingRows) {
       actorName: actor?.actorName ?? '',
       setName: set?.setName ?? '',
       roomName: room?.roomName ?? defaultToneRooms[coordinates.tone],
-      isPrimitive: character.components.length === 0,
-      components: movieComponents.map((component) => {
+      isPrimitive: character.componentStructure === 'atomic',
+      componentNote: character.componentNote,
+      components: movieComponents.map(({ hanzi: component, count }) => {
         const componentCharacter = charactersById.get(component)
         return {
           hanzi: component,
+          count,
           propName: mappings.props.find((item) => item.component === component)?.propName ?? '',
           character: componentCharacter ? {
             pinyin: componentCharacter.pinyin,
@@ -199,7 +202,7 @@ function characterStudyItem(character: Character, mappings: MappingRows) {
       }),
       configured: Boolean(
         actor?.actorName && set?.setName && (room?.roomName || defaultToneRooms[coordinates.tone]) &&
-        movieComponents.every((component) => mappings.props.some((item) => item.component === component && item.propName)),
+        movieComponents.every(({ hanzi: component }) => mappings.props.some((item) => item.component === component && item.propName)),
       ),
     },
   }
@@ -349,8 +352,8 @@ export async function getDashboardHandler() {
         if (rightStarter < 0) return -1
         return leftStarter - rightStarter
       }
-      const leftMissing = left.components.filter((component) => !knownProps.has(component)).length
-      const rightMissing = right.components.filter((component) => !knownProps.has(component)).length
+      const leftMissing = [...new Set(left.components)].filter((component) => !knownProps.has(component)).length
+      const rightMissing = [...new Set(right.components)].filter((component) => !knownProps.has(component)).length
       return leftMissing - rightMissing || left.frequencyRank - right.frequencyRank
     })
     .slice(0, remainingCharacterGoal)

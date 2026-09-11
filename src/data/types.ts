@@ -4,6 +4,8 @@ export type Character = {
   pinyin: string
   meaningEn: string
   components: string[]
+  componentStructure: 'atomic' | 'compound'
+  componentNote: string | null
   frequencyRank: number
   unlocks: number
 }
@@ -19,7 +21,7 @@ export type Word = {
 
 export type Curriculum = {
   version: string
-  sources: { words: string; characters: string }
+  sources: { words: string; characters: string; decompositionReviews: string }
   characters: Character[]
   words: Word[]
 }

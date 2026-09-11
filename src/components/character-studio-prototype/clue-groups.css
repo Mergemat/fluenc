@@ -1,0 +1,89 @@
+/* A: all props share a shelf; each sound cue has its own note below. */
+.cs-shelf-group { display: grid; gap: 9px; }
+.cs-shelf-parts > .cs-components { margin-top: 6px; }
+.cs-shelf-sound { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 9px; }
+.cs-shelf-parts > small, .cs-shape-group > small, .cs-sound-group > small,
+.cs-cast-parts > small, .cs-strip-parts > small { display: block; line-height: 1.3; }
+.cs-shelf-parts .cs-components .cs-clue { display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 6px; text-align: left; }
+.cs-shelf-parts .cs-clue > b { grid-column: 1; grid-row: 1 / span 2; }
+.cs-shelf-parts .cs-clue > strong { grid-column: 2; grid-row: 1; }
+.cs-shelf-parts .cs-clue small { grid-column: 2; grid-row: 2; }
+
+/* C: component shape and pronunciation form two separate groups. */
+.cs-two-groups { display: grid; grid-template-columns: .9fr 1.3fr; gap: 9px; }
+.cs-shape-group .cs-components { margin-top: 10px; flex-direction: column; gap: 10px; align-items: center; }
+.cs-sound-group { display: grid; align-content: start; gap: 10px; }
+.cs-sound-group > .cs-clue { display: grid; grid-template-columns: 50px minmax(0, 1fr); align-items: center; column-gap: 8px; }
+.cs-sound-group > .cs-clue small { grid-column: 1 / -1; }
+.cs-sound-group > .cs-clue > b { font-size: 23px; }
+.cs-sound-group > .cs-clue > strong { font-size: 12px; }
+
+/* D: the room sits inside its place; the props belong to the entire scene. */
+.cs-cast-group { display: grid; grid-template-columns: .85fr 1.3fr; gap: 9px; }
+.cs-location-note { display: grid; gap: 10px; }
+.cs-room-within { margin-inline: -6px; padding: 5px 8px; border-radius: 6px; background: #f2ecdf; }
+.cs-room-within > .cs-clue { display: flex; flex-direction: row; align-items: center; gap: 6px; }
+.cs-room-within > .cs-clue small { order: 3; font-size: 8px; }
+.cs-room-within > .cs-clue > b { font-size: 21px; }
+.cs-room-within > .cs-clue > strong { font-size: 12px; min-width: 0; flex: 1; }
+.cs-cast-parts { grid-column: 1 / -1; }
+.cs-cast-parts .cs-components { margin-top: 6px; }
+.cs-cast-parts .cs-components .cs-clue { display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 6px; text-align: left; }
+.cs-cast-parts .cs-clue > b { grid-column: 1; grid-row: 1 / span 2; }
+.cs-cast-parts .cs-clue > strong { grid-column: 2; grid-row: 1; }
+.cs-cast-parts .cs-clue small { grid-column: 2; grid-row: 2; }
+
+/* E: four colored columns make one continuous reference strip. */
+.cs-strip-group { display: grid; grid-template-columns: 1.1fr 1fr 1.2fr 1fr; border-radius: 13px; overflow: clip; }
+.cs-strip-group > .cs-note { border-radius: 0; padding: 12px 9px; }
+.cs-strip-group .cs-clue small { min-height: 22px; }
+.cs-strip-group .cs-clue > b { font-size: 25px; }
+.cs-strip-group .cs-clue > strong { font-size: 12px; }
+.cs-strip-parts .cs-components { margin-top: 8px; flex-direction: column; gap: 9px; align-items: flex-start; }
+.cs-strip-parts .cs-components .cs-clue { align-items: flex-start; text-align: left; }
+.cs-strip-parts .cs-clue small { display: none; }
+.cs-strip-parts .cs-clue > b { font-size: 27px; }
+
+.cs-dense .cs-shape-group .cs-components { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
+.cs-dense .cs-strip-parts .cs-components { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; align-items: start; }
+.cs-dense .cs-strip-parts .cs-components .cs-clue { min-width: 0; }
+.cs-dense .cs-shelf-parts .cs-components .cs-clue,
+.cs-dense .cs-cast-parts .cs-components .cs-clue { display: flex; flex-direction: column; text-align: center; }
+
+@media (max-height: 710px) {
+  .cs-shelf-group, .cs-shelf-sound, .cs-two-groups, .cs-cast-group { gap: 6px; }
+  .cs-sound-group { gap: 8px; }
+  .cs-location-note { gap: 7px; }
+  .cs-strip-group > .cs-note { padding: 9px 7px; }
+}
+
+@media (max-height: 610px) and (max-width: 767px) {
+  .cs-notebook .cs-target-hanzi { font-size: 70px; }
+  .cs-notebook .cs-target-pinyin > strong { font-size: 23px; }
+  .cs-notebook .cs-character-target { gap: 3px; }
+  .cs-shelf-group, .cs-shelf-sound, .cs-two-groups, .cs-cast-group { gap: 5px; }
+  .cs-sound-group { gap: 6px; }
+  .cs-sound-group > .cs-clue { grid-template-columns: 42px minmax(0, 1fr); column-gap: 5px; }
+  .cs-sound-group > .cs-clue > b { font-size: 21px; }
+  .cs-sound-group > .cs-clue > strong { font-size: 11px; }
+  .cs-room-within { padding: 4px 6px; margin-inline: -3px; }
+  .cs-cast-group > .cs-note { padding-block: 4px; }
+  .cs-scene-cast .cs-location-note { gap: 4px; }
+  .cs-strip-group > .cs-note { padding: 7px 5px; }
+  .cs-strip-group .cs-clue > b { font-size: 21px; }
+  .cs-strip-group .cs-clue > strong { font-size: 10px; }
+  .cs-dense .cs-shelf-parts .cs-components,
+  .cs-dense .cs-cast-parts .cs-components { gap: 4px; }
+  .cs-dense .cs-shelf-parts .cs-components .cs-clue,
+  .cs-dense .cs-cast-parts .cs-components .cs-clue { flex: 1; min-width: 0; max-width: none; }
+  .cs-dense .cs-shape-group .cs-components { gap: 5px; margin-top: 5px; }
+  .cs-dense .cs-shape-group .cs-components .cs-clue { min-width: 0; }
+  .cs-dense .cs-sound-group { gap: 4px; }
+  .cs-dense .cs-location-note > .cs-clue { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 3px 5px; align-items: center; }
+  .cs-dense .cs-location-note > .cs-clue small { grid-column: 1 / -1; }
+  .cs-dense .cs-cast-parts .cs-components { margin-top: 3px; }
+  .cs-dense .cs-strip-parts .cs-components { grid-template-columns: 1fr; gap: 4px; }
+  .cs-dense .cs-strip-parts .cs-components .cs-clue { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: center; gap: 2px; }
+  .cs-dense .cs-strip-parts .cs-components .cs-clue > b { font-size: 17px; }
+  .cs-dense .cs-strip-parts .cs-components .cs-clue > strong { font-size: 9px; }
+}

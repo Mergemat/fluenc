@@ -65,8 +65,9 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
         <footer className="grid gap-3 border-t border-line bg-canvas/55 px-4 py-3 sm:px-5">
           <section>
             <p className="m-0 text-[10px] font-bold uppercase tracking-wider text-faint">Props</p>
+            {item.movie.componentNote ? <details className="text-xs text-muted"><summary>Shape note</summary><p>{item.movie.componentNote}</p></details> : null}
             <div className="mt-1.5 flex gap-2">
-              {props.map((prop) => <Cue key={prop.hanzi} glyph={prop.hanzi} value={prop.propName} fallback="Unnamed" />)}
+              {props.map((prop) => <Cue key={prop.hanzi} glyph={`${prop.hanzi}${prop.count > 1 ? ` ×${prop.count}` : ''}`} value={prop.propName} fallback="Unnamed" />)}
             </div>
           </section>
           <section className="grid grid-cols-3 overflow-hidden rounded-lg border border-line bg-paper">
@@ -86,7 +87,7 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
             <MappingField hideLabel glyph={tone.mark} label="Room" value={roomName} onChange={setRoomName} invalid={showValidation && !roomName.trim()} />
           </FieldGroup>
           <FieldGroup number="02" title="Scene props">
-            {props.map((prop, index) => <MappingField glyph={prop.hanzi} invalid={showValidation && !prop.propName.trim()} key={prop.hanzi} label="Prop" locked={Boolean(item.movie.components[index]?.propName.trim())} value={prop.propName} onChange={(value) => setProps((current) => current.map((entry, entryIndex) => entryIndex === index ? { ...entry, propName: value } : entry))} />)}
+            {props.map((prop, index) => <MappingField glyph={`${prop.hanzi}${prop.count > 1 ? ` ×${prop.count}` : ''}`} invalid={showValidation && !prop.propName.trim()} key={prop.hanzi} label="Prop" locked={Boolean(item.movie.components[index]?.propName.trim())} value={prop.propName} onChange={(value) => setProps((current) => current.map((entry, entryIndex) => entryIndex === index ? { ...entry, propName: value } : entry))} />)}
           </FieldGroup>
         </div>
         <footer className="shrink-0 border-t border-line p-4 md:p-5">
