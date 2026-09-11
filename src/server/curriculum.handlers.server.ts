@@ -26,6 +26,7 @@ import {
   parseCodebookItemId,
   type CodebookKind,
 } from '../lib/codebook'
+import { directCharacters } from '../lib/character-props'
 import { groupHanziComponents } from '../lib/hanzi'
 import { defaultToneRooms, getMovieCoordinates } from '../lib/pinyin'
 import { getToneSyllable } from '../lib/tones'
@@ -172,7 +173,7 @@ function characterStudyItem(character: Character, mappings: MappingRows) {
   const actor = mappings.actors.find((item) => item.actorKey === coordinates.actorKey)
   const set = mappings.sets.find((item) => item.finalKey === coordinates.finalKey)
   const room = mappings.rooms.find((item) => item.tone === coordinates.tone)
-  const movieComponents = groupHanziComponents(character.components)
+  const movieComponents = groupHanziComponents(directCharacters.has(character.hanzi) ? [character.hanzi] : character.components)
   return {
     type: 'character' as const,
     id: character.id,
@@ -202,7 +203,7 @@ function characterStudyItem(character: Character, mappings: MappingRows) {
         }
       }),
       configured: Boolean(
-        actor?.actorName && set?.setName && (room?.roomName || defaultToneRooms[coordinates.tone]) &&
+        (directCharacters.has(character.hanzi) || (actor?.actorName && set?.setName && (room?.roomName || defaultToneRooms[coordinates.tone]))) &&
         movieComponents.every(({ hanzi: component }) => mappings.props.some((item) => item.component === component && item.propName)),
       ),
     },

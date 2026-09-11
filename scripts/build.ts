@@ -18,6 +18,7 @@ const result = await generateSW({
     'assets/**/*.{css,js}',
     'fonts/**/*.woff2',
     'audio/**/*.mp3',
+    'hanzi/**/*.json',
     'icon.svg',
     'manifest.webmanifest',
   ],

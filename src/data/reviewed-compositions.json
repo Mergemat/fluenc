@@ -325,17 +325,17 @@
     "components": [
       "囗",
       "丷",
-      "丨",
       "土",
       "灬"
     ],
     "structure": "compound",
-    "decomposition": null,
+    "decomposition": "⿱⿱⿴囗丷土灬",
     "approximate": true,
-    "note": "Put 丷 inside the box. The central 丨 continues into the 土 shape below, sharing its vertical stroke. Place 灬 underneath.",
+    "note": "The vertical of 土 extends into the upper enclosure. It is one stroke, included in 土 rather than counted again as 丨.",
     "sources": [
       "https://babelstone.co.uk/CJK/IDS.TXT",
-      "https://data.dong-chinese.com/dictionary/dong-chinese-dictionary-2026-09-01.jsonl"
+      "https://data.dong-chinese.com/dictionary/dong-chinese-dictionary-2026-09-01.jsonl",
+      "https://github.com/skishore/makemeahanzi/blob/master/graphics.txt"
     ],
     "confidence": "editorial"
   },
@@ -1427,5 +1427,52 @@
       "https://babelstone.co.uk/CJK/IDS.TXT"
     ],
     "confidence": "verified"
+  },
+  {
+    "character": "生",
+    "structure": "compound",
+    "approximate": false,
+    "sources": [
+      "https://github.com/skishore/makemeahanzi/blob/master/graphics.txt"
+    ],
+    "confidence": "verified",
+    "components": [
+      "𠂉",
+      "土"
+    ],
+    "decomposition": "⿱𠂉土",
+    "note": "The upper slant and horizontal form 𠂉; the remaining three strokes form 土."
+  },
+  {
+    "character": "求",
+    "structure": "compound",
+    "approximate": false,
+    "sources": [
+      "https://github.com/skishore/makemeahanzi/blob/master/graphics.txt"
+    ],
+    "confidence": "verified",
+    "components": [
+      "一",
+      "氺",
+      "丶"
+    ],
+    "decomposition": "⿻⿻一氺丶",
+    "note": "The final upper-right dot is a separate prop alongside 一 and the water shape 氺."
+  },
+  {
+    "character": "首",
+    "structure": "compound",
+    "approximate": false,
+    "sources": [
+      "https://github.com/skishore/makemeahanzi/blob/master/graphics.txt"
+    ],
+    "confidence": "verified",
+    "components": [
+      "丷",
+      "一",
+      "自"
+    ],
+    "decomposition": "⿳丷一自",
+    "note": "The horizontal below 丷 is separate from the six strokes of 自."
   }
 ]

@@ -25,3 +25,16 @@ test('curated source data cannot silently disappear during regeneration', () => 
     expect(findHanziComposition(index, entry.character, entry)).not.toBeNull()
   }
 })
+
+test('every course prop owns real strokes in the shipped glyph files', async () => {
+  const { directCharacters } = await import('./character-props')
+  for (const character of curriculum.characters) {
+    const path = new URL(`../../public/hanzi/${character.hanzi}.json`, import.meta.url)
+    const shape = await Bun.file(path).json() as { strokes: string[]; medians: number[][][]; owners: string[] }
+    const components = directCharacters.has(character.hanzi) ? [character.hanzi] : character.components
+    expect(shape.owners.length, character.hanzi).toBe(shape.strokes.length)
+    expect(shape.medians.length, character.hanzi).toBe(shape.strokes.length)
+    expect([...new Set(shape.owners)].sort(), character.hanzi).toEqual([...new Set(components)].sort())
+    expect(shape.strokes.every(path => path.startsWith('M') && path.includes('Z')), character.hanzi).toBeTrue()
+  }
+})

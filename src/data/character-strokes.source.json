@@ -1,0 +1,6 @@
+{
+  "dictionary": "https://raw.githubusercontent.com/skishore/makemeahanzi/bddc96d41bef78427ed0e034e9f7e31d71fd1b92/dictionary.txt",
+  "graphics": "https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1",
+  "license": "Arphic Public License",
+  "modification": "Fluenc adds component owners to unchanged stroke paths and medians."
+}

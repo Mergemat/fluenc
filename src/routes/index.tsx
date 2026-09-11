@@ -9,7 +9,6 @@ import { PalaceView } from '../components/PalaceView'
 import { ProfileDialog } from '../components/ProfileDialog'
 import { ReadingView } from '../components/ReadingView'
 import { ReviewView } from '../components/ReviewView'
-import { exampleQueues, type Example } from '../components/character-studio-prototype/data'
 import { getOfflineDashboard } from '../offline/progress'
 import { useOfflineSync } from '../offline/useOfflineSync'
 
@@ -24,24 +23,14 @@ const dashboardQueryOptions = queryOptions({
 })
 
 export const Route = createFileRoute('/')({
-  validateSearch: (search: Record<string, unknown>): { example?: Example } => ({
-    example: typeof search.example === 'string' && Object.hasOwn(exampleQueues, search.example) ? search.example as Example : undefined,
-  }),
   loader: ({ context }) => context.queryClient.ensureQueryData(dashboardQueryOptions),
   component: Home,
 })
 
 function Home() {
-  const search = Route.useSearch()
-  const navigate = Route.useNavigate()
   const { data } = useSuspenseQuery(dashboardQueryOptions)
   useOfflineSync(data)
-  const [selectedView, setSelectedView] = useState<AppView>(() => data.codebookQueue.length + data.reviewQueue.length ? 'review' : 'lessons')
-  const view = import.meta.env.DEV && search.example ? 'lessons' : selectedView
-  const setView = (next: AppView) => {
-    setSelectedView(next)
-    if (search.example) void navigate({ search: {}, replace: true })
-  }
+  const [view, setView] = useState<AppView>(() => data.codebookQueue.length + data.reviewQueue.length ? 'review' : 'lessons')
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (

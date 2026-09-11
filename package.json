@@ -10,7 +10,8 @@
     "data:sync": "bun scripts/sync-curriculum.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "data:strokes": "bun scripts/sync-character-strokes.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.17.4",
