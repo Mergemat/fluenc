@@ -22,9 +22,9 @@ export function CharacterTarget({ studio }: { studio: Studio }) {
 function Clue({ cue }: { cue: Cue }) {
   const tone = cue.kind === 'room' ? getToneDetail(Number(cue.code)) : null
   return <div className={`cs-clue cs-clue-${cue.kind}`}>
-    <small>{cue.position || cue.role}</small>
+    {cue.kind !== 'prop' ? <small>{cue.role}</small> : null}
     <b className={cue.kind === 'prop' ? 'font-hanzi' : ''} lang={cue.kind === 'prop' ? 'zh-CN' : undefined}>{tone ? tone.contour : cue.code}{cue.count && cue.count > 1 ? <sup className="cs-prop-count">×{cue.count}</sup> : null}</b>
-    <strong className={cue.name.trim() ? '' : 'cs-missing'}>{cue.name || (cue.kind === 'prop' ? 'Choose prop' : `Choose your ${cue.kind}`)}</strong>
+    <strong className={cue.name.trim() ? '' : 'cs-missing'}>{cue.name.trim() || (cue.kind === 'prop' ? 'Your prop' : `Choose your ${cue.kind}`)}</strong>
   </div>
 }
 

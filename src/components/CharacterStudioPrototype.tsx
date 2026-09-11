@@ -37,14 +37,13 @@ export function CharacterStudioPrototype({ items, example }: { items: CharacterI
   const decomposition = compositions?.[item.hanzi]?.decomposition
   const simpleParts = item.movie.components.length === 2 && item.movie.components.every(part => part.count === 1) && decomposition?.slice(1) === item.movie.components.map((part) => part.hanzi).join('')
   const layout = simpleParts && decomposition?.startsWith('⿰') ? 'horizontal' : simpleParts && decomposition?.startsWith('⿱') ? 'vertical' : undefined
-  const positions = layout === 'horizontal' ? ['Left', 'Right'] : layout === 'vertical' ? ['Top', 'Bottom'] : []
   const initialCues: Cue[] = direct ? [
     { id: 'prop', kind: 'prop', code: item.hanzi, name: item.movie.components.find(part => part.hanzi === item.hanzi)?.propName ?? '', role: 'Reusable prop' },
   ] : [
     { id: 'actor', kind: 'actor', code: item.movie.actorKey, name: item.movie.actorName, role: actorLabels[item.movie.actorCategory] },
     { id: 'set', kind: 'set', code: item.movie.finalKey, name: item.movie.setName, role: 'Place code' },
     { id: 'room', kind: 'room', code: String(item.movie.tone), name: item.movie.roomName, role: 'Tone room' },
-    ...item.movie.components.map((part, partIndex): Cue => ({ id: `prop-${partIndex}`, kind: 'prop', code: part.hanzi, name: part.propName, count: part.count, role: 'Prop', position: positions[partIndex] })),
+    ...item.movie.components.map((part, partIndex): Cue => ({ id: `prop-${partIndex}`, kind: 'prop', code: part.hanzi, name: part.propName, count: part.count, role: 'Prop' })),
   ]
   const cues = initialCues.map((cue) => ({ ...cue, name: names[cueKey(cue)] ?? cue.name }))
   const studio: Studio = { item, cues, layout, meaning: splitMeaning(item.meaning).primary }

@@ -4,10 +4,9 @@
 .cs-shelf-sound { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 9px; }
 .cs-shelf-parts > small, .cs-shape-group > small, .cs-sound-group > small,
 .cs-cast-parts > small, .cs-strip-parts > small { display: block; line-height: 1.3; }
-.cs-shelf-parts .cs-components .cs-clue { display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 6px; text-align: left; }
-.cs-shelf-parts .cs-clue > b { grid-column: 1; grid-row: 1 / span 2; }
+.cs-shelf-parts .cs-components .cs-clue { display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 6px; align-items: center; text-align: left; }
+.cs-shelf-parts .cs-clue > b { grid-column: 1; grid-row: 1; }
 .cs-shelf-parts .cs-clue > strong { grid-column: 2; grid-row: 1; }
-.cs-shelf-parts .cs-clue small { grid-column: 2; grid-row: 2; }
 
 /* C: component shape and pronunciation form two separate groups. */
 .cs-two-groups { display: grid; grid-template-columns: .9fr 1.3fr; gap: 9px; }
@@ -28,10 +27,9 @@
 .cs-room-within > .cs-clue > strong { font-size: 12px; min-width: 0; flex: 1; }
 .cs-cast-parts { grid-column: 1 / -1; }
 .cs-cast-parts .cs-components { margin-top: 6px; }
-.cs-cast-parts .cs-components .cs-clue { display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 6px; text-align: left; }
-.cs-cast-parts .cs-clue > b { grid-column: 1; grid-row: 1 / span 2; }
+.cs-cast-parts .cs-components .cs-clue { display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 6px; align-items: center; text-align: left; }
+.cs-cast-parts .cs-clue > b { grid-column: 1; grid-row: 1; }
 .cs-cast-parts .cs-clue > strong { grid-column: 2; grid-row: 1; }
-.cs-cast-parts .cs-clue small { grid-column: 2; grid-row: 2; }
 
 /* E: four colored columns make one continuous reference strip. */
 .cs-strip-group { display: grid; grid-template-columns: 1.1fr 1fr 1.2fr 1fr; border-radius: 13px; overflow: clip; }

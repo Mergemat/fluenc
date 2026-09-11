@@ -33,7 +33,6 @@
 .cs-missing { color: #817c70; font-weight: 450 !important; }
 .cs-components { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 .cs-components .cs-clue { min-width: 42px; max-width: 110px; align-items: center; text-align: center; }
-.cs-components .cs-clue small { order: 3; font-size: 8px; }
 .cs-vertical { flex-direction: column; align-items: center; gap: 6px; }
 /* B: a character above four compact notes, as in the selected reference. */
 .cs-notebook { height: 100%; display: grid; grid-template-rows: minmax(115px, 1fr) auto; gap: 16px; }
@@ -47,7 +46,6 @@
 .cs-note .cs-clue > strong { font-size: 14px; }
 .cs-note-parts > .cs-components { margin-top: 5px; gap: 12px; }
 .cs-note-parts .cs-components .cs-clue { flex: 1; min-width: 0; max-width: none; }
-.cs-note-parts .cs-clue small { display: none; }
 .cs-note-parts .cs-clue > b { font-size: 32px; }
 .cs-scene-actions { flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-top: 6px; }
 .cs-scene-actions p { display: flex; flex-direction: column; gap: 3px; font-size: 11px; color: var(--color-muted); }
@@ -80,7 +78,6 @@
 .cs-dense .cs-components .cs-clue { min-width: 35px; max-width: 64px; }
 .cs-dense .cs-components .cs-clue > b { font-size: 26px; }
 .cs-dense .cs-components .cs-clue > strong { font-size: 10px; }
-.cs-dense .cs-components .cs-clue small { display: none; }
 .cs-dense .cs-components .cs-clue { gap: 2px; }
 .cs-dense .cs-note-parts .cs-components .cs-clue { flex: 0 0 26%; min-width: 0; }
 .cs-dense .cs-note-parts .cs-components .cs-clue > b { font-size: 22px; }

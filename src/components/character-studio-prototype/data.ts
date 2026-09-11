@@ -12,7 +12,6 @@ export type Cue = {
   name: string
   role: string
   count?: number
-  position?: string
 }
 
 export const variants = [
