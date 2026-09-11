@@ -6,6 +6,7 @@ import {
   Scripts,
 } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
+import { PullToRefresh } from '../components/PullToRefresh'
 
 import appCss from '../styles.css?url'
 
@@ -39,6 +40,7 @@ function RootComponent() {
   return (
     <RootDocument>
       <QueryClientProvider client={queryClient}>
+        <PullToRefresh />
         <Outlet />
       </QueryClientProvider>
     </RootDocument>

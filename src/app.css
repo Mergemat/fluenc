@@ -1,5 +1,6 @@
 /* Shared shell and controls follow Character Studio's canvas and clue colors. */
 .app-layout { min-height: 100dvh; }
+.pull-to-refresh { position: fixed; top: env(safe-area-inset-top); left: 50%; z-index: 100; display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid var(--color-line); border-radius: 24px; background: var(--color-paper); color: var(--color-glaze); font-size: 12px; white-space: nowrap; pointer-events: none; }
 .app-header { height: 60px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; padding: 0 18px; background: var(--color-canvas); }
 .app-brand { display: flex; align-items: center; min-height: 44px; }
 .app-brand > img { display: block; width: 132px; height: auto; filter: brightness(1.04); mix-blend-mode: darken; }
