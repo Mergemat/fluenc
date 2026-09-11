@@ -1,10 +1,9 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: "Fluenc Components";
-  src: url('/fonts/fluenc-components/fluenc-components.woff2') format('woff2');
+  font-family: "Fluenc Hanzi";
+  src: url('/fonts/fluenc-hanzi.woff2') format('woff2');
   font-display: swap;
-  unicode-range: U+2E80-2EFF, U+31C0-31EE, U+20000-323AF;
 }
 
 @theme {
@@ -16,8 +15,8 @@
   --color-canvas: #f1eee5;
   --color-danger: #c43b27;
   --color-glaze: #ef4c2f;
-  --font-ui: "Arial Nova", "Helvetica Neue", Arial, system-ui, sans-serif;
-  --font-hanzi: "Fluenc Components", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  --font-ui: "Arial Nova", "Helvetica Neue", Arial, "Fluenc Hanzi", system-ui, sans-serif;
+  --font-hanzi: "Fluenc Hanzi", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
   --animate-pop: pop .2s ease-out;
 
   @keyframes pop { from { scale: .8; opacity: 0; } }

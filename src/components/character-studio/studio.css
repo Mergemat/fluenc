@@ -24,7 +24,7 @@
 .cs-prop-choice:disabled { opacity: .5; }
 .cs-prop-glyph { font-size: 34px; font-weight: 400; color: var(--cs-gold); line-height: 1.1; }
 .cs-prop-name { font-size: 12px; line-height: 1.3; font-weight: 650; overflow-wrap: anywhere; }
-.cs-prop-count { font-family: var(--font-sans); font-size: 10px; margin-left: 3px; vertical-align: super; }
+.cs-prop-count { font-family: var(--font-ui); font-size: 10px; margin-left: 3px; vertical-align: super; }
 .cs-target-hanzi { font-size: clamp(100px, 18dvh, 170px); line-height: 1; font-weight: 500; }
 .cs-target-pinyin { position: relative; display: flex; align-items: center; justify-content: center; }
 .cs-target-pinyin > strong { font-size: 34px; line-height: 1.15; font-weight: 750; letter-spacing: -.5px; }

@@ -26,6 +26,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
+      { rel: 'preload', href: '/fonts/fluenc-hanzi.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
       { rel: 'manifest', href: '/manifest.webmanifest' },
       { rel: 'icon', href: '/icon.svg', type: 'image/svg+xml' },
     ],

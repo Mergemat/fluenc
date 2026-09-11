@@ -1,4 +1,4 @@
-/* Shared second screen. The current grilling round compares the first screen. */
+/* Association fields on the second lesson screen. */
 .cs-fill-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 16px; }
 .cs-fill-screen .cs-character-target { flex-shrink: 0; gap: 3px; padding-block: 4px; }
 .cs-fill-screen .cs-target-hanzi { font-size: 58px; }
