@@ -1,0 +1,28 @@
+/* Shared second screen. The current grilling round compares the first screen. */
+.cs-fill-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 16px; }
+.cs-fill-screen .cs-character-target { flex-shrink: 0; gap: 3px; padding-block: 4px; }
+.cs-fill-screen .cs-target-hanzi { font-size: 58px; }
+.cs-fill-screen .cs-target-pinyin > strong { font-size: 23px; }
+.cs-clue-form { display: flex; flex-direction: column; gap: 12px; min-height: 0; flex: 1; }
+.cs-fill-heading { display: flex; align-items: center; justify-content: space-between; }
+.cs-fill-heading h2 { font-size: 14px; font-weight: 700; }
+.cs-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.cs-fill-field { display: flex; min-width: 0; align-items: center; border: 1px solid #c7c4ba; border-radius: 7px; background: var(--color-paper); }
+.cs-fill-field:focus-within { outline: 2px solid var(--cs-blue); outline-offset: 1px; }
+.cs-fill-field:has([aria-invalid=true]) { border-color: #af483a; }
+.cs-fill-field:not(.cs-field-prop) { grid-column: 1 / -1; }
+.cs-field-code { display: grid; place-items: center; width: 45px; flex-shrink: 0; font-size: 18px; font-weight: 600; color: var(--cs-blue); }
+.cs-field-room .cs-field-code { color: var(--cs-green); }
+.cs-field-prop .cs-field-code { color: var(--cs-gold); font-size: 26px; font-weight: 400; width: 37px; }
+.cs-field-entry { min-width: 0; flex: 1; display: flex; flex-direction: column; padding: 6px 9px 6px 0; }
+.cs-field-entry > span { font-size: 9px; color: var(--color-muted); }
+.cs-field-entry input { width: 100%; min-width: 0; height: 25px; font-size: 16px; line-height: 25px; font-weight: 550; background: transparent; outline: none; }
+.cs-field-entry input::placeholder { color: #969183; font-weight: 400; }
+.cs-fill-actions { margin-top: auto; flex-shrink: 0; }
+.cs-fill-actions > p { min-height: 15px; font-size: 10px; color: var(--color-muted); margin-bottom: 8px; }
+.cs-fill-actions > div { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.cs-back { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding-right: 10px; font-size: 12px; font-weight: 600; }
+.cs-dense .cs-fields { gap: 5px; }
+.cs-dense .cs-field-entry { padding-block: 3px; }
+.cs-next { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 45px; flex-shrink: 0; padding: 10px 15px; border-radius: 8px; background: var(--color-ink); color: var(--color-paper); font-size: 14px; font-weight: 700; }
+.cs-next:hover { background: #30505b; }

@@ -23,8 +23,8 @@ const dashboardQueryOptions = queryOptions({
 })
 
 export const Route = createFileRoute('/')({
-  validateSearch: (search: Record<string, unknown>): { variant?: 'a' | 'b' | 'c'; example?: 'ming' } => ({
-    variant: search.variant === 'a' || search.variant === 'b' || search.variant === 'c' ? search.variant : undefined,
+  validateSearch: (search: Record<string, unknown>): { variant?: 'a' | 'b' | 'c' | 'd' | 'e'; example?: 'ming' } => ({
+    variant: search.variant === 'a' || search.variant === 'b' || search.variant === 'c' || search.variant === 'd' || search.variant === 'e' ? search.variant : undefined,
     example: search.example === 'ming' ? 'ming' : undefined,
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(dashboardQueryOptions),

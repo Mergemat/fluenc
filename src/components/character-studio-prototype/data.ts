@@ -3,7 +3,7 @@ import type { BuildItem } from '../../server/curriculum'
 import { getMovieCoordinates } from '../../lib/pinyin'
 
 export type CharacterItem = Extract<BuildItem, { type: 'character' }>
-export type Variant = 'a' | 'b' | 'c'
+export type Variant = 'a' | 'b' | 'c' | 'd' | 'e'
 export type CueKind = 'actor' | 'set' | 'room' | 'prop'
 export type Cue = {
   id: string
@@ -15,9 +15,11 @@ export type Cue = {
 }
 
 export const variants = [
-  { id: 'a', name: 'Character canvas' },
-  { id: 'b', name: 'Scene sentence' },
-  { id: 'c', name: 'Shape / sound' },
+  { id: 'a', name: 'Open canvas' },
+  { id: 'b', name: 'Notebook' },
+  { id: 'c', name: 'Cinema' },
+  { id: 'd', name: 'Side notes' },
+  { id: 'e', name: 'Scene script' },
 ] as const
 
 export const exampleCharacter: CharacterItem = {
@@ -55,3 +57,21 @@ export const exampleCharacters: CharacterItem[] = [
     },
   },
 ]
+
+export const denseCharacter: CharacterItem = {
+  type: 'character', queueKind: 'new', id: '聽', hanzi: '聽', pinyin: 'tīng', meaning: 'listen', rank: 400, unlocks: 1,
+  movie: {
+    ...getMovieCoordinates('tīng'), actorName: 'Tina Fey', setName: 'My university library', roomName: 'Outside entrance',
+    isPrimitive: false, configured: true,
+    components: [
+      { hanzi: '耳', propName: 'Headphones', character: null },
+      { hanzi: '王', propName: 'Crown', character: null },
+      { hanzi: '十', propName: 'Cross', character: null },
+      { hanzi: '罒', propName: 'Fishing net', character: null },
+      { hanzi: '一', propName: 'Pencil', character: null },
+      { hanzi: '心', propName: 'Heart', character: null },
+    ],
+  },
+}
+
+export type Sample = 'sequence' | 'missing' | 'dense'
