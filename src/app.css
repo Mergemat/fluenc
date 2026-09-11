@@ -144,8 +144,6 @@
   .recall-content { display: flex; flex-direction: column; overflow: visible; }
   .recall-target { flex: 1; min-height: auto; }
   .review-character.cs-studio { flex: 1; height: auto; min-height: 0; }
-  .review-character .cs-character-and-props { container-type: size; }
-  .review-character .cs-character-drawing { max-width: max(0px, calc(100cqh - 110px)); }
 }
 @media (max-width: 380px) {
   .study-page { padding-inline: 12px; }
