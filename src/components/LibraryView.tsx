@@ -6,6 +6,7 @@ import { getOfflineLibrary } from '../offline/progress'
 import type { LibraryData } from '../server/curriculum'
 import { getHanziCompositions, type HanziCompositions } from '../server/hanzi'
 import { MandarinAudioButton } from './MandarinAudioButton'
+import { DictionaryMeanings } from './DictionaryMeanings'
 import { NeutralToneBadge } from './NeutralToneHint'
 import { Button } from './ui/Button'
 import { Page, PageHeader, Status } from './ui/Layout'
@@ -124,6 +125,7 @@ function LibraryCard({ composition, item }: {
             </>
           ) : null}
         </div>
+        <DictionaryMeanings meanings={meaning.alternatives} />
       </div>
       <div className="library-status">
         <span className={`status-tag status-${item.status}`}>

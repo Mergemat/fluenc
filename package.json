@@ -27,6 +27,7 @@
     "idb": "^8.0.3",
     "lucide-react": "^1.34.0",
     "nitro": "^3.0.260610-beta",
+    "pinyin-pro": "^3.29.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "ts-fsrs": "^5.4.1",

@@ -22,7 +22,8 @@ export type Word = {
   rank: number
   hanzi: string
   pinyin: string
-  meaningEn: string
+  meaning: string
+  dictionaryMeanings: string[]
   characterIds: string[]
 }
 
@@ -34,7 +35,7 @@ export type Curriculum = {
     decompositionReviews: string
     keywordReviews: string
     dictionary: string
-    wordCorrections: string
+    wordReviews: string
   }
   characters: Character[]
   words: Word[]

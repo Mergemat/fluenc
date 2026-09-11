@@ -1,13 +1,23 @@
 import { z } from 'zod'
+import { convert } from 'pinyin-pro'
 
 import { isHanziCharacter } from './hanzi'
-import { getMovieCoordinates } from './pinyin'
 
 export type DictionaryReading = {
   traditional: string
   simplified: string
   pinyin: string
   senses: string[]
+}
+
+const normalizePinyin = (pinyin: string) => pinyin.normalize('NFC').toLowerCase().replace(/[\s'’]/g, '').replaceAll('u:', 'ü').replaceAll('v', 'ü')
+
+export function dictionaryPinyin(pinyin: string) {
+  return convert(pinyin.toLowerCase().replaceAll('u:', 'ü').replace(/5\b/g, ''))
+}
+
+export function samePronunciation(selected: string, source: string) {
+  return normalizePinyin(selected) === normalizePinyin(dictionaryPinyin(source))
 }
 
 const keywordSchema = z.object({
@@ -60,15 +70,11 @@ export function verifyDictionaryReading(
   )
   if (!reading) throw new Error(`Unverified reading and sense: ${character} ${entry.sourcePinyin}`)
 
-  const selected = getMovieCoordinates(entry.pinyin)
   const pronunciations = [reading.pinyin, ...reading.senses.flatMap(sense => {
-    const alternate = /^also pr\. \[([a-zü:]+[1-5])\]$/.exec(sense)?.[1]
+    const alternate = /^also pr\. \[([^\]]+)\]$/.exec(sense)?.[1]
     return alternate ? [alternate] : []
   })]
-  const matches = pronunciations.some(pinyin => {
-    const source = getMovieCoordinates(pinyin)
-    return selected.syllable === source.syllable && selected.tone === source.tone
-  })
+  const matches = pronunciations.some(pinyin => samePronunciation(entry.pinyin, pinyin))
   if (!matches) {
     throw new Error(`Reading mismatch: ${character} ${entry.pinyin} / ${entry.sourcePinyin}`)
   }

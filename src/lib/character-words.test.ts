@@ -29,6 +29,6 @@ test('another reading or sense remains a word lesson even with one character', (
 test('a vocabulary definition change removes an earlier character equivalence', () => {
   const person = curriculum.characters.find(character => character.hanzi === '人')!
   const word = curriculum.words.find(word => word.hanzi === '人')!
-  expect(characterWordEquivalences([person], [{ ...word, meaningEn: 'somebody else' }])).toEqual({})
+  expect(characterWordEquivalences([person], [{ ...word, meaning: 'somebody else' }])).toEqual({})
   expect(characterWordEquivalences([person], [{ ...word, pinyin: 'rěn' }])).toEqual({})
 })

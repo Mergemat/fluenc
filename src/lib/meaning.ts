@@ -1,13 +1,9 @@
-type MeaningItem = { keyword: string; dictionaryMeanings: readonly string[] } | { meaning: string }
+type MeaningItem = ({ keyword: string } | { meaning: string }) & { dictionaryMeanings: readonly string[] }
 
 export function getItemMeaning(item: MeaningItem) {
-  if ('keyword' in item) {
-    return {
-      primary: item.keyword,
-      alternatives: item.dictionaryMeanings.filter(meaning => meaning.toLocaleLowerCase() !== item.keyword.toLocaleLowerCase()),
-    }
+  const primary = 'keyword' in item ? item.keyword : item.meaning
+  return {
+    primary,
+    alternatives: item.dictionaryMeanings.filter(meaning => meaning.toLocaleLowerCase() !== primary.toLocaleLowerCase()),
   }
-
-  const meanings = item.meaning.split(/[;,]/).map(meaning => meaning.trim()).filter(Boolean)
-  return { primary: meanings[0] ?? item.meaning, alternatives: meanings.slice(1) }
 }

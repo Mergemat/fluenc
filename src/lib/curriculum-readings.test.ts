@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 
-import dictionary from '../data/character-dictionary.source.json'
+import dictionary from '../data/dictionary.source.json'
 import { resolveCharacterKeywords, type CharacterKeyword } from './curriculum-readings'
 
 const long: CharacterKeyword = {

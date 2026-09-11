@@ -163,7 +163,8 @@ function wordStudyItem(word: Word, mappings: MappingRows) {
     id: String(word.id),
     hanzi: word.hanzi,
     pinyin: word.pinyin,
-    meaning: word.meaningEn,
+    meaning: word.meaning,
+    dictionaryMeanings: word.dictionaryMeanings,
     rank: word.rank,
     characterIds: word.characterIds,
     livingLink: story?.story ?? '',
@@ -499,7 +500,8 @@ export async function getLibraryHandler() {
       id: String(word.id),
       hanzi: word.hanzi,
       pinyin: word.pinyin,
-      meaning: word.meaningEn,
+      meaning: word.meaning,
+      dictionaryMeanings: word.dictionaryMeanings,
       rank: word.rank,
       status: (characterForWord(String(word.id))
         ? progress.get(`character:${characterForWord(String(word.id))}`)

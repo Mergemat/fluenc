@@ -2,11 +2,12 @@ import { parse } from 'csv-parse/sync'
 
 import { characterWordEquivalences } from '../src/lib/character-word-equivalence'
 
-import characterDictionary from '../src/data/character-dictionary.source.json'
+import dictionarySource from '../src/data/dictionary.source.json'
 import keywordReviews from '../src/data/character-keywords.reviewed.json'
 import reviewedJson from '../src/data/reviewed-compositions.json'
-import wordCorrections from '../src/data/word-corrections.reviewed.json'
-import { resolveCharacterKeywords, verifyDictionaryReading } from '../src/lib/curriculum-readings'
+import wordReviews from '../src/data/word-meanings.reviewed.json'
+import { resolveCharacterKeywords } from '../src/lib/curriculum-readings'
+import { resolveWordMeanings } from '../src/lib/word-meanings'
 import { findHanziComposition, type HanziIndex, type ReviewedComposition } from '../src/lib/hanzi'
 
 const WORDS_URL =
@@ -17,8 +18,6 @@ const CHARACTERS_URL =
 type CsvWord = {
   rank: string
   word: string
-  pinyin: string
-  english: string
 }
 
 type DictionaryEntry = {
@@ -67,24 +66,15 @@ const uniqueRecords = [...records.reduce((items, record) => {
   return items
 }, new Map<string, CsvWord>()).values()]
 
-const words = uniqueRecords.map((record) => ({
+const frequencyWords = uniqueRecords.map((record) => ({
   id: Number(record.rank),
   rank: Number(record.rank),
   hanzi: record.word,
-  pinyin: record.pinyin,
-  meaningEn: record.english,
-  characterIds: [...new Set(splitHanzi(record.word))],
 }))
-
-const correctedWords = new Set<number>()
-for (const correction of wordCorrections) {
-  const word = words.find(word => word.id === correction.id && word.hanzi === correction.hanzi)
-  if (!word || correctedWords.has(correction.id)) throw new Error(`Unexpected or duplicate word correction: ${correction.id}`)
-  verifyDictionaryReading(word.hanzi, correction, characterDictionary.entries)
-  word.pinyin = correction.pinyin
-  word.meaningEn = correction.meaningEn
-  correctedWords.add(word.id)
-}
+const words = resolveWordMeanings(frequencyWords, wordReviews, dictionarySource.entries).map(word => ({
+  ...word,
+  characterIds: [...new Set(splitHanzi(word.hanzi))],
+}))
 
 const stats = new Map<string, { rank: number; unlocks: number }>()
 for (const word of words) {
@@ -101,7 +91,7 @@ const compositions = new Map([...stats.keys()].map(hanzi => [hanzi, findHanziCom
 const incomplete = [...compositions].filter(([, composition]) => !composition).map(([hanzi]) => hanzi)
 if (incomplete.length) throw new Error(`Incomplete decompositions (${incomplete.length}): ${incomplete.join(' ')}. Review these before generating the curriculum.`)
 
-const keywords = resolveCharacterKeywords([...stats.keys()], keywordReviews, characterDictionary.entries)
+const keywords = resolveCharacterKeywords([...stats.keys()], keywordReviews, dictionarySource.entries)
 
 const characters = [...stats.entries()]
   .map(([hanzi, characterStats]) => {
@@ -133,8 +123,8 @@ const curriculum = {
     characters: CHARACTERS_URL,
     decompositionReviews: 'src/data/reviewed-compositions.json',
     keywordReviews: 'src/data/character-keywords.reviewed.json',
-    dictionary: characterDictionary.url,
-    wordCorrections: 'src/data/word-corrections.reviewed.json',
+    dictionary: dictionarySource.url,
+    wordReviews: 'src/data/word-meanings.reviewed.json',
   },
   words,
   characters,

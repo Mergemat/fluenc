@@ -6,6 +6,7 @@ import { getItemMeaning } from '../lib/meaning'
 import { saveEnrollment, saveLivingLinkOffline } from '../offline/progress'
 import type { BuildItem } from '../server/curriculum'
 import { MandarinAudioButton } from './MandarinAudioButton'
+import { DictionaryMeanings } from './DictionaryMeanings'
 import { Button } from './ui/Button'
 import { ErrorNote } from './ui/Layout'
 
@@ -36,6 +37,7 @@ export function WordStudio({ item }: { item: WordItem }) {
       <p className="recall-hanzi recall-word font-hanzi" lang="zh-CN">{item.hanzi}</p>
       <div className="answer-sound"><strong>{item.pinyin}</strong><MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} /></div>
       <p className="answer-meaning">{meaning.primary}</p>
+      <DictionaryMeanings meanings={meaning.alternatives} />
     </div>
     {item.characterIds.length > 1 ? <section className="word-connections">
       <div className="word-parts"><span className="study-label">Character parts</span><div>
