@@ -71,8 +71,12 @@
 .word-target { flex: 1; min-height: 220px; gap: 10px; }
 .word-connections { display: grid; gap: 10px; }
 .word-parts, .word-link { padding: 16px; border-radius: 13px 13px 3px 13px; background: #fcf9ed; }
-.word-parts > div { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+.word-parts > div { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+.word-part-group { display: flex; align-items: flex-start; gap: 12px; max-width: 100%; }
+.word-part-detail { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; max-width: 140px; text-align: center; }
+.word-part-plus { line-height: 48px; }
 .word-part { font-size: 40px; line-height: 1.2; color: #987031; }
+.word-part-meaning { font-size: 13px; line-height: 1.4; color: var(--color-muted); overflow-wrap: anywhere; }
 .word-link { background: #e5edf4; border-radius: 13px 13px 13px 3px; }
 .word-link > label { display: flex; justify-content: space-between; }
 .word-link > label > span { font-size: 10px; opacity: .7; }

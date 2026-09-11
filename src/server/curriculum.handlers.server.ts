@@ -176,6 +176,11 @@ function wordStudyItem(word: Word, mappings: MappingRows) {
     dictionaryMeanings: word.dictionaryMeanings,
     rank: word.rank,
     characterIds: word.characterIds,
+    characterParts: word.characterIds.map(id => {
+      const character = charactersById.get(id)
+      if (!character) throw new Error(`Missing curriculum character: ${id}`)
+      return { hanzi: character.hanzi, meaning: character.keyword }
+    }),
     livingLink: story?.story ?? '',
   }
 }

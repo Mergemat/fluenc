@@ -55,6 +55,7 @@ function character(id: string, pinyin: string): Extract<BuildItem, { type: 'char
 const word: Extract<BuildItem, { type: 'word' }> = {
   type: 'word', id: '5', hanzi: '我们', pinyin: 'wǒmen', meaning: 'we',
   dictionaryMeanings: [], rank: 5, characterIds: ['我', '们'], livingLink: '', queueKind: 'new',
+  characterParts: [{ hanzi: '我', meaning: 'I' }, { hanzi: '们', meaning: 'plural marker' }],
 }
 
 async function show(buildQueue: BuildItem[], lockedWords: DashboardData['lockedWords'] = []) {

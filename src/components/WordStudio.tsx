@@ -35,7 +35,13 @@ export function WordStudio({ item }: { item: WordItem }) {
     </div>
     {item.characterIds.length > 1 ? <section className="word-connections">
       <div className="word-parts"><span className="study-label">Character parts</span><div>
-        {item.characterIds.map((character, index) => <span key={`${character}-${index}`} className="contents"><span className="word-part font-hanzi" lang="zh-CN">{character}</span>{index < item.characterIds.length - 1 ? <span className="text-faint">+</span> : null}</span>)}
+        {item.characterParts.map((part, index) => <div key={`${part.hanzi}-${index}`} className="word-part-group">
+          {index > 0 ? <span className="word-part-plus text-faint" aria-hidden="true">+</span> : null}
+          <div className="word-part-detail">
+            <span className="word-part font-hanzi" lang="zh-CN">{part.hanzi}</span>
+            <span className="word-part-meaning">{part.meaning}</span>
+          </div>
+        </div>)}
       </div></div>
       <div className="word-link">
         <label className="study-label" htmlFor="word-story">Memory link <span>Optional</span></label>
