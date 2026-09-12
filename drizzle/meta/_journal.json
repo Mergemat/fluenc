@@ -15,6 +15,13 @@
       "when": 1787936916369,
       "tag": "0001_breezy_ultron",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1789216469114,
+      "tag": "0002_ambitious_squadron_sinister",
+      "breakpoints": true
     }
   ]
 }

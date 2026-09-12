@@ -143,3 +143,10 @@ export const mnemonics = sqliteTable(
 
 export type LearnerItem = typeof learnerItems.$inferSelect
 export type ItemType = LearnerItem['itemType']
+
+export const pushSubscriptions = sqliteTable('push_subscriptions', {
+  endpoint: text('endpoint').primaryKey(),
+  p256dh: text('p256dh').notNull(),
+  auth: text('auth').notNull(),
+  lastReminderDay: integer('last_reminder_day'),
+})

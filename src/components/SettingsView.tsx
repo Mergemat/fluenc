@@ -7,6 +7,7 @@ import { dashboardQueryOptions, libraryQueryOptions, palaceQueryOptions } from '
 import type { OfflineDownload } from '../offline/useOfflineDownload'
 import { Button } from './ui/Button'
 import { Page, PageHeader } from './ui/Layout'
+import { NotificationSettings } from './NotificationSettings'
 
 type SyncStatus = 'idle' | 'syncing' | 'done' | 'offline' | 'error'
 
@@ -44,6 +45,7 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
       if (!queryClient.isMutating()) window.location.reload()
     }}><RefreshCw size={16} />Refresh app</Button>} />
     <div className="settings-sections">
+      <NotificationSettings />
       <section className="settings-section" aria-labelledby="offline-heading">
         <div className="settings-copy">
           <h2 id="offline-heading">Offline practice</h2>

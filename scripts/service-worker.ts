@@ -7,6 +7,7 @@ import { RangeRequestsPlugin } from 'workbox-range-requests'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
 import { CacheFirst } from 'workbox-strategies'
 import type { DownloadProgress } from '../src/offline/useOfflineDownload'
+import { openReview, showPushNotification } from '../src/notifications/worker'
 
 declare const self: ServiceWorkerGlobalScope & { __WB_MANIFEST: PrecacheEntry[] }
 
@@ -16,6 +17,15 @@ addPlugins([new RangeRequestsPlugin()])
 const entries = self.__WB_MANIFEST
 precacheAndRoute(entries)
 cleanupOutdatedCaches()
+
+self.addEventListener('push', event => {
+  event.waitUntil(showPushNotification(event.data, self.registration))
+})
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close()
+  event.waitUntil(openReview(self.clients, self.location.origin))
+})
 
 self.addEventListener('message', event => {
   if (event.data?.type !== 'DOWNLOAD_PROGRESS') return

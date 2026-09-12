@@ -1,58 +1,106 @@
-import { expect, mock, test } from 'bun:test'
+import { afterEach, beforeEach, expect, mock, test } from 'bun:test'
+import { createClient, type Client } from '@libsql/client'
+import { drizzle } from 'drizzle-orm/libsql'
+import webpush from 'web-push'
+
+import * as schema from '../db/schema'
+import { createPushStore, type PushStore } from './push-store.server'
 import { handleReviewReminder } from './review-reminder.server'
+import { pushSubscriptionInput, type DeviceSubscription } from './push.contract'
+
+let client: Client
+let store: PushStore
+const device = (name: string): DeviceSubscription => ({
+  endpoint: `https://web.push.apple.com/${name}`,
+  keys: { p256dh: 'B'.repeat(87), auth: 'a'.repeat(22) },
+})
+
+beforeEach(async () => {
+  client = createClient({ url: ':memory:' })
+  await client.execute(await Bun.file('drizzle/0002_ambitious_squadron_sinister.sql').text())
+  store = createPushStore(drizzle(client, { schema }))
+})
+afterEach(() => client.close())
 
 function setup() {
-  const hasDueReviews = mock(async () => true)
-  const send = mock(async (_url: URL, _init: RequestInit): Promise<Response> => Response.json({ ok: true, delivered: 1 }))
   return {
-    cronSecret: 'test-cron-secret', webhookUrl: 'https://hark.ryan.ceo/hooks/whk_test',
-    now: new Date('2026-09-11T11:00:00Z'), hasDueReviews, send,
+    cronSecret: 'test-cron-secret', configured: true, store,
+    now: new Date('2026-09-11T11:00:00Z'),
+    hasDueReviews: mock(async () => true),
+    send: mock(async (_subscription: DeviceSubscription): Promise<void> => {}),
   }
 }
-
 const request = (token = 'test-cron-secret') => new Request('https://fluenc.example/api/review-reminder', {
   headers: { authorization: `Bearer ${token}` },
 })
 
-test('unauthenticated and unconfigured reminders never read progress or send a notification', async () => {
+test('unauthorized and unconfigured jobs cannot read progress or consume daily delivery', async () => {
+  await store.save(device('phone'))
   const options = setup()
   expect((await handleReviewReminder(request('wrong'), options)).status).toBe(401)
-  expect((await handleReviewReminder(request(), { ...options, cronSecret: undefined })).status).toBe(401)
-  expect((await handleReviewReminder(request(), { ...options, webhookUrl: undefined })).status).toBe(503)
+  expect((await handleReviewReminder(request(), { ...options, configured: false })).status).toBe(503)
   expect(options.hasDueReviews).not.toHaveBeenCalled()
   expect(options.send).not.toHaveBeenCalled()
-})
-
-test('completed reviews produce no reminder', async () => {
-  const options = setup()
-  options.hasDueReviews.mockResolvedValue(false)
-  const response = await handleReviewReminder(request(), options)
-  expect(await response.json()).toEqual({ status: 'skipped', reason: 'No reviews due' })
-  expect(options.send).not.toHaveBeenCalled()
-})
-
-test('repeated runs use the same Hark event key and payload, with a new key the next day', async () => {
-  const options = setup()
   expect((await handleReviewReminder(request(), options)).status).toBe(200)
-  await handleReviewReminder(request(), { ...options, now: new Date('2026-09-11T11:20:00Z') })
-  await handleReviewReminder(request(), { ...options, now: new Date('2026-09-12T11:00:00Z') })
-  const calls = options.send.mock.calls.map(([, init]) => ({ key: new Headers(init.headers).get('Idempotency-Key'), body: init.body }))
-  expect(calls[0]).toEqual(calls[1])
-  expect(calls[0]!.key).not.toBe(calls[2]!.key)
-  expect(JSON.parse(calls[0]!.body as string).title).toBe('Fluenc')
-  expect(JSON.parse(calls[0]!.body as string).url).toBe('https://example.com/review')
+  expect(options.send).toHaveBeenCalledTimes(1)
 })
 
-test('invalid endpoints, missing devices, upstream failures, and secret-bearing errors are handled', async () => {
+test('completed reviews skip delivery without preventing a later due reminder', async () => {
+  await store.save(device('phone'))
   const options = setup()
-  expect((await handleReviewReminder(request(), { ...options, webhookUrl: 'https://another.example/hooks/whk_test' })).status).toBe(503)
+  options.hasDueReviews.mockResolvedValueOnce(false)
+  expect(await (await handleReviewReminder(request(), options)).json()).toMatchObject({ status: 'skipped' })
   expect(options.send).not.toHaveBeenCalled()
-  options.send.mockResolvedValueOnce(Response.json({ ok: true, delivered: 0 }))
-  expect((await handleReviewReminder(request(), options)).status).toBe(502)
-  options.send.mockResolvedValueOnce(new Response('rate limited', { status: 429 }))
-  expect((await handleReviewReminder(request(), options)).status).toBe(502)
-  options.send.mockRejectedValueOnce(new Error(`Network failure: ${options.webhookUrl}`))
+  await handleReviewReminder(request(), options)
+  expect(options.send).toHaveBeenCalledTimes(1)
+})
+
+test('concurrent cron runs and subscription refreshes send once per device per Moscow day', async () => {
+  await store.save(device('phone'))
+  await store.save(device('tablet'))
+  const options = setup()
+  await Promise.all([handleReviewReminder(request(), options), handleReviewReminder(request(), options)])
+  expect(options.send).toHaveBeenCalledTimes(2)
+  await store.save(device('phone'))
+  await handleReviewReminder(request(), options)
+  expect(options.send).toHaveBeenCalledTimes(2)
+  await handleReviewReminder(request(), { ...options, now: new Date('2026-09-12T11:00:00Z') })
+  expect(options.send).toHaveBeenCalledTimes(4)
+})
+
+test('expired devices are removed, transient failures retry, accepted devices are not resent', async () => {
+  for (const name of ['phone', 'expired', 'offline']) await store.save(device(name))
+  const options = setup()
+  options.send.mockImplementation(async subscription => {
+    if (subscription.endpoint.endsWith('/expired')) throw new webpush.WebPushError('Gone', 410, {}, '', subscription.endpoint)
+    if (subscription.endpoint.endsWith('/offline')) throw new Error('secret subscription details')
+  })
   const response = await handleReviewReminder(request(), options)
   expect(response.status).toBe(502)
-  expect(await response.text()).not.toContain('whk_test')
+  expect(await response.json()).toMatchObject({ devices: 1, failed: 1 })
+  expect(await store.has(device('expired'))).toBe(false)
+  options.send.mockClear()
+  options.send.mockResolvedValue(undefined)
+  await handleReviewReminder(request(), options)
+  expect(options.send.mock.calls.map(([subscription]) => subscription.endpoint)).toEqual([device('offline').endpoint])
+})
+
+test('unsubscribe affects only the matching device credentials', async () => {
+  await store.save(device('phone'))
+  await store.save(device('tablet'))
+  await store.remove({ ...device('phone'), keys: { ...device('phone').keys, auth: 'wrong' } })
+  expect(await store.has(device('phone'))).toBe(true)
+  await store.remove(device('phone'))
+  const options = setup()
+  await handleReviewReminder(request(), options)
+  expect(options.send.mock.calls.map(([subscription]) => subscription.endpoint)).toEqual([device('tablet').endpoint])
+})
+
+test('subscription validation rejects arbitrary hosts, credentials, ports and malformed keys', () => {
+  for (const endpoint of ['not a URL', 'http://web.push.apple.com/x', 'https://127.0.0.1/x',
+    'https://web.push.apple.com.evil.example/x', 'https://user:password@web.push.apple.com/x', 'https://web.push.apple.com:444/x']) {
+    expect(pushSubscriptionInput.safeParse({ ...device('phone'), endpoint }).success).toBe(false)
+  }
+  expect(pushSubscriptionInput.safeParse({ ...device('phone'), keys: { p256dh: 'bad', auth: 'bad' } }).success).toBe(false)
+  expect(pushSubscriptionInput.safeParse(device('phone')).success).toBe(true)
 })
