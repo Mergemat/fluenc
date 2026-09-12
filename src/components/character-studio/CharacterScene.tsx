@@ -20,7 +20,7 @@ function SoundClue({ cue }: { cue: Cue }) {
   const tone = cue.kind === 'room' ? getToneDetail(Number(cue.code)) : null
   return <section className={`cs-note cs-note-${cue.kind}`}><div className={`cs-clue cs-clue-${cue.kind}`}>
     <small>{cue.role}</small><b>{tone ? tone.contour : cue.code}</b>
-    <strong className={cue.name.trim() ? '' : 'cs-missing'}>{cue.name.trim() || `Choose your ${cue.kind}`}</strong>
+    <strong className={cue.name.trim() ? '' : 'cs-missing'}>{cue.name.trim() || '…'}</strong>
   </div></section>
 }
 
@@ -46,12 +46,24 @@ export function CharacterScene({ studio, direct, reviewing = false }: { studio: 
   const mapped = shape.data && owners?.length === shape.data.strokes.length && owners.every(code => props.some(prop => prop.code === code)) && props.every(prop => owners.includes(prop.code))
   const select = (code: string) => {
     setSelected(previous => previous === code ? null : code)
-    propButtons.current[code]?.scrollIntoView({ block: 'nearest' })
+    propButtons.current[code]?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
   }
   const highlightedName = props.find(prop => prop.code === highlighted)?.name.trim()
 
   return <div className="cs-prop-scene">
     <div className="cs-character-and-props">
+      <aside className="cs-prop-list" aria-label="Props">
+        {props.map(prop => <button key={prop.id} type="button" className="cs-prop-choice" ref={element => { propButtons.current[prop.code] = element }}
+          aria-label={`Select ${prop.code} prop${prop.name.trim() ? `: ${prop.name.trim()}` : ''}`}
+          aria-pressed={selected === prop.code} data-highlighted={highlighted === prop.code} disabled={!mapped}
+          onClick={() => select(prop.code)}
+          onPointerEnter={event => { if (event.pointerType !== 'touch') setHovered(prop.code) }}
+          onPointerLeave={() => setHovered(null)}
+          onPointerCancel={() => setHovered(null)}>
+          <span className="cs-prop-glyph font-hanzi-modern" lang="zh-CN">{prop.code}{prop.count && prop.count > 1 ? <sup className="cs-prop-count">×{prop.count}</sup> : null}</span>
+          <span className={`cs-prop-name ${prop.name.trim() ? '' : 'cs-missing'}`}>{prop.name.trim() || '…'}</span>
+        </button>)}
+      </aside>
       <CharacterTarget studio={studio}>
         <div className="cs-character-drawing">
           {mapped && shape.data ? <svg className="cs-interactive-hanzi" viewBox="0 0 1024 1024" aria-label={`${item.hanzi} character parts`}>
@@ -73,18 +85,6 @@ export function CharacterScene({ studio, direct, reviewing = false }: { studio: 
           <span className="cs-selected-prop-label" aria-live="polite">{highlightedName || ''}</span>
         </div>
       </CharacterTarget>
-      <aside className="cs-prop-column" aria-label="Props">
-        {props.map(prop => <button key={prop.id} type="button" className="cs-prop-choice" ref={element => { propButtons.current[prop.code] = element }}
-          aria-label={`Select ${prop.code} prop${prop.name.trim() ? `: ${prop.name.trim()}` : ''}`}
-          aria-pressed={selected === prop.code} data-highlighted={highlighted === prop.code} disabled={!mapped}
-          onClick={() => select(prop.code)}
-          onPointerEnter={event => { if (event.pointerType !== 'touch') setHovered(prop.code) }}
-          onPointerLeave={() => setHovered(null)}
-          onPointerCancel={() => setHovered(null)}>
-          <span className="cs-prop-glyph font-hanzi-modern" lang="zh-CN">{prop.code}{prop.count && prop.count > 1 ? <sup className="cs-prop-count">×{prop.count}</sup> : null}</span>
-          <span className={`cs-prop-name ${prop.name.trim() ? '' : 'cs-missing'}`}>{prop.name.trim() || 'Your prop'}</span>
-        </button>)}
-      </aside>
     </div>
     {shape.isError ? <p className="cs-shape-status" role="status">Could not load strokes. <button type="button" onClick={() => void shape.refetch()}>Retry</button></p> : shape.data && !mapped ? <p className="cs-shape-status" role="status">Character parts could not be loaded.</p> : null}
     {direct && reviewing ? null : direct ? <p className="cs-direct-caption">Learn this simple character directly. Choose an object to represent it inside other characters.</p> : <div className="cs-shelf-sound">{cues.filter(cue => cue.kind !== 'prop').map(cue => <SoundClue key={cue.id} cue={cue} />)}</div>}
