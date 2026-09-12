@@ -7,6 +7,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Noto Sans CJK SC";
+  src: url('/fonts/noto-sans-sc-props.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 @theme {
   --color-ink: #151515;
   --color-muted: #66645f;
@@ -18,7 +26,7 @@
   --color-glaze: #337465;
   --font-ui: "Arial Nova", "Helvetica Neue", Arial, "Fluenc Hanzi", system-ui, sans-serif;
   --font-hanzi: "Fluenc Hanzi", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
-  --font-hanzi-modern: "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  --font-hanzi-props: "Noto Sans CJK SC", "Fluenc Hanzi", sans-serif;
   --animate-pop: pop .2s ease-out;
 
   @keyframes pop { from { scale: .8; opacity: 0; } }

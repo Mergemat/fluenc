@@ -1,6 +1,6 @@
 # Fluenc Hanzi
 
-`fluenc-hanzi.woff2` is the shared Chinese font for lessons, reviews, reading, the library, and props. It contains all 1,085 characters and components referenced by the current curriculum, reviewed compositions, and reading sentences. The Latin interface keeps its existing font.
+`fluenc-hanzi.woff2` is the shared Chinese font for lessons, reviews, reading, and the library. It contains all 1,085 characters and components referenced by the current curriculum, reviewed compositions, and reading sentences. Props use Noto Sans CJK SC, described below. The Latin interface keeps its existing font.
 
 The 728 course glyphs use the stroke paths shipped in `public/hanzi`, matching the studio's interactive SVG. Other glyphs come from the pinned Make Me a Hanzi graphics source recorded in `src/data/character-strokes.source.json`. For 49 component symbols without standalone source glyphs, the generator extracts a single occurrence from a course character, scales it proportionally, and centers it in the em square.
 
@@ -21,3 +21,16 @@ FLUENC_FONT_PYTHON=/tmp/fluenc-font-env/bin/python bun run data:font
 `FLUENC_FONT_PYTHON` selects the font-authoring Python environment; otherwise the script uses `python3`. The Bun script downloads the pinned glyph source, gathers the app's required characters, and passes the paths to the FontTools encoder. Temporary input files are removed after generation.
 
 The font is preloaded by the root document and precached by the service worker. Unsupported characters outside the shipped curriculum use the platform's Chinese font.
+
+## Modern prop font
+
+`noto-sans-sc-props.woff2` is a locally hosted subset of Noto Sans CJK SC Regular, used for prop glyphs in the studio, clue form, library, and palace. It includes 1,063 of the 1,084 characters and components in the curriculum and reviewed compositions. The 21 rare component symbols absent from Noto use the existing Fluenc Hanzi glyphs so they remain readable.
+
+The source is [Noto Sans CJK SC Regular](https://github.com/notofonts/noto-cjk/blob/165c01b46ea533872e002e0785ff17e44f6d97d8/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf), distributed under the [SIL Open Font License](../licenses/NotoSansSC-OFL.txt). The 295,476-byte WOFF2 subset retains its original outlines and is precached by the existing service worker font rule.
+
+To rebuild, download the source OTF to `.cache/noto-sans-cjk-sc.otf`, then use the FontTools environment from the instructions above:
+
+```sh
+bun -e 'import curriculum from "./src/data/curriculum.generated.json"; import reviewed from "./src/data/reviewed-compositions.json"; await Bun.write(".cache/prop-glyphs.txt", [...new Set([...curriculum.characters.flatMap(c => [c.hanzi, ...c.components]), ...reviewed.flatMap(c => [c.character, ...c.components])])].sort().join(""));'
+/tmp/fluenc-font-env/bin/pyftsubset .cache/noto-sans-cjk-sc.otf --text-file=.cache/prop-glyphs.txt --flavor=woff2 --output-file=public/fonts/noto-sans-sc-props.woff2
+```

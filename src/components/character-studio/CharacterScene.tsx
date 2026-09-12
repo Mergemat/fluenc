@@ -60,7 +60,7 @@ export function CharacterScene({ studio, direct, reviewing = false }: { studio: 
           onPointerEnter={event => { if (event.pointerType !== 'touch') setHovered(prop.code) }}
           onPointerLeave={() => setHovered(null)}
           onPointerCancel={() => setHovered(null)}>
-          <span className="cs-prop-glyph font-hanzi-modern" lang="zh-CN">{prop.code}{prop.count && prop.count > 1 ? <sup className="cs-prop-count">×{prop.count}</sup> : null}</span>
+          <span className="cs-prop-glyph font-hanzi-props" lang="zh-CN">{prop.code}{prop.count && prop.count > 1 ? <sup className="cs-prop-count">×{prop.count}</sup> : null}</span>
           <span className={`cs-prop-name ${prop.name.trim() ? '' : 'cs-missing'}`}>{prop.name.trim() || '…'}</span>
         </button>)}
       </aside>
