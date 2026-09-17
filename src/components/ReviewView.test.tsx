@@ -128,3 +128,70 @@ test('recent reviews stay separate while a fixed catch-up batch retains misses a
   expect(host.textContent).toContain('5 left in this batch')
   expect(host.textContent).toContain('Older sentence 20')
 })
+
+test('extra practice reviews future cards offline, retains misses across tabs, and finishes a fixed batch', async () => {
+  const now = new Date()
+  let data: DashboardData = {
+    curriculum: { version: 'test', characters: 0, words: 0 },
+    progress: { introducedCharacters: 0, introducedWords: 0 },
+    reviewQueue: [], buildQueue: [], lockedWords: [], scheduledQueue: [], nextReviewAt: null,
+    getQueue: ['oldest', 'newer'].map(id => ({
+      id, hanzi: '你好。', pinyin: 'Nǐ hǎo.', meaning: id,
+      words: ['你', '好'], coverage: 1, missingWords: [], missingCharacters: [],
+    })),
+  }
+  for (const [index, id] of ['oldest', 'newer'].entries()) {
+    const reviewedAt = new Date(now.getTime() - (2 - index) * 3_600_000).toISOString()
+    data = applyOperation(data, { kind: 'enroll', data: { itemType: 'sentence', itemId: id, enrolledAt: reviewedAt } })
+    data = applyOperation(data, { kind: 'review', data: {
+      eventId: crypto.randomUUID(), itemType: 'sentence', itemId: id, rating: 4, reviewedAt, durationMs: 100,
+    } })
+  }
+  expect(data.reviewQueue).toHaveLength(0)
+  expect(data.scheduledQueue).toHaveLength(2)
+  const show = async () => {
+    await act(async () => root.render(<QueryClientProvider client={client}><ReviewView key="extra" data={data} /></QueryClientProvider>))
+  }
+  const click = async (label: string) => {
+    const button = [...host.querySelectorAll('button')].find(button => button.textContent?.includes(label))
+    expect(button).toBeDefined()
+    await act(async () => button!.click())
+  }
+  let time = now.getTime()
+  const rate = (id: string, rating: number) => {
+    time += 1000
+    data = applyOperation(data, { kind: 'review', data: {
+      eventId: crypto.randomUUID(), itemType: 'sentence', itemId: id, rating,
+      reviewedAt: new Date(time).toISOString(), durationMs: 100,
+    } })
+    data = JSON.parse(JSON.stringify(data))
+  }
+  await show()
+  expect(host.textContent).toContain('All caught up')
+  await click('Extra practice')
+  expect(host.textContent).toContain('2 left in this batch')
+  expect(host.textContent).toContain('oldest')
+  await click('Reveal answer')
+  rate('oldest', 1)
+  await show()
+  expect(data.reviewQueue.map(item => item.id)).toEqual(['oldest'])
+  expect(host.textContent).toContain('newer')
+  expect(host.querySelector('.sentence-answer')).toBeNull()
+  await click('Recent · 1')
+  await click('Extra practice')
+  expect(host.textContent).toContain('newer')
+  rate('newer', 3)
+  await show()
+  expect(host.textContent).toContain('1 left in this batch')
+  expect(host.textContent).toContain('oldest')
+  rate('oldest', 4)
+  await show()
+  expect(data.reviewQueue).toHaveLength(0)
+  expect(data.scheduledQueue.find(item => item.id === 'oldest')?.reps).toBe(3)
+  expect(data.scheduledQueue.find(item => item.id === 'oldest')?.card.lapses).toBe(1)
+  expect(host.textContent).toContain('Practice complete')
+  expect(host.textContent).not.toContain('Reveal answer')
+  await click('Practise 2 more cards')
+  expect(host.textContent).toContain('2 left in this batch')
+  expect(host.textContent).toContain('newer')
+})

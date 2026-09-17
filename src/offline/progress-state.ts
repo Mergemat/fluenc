@@ -75,7 +75,7 @@ export function refreshDueQueues(data: DashboardData, now = new Date()) {
 function applyReview(data: DashboardData, operation: Extract<ProgressOperation, { kind: 'review' }>) {
   const target = studyIdentity(operation.data.itemType, operation.data.itemId)
   const key = `${target.itemType}:${target.itemId}`
-  const item = data.reviewQueue.find((candidate) => itemKey(candidate) === key)
+  const item = [...data.reviewQueue, ...data.scheduledQueue].find((candidate) => itemKey(candidate) === key)
   if (!item) return data
 
   const reviewedAt = new Date(operation.data.reviewedAt)

@@ -27,6 +27,6 @@ export function NotificationSettings() {
     {status === 'on' ? <Button variant="secondary" disabled={!!busy} onClick={() => void run('test')}><Bell size={16} />Send test notification</Button> : null}
     {hasSubscription ? <Button variant="ghost" disabled={!!busy || status === 'checking'} onClick={() => void run('unsubscribe')}><BellOff size={16} />Turn off notifications</Button> : null}
     {status === 'error' || status === 'blocked' || status === 'unconfigured' ? <Button variant="secondary" disabled={!!busy} onClick={retry}>Check again</Button> : null}
-    <p className="settings-note">Scheduled for 14:00 Moscow time; delivery may arrive within the following hour. Only synced progress is checked.</p>
+    <p className="settings-note">Scheduled for 14:00 Shanghai time; delivery may arrive within the following hour. Only synced progress is checked.</p>
   </section>
 }

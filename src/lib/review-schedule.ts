@@ -1,19 +1,19 @@
 import { BasicLearningStepsStrategy, fsrs, Rating, State, StrategyMode, type Card, type Grade } from 'ts-fsrs'
 
-export const REVIEW_TIME_ZONE = 'Europe/Moscow'
-export const REVIEW_TIME_LABEL = '14:00 Moscow time'
+export const REVIEW_TIME_ZONE = 'Asia/Shanghai'
+export const REVIEW_TIME_LABEL = '14:00 Shanghai time'
 
 const dayMs = 86_400_000
-// Moscow is UTC+3. Use UTC arithmetic so server and offline devices agree.
-const moscowOffsetMs = 3 * 3_600_000
-const reviewHourUtc = 11
+// Shanghai is UTC+8. Use UTC arithmetic so server and offline devices agree.
+const shanghaiOffsetMs = 8 * 3_600_000
+const reviewHourUtc = 6
 
 export function reviewDay(date: Date) {
-  return Math.floor((date.getTime() + moscowOffsetMs) / dayMs)
+  return Math.floor((date.getTime() + shanghaiOffsetMs) / dayMs)
 }
 
 const scheduler = fsrs({
-  request_retention: 0.9,
+  request_retention: 0.95,
   enable_short_term: true,
   enable_fuzz: false,
   learning_steps: ['10m'],
@@ -28,7 +28,7 @@ function needsRepeat(state: number) {
 }
 
 function batchOnDate(date: Date) {
-  const localDate = new Date(date.getTime() + moscowOffsetMs)
+  const localDate = new Date(date.getTime() + shanghaiOffsetMs)
   return Date.UTC(localDate.getUTCFullYear(), localDate.getUTCMonth(), localDate.getUTCDate(), reviewHourUtc)
 }
 

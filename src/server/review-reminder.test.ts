@@ -25,7 +25,7 @@ afterEach(() => client.close())
 function setup() {
   return {
     cronSecret: 'test-cron-secret', configured: true, store,
-    now: new Date('2026-09-11T11:00:00Z'),
+    now: new Date('2026-09-11T06:00:00.000Z'),
     hasDueReviews: mock(async () => true),
     send: mock(async (_subscription: DeviceSubscription): Promise<void> => {}),
   }
@@ -55,7 +55,7 @@ test('completed reviews skip delivery without preventing a later due reminder', 
   expect(options.send).toHaveBeenCalledTimes(1)
 })
 
-test('concurrent cron runs and subscription refreshes send once per device per Moscow day', async () => {
+test('concurrent cron runs and subscription refreshes send once per device per Shanghai day', async () => {
   await store.save(device('phone'))
   await store.save(device('tablet'))
   const options = setup()
@@ -64,7 +64,7 @@ test('concurrent cron runs and subscription refreshes send once per device per M
   await store.save(device('phone'))
   await handleReviewReminder(request(), options)
   expect(options.send).toHaveBeenCalledTimes(2)
-  await handleReviewReminder(request(), { ...options, now: new Date('2026-09-12T11:00:00Z') })
+  await handleReviewReminder(request(), { ...options, now: new Date('2026-09-12T06:00:00.000Z') })
   expect(options.send).toHaveBeenCalledTimes(4)
 })
 

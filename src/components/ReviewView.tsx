@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 
 import { REVIEW_TIME_LABEL, REVIEW_TIME_ZONE } from '../lib/review-schedule'
-import { CATCH_UP_BATCH_SIZE, partitionReviews, reviewKey } from '../lib/review-session'
+import { CATCH_UP_BATCH_SIZE, EXTRA_PRACTICE_BATCH_SIZE, extraPracticeQueue, oldestReviewedFirst, partitionReviews, reviewKey } from '../lib/review-session'
 import { useProgressMutation } from '../offline/useProgressMutation'
 import { saveReview } from '../offline/progress'
 import type { DashboardData } from '../server/curriculum'
@@ -12,16 +12,24 @@ import { Button } from './ui/Button'
 
 export function ReviewView({ data }: { data: DashboardData }) {
   const cardStartedAt = useRef(Date.now())
-  const [mode, setMode] = useState<'recent' | 'catchup'>('recent')
+  const [mode, setMode] = useState<'recent' | 'catchup' | 'extra'>('recent')
   const [catchUpIds, setCatchUpIds] = useState<Set<string>>(() => new Set())
+  const [extraBatch, setExtraBatch] = useState<Map<string, number>>(() => new Map())
   const { recent, backlog } = partitionReviews(data.reviewQueue, new Date(), catchUpIds)
   const batch = backlog.filter(item => catchUpIds.has(reviewKey(item)))
-  const queue = mode === 'recent' ? recent : batch
+  const extraQueue = extraPracticeQueue([...data.reviewQueue, ...data.scheduledQueue], extraBatch)
+  const queue = mode === 'recent' ? recent : mode === 'catchup' ? batch : extraQueue
   const activeReview = queue[0]
   const nextBatchSize = Math.min(CATCH_UP_BATCH_SIZE, backlog.length)
   const startCatchUp = () => {
     setCatchUpIds(new Set(backlog.slice(0, CATCH_UP_BATCH_SIZE).map(reviewKey)))
     setMode('catchup')
+    cardStartedAt.current = Date.now()
+  }
+  const startExtraPractice = () => {
+    const cards = [...data.scheduledQueue].sort(oldestReviewedFirst).slice(0, EXTRA_PRACTICE_BATCH_SIZE)
+    setExtraBatch(new Map(cards.map(item => [reviewKey(item), item.reps])))
+    setMode('extra')
     cardStartedAt.current = Date.now()
   }
 
@@ -40,21 +48,30 @@ export function ReviewView({ data }: { data: DashboardData }) {
 
   return (
     <section className="study-page session-page">
-      <PageHeader title="Review" meta={activeReview ? `${queue.length} left${mode === 'catchup' ? ' in this batch' : ''}` : data.reviewQueue.length ? 'Catch up at your pace' : 'Up to date'} />
+      <PageHeader title="Review" meta={activeReview ? `${queue.length} left${mode !== 'recent' ? ' in this batch' : ''}` : mode === 'extra' ? 'Practice complete' : data.reviewQueue.length ? 'Catch up at your pace' : 'Up to date'} />
 
-      {backlog.length || catchUpIds.size ? <div className="review-queues" role="group" aria-label="Review queues">
+      {backlog.length || catchUpIds.size || data.scheduledQueue.length || extraBatch.size ? <div className="review-queues" role="group" aria-label="Review queues">
         <Button variant={mode === 'recent' ? 'primary' : 'secondary'} aria-pressed={mode === 'recent'} onClick={() => {
           setMode('recent')
           cardStartedAt.current = Date.now()
         }}>Recent · {recent.length}</Button>
-        <Button variant={mode === 'catchup' ? 'primary' : 'secondary'} aria-pressed={mode === 'catchup'} onClick={() => {
+        {backlog.length || catchUpIds.size ? <Button variant={mode === 'catchup' ? 'primary' : 'secondary'} aria-pressed={mode === 'catchup'} onClick={() => {
           if (!catchUpIds.size) startCatchUp()
           else {
             setMode('catchup')
             cardStartedAt.current = Date.now()
           }
-        }}>Catch up · {backlog.length}</Button>
+        }}>Catch up · {backlog.length}</Button> : null}
+        {data.scheduledQueue.length || extraBatch.size ? <Button variant={mode === 'extra' ? 'primary' : 'secondary'} aria-pressed={mode === 'extra'} onClick={() => {
+          if (!extraBatch.size) startExtraPractice()
+          else {
+            setMode('extra')
+            cardStartedAt.current = Date.now()
+          }
+        }}>Extra practice</Button> : null}
       </div> : null}
+
+      {mode === 'extra' && activeReview ? <p className="settings-note">Review ahead of schedule, starting with cards you last reviewed longest ago. Your answers update the next review dates.</p> : null}
 
       {activeReview?.type === 'sentence' ? (
         <SentenceReviewDeck
@@ -70,6 +87,12 @@ export function ReviewView({ data }: { data: DashboardData }) {
           pending={mutation.isPending}
           onRate={rate}
         />
+      ) : mode === 'extra' ? (
+        <div className="review-complete">
+          <Empty title="Practice complete" detail="Your answers are saved. Start another batch whenever you want to practise more." />
+          {data.scheduledQueue.length ? <Button onClick={startExtraPractice}>Practise {Math.min(EXTRA_PRACTICE_BATCH_SIZE, data.scheduledQueue.length)} more cards</Button> : null}
+          {data.reviewQueue.length ? <Button variant="ghost" onClick={() => setMode('recent')}>Return to due reviews</Button> : null}
+        </div>
       ) : backlog.length ? (
         <div className="review-complete">
           <Empty
@@ -88,7 +111,7 @@ export function ReviewView({ data }: { data: DashboardData }) {
         <Empty
           title="All caught up"
           detail={data.nextReviewAt
-            ? `Next review: ${new Date(data.nextReviewAt).toLocaleString('en-GB', { timeZone: REVIEW_TIME_ZONE, day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })} Moscow time. Lessons and reading are always open.`
+            ? `Next review: ${new Date(data.nextReviewAt).toLocaleString('en-GB', { timeZone: REVIEW_TIME_ZONE, day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })} Shanghai time. Lessons and reading are always open.`
             : `Reviews return at ${REVIEW_TIME_LABEL}. Start a lesson to add cards.`}
         />
       )}
