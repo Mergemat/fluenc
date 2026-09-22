@@ -117,7 +117,7 @@ const characters = [...stats.entries()]
   )
 
 const curriculum = {
-  version: '2026-09-11',
+  version: '2026-09-23',
   sources: {
     words: WORDS_URL,
     characters: CHARACTERS_URL,

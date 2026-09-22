@@ -66,10 +66,10 @@
   {
     "character": "么",
     "pinyin": "me",
-    "keyword": "question suffix",
+    "keyword": "word-forming suffix",
     "sourcePinyin": "me5",
     "sourceSense": "suffix, used to form interrogative 什麼|什么[shen2 me5], what?, indefinite 這麼|这么[zhe4 me5] thus, etc",
-    "note": "One cue selected from the documented sense."
+    "note": "Forms both interrogative words such as 什么 and non-interrogative words such as 这么; it has no standalone meaning of question."
   },
   {
     "character": "什",
@@ -226,10 +226,10 @@
   {
     "character": "没",
     "pinyin": "méi",
-    "keyword": "not yet",
+    "keyword": "not",
     "sourcePinyin": "mei2",
     "sourceSense": "(negative prefix for verbs) have not; not",
-    "note": "common negative prefix"
+    "note": "Negates possession, occurrence or completion; 没 alone does not imply yet."
   },
   {
     "character": "让",
@@ -482,10 +482,10 @@
   {
     "character": "找",
     "pinyin": "zhǎo",
-    "keyword": "find",
+    "keyword": "look for",
     "sourcePinyin": "zhao3",
-    "sourceSense": "to find",
-    "note": "Chosen for the common modern find sense."
+    "sourceSense": "to look for",
+    "note": "The common search sense; success is expressed by 找到 rather than implied by 找."
   },
   {
     "character": "多",
@@ -1314,10 +1314,10 @@
   {
     "character": "麼",
     "pinyin": "me",
-    "keyword": "question suffix",
+    "keyword": "word-forming suffix",
     "sourcePinyin": "me5",
     "sourceSense": "suffix, used to form interrogative 什麼|什么[shen2 me5], what?, indefinite 這麼|这么[zhe4 me5] thus, etc",
-    "note": "One cue selected from the documented sense."
+    "note": "Forms both interrogative words such as 什麼 and non-interrogative words such as 這麼; it has no standalone meaning of question."
   },
   {
     "character": "世",
@@ -2842,10 +2842,10 @@
   {
     "character": "沒",
     "pinyin": "méi",
-    "keyword": "not yet",
+    "keyword": "not",
     "sourcePinyin": "mei2",
     "sourceSense": "(negative prefix for verbs) have not; not",
-    "note": "common negative prefix"
+    "note": "Negates possession, occurrence or completion; 沒 alone does not imply yet."
   },
   {
     "character": "影",
@@ -3258,10 +3258,10 @@
   {
     "character": "曾",
     "pinyin": "céng",
-    "keyword": "once",
+    "keyword": "formerly",
     "sourcePinyin": "ceng2",
-    "sourceSense": "once",
-    "note": "Common past-time adverb."
+    "sourceSense": "previously",
+    "note": "Past experience or a former state, not a count of one occurrence."
   },
   {
     "character": "在",
@@ -3290,10 +3290,10 @@
   {
     "character": "概",
     "pinyin": "gài",
-    "keyword": "approximately",
+    "keyword": "approximate",
     "sourcePinyin": "gai4",
     "sourceSense": "(bound form) general; approximate",
-    "note": "Chosen for the common modern approximately sense."
+    "note": "Bound form meaning general or approximate, as in 大概; not a standalone adverb approximately."
   },
   {
     "character": "务",
@@ -3698,10 +3698,10 @@
   {
     "character": "乎",
     "pinyin": "hū",
-    "keyword": "final particle",
+    "keyword": "classical final particle",
     "sourcePinyin": "hu1",
     "sourceSense": "(classical final particle similar to 嗎|吗[ma5], 吧[ba5], 呢[ne5], expressing question, doubt or astonishment)",
-    "note": "Uses final-particle reading found in 似乎."
+    "note": "Classical sentence-final particle expressing a question, doubt or astonishment. In modern words such as 似乎, 几乎 and 在乎, learn the whole word; this classical role is not their compositional translation."
   },
   {
     "character": "似",
@@ -3906,10 +3906,10 @@
   {
     "character": "吗",
     "pinyin": "ma",
-    "keyword": "question particle",
+    "keyword": "yes-no question particle",
     "sourcePinyin": "ma5",
     "sourceSense": "(question particle for \"yes-no\" questions)",
-    "note": "Neutral final particle."
+    "note": "Forms yes-no questions; not a general marker to append to 什么 or 怎么 questions."
   },
   {
     "character": "尸",
@@ -3946,10 +3946,10 @@
   {
     "character": "姑",
     "pinyin": "gū",
-    "keyword": "aunt",
+    "keyword": "paternal aunt",
     "sourcePinyin": "gu1",
     "sourceSense": "paternal aunt",
-    "note": "common paternal-aunt sense"
+    "note": "Father's sister; other uses such as 姑娘 are taught as whole words."
   },
   {
     "character": "娘",
@@ -3986,10 +3986,10 @@
   {
     "character": "约",
     "pinyin": "yuē",
-    "keyword": "appointment",
+    "keyword": "arrange a meeting",
     "sourcePinyin": "yue1",
     "sourceSense": "to make an appointment",
-    "note": "Uses appointment reading of 约 (yuē), not weighing."
+    "note": "Verb meaning to make an appointment or arrange to meet."
   },
   {
     "character": "翰",

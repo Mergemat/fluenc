@@ -615,10 +615,10 @@
     "id": 69,
     "hanzi": "太",
     "pinyin": "tài",
-    "meaning": "too",
+    "meaning": "too (excessively)",
     "sourcePinyin": "tai4",
     "sourceSense": "too (much)",
-    "note": "Reviewed primary sense and reading against the supplied dictionary entry."
+    "note": "Degree adverb meaning excessively; English too here does not mean also."
   },
   {
     "id": 70,
@@ -1698,7 +1698,7 @@
   {
     "id": 187,
     "hanzi": "亲爱",
-    "pinyin": "qīnài",
+    "pinyin": "qīn'ài",
     "meaning": "dear",
     "sourcePinyin": "qin1 ai4",
     "sourceSense": "dear",
@@ -2347,7 +2347,7 @@
   {
     "id": 259,
     "hanzi": "女儿",
-    "pinyin": "nǚér",
+    "pinyin": "nǚ'ér",
     "meaning": "daughter",
     "sourcePinyin": "nu:3 er2",
     "sourceSense": "daughter",
@@ -3225,10 +3225,10 @@
     "id": 353,
     "hanzi": "不了",
     "pinyin": "bùliǎo",
-    "meaning": "unable to",
+    "meaning": "cannot (verb suffix)",
     "sourcePinyin": "bu4 liao3",
     "sourceSense": "(as a resultative verb suffix) unable to (do sth)",
-    "note": "Select the resultative suffix reading bùliǎo, not the declining-an-offer reading."
+    "note": "Follows a verb to express inability, as in 做不了; not a standalone modal or the declining-an-offer reading."
   },
   {
     "id": 354,
@@ -4493,10 +4493,10 @@
     "id": 483,
     "hanzi": "曾",
     "pinyin": "céng",
-    "meaning": "once",
+    "meaning": "formerly",
     "sourcePinyin": "ceng2",
-    "sourceSense": "once",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "sourceSense": "previously",
+    "note": "Past experience or a former state, not a count of one occurrence."
   },
   {
     "id": 484,
@@ -4538,7 +4538,7 @@
     "id": 488,
     "hanzi": "放在",
     "pinyin": "fàngzài",
-    "meaning": "put at",
+    "meaning": "put in/on/at",
     "note": "Put plus a location marker; a place follows. The location can be at, in or on depending on context.",
     "composition": [
       {
@@ -4665,10 +4665,10 @@
     "id": 501,
     "hanzi": "耶",
     "pinyin": "ye",
-    "meaning": "yeah",
+    "meaning": "yay!",
     "sourcePinyin": "ye5",
     "sourceSense": "final particle indicating enthusiasm etc",
-    "note": "An enthusiasm particle, using the neutral modern reading."
+    "note": "An expression of enthusiasm; yay distinguishes this from an ordinary affirmative reply."
   },
   {
     "id": 502,
@@ -4745,7 +4745,7 @@
   {
     "id": 510,
     "hanzi": "可爱",
-    "pinyin": "kěài",
+    "pinyin": "kě'ài",
     "meaning": "cute",
     "sourcePinyin": "ke3 ai4",
     "sourceSense": "cute",
@@ -4773,10 +4773,10 @@
     "id": 513,
     "hanzi": "曾经",
     "pinyin": "céngjīng",
-    "meaning": "once",
+    "meaning": "once in the past",
     "sourcePinyin": "ceng2 jing1",
     "sourceSense": "once",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "note": "Marks past experience; once here does not count a single occurrence."
   },
   {
     "id": 514,
@@ -4836,7 +4836,7 @@
   {
     "id": 519,
     "hanzi": "晚安",
-    "pinyin": "wǎnān",
+    "pinyin": "wǎn'ān",
     "meaning": "good night",
     "sourcePinyin": "wan3 an1",
     "sourceSense": "Good night!",
@@ -5107,10 +5107,10 @@
     "id": 549,
     "hanzi": "似乎",
     "pinyin": "sìhū",
-    "meaning": "seem",
+    "meaning": "seemingly",
     "sourcePinyin": "si4 hu1",
     "sourceSense": "it seems; seemingly; as if",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "note": "Adverb expressing how something appears; avoids teaching it as the English verb seem."
   },
   {
     "id": 550,
@@ -5343,8 +5343,8 @@
     "id": 574,
     "hanzi": "一场",
     "pinyin": "yīchǎng",
-    "meaning": "one match",
-    "note": "Select the sports-event classifier chǎng; one match is a teaching cue for this use, with the noun supplied by context.",
+    "meaning": "one (sports/event measure word)",
+    "note": "One plus the classifier for sporting or recreational events; the phrase alone does not specify a match.",
     "composition": [
       {
         "hanzi": "一",
@@ -5654,8 +5654,8 @@
     "id": 603,
     "hanzi": "一只",
     "pinyin": "yīzhī",
-    "meaning": "one animal",
-    "note": "Select zhī, the classifier for animals and other listed objects. One animal is a teaching cue with the noun supplied by context.",
+    "meaning": "one (animal/object measure word)",
+    "note": "One plus the classifier for certain animals, paired objects and utensils; the counted noun comes from context.",
     "composition": [
       {
         "hanzi": "一",
@@ -6259,10 +6259,10 @@
     "id": 666,
     "hanzi": "叔叔",
     "pinyin": "shūshu",
-    "meaning": "uncle",
+    "meaning": "father's younger brother",
     "sourcePinyin": "shu1 shu5",
     "sourceSense": "father's younger brother; paternal uncle",
-    "note": "Primary reference is the father's younger brother; other address usage remains in dictionary senses."
+    "note": "Preserve the paternal and younger-brother distinctions of this kinship sense; other forms of address remain in dictionary senses."
   },
   {
     "id": 667,
@@ -6798,8 +6798,8 @@
     "id": 726,
     "hanzi": "一份",
     "pinyin": "yīfèn",
-    "meaning": "one copy",
-    "note": "Number plus document classifier; one copy is the intended counting phrase, not every use of 份.",
+    "meaning": "one (document/copy measure word)",
+    "note": "One plus the classifier used for documents and copies in the selected sense; context supplies what is counted.",
     "composition": [
       {
         "hanzi": "一",
@@ -6819,8 +6819,8 @@
     "pinyin": "bàng",
     "meaning": "excellent",
     "sourcePinyin": "bang4",
-    "sourceSense": "classifier for legs of a relay race",
-    "note": "Retained the clear teaching sense \"excellent\" after comparing the supplied readings and senses."
+    "sourceSense": "wonderful",
+    "note": "Excellent paraphrases the adjective wonderful, not the unrelated relay-leg classifier sense."
   },
   {
     "id": 728,
@@ -6934,8 +6934,8 @@
     "id": 740,
     "hanzi": "一张",
     "pinyin": "yīzhāng",
-    "meaning": "one sheet",
-    "note": "Number plus flat-object classifier; sheet is a teaching example of this counting construction.",
+    "meaning": "one (flat-object measure word)",
+    "note": "One plus the flat-object classifier; a sheet is one possible example, not a noun present in the phrase.",
     "composition": [
       {
         "hanzi": "一",
