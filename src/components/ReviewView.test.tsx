@@ -41,6 +41,7 @@ afterAll(async () => {
 })
 
 test('the last missed card hides its answer again instead of ending the session', async () => {
+  const now = new Date()
   const fixture: DashboardData = {
     curriculum: { version: 'test', characters: 0, words: 0 },
     progress: { introducedCharacters: 0, introducedWords: 0 },
@@ -48,7 +49,7 @@ test('the last missed card hides its answer again instead of ending the session'
     getQueue: [{ id: 's01', hanzi: '你好。', pinyin: 'Nǐ hǎo.', meaning: 'Hi.', words: ['你', '好'], coverage: 1, missingWords: [], missingCharacters: [] }],
   }
   let data = applyOperation(fixture, { kind: 'enroll', data: {
-    itemType: 'sentence', itemId: 's01', enrolledAt: '2026-09-11T19:00:00Z',
+    itemType: 'sentence', itemId: 's01', enrolledAt: new Date(now.getTime() - 60_000).toISOString(),
   } })
   const show = async () => {
     await act(async () => root.render(<QueryClientProvider client={client}><ReviewView data={data} /></QueryClientProvider>))
@@ -60,7 +61,7 @@ test('the last missed card hides its answer again instead of ending the session'
   expect(host.querySelector('.sentence-answer')).not.toBeNull()
   data = applyOperation(data, { kind: 'review', data: {
     eventId: crypto.randomUUID(), itemType: 'sentence', itemId: 's01', rating: 1,
-    reviewedAt: '2026-09-11T19:01:00Z', durationMs: 100,
+    reviewedAt: now.toISOString(), durationMs: 100,
   } })
   await show()
   expect(host.querySelector('.sentence-answer')).toBeNull()
