@@ -336,10 +336,10 @@
     "id": 38,
     "hanzi": "这样",
     "pinyin": "zhèyàng",
-    "meaning": "this way",
+    "meaning": "like this",
     "sourcePinyin": "zhe4 yang4",
     "sourceSense": "this way; like this; so",
-    "note": "Reviewed primary sense and reading against the supplied dictionary entry."
+    "note": "Manner cue shared with the traditional spelling; describes how something is done, rather than treating every demonstrative as a degree word. Example: 这样做。 / Do it like this."
   },
   {
     "id": 39,
@@ -381,10 +381,10 @@
     "id": 43,
     "hanzi": "不会",
     "pinyin": "bùhuì",
-    "meaning": "cannot",
+    "meaning": "not know how to",
     "sourcePinyin": "bu4 hui4",
-    "sourceSense": "not able",
-    "note": "Core inability sense; use underlying bu4 rather than sandhi bú."
+    "sourceSense": "not having learned to do sth",
+    "note": "Cannot loses learned-ability contrast with 不能; 他不会来 is also a future prediction, not inability. Example: 我不会开车。 / I don't know how to drive. Usage evidence: https://resources.allsetlearning.com/chinese/grammar/ASGRHM0E"
   },
   {
     "id": 44,
@@ -507,10 +507,10 @@
     "id": 57,
     "hanzi": "这么",
     "pinyin": "zhème",
-    "meaning": "this way",
+    "meaning": "so (to this extent)",
     "sourcePinyin": "zhe4 me5",
-    "sourceSense": "this way",
-    "note": "Clearer standalone teaching meaning than isolated so."
+    "sourceSense": "this much",
+    "note": "Teach degree in 这么贵 (so expensive) and 这么多 (this much/many); manner use remains a dictionary alternative. Example: 今天怎么这么冷？ / Why is it so cold today? Usage evidence: https://resources.allsetlearning.com/chinese/grammar/Adjectives_with_%22name%22_and_%22zheme%22"
   },
   {
     "id": 58,
@@ -615,10 +615,10 @@
     "id": 69,
     "hanzi": "太",
     "pinyin": "tài",
-    "meaning": "too (excessively)",
+    "meaning": "too; extremely",
     "sourcePinyin": "tai4",
     "sourceSense": "too (much)",
-    "note": "Degree adverb meaning excessively; English too here does not mean also."
+    "note": "Excess cue works here; 太好了 praises 'so great' without negative excess, so qualifier must not imply every 太 is excessive. The previous excessively-only qualifier overcorrected the bare English too. Keep excess and positive intensity together without claiming interchangeable English translations. Example: 这个太贵了。 / This is too expensive. Usage evidence: https://resources.allsetlearning.com/chinese/grammar/Expressing_%22excessively%22_with_%22tai%22"
   },
   {
     "id": 70,
@@ -724,10 +724,10 @@
     "id": 80,
     "hanzi": "一下",
     "pinyin": "yīxià",
-    "meaning": "briefly",
+    "meaning": "a bit; softens requests",
     "sourcePinyin": "yi1 xia4",
     "sourceSense": "(after a verb) a bit; a little (indicating brief duration, or softening the tone, or suggesting giving sth a try)",
-    "note": "Verb complement for a short action; use underlying yi1."
+    "note": "After a verb, can suggest a brief action, a try, or soften a request. Compare 看一下 (take a look) and 开一下门 (please open the door); the latter does not require opening it briefly or only a little. Example: 请帮我看一下。 / Please take a look for me. Usage evidence: http://resources.allsetlearning.com/chinese/grammar/ASGWCESP"
   },
   {
     "id": 81,
@@ -787,10 +787,10 @@
     "id": 88,
     "hanzi": "那么",
     "pinyin": "nàme",
-    "meaning": "like that",
+    "meaning": "so (to that extent)",
     "sourcePinyin": "na4 me5",
     "sourceSense": "like that; in that way; to that extent",
-    "note": "Makes the demonstrative meaning explicit."
+    "note": "Teach degree in 那么高 (so tall) and 那么多 (that much/many); discourse then/in that case remains an alternative. Example: 你那么聪明，一定能猜到。 / You are so smart. You can definitely guess it. Usage evidence: https://resources.allsetlearning.com/chinese/grammar/Adjectives_with_%22name%22_and_%22zheme%22"
   },
   {
     "id": 89,
@@ -1491,10 +1491,10 @@
     "id": 165,
     "hanzi": "怎么样",
     "pinyin": "zěnmeyàng",
-    "meaning": "how about",
+    "meaning": "how is it?",
     "sourcePinyin": "zen3 me5 yang4",
-    "sourceSense": "how about?",
-    "note": "Reviewed primary sense and reading against the supplied dictionary entry."
+    "sourceSense": "how are things?",
+    "note": "How about only teaches suggestion use, while this routine condition/quality question is central. Tomorrow suggestion 明天去怎么样 still means how about going tomorrow; the new cue prioritizes a condition/evaluation question without banning suggestions. Example: 你今天感觉怎么样？ / How are you feeling today? Usage evidence: https://resources.allsetlearning.com/vocabwiki?printable=yes&title=Comparing_%22ganjue%22_and_%22juede%22"
   },
   {
     "id": 166,
@@ -1600,19 +1600,19 @@
     "id": 176,
     "hanzi": "不行",
     "pinyin": "bùxíng",
-    "meaning": "will not do",
+    "meaning": "not OK",
     "sourcePinyin": "bu4 xing2",
-    "sourceSense": "won't do",
-    "note": "Clear judgment of acceptability or feasibility."
+    "sourceSense": "be no good",
+    "note": "Will not do is idiomatic rejection, but may read like future refusal to a novice; won't work is clearer. The cue covers unacceptable plans and refusal to allow an action; 这个办法不行 also means a method does not work. Do not interpret it as a prediction that someone refuses to do a task. Example: 这个办法不行。 / This approach won't work. Usage evidence: https://thatsmandarin.com/chinese-language/say-no-5-ways-to-refuse-in-chinese"
   },
   {
     "id": 177,
     "hanzi": "那样",
     "pinyin": "nàyàng",
-    "meaning": "that kind",
+    "meaning": "like that",
     "sourcePinyin": "na4 yang4",
     "sourceSense": "that kind",
-    "note": "Use an explicit dictionary-supported demonstrative gloss."
+    "note": "Describes manner in 别那样做 (do not do it like that), not only a type in 那样的人 (that kind of person). The pinned dictionary entry is incomplete; the manner reading is evidenced by the linked usage example. Example: 别那样做。 / Do not do it like that. Usage evidence: https://chinesepod.com/dictionary/%E8%AF%8D%E6%B1%87"
   },
   {
     "id": 178,
@@ -1753,10 +1753,10 @@
     "id": 193,
     "hanzi": "到底",
     "pinyin": "dàodǐ",
-    "meaning": "after all",
+    "meaning": "exactly (in questions)",
     "sourcePinyin": "dao4 di3",
     "sourceSense": "after all",
-    "note": "Reviewed primary sense and reading against the supplied dictionary entry."
+    "note": "After all fails the common emphatic question; 到底是孩子 still supports the original statement sense. Pinned sourceSense is retained as a reading anchor, not claimed to be an English gloss for the question use. The external usage evidence establishes the proposed cue. Example: 你到底想要什么？ / What exactly do you want? Usage evidence: https://resources.allsetlearning.com/chinese/grammar/Expressing_%22in_the_end%22_with_%22daodi%22"
   },
   {
     "id": 194,
@@ -1906,10 +1906,10 @@
     "id": 210,
     "hanzi": "看起来",
     "pinyin": "kànqǐlai",
-    "meaning": "to look like",
+    "meaning": "to look/seem",
     "sourcePinyin": "kan4 qi3 lai5",
     "sourceSense": "seemingly; apparently; looks as if; appears to be; gives the impression that; seems on the face of it to be",
-    "note": "Dictionary reading ends in neutral lai5."
+    "note": "To look like misleads before an adjective; English looks/seems better covers apparent state without a comparison noun. Compare 看起来很累 with 看起来像你姐姐. English like belongs to the noun-comparison construction, not every 看起来. Example: 他看起来很累。 / He looks tired. Usage evidence: http://resources.allsetlearning.com/chinese/grammar/ASG9K0F8"
   },
   {
     "id": 211,
@@ -1996,10 +1996,10 @@
     "id": 220,
     "hanzi": "多少",
     "pinyin": "duōshao",
-    "meaning": "how many",
+    "meaning": "how much/many",
     "sourcePinyin": "duo1 shao5",
     "sourceSense": "how much?; how many?",
-    "note": "Question reading has neutral shao5; duo1 shao3 is amount or somewhat."
+    "note": "How many alone misses the routine price question; same interrogative covers counts and amounts. Count question 多少人 remains how many people; both belong to the same everyday amount question, not unrelated dictionary senses. Example: 这个多少钱？ / How much does this cost? Usage evidence: https://resources.allsetlearning.com/chinese/grammar/Counting_money"
   },
   {
     "id": 222,
@@ -2411,10 +2411,10 @@
     "id": 266,
     "hanzi": "有没有",
     "pinyin": "yǒuméiyǒu",
-    "meaning": "do you have",
+    "meaning": "is there...?",
     "sourcePinyin": "you3 mei2 you3",
-    "sourceSense": "(before a noun) Do (you, they etc) have ...?",
-    "note": "Teach the question pattern instead of literal have or not."
+    "sourceSense": "Is there a ...?",
+    "note": "Do you have adds a person not present in existential questions; 你有没有时间 is possession. Needs a question cue without fixed you. Prioritize the existential yes/no question. 你有没有时间 still asks possession, while 你有没有去 asks about a past action; keep these real alternatives in details. Example: 这里有没有人？ / Is there anyone here? Usage evidence: https://chinesepod.com/dictionary/%E6%9C%89%E6%B2%A1%E6%9C%89"
   },
   {
     "id": 267,
@@ -2429,10 +2429,10 @@
     "id": 268,
     "hanzi": "根本",
     "pinyin": "gēnběn",
-    "meaning": "fundamental",
+    "meaning": "at all (in negatives)",
     "sourcePinyin": "gen1 ben3",
-    "sourceSense": "fundamental",
-    "note": "At all depends on negation; fundamental is a complete standalone core sense."
+    "sourceSense": "(not) at all",
+    "note": "Fundamental misses emphatic denial. 根本原因 still means fundamental cause, so negative qualifier is necessary on replacement. Example: 我根本不认识他。 / I don't know him at all. Usage evidence: https://resources.allsetlearning.com/chinese/grammar/Comparing_%22genben%22_and_%22daodi%22"
   },
   {
     "id": 269,
@@ -3135,19 +3135,19 @@
     "id": 343,
     "hanzi": "绝对",
     "pinyin": "juéduì",
-    "meaning": "absolute",
+    "meaning": "absolutely",
     "sourcePinyin": "jue2 dui4",
     "sourceSense": "absolute; unconditional",
-    "note": "Use the adjective supported explicitly by the source sense."
+    "note": "Absolute hides everyday adverb before predicates; 绝对优势 still supports adjective. The pinned adjective sense remains a reading anchor. 绝对优势 still has adjectival absolute; the cue selects common predicate emphasis, not exclusive part of speech. Example: 我绝对同意。 / I absolutely agree. Usage evidence: https://dictionary.cambridge.org/zht/%E8%A9%9E%E5%85%B8/%E8%8B%B1%E8%AA%9E-%E6%BC%A2%E8%AA%9E-%E7%B0%A1%E9%AB%94/absolutely"
   },
   {
     "id": 344,
     "hanzi": "正",
     "pinyin": "zhèng",
-    "meaning": "straight",
+    "meaning": "ongoing-action adverb",
     "sourcePinyin": "zheng4",
-    "sourceSense": "straight",
-    "note": "Select zhèng, not the first-month reading zhēng."
+    "sourceSense": "just (at that time)",
+    "note": "Marks an ongoing action at the relevant time, as in 我正忙着呢 and 他来的时候，我正做饭呢. The cue must not imply present tense or exclude a past reference time; correct/upright senses remain alternatives. Example: 我正忙着呢。 / I am busy right now. Usage evidence: https://resources.allsetlearning.com/chinese/grammar/ASGEYQ9O"
   },
   {
     "id": 345,
@@ -3451,10 +3451,10 @@
     "id": 377,
     "hanzi": "这边",
     "pinyin": "zhèbiān",
-    "meaning": "this side",
+    "meaning": "over here",
     "sourcePinyin": "zhe4 bian1",
-    "sourceSense": "this side",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "sourceSense": "here",
+    "note": "This side too spatially narrow for routine deictic invitation; 街道这边 still genuinely this side. Example: 请到这边来。 / Please come over here. Usage evidence: https://www.yellowbridge.com/chinese/sentsearch.php?word=%E8%BF%99%E8%BE%B9"
   },
   {
     "id": 378,
@@ -3596,10 +3596,10 @@
     "id": 392,
     "hanzi": "突然",
     "pinyin": "tūrán",
-    "meaning": "sudden",
+    "meaning": "suddenly",
     "sourcePinyin": "tu1 ran2",
     "sourceSense": "sudden; abrupt; unexpected",
-    "note": "Use the source adjective as the compact cue; adverbial uses remain contextual."
+    "note": "Ordinary adverbial usage; sudden adjective remains valid in 太突然了 and 突然的变化. The pinned sourceSense remains an adjective-form reading anchor. The external reference supports the adverb-form teaching cue, while 突然的变化 and 太突然了 remain valid adjective contexts. Example: 电话突然响了。 / The phone suddenly rang. Usage evidence: https://resources.allsetlearning.com/gramwiki?oldid=41796&title=Comparing_%22turan%22_and_%22huran%22"
   },
   {
     "id": 393,
@@ -3686,10 +3686,10 @@
     "id": 402,
     "hanzi": "讓",
     "pinyin": "ràng",
-    "meaning": "let",
+    "meaning": "to let",
     "sourcePinyin": "rang4",
     "sourceSense": "to let sb do sth",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "note": "Same selected reading and meaning as 让; the traditional spelling does not introduce a different sense."
   },
   {
     "id": 403,
@@ -3768,10 +3768,10 @@
     "id": 408,
     "hanzi": "沒有",
     "pinyin": "méiyǒu",
-    "meaning": "not have",
+    "meaning": "to not have",
     "sourcePinyin": "mei2 you3",
     "sourceSense": "to not have",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "note": "Same selected reading and meaning as 没有; the traditional spelling does not introduce a different sense."
   },
   {
     "id": 409,
@@ -4312,10 +4312,10 @@
     "id": 464,
     "hanzi": "拍",
     "pinyin": "pāi",
-    "meaning": "clap",
+    "meaning": "to pat",
     "sourcePinyin": "pai1",
-    "sourceSense": "to clap",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "sourceSense": "to pat",
+    "note": "Clap implies hands together and misses the basic contact action; 拍照 additionally means photograph. Use a basic hand-contact action instead of clapping two hands together. 拍照 is to photograph and 拍手 is to clap; both remain ordinary separate object-dependent meanings, not invalid uses. Example: 她轻轻拍了拍我的肩膀。 / She gently patted my shoulder. Usage evidence: https://dictionary.cambridge.org/dictionary/english-chinese-traditional/pat"
   },
   {
     "id": 465,
@@ -4466,10 +4466,10 @@
     "id": 480,
     "hanzi": "沒",
     "pinyin": "méi",
-    "meaning": "have not",
+    "meaning": "not",
     "sourcePinyin": "mei2",
     "sourceSense": "(negative prefix for verbs) have not; not",
-    "note": "This entry supports a negative verb marker; avoid implying it alone always means possess nothing."
+    "note": "Same selected reading and meaning as 没; the traditional spelling does not introduce a different sense."
   },
   {
     "id": 481,
@@ -4611,10 +4611,10 @@
     "id": 495,
     "hanzi": "接",
     "pinyin": "jiē",
-    "meaning": "receive",
+    "meaning": "to pick up (a person/phone)",
     "sourcePinyin": "jie1",
-    "sourceSense": "to receive",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "sourceSense": "to meet or welcome sb",
+    "note": "Picks up a person or answers a phone, as in 接孩子 and 接电话. The qualifier prevents the English lifting-an-object sense from being inferred; other receiving and connecting uses remain in the dictionary senses. Example: 我去接孩子。 / I am going to pick up the child. Usage evidence: https://chinesepod.com/dictionary/%E6%8E%A5"
   },
   {
     "id": 496,
@@ -4809,8 +4809,8 @@
     "id": 517,
     "hanzi": "留在",
     "pinyin": "liúzài",
-    "meaning": "stay at",
-    "note": "Stay plus a location marker; a place follows. At avoids suggesting that every use means inside.",
+    "meaning": "stay in/at",
+    "note": "The place determines the English preposition: 留在家里 is stay at home, while 留在上海 is stay in Shanghai. Keep the location phrase open until its complement is supplied. Example: 我想留在上海。 / I want to stay in Shanghai. Usage evidence: https://dictionary.cambridge.org/dictionary/english-chinese-simplified/stay",
     "composition": [
       {
         "hanzi": "留",
@@ -4828,10 +4828,10 @@
     "id": 518,
     "hanzi": "痛苦",
     "pinyin": "tòngkǔ",
-    "meaning": "pain",
+    "meaning": "suffering",
     "sourcePinyin": "tong4 ku3",
-    "sourceSense": "pain",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "sourceSense": "suffering",
+    "note": "Prefer suffering as the recall cue for deep bodily or mental distress. Pain is possible, but collapses 痛苦 into ordinary 痛 and gives less guidance for difficult lives, loss, and painful experiences. Example: 失去朋友让她很痛苦。 / Losing her friend caused her great suffering. Usage evidence: https://chinesepod.com/dictionary/痛苦"
   },
   {
     "id": 519,
@@ -5170,8 +5170,8 @@
     "id": 556,
     "hanzi": "坐在",
     "pinyin": "zuòzài",
-    "meaning": "sit at",
-    "note": "Sit plus a location marker; a place follows. English in or on depends on that location.",
+    "meaning": "sit in/on/at",
+    "note": "The place determines the English preposition: 坐在椅子上 is sit on a chair, while 坐在桌旁 is sit at a table. The construction does not prescribe at for every location. Example: 她坐在椅子上。 / She is sitting on the chair. Usage evidence: https://dictionary.cambridge.org/pt/dicionario/ingles-chines-tradicional/sit",
     "composition": [
       {
         "hanzi": "坐",
@@ -5189,10 +5189,10 @@
     "id": 557,
     "hanzi": "答应",
     "pinyin": "dāying",
-    "meaning": "promise",
+    "meaning": "agree to a request",
     "sourcePinyin": "da1 ying5",
     "sourceSense": "to answer positively; to agree; to accept; to promise",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "note": "Accepts a request or proposal, as in 答应帮忙 and 答应求婚; it can also make a promise. This distinguishes saying yes to a request from merely sharing an opinion. Example: 她答应帮我。 / She agreed to help me. Usage evidence: https://chinesepod.com/dictionary/答应"
   },
   {
     "id": 558,
@@ -5264,7 +5264,7 @@
     "meaning": "like this",
     "sourcePinyin": "zhe4 yang4",
     "sourceSense": "this way; like this; so",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "note": "Same meaning and lesson cue as simplified 这样. Example: 這樣做。 / Do it like this."
   },
   {
     "id": 567,
@@ -5452,10 +5452,10 @@
     "id": 585,
     "hanzi": "加油",
     "pinyin": "jiāyóu",
-    "meaning": "cheer on",
+    "meaning": "you can do it!",
     "sourcePinyin": "jia1 you2",
     "sourceSense": "(fig.) to make an extra effort; to cheer sb on",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "note": "A direct encouragement before or during an attempt, as in 加油，你能做到 and 为运动员加油. Cheer on describes the supporter's action; keep it up assumes an effort already in progress. Refueling remains a separate dictionary sense. Example: 加油，你能做到！ / Keep it up, you can do it! Usage evidence: https://goeastmandarin.com/how-to-say-good-luck-in-chinese/"
   },
   {
     "id": 586,
@@ -5782,8 +5782,8 @@
     "id": 615,
     "hanzi": "一条",
     "pinyin": "yītiáo",
-    "meaning": "one long object",
-    "note": "One plus the classifier for long thin things; this teaching cue names the classifier category, and context supplies the actual noun.",
+    "meaning": "one (long-object measure word)",
+    "note": "A number plus classifier, not a standalone noun meaning one long object. The classifier also counts text messages and trousers; the noun supplies what is counted. Example: 我买了一条裤子。 / I bought a pair of trousers. Usage evidence: https://resources.allsetlearning.com/gramwiki?oldid=48980&title=Measure_words_for_counting",
     "composition": [
       {
         "hanzi": "一",
@@ -5837,10 +5837,10 @@
     "id": 621,
     "hanzi": "原来",
     "pinyin": "yuánlái",
-    "meaning": "originally",
+    "meaning": "as it turns out",
     "sourcePinyin": "yuan2 lai2",
-    "sourceSense": "originally; formerly; at first",
-    "note": "Retain a concise teaching cue supported by the selected dictionary reading and sense."
+    "sourceSense": "so, actually, as it turns out",
+    "note": "Select the realization/discovery use for a conversational lesson. Originally is also ordinary and must remain in alternatives, including 原来的; it cannot explain 原来是你. This is a lesson-priority choice, not a frequency claim. Example: 原来是你！ / So it was you! Usage evidence: https://www.chinesepod.com/dictionary/原来"
   },
   {
     "id": 622,
@@ -6798,8 +6798,8 @@
     "id": 726,
     "hanzi": "一份",
     "pinyin": "yīfèn",
-    "meaning": "one (document/copy measure word)",
-    "note": "One plus the classifier used for documents and copies in the selected sense; context supplies what is counted.",
+    "meaning": "one (portion/copy measure word)",
+    "note": "The current document/copy restriction omits an ordinary food-ordering function. The existing pinned classifier sense can support documents; independent meal examples support the portion extension. Preserve exact pinned evidence rather than inventing a dictionary sense. Example: 我要一份米饭。 / I'd like one portion of rice. Usage evidence: https://www.chinesepod.com/dictionary/套餐",
     "composition": [
       {
         "hanzi": "一",
@@ -6835,10 +6835,10 @@
     "id": 729,
     "hanzi": "做出",
     "pinyin": "zuòchū",
-    "meaning": "issue",
+    "meaning": "make",
     "sourcePinyin": "zuo4 chu1",
-    "sourceSense": "to issue",
-    "note": "Uses the attested resultative sense rather than the overly broad make."
+    "sourceSense": "to put out",
+    "note": "Natural result-producing verb in 做出决定, 做出选择, and 做出卡片. Bare issue suggests a problem noun or formally issuing a document and does not transfer to these ordinary combinations. External examples establish the paraphrase beyond the pinned terse gloss. Example: 他做出了决定。 / He made a decision. Usage evidence: https://www.chinesepod.com/dictionary/做出"
   },
   {
     "id": 730,
@@ -7698,10 +7698,10 @@
     "id": 818,
     "hanzi": "辛苦",
     "pinyin": "xīnkǔ",
-    "meaning": "hardship",
+    "meaning": "hard and tiring",
     "sourcePinyin": "xin1 ku3",
-    "sourceSense": "hardship(s)",
-    "note": "Retained the clear teaching sense \"hardship\" after comparing the supplied readings and senses."
+    "sourceSense": "exhausting",
+    "note": "Teach demanding effort and fatigue, as in 工作很辛苦. Hardship alone encourages a noun-only reading and misses the frequent predicative adjective and appreciation formula 辛苦你了. The appreciation formula needs a natural sentence translation, not literal substitution. Example: 这份工作很辛苦。 / This job is hard work. Usage evidence: https://chinesepod.com/dictionary/辛苦"
   },
   {
     "id": 819,
@@ -7932,8 +7932,8 @@
     "id": 844,
     "hanzi": "说得对",
     "pinyin": "shuōdeduì",
-    "meaning": "say it correctly",
-    "note": "Verb plus neutral-tone complement marker de5 plus correct. Existing shuōdéduì selected the wrong reading of 得.",
+    "meaning": "be right",
+    "note": "Agreement that the content of someone's statement is correct. Say it correctly can sound like instructions for wording or pronunciation. The subject determines I/you/he, so do not hardcode you in the meaning. Example: 你说得对。 / You're right. Usage evidence: https://chinesepod.com/dictionary/答应",
     "composition": [
       {
         "hanzi": "说",
@@ -8064,10 +8064,10 @@
     "id": 857,
     "hanzi": "救命",
     "pinyin": "jiùmìng",
-    "meaning": "save a life",
+    "meaning": "Help!",
     "sourcePinyin": "jiu4 ming4",
-    "sourceSense": "to save sb's life",
-    "note": "Retained the clear teaching sense \"save a life\" after comparing the supplied readings and senses."
+    "sourceSense": "(interj.) Help!",
+    "note": "Teach the standalone urgent rescue cry. Save a life is valid inside verb phrases but is not how English renders 救命啊 addressed to potential rescuers. Example: 救命啊！ / Help! Usage evidence: https://www.chinesepod.com/dictionary/救命"
   },
   {
     "id": 858,
@@ -8154,10 +8154,10 @@
     "id": 867,
     "hanzi": "不准",
     "pinyin": "bùzhǔn",
-    "meaning": "forbid",
+    "meaning": "not allowed",
     "sourcePinyin": "bu4 zhun3",
-    "sourceSense": "to forbid",
-    "note": "Retained the clear teaching sense \"forbid\" after comparing the supplied readings and senses."
+    "sourceSense": "not to allow",
+    "note": "The modal prohibition applies to the following action, as in 你不准告诉别人. Bare forbid suggests a transitive verb with the person doing the forbidding as subject. Example: 这里不准停车。 / Parking isn't allowed here. Usage evidence: https://www.chinesepod.com/dictionary/不准"
   },
   {
     "id": 868,
@@ -8281,10 +8281,10 @@
     "id": 880,
     "hanzi": "如",
     "pinyin": "rú",
-    "meaning": "as if",
+    "meaning": "as (in comparisons)",
     "sourcePinyin": "ru2",
-    "sourceSense": "as if",
-    "note": "Retained the clear teaching sense \"as if\" after comparing the supplied readings and senses."
+    "sourceSense": "as",
+    "note": "As if imposes a hypothetical comparison and is too narrow for correspondence and resemblance. Teach the comparison function; conditional and example-introducing contexts can remain in references. Example: 正如你所说。 / Just as you said. Usage evidence: https://www.chinesepod.com/dictionary/一般"
   },
   {
     "id": 881,
@@ -8314,10 +8314,10 @@
     "id": 883,
     "hanzi": "公寓",
     "pinyin": "gōngyù",
-    "meaning": "apartment building",
+    "meaning": "apartment",
     "sourcePinyin": "gong1 yu4",
     "sourceSense": "apartment building; block of flats (may be a public housing block or a condominium etc) (CL:套[tao4])",
-    "note": "The supplied dictionary specifies the building rather than an individual apartment."
+    "note": "An individual residential unit is an ordinary use, illustrated by renting one and contrasting it with a single room. Building alone misleads a learner into thinking 租一套公寓 means renting an entire building. Pinned CEDICT only says apartment building; the independent examples are required evidence for this lesson paraphrase. Example: 我租了一套公寓。 / I rented an apartment. Usage evidence: https://www.chinesepod.com/dictionary/公寓"
   },
   {
     "id": 884,
@@ -8359,10 +8359,10 @@
     "id": 888,
     "hanzi": "告訴",
     "pinyin": "gàosu",
-    "meaning": "tell",
+    "meaning": "to tell",
     "sourcePinyin": "gao4 su5",
     "sourceSense": "to tell; to inform; to let know",
-    "note": "Retained the clear teaching sense \"tell\" after comparing the supplied readings and senses."
+    "note": "Same selected reading and meaning as 告诉; the traditional spelling does not introduce a different sense."
   },
   {
     "id": 889,
@@ -8464,10 +8464,10 @@
     "id": 898,
     "hanzi": "喜歡",
     "pinyin": "xǐhuan",
-    "meaning": "like",
+    "meaning": "to like",
     "sourcePinyin": "xi3 huan5",
     "sourceSense": "to like; to be fond of",
-    "note": "Retained the clear teaching sense \"like\" after comparing the supplied readings and senses."
+    "note": "Same selected reading and meaning as 喜欢; the traditional spelling does not introduce a different sense."
   },
   {
     "id": 899,
@@ -8509,10 +8509,10 @@
     "id": 903,
     "hanzi": "這麼",
     "pinyin": "zhème",
-    "meaning": "this way",
+    "meaning": "so (to this extent)",
     "sourcePinyin": "zhe4 me5",
-    "sourceSense": "this way",
-    "note": "Use the same teaching meaning as the simplified spelling 这么."
+    "sourceSense": "this much",
+    "note": "Same degree cue as simplified 这么; the traditional spelling does not change the meaning. Example: 這麼貴。 / So expensive. Usage evidence: https://resources.allsetlearning.com/chinese/grammar/Adjectives_with_%22name%22_and_%22zheme%22"
   },
   {
     "id": 904,
@@ -8563,10 +8563,10 @@
     "id": 910,
     "hanzi": "聽",
     "pinyin": "tīng",
-    "meaning": "listen",
+    "meaning": "to listen",
     "sourcePinyin": "ting1",
     "sourceSense": "to listen to; to hear",
-    "note": "Retained the clear teaching sense \"listen\" after comparing the supplied readings and senses."
+    "note": "Same selected reading and meaning as 听; the traditional spelling does not introduce a different sense."
   },
   {
     "id": 911,
@@ -8581,10 +8581,10 @@
     "id": 912,
     "hanzi": "見",
     "pinyin": "jiàn",
-    "meaning": "meet",
+    "meaning": "to see",
     "sourcePinyin": "jian4",
-    "sourceSense": "to meet",
-    "note": "Retained the clear teaching sense \"meet\" after comparing the supplied readings and senses."
+    "sourceSense": "to see",
+    "note": "Same selected reading and meaning as 见; the traditional spelling does not introduce a different sense."
   },
   {
     "id": 913,
@@ -8768,13 +8768,13 @@
     "id": 930,
     "hanzi": "是从",
     "pinyin": "shìcóng",
-    "meaning": "be from",
-    "note": "Copula plus source preposition; incomplete without a following origin or phrase and not an independent dictionary word.",
+    "meaning": "from (emphasized origin)",
+    "note": "This is an unfinished construction fragment, not a standalone be-from verb. In 我是从北京来的, 是 marks focus and 从 introduces origin. Bind 是 to its emphatic-adverb sense and explain that origin and a following clause are required. Example: 我是从北京来的。 / I came from Beijing. Usage evidence: http://resources.allsetlearning.com/chinese/grammar/ASGE662E",
     "composition": [
       {
         "hanzi": "是",
         "sourcePinyin": "shi4",
-        "sourceSense": "to be (followed by substantives only)"
+        "sourceSense": "(adverb for emphatic assertion)"
       },
       {
         "hanzi": "从",
@@ -9057,10 +9057,10 @@
     "id": 961,
     "hanzi": "美好",
     "pinyin": "měihǎo",
-    "meaning": "beautiful",
+    "meaning": "wonderful",
     "sourcePinyin": "mei3 hao3",
     "sourceSense": "beautiful",
-    "note": "Retained the clear teaching sense \"beautiful\" after comparing the supplied readings and senses."
+    "note": "Choose a broad positive evaluation of memories, life, hopes, and experiences. Beautiful is possible but overemphasizes appearance and makes 美好 look interchangeable with 美丽. Example: 我们有很多美好的回忆。 / We have many wonderful memories. Usage evidence: https://chinesepod.com/dictionary/美好"
   },
   {
     "id": 962,
@@ -9422,10 +9422,10 @@
     "id": 996,
     "hanzi": "幫",
     "pinyin": "bāng",
-    "meaning": "help",
+    "meaning": "to help",
     "sourcePinyin": "bang1",
     "sourceSense": "to help",
-    "note": "Retained the clear teaching sense \"help\" after comparing the supplied readings and senses."
+    "note": "Same selected reading and meaning as 帮; the traditional spelling does not introduce a different sense."
   },
   {
     "id": 997,

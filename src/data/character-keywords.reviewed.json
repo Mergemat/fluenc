@@ -146,10 +146,10 @@
   {
     "character": "会",
     "pinyin": "huì",
-    "keyword": "can",
+    "keyword": "know how",
     "sourcePinyin": "hui4",
     "sourceSense": "can; to have the skill; to know how to",
-    "note": "Chosen for the common modern can sense."
+    "note": "Selected sense is learned ability; bare can obscures the useful distinction from 能. Example: 我会游泳。 / I know how to swim. Usage evidence: https://resources.allsetlearning.com/chinese/grammar/ASGZL717"
   },
   {
     "character": "去",
@@ -370,10 +370,10 @@
   {
     "character": "的",
     "pinyin": "de",
-    "keyword": "possessive particle",
+    "keyword": "modifier particle",
     "sourcePinyin": "de5",
-    "sourceSense": "of; ~'s (possessive particle)",
-    "note": "common possessive particle"
+    "sourceSense": "(used after an attribute when it modifies a noun)",
+    "note": "Links a noun to its modifier, including possession (我的书) and description (红色的书). Possessive particle alone suggests that every 的 expresses ownership. Example: 红色的书 / a red book Usage evidence: https://resources.allsetlearning.com/chinese/grammar/ASG5MOMM"
   },
   {
     "character": "告",
@@ -426,10 +426,10 @@
   {
     "character": "像",
     "pinyin": "xiàng",
-    "keyword": "like",
+    "keyword": "resemble",
     "sourcePinyin": "xiang4",
     "sourceSense": "to be like",
-    "note": "Common comparison verb."
+    "note": "The selected comparison verb describes resemblance. Bare like invites the unrelated preference sense of 喜欢; resemble stays one clear mnemonic concept. Example: 他像他爸爸。 / He looks like his father. Usage evidence: https://resources.allsetlearning.com/gramwiki?direction=prev&oldid=48533&title=Comparing_specifically_with_%22xiang%22"
   },
   {
     "character": "可",
@@ -1170,10 +1170,10 @@
   {
     "character": "您",
     "pinyin": "nín",
-    "keyword": "you",
+    "keyword": "polite you",
     "sourcePinyin": "nin2",
     "sourceSense": "you (courteous, as opposed to informal 你[ni3])",
-    "note": "Honorific second-person form."
+    "note": "Bare you loses the polite distinction from 你, which is the entire point of 您 for a beginner. Example: 您好。 / Hello. Usage evidence: https://resources.allsetlearning.com/chinese/grammar/Personal_pronouns"
   },
   {
     "character": "感",
@@ -1226,18 +1226,18 @@
   {
     "character": "會",
     "pinyin": "huì",
-    "keyword": "can",
+    "keyword": "know how",
     "sourcePinyin": "hui4",
     "sourceSense": "can; to have the skill; to know how to",
-    "note": "Chosen for the common modern can sense."
+    "note": "Traditional learned-ability cue should align with 会 and not obscure the contrast with 能. Example: 我會游泳。 / I know how to swim. Usage evidence: https://resources.allsetlearning.com/chinese/grammar/ASGZL717"
   },
   {
     "character": "现",
     "pinyin": "xiàn",
-    "keyword": "present",
+    "keyword": "current",
     "sourcePinyin": "xian4",
     "sourceSense": "present",
-    "note": "One cue selected from the documented sense."
+    "note": "Present means current time or state, not a gift or the verb to present. Example: 现在 / now Usage evidence: https://www.chinesepod.com/dictionary/%E7%8E%B0"
   },
   {
     "character": "两",
@@ -1282,10 +1282,10 @@
   {
     "character": "担",
     "pinyin": "dān",
-    "keyword": "shoulder",
+    "keyword": "bear a burden",
     "sourcePinyin": "dan1",
     "sourceSense": "to shoulder",
-    "note": "common carry-responsibility sense"
+    "note": "Shoulder is a verb meaning bear a burden; bare English can be mistaken for the body part 肩. Example: 承担责任 / to shoulder responsibility Usage evidence: https://www.chinesepod.com/dictionary/%E6%8B%85"
   },
   {
     "character": "记",
@@ -1450,10 +1450,10 @@
   {
     "character": "医",
     "pinyin": "yī",
-    "keyword": "medicine",
+    "keyword": "medical",
     "sourcePinyin": "yi1",
-    "sourceSense": "medicine",
-    "note": "common medical sense"
+    "sourceSense": "medical",
+    "note": "A medical field or treatment root, as in 医疗 and 医生; it does not name medicine taken as a drug like 药, nor is it limited to academic science. Example: 医疗 / medical treatment Usage evidence: https://dictionary.cambridge.org/tr/s%C3%B6zl%C3%BCk/ingilizce-basitle%C5%9Ftirilmi%C5%9F-%C3%A7ince/medicine"
   },
   {
     "character": "年",
@@ -1770,10 +1770,10 @@
   {
     "character": "了",
     "pinyin": "le",
-    "keyword": "completed-action particle",
+    "keyword": "aspect particle",
     "sourcePinyin": "le5",
     "sourceSense": "(completed action marker)",
-    "note": "Neutral aspect particle."
+    "note": "The aspect use marks an event, while sentence-final 了 can mark a changed situation. Compare 我买了一本书 (I bought a book) with 下雨了 (it is raining now). Neither use makes 了 a general past-tense or finished-action translation. Example: 我买了一本书。下雨了。 / I bought a book. It's raining now. Usage evidence: https://resources.allsetlearning.com/chinese/grammar/Change_of_state_with_%22le%22 https://resources.allsetlearning.com/chinese/grammar/Expressing_completion_with_%22le%22"
   },
   {
     "character": "解",
@@ -1978,10 +1978,10 @@
   {
     "character": "划",
     "pinyin": "huá",
-    "keyword": "row",
+    "keyword": "row a boat",
     "sourcePinyin": "hua2",
     "sourceSense": "to row",
-    "note": "corrected second-tone boating sense"
+    "note": "Row is the propulsion verb huá, not a line of seats or the planning reading huà. Example: 划船 / to row a boat Usage evidence: https://chinesepod.com/lessons/rowing-a-boat"
   },
   {
     "character": "长",
@@ -2906,10 +2906,10 @@
   {
     "character": "调",
     "pinyin": "diào",
-    "keyword": "tune",
+    "keyword": "musical tune",
     "sourcePinyin": "diao4",
     "sourceSense": "tune",
-    "note": "Chooses musical tune reading of 调 (diào)."
+    "note": "Tune is a musical noun at diào; English to tune would suggest the other reading tiáo. Example: 曲调 / a musical tune Usage evidence: https://chinesepod.com/lesson/%E4%BD%86%E6%84%BF%E4%BA%BA%E9%95%BF%E4%B9%85-a-song-song"
   },
   {
     "character": "院",
@@ -3322,10 +3322,10 @@
   {
     "character": "久",
     "pinyin": "jiǔ",
-    "keyword": "long",
+    "keyword": "long time",
     "sourcePinyin": "jiu3",
     "sourceSense": "(of a period of time) long",
-    "note": "common duration sense"
+    "note": "Only duration is intended; bare long obscures the distinction from spatial 长. Example: 等了很久。 / Waited a long time. Usage evidence: https://chinesepod.com/dictionary/%E4%B9%85"
   },
   {
     "character": "答",
@@ -3570,10 +3570,10 @@
   {
     "character": "咱",
     "pinyin": "zán",
-    "keyword": "we",
+    "keyword": "we including you",
     "sourcePinyin": "zan2",
     "sourceSense": "we (including both the speaker and the person spoken to)",
-    "note": "Inclusive first-person pronoun."
+    "note": "We includes the listener in the taught sense; bare we loses the useful inclusive distinction. Example: 咱们一起去。 / Let's go together. Usage evidence: https://resources.allsetlearning.com/chinese/grammar/Personal_pronouns"
   },
   {
     "character": "路",
@@ -3586,10 +3586,10 @@
   {
     "character": "戏",
     "pinyin": "xì",
-    "keyword": "play",
+    "keyword": "drama",
     "sourcePinyin": "xi4",
-    "sourceSense": "play",
-    "note": "common drama/play sense"
+    "sourceSense": "drama",
+    "note": "The selected play sense is a theatrical noun; bare play suggests the activity 玩. Example: 看戏 / to watch a play Usage evidence: https://dictionary.cambridge.org/zht/%E8%A9%9E%E5%85%B8/%E8%8B%B1%E8%AA%9E-%E6%BC%A2%E8%AA%9E-%E7%B0%A1%E9%AB%94/drama"
   },
   {
     "character": "游",
@@ -3738,10 +3738,10 @@
   {
     "character": "轻",
     "pinyin": "qīng",
-    "keyword": "light",
+    "keyword": "light in weight",
     "sourcePinyin": "qing1",
     "sourceSense": "light",
-    "note": "Common adjective."
+    "note": "Weight is the intended meaning, not brightness or illumination. Example: 这个箱子很轻。 / This suitcase is light in weight. Usage evidence: https://dictionary.cambridge.org/zhs/%E8%AF%8D%E5%85%B8/%E8%8B%B1%E8%AF%AD-%E6%B1%89%E8%AF%AD-%E7%AE%80%E4%BD%93/light"
   },
   {
     "character": "庭",
@@ -4282,10 +4282,10 @@
   {
     "character": "叔",
     "pinyin": "shū",
-    "keyword": "uncle",
+    "keyword": "father's younger brother",
     "sourcePinyin": "shu1",
-    "sourceSense": "uncle",
-    "note": "common kinship sense"
+    "sourceSense": "father's younger brother",
+    "note": "Bare uncle omits the family-side and age distinction central to this kinship root. Example: 叔叔 / father's younger brother Usage evidence: https://chinesepod.com/dictionary/%E5%8F%94%E5%8F%94"
   },
   {
     "character": "敢",
@@ -4346,10 +4346,10 @@
   {
     "character": "提",
     "pinyin": "tí",
-    "keyword": "carry",
+    "keyword": "carry by hand",
     "sourcePinyin": "ti2",
     "sourceSense": "to carry (hanging down from the hand)",
-    "note": "Chosen for the common modern carry sense."
+    "note": "Carry here means hanging from the hand; plain carry hides the specific action. Example: 提着包 / to carry a bag by its handle Usage evidence: https://dict.concised.moe.edu.tw/dictView.jsp?ID=10701&la=0&powerMode=0"
   },
   {
     "character": "供",
@@ -4538,10 +4538,10 @@
   {
     "character": "谅",
     "pinyin": "liàng",
-    "keyword": "excuse",
+    "keyword": "forgive",
     "sourcePinyin": "liang4",
     "sourceSense": "to excuse",
-    "note": "Chosen for the common modern excuse sense."
+    "note": "Excuse means forgive, not an excuse as a noun or exempting someone automatically. Example: 原谅我。 / Forgive me. Usage evidence: https://www.chinesepod.com/dictionary/%E8%B0%85"
   },
   {
     "character": "別",
@@ -4586,10 +4586,10 @@
   {
     "character": "斯",
     "pinyin": "sī",
-    "keyword": "this",
+    "keyword": "literary this",
     "sourcePinyin": "si1",
     "sourceSense": "this",
-    "note": "The demonstrative sense matches the curriculum standalone word; it is a literary use, while modern 斯 also appears in transliterations."
+    "note": "Demonstrative this is literary, not a substitute for everyday 这; most modern occurrences are compounds or names. Example: 斯人 / this person Usage evidence: https://dict.concised.moe.edu.tw/dictView.jsp?ID=38556&la=0&powerMode=0"
   },
   {
     "character": "話",
@@ -4682,10 +4682,10 @@
   {
     "character": "响",
     "pinyin": "xiǎng",
-    "keyword": "sound",
+    "keyword": "make a sound",
     "sourcePinyin": "xiang3",
     "sourceSense": "to make a sound",
-    "note": "Chosen for the common modern sound sense."
+    "note": "Sound is the verb make a sound here; bare English noun could obscure the role. Example: 门铃响了。 / The doorbell rang. Usage evidence: https://www.chinesepod.com/dictionary/%E5%93%8D"
   },
   {
     "character": "属",
@@ -4722,10 +4722,10 @@
   {
     "character": "之",
     "pinyin": "zhī",
-    "keyword": "possessive particle",
+    "keyword": "literary possessive particle",
     "sourcePinyin": "zhi1",
     "sourceSense": "(possessive particle, literary equivalent of 的[de5])",
-    "note": "Literary possessive role."
+    "note": "Possessive or attributive linker is literary/formal; ordinary spoken possession uses 的. Example: 成功之路 / the road to success Usage evidence: https://resources.allsetlearning.com/chinese/grammar/ASGBAIMA"
   },
   {
     "character": "仍",
@@ -4778,10 +4778,10 @@
   {
     "character": "运",
     "pinyin": "yùn",
-    "keyword": "move",
+    "keyword": "transport",
     "sourcePinyin": "yun4",
-    "sourceSense": "to move",
-    "note": "Chosen for the common modern move sense."
+    "sourceSense": "to transport",
+    "note": "Move means transport a load, not generic bodily motion 动. Example: 运货 / to transport goods Usage evidence: https://www.chinesepod.com/dictionary/%E8%BF%90"
   },
   {
     "character": "血",
@@ -5354,10 +5354,10 @@
   {
     "character": "疗",
     "pinyin": "liáo",
-    "keyword": "treat",
+    "keyword": "treat illness",
     "sourcePinyin": "liao2",
     "sourceSense": "to treat",
-    "note": "common medical-treatment sense"
+    "note": "Treat means medically treat, not treat someone to dinner or behave toward them. Example: 治疗疾病 / to treat an illness Usage evidence: https://www.chinesepod.com/dictionary/%E6%B2%BB%E7%96%97"
   },
   {
     "character": "造",
@@ -5746,10 +5746,10 @@
   {
     "character": "差",
     "pinyin": "chà",
-    "keyword": "different",
+    "keyword": "fall short",
     "sourcePinyin": "cha4",
-    "sourceSense": "different",
-    "note": "Chosen chà reading; 差点 is a compound meaning almost."
+    "sourceSense": "to fall short; to lack",
+    "note": "Select the deficiency sense of chà: 还差十块钱 (still ten yuan short) and 差一点 (fall a little short). Bare different encourages a mistaken reading of quality judgments such as 他很差. Difference and inferior-quality senses remain alternatives; this is a mnemonic choice, not a claim that different is unattested. Example: 还差十块钱。 / Still ten yuan short. Usage evidence: http://resources.allsetlearning.com/chinese/grammar/Basic_comparisons_with_%22bu_bi%22 https://resources.allsetlearning.com/chinese/grammar/The_opposite_of_%22chabuduo%22_is_%22cha_hen_duo%22"
   },
   {
     "character": "越",
@@ -5810,9 +5810,9 @@
   {
     "character": "踪",
     "pinyin": "zōng",
-    "keyword": "footprint",
+    "keyword": "trace",
     "sourcePinyin": "zong1",
     "sourceSense": "(bound form) footprint; trace; tracks",
-    "note": "common trace/track sense"
+    "note": "Footprint is a literal attestation, but trace or tracks better carries the modern root visible in 失踪/跟踪. Example: 无影无踪 / without a trace Usage evidence: https://www.chinesepod.com/dictionary/%E8%B8%AA"
   }
 ]
