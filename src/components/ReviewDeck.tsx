@@ -6,6 +6,7 @@ import { CharacterScene } from './character-studio/CharacterScene'
 import { characterCues } from './character-studio/cues'
 import { MandarinAudioButton } from './MandarinAudioButton'
 import { NeutralToneBadge } from './NeutralToneHint'
+import { RecallAnswer } from './ui/RecallAnswer'
 import { RecallFrame } from './ui/RecallFrame'
 import './character-studio/studio.css'
 
@@ -15,16 +16,16 @@ export function ReviewDeck({ item, pending, onRate }: { item: RecallItem; pendin
   const { revealed, reveal } = useReveal({ pending, onRate })
   const meaning = getItemMeaning(item)
   return <RecallFrame revealed={revealed} reveal={reveal} pending={pending} onRate={onRate}>
-    {revealed && item.type === 'character' ? <div className="review-character cs-studio">
-      <CharacterScene studio={{ item, meaning: meaning.primary, cues: characterCues(item) }} direct={directCharacters.has(item.hanzi)} reviewing />
+    {item.type === 'character' ? <div className="review-character cs-studio">
+      <CharacterScene studio={{ item, meaning: meaning.primary, cues: characterCues(item) }} direct={directCharacters.has(item.hanzi)} reviewing concealed={!revealed} />
     </div> : <div className="recall-target">
-      <p className="study-label">{revealed ? 'Word' : 'Meaning & pronunciation'}</p>
-      <p className={`recall-hanzi font-hanzi ${item.type === 'word' ? 'recall-word' : ''}`} lang="zh-CN">{item.hanzi}</p>
-      {revealed ? <>
+      <p className="study-label">Meaning & pronunciation</p>
+      <p className="recall-hanzi recall-word font-hanzi" lang="zh-CN">{item.hanzi}</p>
+      <RecallAnswer revealed={revealed} hint="Recall the meaning and say it aloud, including the tones.">
         <div className="answer-sound"><strong>{item.pinyin}</strong><NeutralToneBadge text={item.hanzi} pinyin={item.pinyin} /><MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} /></div>
         <p className="answer-meaning">{meaning.primary}</p>
-        {item.type === 'word' && item.livingLink ? <p className="memory-link">{item.livingLink}</p> : null}
-      </> : <p className="recall-hint">Recall the meaning and say it aloud, including the tones.</p>}
+        {item.livingLink ? <p className="memory-link">{item.livingLink}</p> : null}
+      </RecallAnswer>
     </div>}
   </RecallFrame>
 }

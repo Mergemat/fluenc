@@ -58,13 +58,13 @@ test('the last missed card hides its answer again instead of ending the session'
   const reveal = [...host.querySelectorAll('button')].find(button => button.textContent?.includes('Reveal answer'))
   expect(reveal).toBeDefined()
   await act(async () => reveal!.click())
-  expect(host.querySelector('.sentence-answer')).not.toBeNull()
+  expect(host.querySelector('.sentence-answer')!.closest('[inert]')).toBeNull()
   data = applyOperation(data, { kind: 'review', data: {
     eventId: crypto.randomUUID(), itemType: 'sentence', itemId: 's01', rating: 1,
     reviewedAt: now.toISOString(), durationMs: 100,
   } })
   await show()
-  expect(host.querySelector('.sentence-answer')).toBeNull()
+  expect(host.querySelector('.sentence-answer')!.closest('[inert]')).not.toBeNull()
   expect(host.textContent).toContain('Reveal answer')
   expect(host.textContent).not.toContain('All caught up')
 })
@@ -177,7 +177,7 @@ test('extra practice reviews future cards offline, retains misses across tabs, a
   await show()
   expect(data.reviewQueue.map(item => item.id)).toEqual(['oldest'])
   expect(host.textContent).toContain('newer')
-  expect(host.querySelector('.sentence-answer')).toBeNull()
+  expect(host.querySelector('.sentence-answer')!.closest('[inert]')).not.toBeNull()
   await click('Recent · 1')
   await click('Extra practice')
   expect(host.textContent).toContain('newer')

@@ -24,7 +24,7 @@ function SoundClue({ cue }: { cue: Cue }) {
   </div></section>
 }
 
-export function CharacterScene({ studio, direct, reviewing = false }: { studio: Studio; direct: boolean; reviewing?: boolean }) {
+export function CharacterScene({ studio, direct, reviewing = false, concealed = false }: { studio: Studio; direct: boolean; reviewing?: boolean; concealed?: boolean }) {
   const { item, cues } = studio
   const [selected, setSelected] = useState<string | null>(null)
   const [hovered, setHovered] = useState<string | null>(null)
@@ -45,12 +45,13 @@ export function CharacterScene({ studio, direct, reviewing = false }: { studio: 
   const owners = shape.data?.owners
   const mapped = shape.data && owners?.length === shape.data.strokes.length && owners.every(code => props.some(prop => prop.code === code)) && props.every(prop => owners.includes(prop.code))
   const select = (code: string) => {
+    if (concealed) return
     setSelected(previous => previous === code ? null : code)
     propButtons.current[code]?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
   }
   const highlightedName = props.find(prop => prop.code === highlighted)?.name.trim()
 
-  return <div className="cs-prop-scene">
+  return <div className="cs-prop-scene" data-concealed={concealed}>
     <div className="cs-character-and-props">
       <aside className="cs-prop-list" aria-label="Props">
         {props.map(prop => <button key={prop.id} type="button" className="cs-prop-choice" ref={element => { propButtons.current[prop.code] = element }}
@@ -66,27 +67,31 @@ export function CharacterScene({ studio, direct, reviewing = false }: { studio: 
       </aside>
       <CharacterTarget studio={studio}>
         <div className="cs-character-drawing">
-          {mapped && shape.data ? <svg className="cs-interactive-hanzi" viewBox="0 0 1024 1024" aria-label={`${item.hanzi} character parts`}>
-            <g transform={shape.data.transform}>{props.map(prop => <path
-              key={prop.code}
-              d={shape.data!.strokes.filter((_, index) => owners![index] === prop.code).join(' ')}
-              className={`cs-character-part ${highlighted === prop.code ? 'cs-part-highlighted' : ''}`}
-              role="button" tabIndex={0} aria-pressed={selected === prop.code}
-              aria-label={`Select ${prop.code} inside ${item.hanzi}${prop.name.trim() ? `: ${prop.name.trim()}` : ''}`}
-              onClick={() => select(prop.code)}
-              onPointerEnter={event => { if (event.pointerType !== 'touch') setHovered(prop.code) }}
-              onPointerLeave={() => setHovered(null)}
-              onPointerCancel={() => setHovered(null)}
-              onKeyDown={event => {
-                if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(prop.code) }
-              }}
-            />)}</g>
-          </svg> : <span className="cs-target-hanzi font-hanzi" lang="zh-CN">{item.hanzi}</span>}
-          <span className="cs-selected-prop-label" aria-live="polite">{highlightedName || ''}</span>
+          <div className="cs-character-shape">
+            {mapped && shape.data ? <svg className="cs-interactive-hanzi" viewBox="0 0 1024 1024" role={concealed ? 'img' : undefined} aria-label={concealed ? item.hanzi : `${item.hanzi} character parts`}>
+              <g transform={shape.data.transform}>{props.map(prop => <path
+                key={prop.code}
+                d={shape.data!.strokes.filter((_, index) => owners![index] === prop.code).join(' ')}
+                className={`cs-character-part ${highlighted === prop.code ? 'cs-part-highlighted' : ''}`}
+                role={concealed ? undefined : 'button'} tabIndex={concealed ? -1 : 0} aria-pressed={concealed ? undefined : selected === prop.code}
+                aria-label={concealed ? undefined : `Select ${prop.code} inside ${item.hanzi}${prop.name.trim() ? `: ${prop.name.trim()}` : ''}`}
+                onClick={concealed ? undefined : () => select(prop.code)}
+                onPointerEnter={event => { if (event.pointerType !== 'touch') setHovered(prop.code) }}
+                onPointerLeave={() => setHovered(null)}
+                onPointerCancel={() => setHovered(null)}
+                onKeyDown={event => {
+                  if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); select(prop.code) }
+                }}
+              />)}</g>
+            </svg> : <span className="cs-target-hanzi font-hanzi" lang="zh-CN">{item.hanzi}</span>}
+          </div>
+          <span className={`cs-selected-prop-label ${shape.isError || (shape.data && !mapped) ? 'cs-shape-status' : ''}`} aria-live="polite" title={highlightedName}>
+            {shape.isError ? <>Strokes unavailable. <button type="button" onClick={() => void shape.refetch()}>Retry</button></>
+              : shape.data && !mapped ? 'Character parts unavailable.' : highlightedName || ''}
+          </span>
         </div>
       </CharacterTarget>
     </div>
-    {shape.isError ? <p className="cs-shape-status" role="status">Could not load strokes. <button type="button" onClick={() => void shape.refetch()}>Retry</button></p> : shape.data && !mapped ? <p className="cs-shape-status" role="status">Character parts could not be loaded.</p> : null}
     {direct && reviewing ? null : direct ? <p className="cs-direct-caption">Learn this simple character directly. Choose an object to represent it inside other characters.</p> : <div className="cs-shelf-sound">{cues.filter(cue => cue.kind !== 'prop').map(cue => <SoundClue key={cue.id} cue={cue} />)}</div>}
   </div>
 }

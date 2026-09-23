@@ -41,7 +41,10 @@ self.addEventListener('message', event => {
 })
 
 registerRoute(new NavigationRoute(createHandlerBoundToURL('/offline.html'), {
-  allowlist: [/^\/(?:review|lessons|reading|library|palace|settings)?\/?(?:\?.*)?$/],
+  allowlist: [
+    /^\/(?:review|lessons|reading|library|palace|settings)?\/?(?:\?.*)?$/,
+    /^\/library\/(?:characters|words)\/[^/?]+\/?(?:\?.*)?$/,
+  ],
 }))
 
 registerRoute(

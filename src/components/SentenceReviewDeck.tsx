@@ -1,6 +1,7 @@
 import { useReveal } from '../hooks/useReveal'
 import type { ReviewItem } from '../server/curriculum'
 import { MandarinAudioButton } from './MandarinAudioButton'
+import { RecallAnswer } from './ui/RecallAnswer'
 import { RecallFrame } from './ui/RecallFrame'
 
 type SentenceItem = Extract<ReviewItem, { type: 'sentence' }>
@@ -11,10 +12,12 @@ export function SentenceReviewDeck({ item, pending, onRate }: { item: SentenceIt
     <div className="recall-target">
       <p className="study-label">Say it in Mandarin</p>
       <p className="sentence-prompt">{item.meaning}</p>
-      {revealed ? <section className="sentence-answer">
-        <p className="font-hanzi" lang="zh-CN">{item.hanzi}</p><strong>{item.pinyin}</strong>
-        <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} label="Listen" />
-      </section> : <p className="recall-hint">Say the whole sentence aloud, including the tones.</p>}
+      <RecallAnswer revealed={revealed} hint="Say the whole sentence aloud, including the tones.">
+        <section className="sentence-answer">
+          <p className="font-hanzi" lang="zh-CN">{item.hanzi}</p><strong>{item.pinyin}</strong>
+          <MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} label="Listen" />
+        </section>
+      </RecallAnswer>
     </div>
   </RecallFrame>
 }

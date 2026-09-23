@@ -10,13 +10,18 @@
 .cs-prop-scene { height: 100%; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 14px; }
 .cs-character-and-props { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); align-items: center; gap: 12px; min-height: 0; }
 .cs-character-target { min-width: 0; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; text-align: center; }
-.cs-character-drawing { width: min(90%, 27dvh, 270px); position: relative; display: grid; justify-items: center; }
-.cs-interactive-hanzi { display: block; width: 100%; aspect-ratio: 1; overflow: visible; }
+.cs-character-drawing { width: min(90%, 27dvh, 270px); position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; }
+.cs-character-shape { position: relative; width: 100%; aspect-ratio: 1; display: grid; place-items: center; container-type: inline-size; }
+/* Match the SVG's 55-unit padding on both sides of its 1024-unit square. */
+.cs-character-shape > .cs-target-hanzi { font-size: calc(100cqi * 914 / 1024); }
+.cs-interactive-hanzi { position: absolute; inset: 0; display: block; width: 100%; height: 100%; overflow: visible; }
 .cs-character-part { fill: var(--color-ink); stroke: transparent; stroke-width: 20; cursor: pointer; transition: fill 140ms; pointer-events: visiblePainted; outline: none; -webkit-tap-highlight-color: transparent; }
 .cs-character-part:focus { outline: none; }
 .cs-character-part.cs-part-highlighted { fill: var(--cs-gold); }
 .cs-character-part:focus-visible { outline: none; stroke: var(--cs-gold); stroke-width: 9; }
-.cs-selected-prop-label { min-height: 20px; max-width: 100%; font-size: 13px; font-weight: 650; line-height: 20px; color: var(--cs-gold); overflow-wrap: anywhere; }
+.cs-selected-prop-label { height: 20px; width: max-content; max-width: min(340px, calc(100vw - 32px)); font-size: 13px; font-weight: 650; line-height: 20px; color: var(--cs-gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cs-prop-scene[data-concealed=true] :is(.cs-prop-list, .cs-target-pinyin, .cs-target-details, .cs-shelf-sound, .cs-selected-prop-label, .cs-shape-status) { visibility: hidden; }
+.cs-prop-scene[data-concealed=true] :is(.cs-interactive-hanzi, .cs-character-part) { pointer-events: none; }
 .cs-prop-list { display: flex; justify-self: center; gap: 5px; min-width: 0; max-width: 100%; padding: 3px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; border-radius: 10px; background: #fcf9ed; }
 .cs-prop-choice { display: flex; flex-shrink: 0; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 44px; min-width: 56px; max-width: 140px; padding: 5px 10px; border: 1px solid transparent; border-radius: 8px; text-align: center; }
 .cs-prop-choice[data-highlighted=true] { background: #f1e6cb; border-color: var(--cs-gold); }
@@ -119,7 +124,8 @@
 @media (max-width: 767px) {
   .cs-host { display: flex; flex-direction: column; height: calc(100dvh - 84px - env(safe-area-inset-top)); min-height: 0; padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
   .cs-studio { flex: 1; height: auto; min-height: 0; }
-  .cs-workspace { display: flex; flex-direction: column; }
+  .cs-workspace { display: flex; flex-direction: column; overflow-y: auto; }
+  .cs-workspace > .cs-prop-scene { min-height: 380px; }
   .cs-prop-scene { flex: 1; height: auto; grid-template-rows: minmax(0, 1fr) auto; }
   .cs-character-and-props > .cs-character-target { align-self: stretch; container-type: size; }
   .cs-character-and-props .cs-character-drawing { max-width: max(0px, calc(100cqh - 110px)); }

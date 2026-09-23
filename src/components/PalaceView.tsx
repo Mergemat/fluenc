@@ -1,30 +1,23 @@
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useRef, useState } from 'react'
+import { getRouteApi, Link } from '@tanstack/react-router'
 
 import { getItemMeaning } from '../lib/meaning'
 import { getToneDetail } from '../lib/tones'
-import type { LibraryEntry, LibraryKind } from '../lib/library-search'
 import { libraryQueryOptions, palaceQueryOptions } from '../offline/queries'
 import type { PalaceData } from '../server/curriculum'
-import { LibraryDetails } from './LibraryDetails'
-import { MandarinAudioButton } from './MandarinAudioButton'
 import { ToneAudioButton } from './ToneAudioButton'
 import { Button } from './ui/Button'
 import { Page, PageHeader, Status } from './ui/Layout'
 
+const palaceRoute = getRouteApi('/_app/palace')
+
 export function PalaceView() {
   const palaceQuery = useQuery(palaceQueryOptions)
   const libraryQuery = useQuery(libraryQueryOptions)
-  const [kind, setKind] = useState<LibraryKind>('characters')
-  const [selected, setSelected] = useState<LibraryEntry | null>(null)
-  const [limit, setLimit] = useState(48)
-  const detailsRef = useRef<HTMLElement>(null)
-  useEffect(() => {
-    if (selected) {
-      detailsRef.current?.focus({ preventScroll: true })
-      detailsRef.current?.scrollIntoView({ block: 'nearest' })
-    }
-  }, [selected])
+  const filters = palaceRoute.useSearch()
+  const { kind = 'characters', limit = 48 } = filters
+  const navigate = palaceRoute.useNavigate()
+  const updateFilters = (next: Partial<typeof filters>) => void navigate({ search: previous => ({ ...previous, ...next }), replace: true, resetScroll: false })
   const library = libraryQuery.data
   const collection = library?.[kind].filter(item => item.status !== 'new') ?? []
 
@@ -48,20 +41,16 @@ export function PalaceView() {
       <section className="palace-collection">
         <header><h2>Your collection</h2><span>Tap to revisit your clues</span></header>
         <div className="library-tabs" aria-label="Your collection">
-          {(['characters', 'words'] as const).map(section => <button className="library-tab" type="button" aria-pressed={kind === section} key={section} onClick={() => { setKind(section); setLimit(48); setSelected(null) }}>{section === 'characters' ? 'Characters' : 'Words'} <span>{library[section].filter(item => item.status !== 'new').length}</span></button>)}
+          {(['characters', 'words'] as const).map(section => <button className="library-tab" type="button" aria-pressed={kind === section} key={section} onClick={() => updateFilters({ kind: section, limit: 48 })}>{section === 'characters' ? 'Characters' : 'Words'} <span>{library[section].filter(item => item.status !== 'new').length}</span></button>)}
         </div>
         {collection.length ? <>
           <div className={`palace-tiles palace-tiles-${kind}`}>
-            {collection.slice(0, limit).map(item => <button key={item.id} type="button" aria-label={`View ${item.hanzi}: ${getItemMeaning(item).primary}`} aria-pressed={selected?.kind === kind && selected.id === item.id} onClick={() => setSelected({ ...item, kind })}>
+            {collection.slice(0, limit).map(item => <Link key={item.id} to="/library/$kind/$id" params={{ kind, id: item.id }} search={{ from: 'palace' }} aria-label={`View ${item.hanzi}: ${getItemMeaning(item).primary}`}>
               <span className="font-hanzi" lang="zh-CN">{item.hanzi}</span><small>{item.pinyin}</small><span className={`status-tag status-${item.status}`}>{item.status === 'review' ? 'Learned' : 'Learning'}</span>
-            </button>)}
+            </Link>)}
           </div>
-          {collection.length > limit ? <Button type="button" variant="secondary" onClick={() => setLimit(value => value + 48)}>Show more</Button> : null}
+          {collection.length > limit ? <Button type="button" variant="secondary" onClick={() => updateFilters({ limit: limit + 48 })}>Show more</Button> : null}
         </> : <p className="palace-empty">Your {kind} will appear here after you finish a lesson.</p>}
-        {selected ? <section ref={detailsRef} tabIndex={-1} className="palace-selected" aria-label={`Saved details for ${selected.hanzi}`}>
-          <header><div><strong className="font-hanzi" lang="zh-CN">{selected.hanzi}</strong><span>{selected.pinyin} · {getItemMeaning(selected).primary}</span><MandarinAudioButton text={selected.hanzi} pinyin={selected.pinyin} /></div><Button type="button" variant="ghost" onClick={() => setSelected(null)}>Close</Button></header>
-          <LibraryDetails key={`${selected.kind}:${selected.id}`} id={selected.id} hanzi={selected.hanzi} kind={selected.kind} />
-        </section> : null}
       </section>
     </> : <Status title={libraryQuery.isError ? 'Could not load your progress' : 'Loading progress…'} action={libraryQuery.isError ? <Button type="button" variant="secondary" onClick={() => libraryQuery.refetch()}>Retry</Button> : undefined} />}
     {palaceQuery.data ? <MemoryClues palace={palaceQuery.data} /> : <Status title={palaceQuery.isError ? 'Could not load your memory clues' : 'Loading memory clues…'} action={palaceQuery.isError ? <Button variant="secondary" type="button" onClick={() => palaceQuery.refetch()}>Retry</Button> : undefined} />}
