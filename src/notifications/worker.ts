@@ -4,7 +4,7 @@ export function showPushNotification(data: PushMessageData | null, registration:
   let payload: { title?: string; body?: string; tag?: string } = {}
   try { payload = data?.json() ?? {} } catch { /* Even an empty push must display a notification. */ }
   return registration.showNotification(typeof payload?.title === 'string' ? payload.title : 'Fluenc', {
-    body: typeof payload?.body === 'string' ? payload.body : 'Your Mandarin reviews are ready.',
+    body: typeof payload?.body === 'string' ? payload.body : 'Time for your daily Mandarin review.',
     tag: typeof payload?.tag === 'string' ? payload.tag : 'fluenc-review',
     icon: '/brand/icon-192.png',
   })

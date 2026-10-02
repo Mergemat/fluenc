@@ -6,7 +6,6 @@ import type { PushStore } from './push-store.server'
 type ReminderOptions = {
   cronSecret: string | undefined
   configured: boolean
-  hasDueReviews: () => Promise<boolean>
   store: PushStore
   send: (subscription: DeviceSubscription) => Promise<void>
   now?: Date
@@ -20,7 +19,6 @@ export async function handleReviewReminder(request: Request, options: ReminderOp
   if (!options.configured) return json({ error: 'Web Push is not configured' }, 503)
 
   try {
-    if (!await options.hasDueReviews()) return json({ status: 'skipped', reason: 'No reviews due' })
     const day = reviewDay(options.now ?? new Date())
     const subscriptions = await options.store.claim(day)
     const results = await Promise.allSettled(subscriptions.map(async subscription => {

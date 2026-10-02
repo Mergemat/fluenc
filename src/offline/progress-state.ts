@@ -60,7 +60,7 @@ export function refreshDueQueues(data: DashboardData, now = new Date()) {
   next.reviewQueue = []
   next.scheduledQueue = []
   for (const item of items.values()) {
-    const due = reviewDueAt(new Date(item.card.due), item.card.lastReview ? new Date(item.card.lastReview) : null, item.card.state)
+    const due = reviewDueAt(new Date(item.card.due), item.card.state)
     const scheduled = { ...item, card: { ...item.card, due: due.toISOString() } }
     if (due <= now) next.reviewQueue.push(scheduled)
     else next.scheduledQueue.push(scheduled)
@@ -139,7 +139,7 @@ function applyEnrollment(data: DashboardData, operation: Extract<ProgressOperati
   } else if (target.itemType === 'word') {
     next.progress.introducedWords += 1
   }
-  return next
+  return refreshDueQueues(next, new Date(operation.data.enrolledAt))
 }
 
 function applyMovie(data: DashboardData, operation: Extract<ProgressOperation, { kind: 'movie' }>) {

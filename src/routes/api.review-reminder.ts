@@ -13,10 +13,6 @@ export const Route = createFileRoute('/api/review-reminder')({
           configured: !!getVapidDetails(),
           store: createPushStore(db),
           send: sendPush,
-          hasDueReviews: async () => {
-            const { getDashboardHandler } = await import('../server/curriculum.handlers.server')
-            return (await getDashboardHandler()).reviewQueue.length > 0
-          },
         })
       },
     },

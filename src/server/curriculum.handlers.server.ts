@@ -214,7 +214,7 @@ export async function getDashboardHandler() {
 
   const items = rows
     .filter(item => item.itemType !== 'word' || !characterForWord(item.itemId))
-    .map(item => ({ ...item, due: reviewDueAt(item.due, item.lastReview, item.state) }))
+    .map(item => ({ ...item, due: reviewDueAt(item.due, item.state) }))
 
   const itemKey = (type: ItemType, id: string) => `${type}:${id}`
   const introduced = new Set(items.map((item) => itemKey(item.itemType, item.itemId)))
@@ -296,10 +296,6 @@ export async function getDashboardHandler() {
     .sort((left, right) => right.coverage - left.coverage)
     .slice(0, 6)
 
-  const nextDue = items
-    .filter((item) => item.due > now)
-    .reduce<Date | null>((earliest, item) => !earliest || item.due < earliest ? item.due : earliest, null)
-
   const scheduledQueue = items
     .filter((item) => item.due > now)
     .map((progress) => {
@@ -329,7 +325,7 @@ export async function getDashboardHandler() {
     lockedWords,
     getQueue,
     scheduledQueue,
-    nextReviewAt: nextDue?.toISOString() ?? null,
+    nextReviewAt: scheduledQueue.reduce<string | null>((earliest, item) => !earliest || item.card.due < earliest ? item.card.due : earliest, null),
   }
 }
 

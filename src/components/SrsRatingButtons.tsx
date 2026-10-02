@@ -1,10 +1,10 @@
-type Rating = { value: number; label: string }
+import { Rating } from 'ts-fsrs'
 
-const reviewRatings: Rating[] = [
-  { value: 1, label: 'Missed something' },
-  { value: 2, label: 'With effort' },
-  { value: 3, label: 'After a pause' },
-  { value: 4, label: 'Instantly' },
+const reviewRatings = [
+  { value: Rating.Again, label: 'Again', description: 'Missed any part' },
+  { value: Rating.Hard, label: 'Hard', description: 'Correct, with effort' },
+  { value: Rating.Good, label: 'Good', description: 'Correct, slight pause' },
+  { value: Rating.Easy, label: 'Easy', description: 'Immediate recall' },
 ]
 
 export function SrsRatingButtons({
@@ -25,6 +25,7 @@ export function SrsRatingButtons({
           onClick={() => onRate(rating.value)}
         >
           <span className="rating-label">{rating.label}<span className="key-hint" aria-hidden="true">{rating.value}</span></span>
+          <span className="rating-description">{rating.description}</span>
         </button>
       ))}
     </div>

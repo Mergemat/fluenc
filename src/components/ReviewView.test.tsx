@@ -2,26 +2,27 @@ import { afterAll, beforeAll, expect, test } from 'bun:test'
 import { Window } from 'happy-dom'
 import { act } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { createMemoryHistory, createRootRoute, createRouter, RouterContextProvider } from '@tanstack/react-router'
 import type { Root } from 'react-dom/client'
+import { Rating } from 'ts-fsrs'
 
-import { applyOperation } from '../offline/progress-state'
+import { applyOperation, refreshDueQueues } from '../offline/progress-state'
 import type { DashboardData } from '../server/curriculum'
 
 const browser = new Window()
 const globals = ['window', 'document', 'navigator', 'HTMLElement', 'IS_REACT_ACT_ENVIRONMENT'] as const
 const originals = new Map(globals.map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]))
 const client = new QueryClient()
+const router = createRouter({ routeTree: createRootRoute(), history: createMemoryHistory() })
 let root: Root
 let host: HTMLDivElement
 let ReviewView: typeof import('./ReviewView')['ReviewView']
 
 beforeAll(async () => {
-  for (const key of globals) {
-    Object.defineProperty(globalThis, key, {
-      configurable: true,
-      value: key === 'IS_REACT_ACT_ENVIRONMENT' ? true : key === 'window' ? browser : browser[key],
-    })
-  }
+  for (const key of globals) Object.defineProperty(globalThis, key, {
+    configurable: true,
+    value: key === 'IS_REACT_ACT_ENVIRONMENT' ? true : key === 'window' ? browser : browser[key],
+  })
   const { createRoot } = await import('react-dom/client')
   ;({ ReviewView } = await import('./ReviewView'))
   host = document.createElement('div')
@@ -40,159 +41,94 @@ afterAll(async () => {
   }
 })
 
-test('the last missed card hides its answer again instead of ending the session', async () => {
-  const now = new Date()
-  const fixture: DashboardData = {
-    curriculum: { version: 'test', characters: 0, words: 0 },
-    progress: { introducedCharacters: 0, introducedWords: 0 },
-    reviewQueue: [], buildQueue: [], lockedWords: [], scheduledQueue: [], nextReviewAt: null,
-    getQueue: [{ id: 's01', hanzi: '你好。', pinyin: 'Nǐ hǎo.', meaning: 'Hi.', words: ['你', '好'], coverage: 1, missingWords: [], missingCharacters: [] }],
-  }
-  let data = applyOperation(fixture, { kind: 'enroll', data: {
-    itemType: 'sentence', itemId: 's01', enrolledAt: new Date(now.getTime() - 60_000).toISOString(),
-  } })
-  const show = async () => {
-    await act(async () => root.render(<QueryClientProvider client={client}><ReviewView data={data} /></QueryClientProvider>))
-  }
-  await show()
-  const reveal = [...host.querySelectorAll('button')].find(button => button.textContent?.includes('Reveal answer'))
-  expect(reveal).toBeDefined()
-  await act(async () => reveal!.click())
-  expect(host.querySelector('.sentence-answer')!.closest('[inert]')).toBeNull()
-  data = applyOperation(data, { kind: 'review', data: {
-    eventId: crypto.randomUUID(), itemType: 'sentence', itemId: 's01', rating: 1,
-    reviewedAt: now.toISOString(), durationMs: 100,
-  } })
-  await show()
-  expect(host.querySelector('.sentence-answer')!.closest('[inert]')).not.toBeNull()
-  expect(host.textContent).toContain('Reveal answer')
-  expect(host.textContent).not.toContain('All caught up')
-})
-
-test('recent reviews stay separate while a fixed catch-up batch retains misses and stops at completion', async () => {
-  const now = new Date()
-  const fixture: DashboardData = {
-    curriculum: { version: 'test', characters: 0, words: 0 },
-    progress: { introducedCharacters: 0, introducedWords: 0 },
-    reviewQueue: [], buildQueue: [], lockedWords: [], scheduledQueue: [], nextReviewAt: null,
-    getQueue: Array.from({ length: 26 }, (_, index) => ({
-      id: `s${index}`, hanzi: '你好。', pinyin: 'Nǐ hǎo.', meaning: index === 25 ? 'Recent sentence' : `Older sentence ${index}`,
-      words: ['你', '好'], coverage: 1, missingWords: [], missingCharacters: [],
-    })),
-  }
-  let data = fixture
-  for (const item of fixture.getQueue) {
-    data = applyOperation(data, { kind: 'enroll', data: {
-      itemType: 'sentence', itemId: item.id,
-      enrolledAt: new Date(now.getTime() - (item.id === 's25' ? 1 : 10) * 86_400_000).toISOString(),
-    } })
-  }
-  const show = async () => {
-    await act(async () => root.render(<QueryClientProvider client={client}><ReviewView key="catchup" data={data} /></QueryClientProvider>))
-  }
-  const click = async (label: string) => {
-    const button = [...host.querySelectorAll('button')].find(button => button.textContent?.includes(label))
-    expect(button).toBeDefined()
-    await act(async () => button!.click())
-  }
-  let time = now.getTime()
-  const rate = (id: string, rating: number) => {
-    time += 100
-    data = applyOperation(data, { kind: 'review', data: {
-      eventId: crypto.randomUUID(), itemType: 'sentence', itemId: id, rating,
-      reviewedAt: new Date(time).toISOString(), durationMs: 100,
-    } })
-  }
-  await show()
-  expect(host.textContent).toContain('Recent sentence')
-  expect(host.textContent).toContain('Catch up · 25')
-  await click('Catch up · 25')
-  expect(host.textContent).toContain('20 left in this batch')
-  expect(host.textContent).toContain('Older sentence 0')
-  rate('s0', 1)
-  await show()
-  expect(host.textContent).toContain('Older sentence 1')
-  expect(host.textContent).toContain('20 left in this batch')
-  await click('Recent · 1')
-  expect(host.textContent).toContain('Recent sentence')
-  await click('Catch up · 25')
-  for (let index = 1; index < 20; index += 1) rate(`s${index}`, 3)
-  await show()
-  expect(host.textContent).toContain('1 left in this batch')
-  expect(host.textContent).toContain('Older sentence 0')
-  rate('s0', 3)
-  await show()
-  expect(host.textContent).toContain('Batch complete')
-  expect(host.textContent).toContain('5 older cards remain')
-  expect(host.textContent).not.toContain('All caught up')
-  await click('Review next 5 cards')
-  expect(host.textContent).toContain('5 left in this batch')
-  expect(host.textContent).toContain('Older sentence 20')
-})
-
-test('extra practice reviews future cards offline, retains misses across tabs, and finishes a fixed batch', async () => {
-  const now = new Date()
+function fixture(count = 1): DashboardData {
   let data: DashboardData = {
     curriculum: { version: 'test', characters: 0, words: 0 },
     progress: { introducedCharacters: 0, introducedWords: 0 },
     reviewQueue: [], buildQueue: [], lockedWords: [], scheduledQueue: [], nextReviewAt: null,
-    getQueue: ['oldest', 'newer'].map(id => ({
-      id, hanzi: '你好。', pinyin: 'Nǐ hǎo.', meaning: id,
+    getQueue: Array.from({ length: count }, (_, index) => ({
+      id: `s${index}`, hanzi: '你好。', pinyin: 'Nǐ hǎo.', meaning: `Sentence ${index}`,
       words: ['你', '好'], coverage: 1, missingWords: [], missingCharacters: [],
     })),
   }
-  for (const [index, id] of ['oldest', 'newer'].entries()) {
-    const reviewedAt = new Date(now.getTime() - (2 - index) * 3_600_000).toISOString()
-    data = applyOperation(data, { kind: 'enroll', data: { itemType: 'sentence', itemId: id, enrolledAt: reviewedAt } })
-    data = applyOperation(data, { kind: 'review', data: {
-      eventId: crypto.randomUUID(), itemType: 'sentence', itemId: id, rating: 4, reviewedAt, durationMs: 100,
-    } })
+  for (const item of data.getQueue) data = applyOperation(data, { kind: 'enroll', data: {
+    itemType: 'sentence', itemId: item.id, enrolledAt: '2026-09-01T02:00:00.000Z',
+  } })
+  return data
+}
+
+async function show(data: DashboardData, session: string) {
+  await act(async () => root.render(<RouterContextProvider router={router}><QueryClientProvider client={client}>
+    <ReviewView key={session} data={data} />
+  </QueryClientProvider></RouterContextProvider>))
+}
+
+async function reveal() {
+  const button = [...host.querySelectorAll('button')].find(button => button.textContent?.includes('Reveal answer'))
+  expect(button).toBeDefined()
+  await act(async () => button!.click())
+}
+
+function rate(data: DashboardData, id: string, rating: number, reviewedAt = '2026-09-23T02:00:00.000Z') {
+  return applyOperation(data, { kind: 'review', data: {
+    eventId: crypto.randomUUID(), itemType: 'sentence', itemId: id, rating, reviewedAt, durationMs: 100,
+  } })
+}
+
+test('a last missed card waits and returns concealed instead of falsely completing the reviews', async () => {
+  let data = fixture()
+  await show(data, 'miss')
+  await reveal()
+  expect(host.querySelector('.sentence-answer')?.closest('[inert]')).toBeNull()
+  data = rate(data, 's0', Rating.Again)
+  await show(data, 'miss')
+  expect(host.textContent).toContain('1 card still needs practice')
+  expect(host.textContent).not.toContain('Reviews finished')
+  expect(host.querySelector('a[href="/lessons"]')).toBeNull()
+  data = refreshDueQueues(JSON.parse(JSON.stringify(data)), new Date('2026-09-23T02:01:00.000Z'))
+  await show(data, 'miss')
+  expect(host.querySelector('.sentence-answer')?.closest('[inert]')).not.toBeNull()
+  expect(host.textContent).toContain('Reveal answer')
+})
+
+test('all overdue cards remain in one session beyond twenty reviews', async () => {
+  let data = fixture(26)
+  await show(data, 'all-due')
+  expect(host.textContent).toContain('26 ready')
+  for (let index = 0; index < 20; index += 1) {
+    data = rate(data, `s${index}`, Rating.Easy)
+    await show(data, 'all-due')
   }
-  expect(data.reviewQueue).toHaveLength(0)
-  expect(data.scheduledQueue).toHaveLength(2)
-  const show = async () => {
-    await act(async () => root.render(<QueryClientProvider client={client}><ReviewView key="extra" data={data} /></QueryClientProvider>))
-  }
-  const click = async (label: string) => {
-    const button = [...host.querySelectorAll('button')].find(button => button.textContent?.includes(label))
-    expect(button).toBeDefined()
-    await act(async () => button!.click())
-  }
-  let time = now.getTime()
-  const rate = (id: string, rating: number) => {
-    time += 1000
-    data = applyOperation(data, { kind: 'review', data: {
-      eventId: crypto.randomUUID(), itemType: 'sentence', itemId: id, rating,
-      reviewedAt: new Date(time).toISOString(), durationMs: 100,
-    } })
-    data = JSON.parse(JSON.stringify(data))
-  }
-  await show()
-  expect(host.textContent).toContain('All caught up')
-  await click('Extra practice')
-  expect(host.textContent).toContain('2 left in this batch')
-  expect(host.textContent).toContain('oldest')
-  await click('Reveal answer')
-  rate('oldest', 1)
-  await show()
-  expect(data.reviewQueue.map(item => item.id)).toEqual(['oldest'])
-  expect(host.textContent).toContain('newer')
-  expect(host.querySelector('.sentence-answer')!.closest('[inert]')).not.toBeNull()
-  await click('Recent · 1')
-  await click('Extra practice')
-  expect(host.textContent).toContain('newer')
-  rate('newer', 3)
-  await show()
-  expect(host.textContent).toContain('1 left in this batch')
-  expect(host.textContent).toContain('oldest')
-  rate('oldest', 4)
-  await show()
-  expect(data.reviewQueue).toHaveLength(0)
-  expect(data.scheduledQueue.find(item => item.id === 'oldest')?.reps).toBe(3)
-  expect(data.scheduledQueue.find(item => item.id === 'oldest')?.card.lapses).toBe(1)
-  expect(host.textContent).toContain('Practice complete')
-  expect(host.textContent).not.toContain('Reveal answer')
-  await click('Practise 2 more cards')
-  expect(host.textContent).toContain('2 left in this batch')
-  expect(host.textContent).toContain('newer')
+  expect(host.textContent).toContain('6 ready')
+  expect(host.textContent).toContain('Sentence 20')
+  expect(host.textContent).not.toContain('Reviews finished')
+  for (let index = 20; index < 26; index += 1) data = rate(data, `s${index}`, Rating.Easy)
+  await show(data, 'all-due')
+  expect(host.textContent).toContain('Reviews finished')
+  expect(host.querySelector('a[href="/lessons"]')).not.toBeNull()
+  expect(host.querySelector('a[href="/reading"]')).not.toBeNull()
+  expect(host.querySelector('.recall-frame')).toBeNull()
+})
+
+test('a learning step becoming due does not replace the currently revealed card', async () => {
+  let data = rate(fixture(2), 's0', Rating.Again)
+  await show(data, 'stable')
+  expect(host.textContent).toContain('Sentence 1')
+  await reveal()
+  data = refreshDueQueues(data, new Date('2026-09-23T02:01:00.000Z'))
+  expect(data.reviewQueue.map(item => item.id)).toEqual(['s0', 's1'])
+  await show(data, 'stable')
+  expect(host.textContent).toContain('Sentence 1')
+  expect(host.querySelector('.sentence-answer')?.closest('[inert]')).toBeNull()
+  data = rate(data, 's1', Rating.Easy, '2026-09-23T02:01:00.000Z')
+  await show(data, 'stable')
+  expect(host.textContent).toContain('Sentence 0')
+  expect(host.querySelector('.sentence-answer')?.closest('[inert]')).not.toBeNull()
+})
+
+test('no introduced material leads to learning rather than an invented review session', async () => {
+  await show(fixture(0), 'empty')
+  expect(host.textContent).toContain('Start with a lesson')
+  expect(host.querySelector('a[href="/lessons"]')).not.toBeNull()
+  expect(host.querySelector('.recall-frame')).toBeNull()
 })

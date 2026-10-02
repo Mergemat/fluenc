@@ -12,17 +12,19 @@ export function getVapidDetails() {
 export async function sendPush(subscription: DeviceSubscription, test = false) {
   const vapidDetails = getVapidDetails()
   if (!vapidDetails) throw new Error('Web Push is not configured')
+  const tag = test ? 'fluenc-test' : 'fluenc-review'
   await webpush.sendNotification(subscription, JSON.stringify({
     title: 'Fluenc',
     body: test ? 'Notifications are ready. Tap to open Review in Fluenc.'
-      : 'Your Mandarin reviews are ready. Start with recent cards, then catch up at your pace.',
-    tag: test ? 'fluenc-test' : 'fluenc-review',
+      : 'Time for Mandarin. Finish your reviews, then learn something new and read.',
+    tag,
   }), {
     vapidDetails,
     TTL: test ? 300 : 3600,
     timeout: 10_000,
     urgency: 'normal',
-    topic: test ? 'fluenc-test' : 'fluenc-review',
+    // Apple rejects topics that cannot be decoded as base64url.
+    topic: Buffer.from(tag).toString('base64url'),
   })
 }
 

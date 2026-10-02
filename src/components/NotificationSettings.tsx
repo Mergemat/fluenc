@@ -8,7 +8,7 @@ export function NotificationSettings() {
   return <section className="settings-section" aria-labelledby="notifications-heading">
     <div className="settings-copy">
       <h2 id="notifications-heading">Review reminders</h2>
-      <p>A daily notification when reviews are due. Tap it to open Review in Fluenc.</p>
+      <p>A daily reminder to review Mandarin, even when you are caught up. Tap it to open Review in Fluenc.</p>
     </div>
     <p className="settings-state" role="status">
       {busy === 'subscribe' ? 'Preparing notifications. Keep Fluenc open…'
@@ -27,6 +27,6 @@ export function NotificationSettings() {
     {status === 'on' ? <Button variant="secondary" disabled={!!busy} onClick={() => void run('test')}><Bell size={16} />Send test notification</Button> : null}
     {hasSubscription ? <Button variant="ghost" disabled={!!busy || status === 'checking'} onClick={() => void run('unsubscribe')}><BellOff size={16} />Turn off notifications</Button> : null}
     {status === 'error' || status === 'blocked' || status === 'unconfigured' ? <Button variant="secondary" disabled={!!busy} onClick={retry}>Check again</Button> : null}
-    <p className="settings-note">Scheduled for 14:00 Shanghai time; delivery may arrive within the following hour. Only synced progress is checked.</p>
+    <p className="settings-note">Scheduled for 14:00 Shanghai time; delivery may arrive within the following hour. Your daily reviews are available from the start of the day.</p>
   </section>
 }

@@ -26,7 +26,6 @@ function setup() {
   return {
     cronSecret: 'test-cron-secret', configured: true, store,
     now: new Date('2026-09-11T06:00:00.000Z'),
-    hasDueReviews: mock(async () => true),
     send: mock(async (_subscription: DeviceSubscription): Promise<void> => {}),
   }
 }
@@ -34,25 +33,23 @@ const request = (token = 'test-cron-secret') => new Request('https://fluenc.exam
   headers: { authorization: `Bearer ${token}` },
 })
 
-test('unauthorized and unconfigured jobs cannot read progress or consume daily delivery', async () => {
+test('unauthorized and unconfigured jobs cannot consume daily delivery', async () => {
   await store.save(device('phone'))
   const options = setup()
   expect((await handleReviewReminder(request('wrong'), options)).status).toBe(401)
   expect((await handleReviewReminder(request(), { ...options, configured: false })).status).toBe(503)
-  expect(options.hasDueReviews).not.toHaveBeenCalled()
   expect(options.send).not.toHaveBeenCalled()
   expect((await handleReviewReminder(request(), options)).status).toBe(200)
   expect(options.send).toHaveBeenCalledTimes(1)
 })
 
-test('completed reviews skip delivery without preventing a later due reminder', async () => {
+test('daily reminders reach subscribed devices without any learning progress', async () => {
+  // This database has subscriptions only, with no learner or review tables.
   await store.save(device('phone'))
   const options = setup()
-  options.hasDueReviews.mockResolvedValueOnce(false)
-  expect(await (await handleReviewReminder(request(), options)).json()).toMatchObject({ status: 'skipped' })
-  expect(options.send).not.toHaveBeenCalled()
-  await handleReviewReminder(request(), options)
+  expect(await (await handleReviewReminder(request(), options)).json()).toEqual({ status: 'accepted', devices: 1, failed: 0 })
   expect(options.send).toHaveBeenCalledTimes(1)
+  expect(options.send).toHaveBeenCalledWith(device('phone'))
 })
 
 test('concurrent cron runs and subscription refreshes send once per device per Shanghai day', async () => {
