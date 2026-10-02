@@ -8,6 +8,7 @@ import { Button } from '../components/ui/Button'
 import { OfflineDownloadProvider } from '../offline/OfflineDownloadProvider'
 import { dashboardQueryOptions, loadDashboard } from '../offline/queries'
 import { useOfflineSync } from '../offline/useOfflineSync'
+import { AppUpdateProvider } from '../updates/AppUpdateProvider'
 
 export const Route = createFileRoute('/_app')({
   loader: ({ context }) => loadDashboard(context.queryClient),
@@ -22,7 +23,7 @@ function AppLayout() {
   const pathname = useLocation({ select: location => location.pathname })
   useOfflineSync(data)
 
-  return <OfflineDownloadProvider>
+  return <AppUpdateProvider><OfflineDownloadProvider>
     <div className="app-viewport">
       <AppScroll pathname={pathname}>
         <div className="app-layout">
@@ -32,7 +33,7 @@ function AppLayout() {
       </AppScroll>
       <AppTabBar data={data} />
     </div>
-  </OfflineDownloadProvider>
+  </OfflineDownloadProvider></AppUpdateProvider>
 }
 
 function StartupError() {

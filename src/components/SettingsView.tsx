@@ -8,6 +8,7 @@ import type { OfflineDownload } from '../offline/useOfflineDownload'
 import { Button } from './ui/Button'
 import { Page, PageHeader } from './ui/Layout'
 import { NotificationSettings } from './NotificationSettings'
+import { useAppUpdate } from '../updates/AppUpdateProvider'
 
 type SyncStatus = 'idle' | 'syncing' | 'done' | 'offline' | 'error'
 
@@ -15,6 +16,7 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
   const queryClient = useQueryClient()
   const saving = useIsMutating() > 0
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle')
+  const update = useAppUpdate()
   const { status, progress, download } = offline
   const downloading = status === 'downloading' || status === 'checking'
   const unavailable = status === 'unsupported' || status === 'development'
@@ -46,6 +48,24 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
     }}><RefreshCw size={16} />Refresh app</Button>} />
     <div className="settings-sections">
       <NotificationSettings />
+      <section className="settings-section" aria-labelledby="updates-heading">
+        <div className="settings-copy">
+          <h2 id="updates-heading">App updates</h2>
+          <p>New versions are checked automatically when you open the app.</p>
+        </div>
+        <p className="settings-state" role="status">
+          {update.status === 'development' ? 'Updates are available in the published app.'
+            : update.status === 'unsupported' ? 'This browser does not support app updates.'
+              : update.status === 'applying' ? 'Applying update…'
+                : update.available ? 'A new version is ready to install.'
+                  : update.status === 'checking' ? 'Checking for updates…'
+                    : update.status === 'error' ? 'Could not check for updates. Connect to the internet and try again.'
+                      : 'You’re up to date.'}
+        </p>
+        <Button variant="secondary" disabled={update.status === 'checking' || update.status === 'applying' || update.status === 'unsupported' || update.status === 'development'} onClick={() => void update.check()}>
+          <RefreshCw size={16} />{update.available ? 'View update' : 'Check for updates'}
+        </Button>
+      </section>
       <section className="settings-section" aria-labelledby="offline-heading">
         <div className="settings-copy">
           <h2 id="offline-heading">Offline practice</h2>
@@ -64,7 +84,7 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
           </p>}
           <Button variant="secondary" disabled={downloading || unavailable} onClick={download}>
             {status === 'ready' ? <RefreshCw size={16} /> : <Download size={16} />}
-            {status === 'ready' ? 'Check for updates' : status === 'error' ? 'Retry download' : downloading ? 'Downloading…' : 'Download for offline use'}
+            {status === 'ready' ? 'Download again' : status === 'error' ? 'Retry download' : downloading ? 'Downloading…' : 'Download for offline use'}
           </Button>
         </div>
         <p className="settings-note">Generated word and sentence audio needs internet. Stroke drawings save as you view them.</p>

@@ -1,0 +1,6 @@
+.app-update-dialog { margin: auto; width: min(420px, calc(100% - 40px)); max-height: calc(100dvh - 40px); overflow: auto; border: 1px solid var(--color-line); border-radius: 16px; padding: 24px; background: var(--color-paper); color: var(--color-ink); }
+.app-update-dialog::backdrop { background: rgb(0 0 0 / 45%); }
+.app-update-dialog h2 { margin: 0 0 12px; font-size: 20px; font-weight: 650; }
+.app-update-dialog p { margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: var(--color-muted); }
+.app-update-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; }
+.app-update-actions .ui-button { width: auto; }

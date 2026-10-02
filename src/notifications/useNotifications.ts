@@ -16,6 +16,7 @@ async function updateSubscription(action: Action, subscription: PushSubscription
 
 async function activeRegistration() {
   const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' })
+  if (registration.active) return registration
   const worker = registration.installing ?? registration.waiting
   if (!worker || worker.state === 'activated') return navigator.serviceWorker.ready
   // The shared worker also prepares offline files; a stalled install must stay retryable.

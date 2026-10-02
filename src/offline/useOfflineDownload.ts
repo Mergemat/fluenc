@@ -54,7 +54,7 @@ export function useOfflineDownload() {
       if (!active || !registration) return
 
       const check = async () => {
-        const worker = registration.installing ?? registration.waiting ?? registration.active
+        const worker = registration.active ?? registration.installing
         if (!worker) return
         const download: DownloadProgress = await messageSW(worker, { type: 'DOWNLOAD_PROGRESS' })
         if (!active) return
