@@ -30,8 +30,8 @@ export function WordStudio({ item }: { item: WordItem }) {
       <p className="study-label">{singleCharacter ? 'Character reading' : 'Word'} {item.rank}</p>
       <p className="recall-hanzi recall-word font-hanzi" lang="zh-CN">{item.hanzi}</p>
       <div className="answer-sound"><strong>{item.pinyin}</strong><MandarinAudioButton text={item.hanzi} pinyin={item.pinyin} /></div>
-      <p className="answer-meaning">{meaning.primary}</p>
-      <DictionaryMeanings meanings={meaning.alternatives} />
+      <p className="answer-meaning">{meaning.summary}</p>
+      <DictionaryMeanings meanings={meaning.alternatives.slice(1)} />
     </div>
     {item.characterIds.length > 1 ? <section className="word-connections">
       <div className="word-parts"><span className="study-label">Character parts</span><div>
