@@ -21,7 +21,8 @@ export function CharacterStudio({ item }: { item: CharacterItem }) {
   const [showShapeNote, setShowShapeNote] = useState(false)
   const direct = directCharacters.has(item.hanzi)
   const cues = characterCues(item).map((cue) => ({ ...cue, name: names[cueKey(cue)] ?? cue.name }))
-  const studio: Studio = { item, cues, meaning: getItemMeaning(item).primary }
+  const { primary, alternatives } = getItemMeaning(item)
+  const studio: Studio = { item, cues, meaning: [primary, ...alternatives.slice(0, 1)].join('; ') }
   const finishMutation = useProgressMutation(async () => {
     const name = (kind: Cue['kind']) => cues.find(cue => cue.kind === kind)?.name.trim() ?? ''
     const movie = await saveMovieOffline({
