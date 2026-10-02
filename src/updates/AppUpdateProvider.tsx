@@ -21,8 +21,6 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
   const [attempt, setAttempt] = useState(0)
   const workbox = useRef<Workbox | null>(null)
   const registration = useRef<ServiceWorkerRegistration | null>(null)
-  const applying = useRef(false)
-  const timer = useRef<number | undefined>(undefined)
   const saving = useIsMutating() > 0
 
   useEffect(() => {
@@ -42,22 +40,19 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
       if (!active) return
       const worker = new Workbox('/sw.js', { scope: '/', updateViaCache: 'none' })
       workbox.current = worker
-      const waiting = () => {
+      const updated = () => {
         if (!active) return
         setAvailable(true)
         setToastOpen(true)
         setStatus('current')
       }
-      const installed = (event: { isUpdate?: boolean }) => {
-        if (active && !event.isUpdate) setStatus('current')
-      }
-      const controlling = () => {
-        if (applying.current) window.location.reload()
+      const activated = (event: { isUpdate?: boolean }) => {
+        if (!active) return
+        if (event.isUpdate) updated()
+        else setStatus('current')
       }
       const failed = () => { if (active) setStatus('error') }
-      worker.addEventListener('waiting', waiting)
-      worker.addEventListener('installed', installed)
-      worker.addEventListener('controlling', controlling)
+      worker.addEventListener('activated', activated)
       worker.addEventListener('redundant', failed)
       const checkInBackground = () => {
         if (document.visibilityState === 'visible' && navigator.onLine) void worker.update().catch(() => {})
@@ -66,9 +61,7 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
       window.addEventListener('online', checkInBackground)
       const interval = window.setInterval(checkInBackground, 60 * 60 * 1000)
       cleanup = () => {
-        worker.removeEventListener('waiting', waiting)
-        worker.removeEventListener('installed', installed)
-        worker.removeEventListener('controlling', controlling)
+        worker.removeEventListener('activated', activated)
         worker.removeEventListener('redundant', failed)
         document.removeEventListener('visibilitychange', checkInBackground)
         window.removeEventListener('online', checkInBackground)
@@ -78,14 +71,12 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
       if (!active) return
       if (!result) throw new Error('App registration failed')
       registration.current = result
-      if (result.waiting) waiting()
-      else if (!result.installing) setStatus('current')
+      if (!result.installing) setStatus('current')
     }
     void prepare().catch(() => { if (active) setStatus('error') })
     return () => {
       active = false
       cleanup()
-      window.clearTimeout(timer.current)
       workbox.current = null
       registration.current = null
     }
@@ -110,24 +101,14 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
     }
   }
   const apply = () => {
-    if (saving || !available || applying.current) return
-    // Another open tab may have activated the waiting version already.
-    if (!registration.current?.waiting) {
-      window.location.reload()
-      return
-    }
-    applying.current = true
+    if (saving || !available || status === 'applying') return
     setStatus('applying')
-    timer.current = window.setTimeout(() => {
-      applying.current = false
-      setStatus('error')
-    }, 30_000)
-    workbox.current?.messageSkipWaiting()
+    window.location.reload()
   }
 
   return <AppUpdateContext.Provider value={{ status, available, check, apply }}>
     {children}
-    {toastOpen && available ? <AppUpdateToast updating={status === 'applying'} failed={status === 'error'} saving={saving} onRefresh={apply} onDismiss={() => setToastOpen(false)} /> : null}
+    {toastOpen && available ? <AppUpdateToast updating={status === 'applying'} saving={saving} onRefresh={apply} onDismiss={() => setToastOpen(false)} /> : null}
   </AppUpdateContext.Provider>
 }
 

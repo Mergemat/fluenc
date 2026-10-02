@@ -11,6 +11,7 @@ import { openReview, showPushNotification } from '../src/notifications/worker'
 
 declare const self: ServiceWorkerGlobalScope & { __WB_MANIFEST: PrecacheEntry[] }
 
+void self.skipWaiting()
 clientsClaim()
 addPlugins([new RangeRequestsPlugin()])
 const entries = self.__WB_MANIFEST
@@ -27,10 +28,6 @@ self.addEventListener('notificationclick', event => {
 })
 
 self.addEventListener('message', event => {
-  if (event.data?.type === 'SKIP_WAITING') {
-    event.waitUntil(self.skipWaiting())
-    return
-  }
   if (event.data?.type !== 'DOWNLOAD_PROGRESS') return
   event.waitUntil((async () => {
     const cache = await caches.open(cacheNames.precache)

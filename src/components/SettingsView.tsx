@@ -57,7 +57,7 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
           {update.status === 'development' ? 'Updates are available in the published app.'
             : update.status === 'unsupported' ? 'This browser does not support app updates.'
               : update.status === 'applying' ? 'Applying update…'
-                : update.available ? 'A new version is ready to install.'
+                : update.available ? 'Refresh to use the latest version.'
                   : update.status === 'checking' ? 'Checking for updates…'
                     : update.status === 'error' ? 'Could not check for updates. Connect to the internet and try again.'
                       : 'You’re up to date.'}
