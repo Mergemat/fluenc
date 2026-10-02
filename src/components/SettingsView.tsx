@@ -63,7 +63,7 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
                       : 'You’re up to date.'}
         </p>
         <Button variant="secondary" disabled={update.status === 'checking' || update.status === 'applying' || update.status === 'unsupported' || update.status === 'development'} onClick={() => void update.check()}>
-          <RefreshCw size={16} />{update.available ? 'View update' : 'Check for updates'}
+          <RefreshCw size={16} />{update.available ? 'Refresh to update' : 'Check for updates'}
         </Button>
       </section>
       <section className="settings-section" aria-labelledby="offline-heading">

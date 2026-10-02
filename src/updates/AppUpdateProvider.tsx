@@ -2,7 +2,7 @@ import { useIsMutating } from '@tanstack/react-query'
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Workbox } from 'workbox-window'
 
-import { AppUpdatePrompt } from './AppUpdatePrompt'
+import { AppUpdateToast } from './AppUpdateToast'
 
 type UpdateStatus = 'checking' | 'current' | 'applying' | 'error' | 'unsupported' | 'development'
 type AppUpdate = {
@@ -17,7 +17,7 @@ const AppUpdateContext = createContext<AppUpdate | null>(null)
 export function AppUpdateProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<UpdateStatus>('checking')
   const [available, setAvailable] = useState(false)
-  const [promptOpen, setPromptOpen] = useState(false)
+  const [toastOpen, setToastOpen] = useState(false)
   const [attempt, setAttempt] = useState(0)
   const workbox = useRef<Workbox | null>(null)
   const registration = useRef<ServiceWorkerRegistration | null>(null)
@@ -45,7 +45,7 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
       const waiting = () => {
         if (!active) return
         setAvailable(true)
-        setPromptOpen(true)
+        setToastOpen(true)
         setStatus('current')
       }
       const installed = (event: { isUpdate?: boolean }) => {
@@ -93,7 +93,7 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
 
   const check = async () => {
     if (available) {
-      setPromptOpen(true)
+      setToastOpen(true)
       return
     }
     if (!workbox.current || !registration.current) {
@@ -127,7 +127,7 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
 
   return <AppUpdateContext.Provider value={{ status, available, check, apply }}>
     {children}
-    {promptOpen && available ? <AppUpdatePrompt status={status} saving={saving} onUpdate={apply} onDismiss={() => setPromptOpen(false)} /> : null}
+    {toastOpen && available ? <AppUpdateToast updating={status === 'applying'} failed={status === 'error'} saving={saving} onRefresh={apply} onDismiss={() => setToastOpen(false)} /> : null}
   </AppUpdateContext.Provider>
 }
 
