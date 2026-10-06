@@ -6,6 +6,10 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   resolve: { tsconfigPaths: true },
+  server: {
+    // Production builds write here; reloading the dev tab for them is noise.
+    watch: { ignored: ["**/.output/**", "**/.vercel/**"] },
+  },
   environments: {
     client: {
       build: {
