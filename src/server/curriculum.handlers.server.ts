@@ -478,10 +478,11 @@ export async function saveLivingLinkHandler(data: LivingLinkInput) {
 }
 
 export async function getLibraryHandler() {
-  const items = await db
-    .select()
-    .from(learnerItems)
-    .where(eq(learnerItems.learnerId, LEARNER_ID))
+  const [items, stories] = await db.batch([
+    db.select().from(learnerItems).where(eq(learnerItems.learnerId, LEARNER_ID)),
+    db.select().from(mnemonics).where(and(eq(mnemonics.learnerId, LEARNER_ID), eq(mnemonics.itemType, 'word'))),
+  ])
+  const livingLinks = new Map(stories.map(story => [story.itemId, story.story]))
   const progress = new Map(
     items.map((item) => [
       `${item.itemType}:${item.itemId}`,
@@ -505,6 +506,11 @@ export async function getLibraryHandler() {
       dictionaryMeanings: character.dictionaryMeanings,
       rank: character.frequencyRank,
       status: progress.get(`character:${character.id}`) ?? 'new' as const,
+      // Everything an entry page needs, so it renders offline from this one payload.
+      movie: getMovieCoordinates(character.pinyin),
+      components: groupHanziComponents(directCharacters.has(character.hanzi) ? [character.hanzi] : character.components),
+      structure: character.componentStructure,
+      componentNote: character.componentNote,
     })),
     words: uniqueWords.map((word) => ({
       id: String(word.id),
@@ -513,6 +519,12 @@ export async function getLibraryHandler() {
       meaning: word.meaning,
       dictionaryMeanings: word.dictionaryMeanings,
       rank: word.rank,
+      characterParts: word.characterIds.map(id => {
+        const character = charactersById.get(id)
+        if (!character) throw new Error(`Missing curriculum character: ${id}`)
+        return { id, hanzi: character.hanzi, meaning: character.keyword }
+      }),
+      livingLink: livingLinks.get(String(word.id)) ?? '',
       status: (characterForWord(String(word.id))
         ? progress.get(`character:${characterForWord(String(word.id))}`)
         : wordProgress.get(word.hanzi)) ?? 'new' as const,

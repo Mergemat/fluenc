@@ -1,106 +1,51 @@
-import { useIsMutating, useQueryClient } from '@tanstack/react-query'
-import { Check, Download, RefreshCw } from 'lucide-react'
-import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { RefreshCw } from 'lucide-react'
 
-import { flushProgress, hasPendingProgress } from '../offline/progress'
-import { dashboardQueryOptions, libraryQueryOptions, palaceQueryOptions } from '../offline/queries'
+import { hasPendingProgress } from '../offline/progress'
 import type { OfflineDownload } from '../offline/useOfflineDownload'
-import { Button } from './ui/Button'
-import { Page, PageHeader } from './ui/Layout'
-import { NotificationSettings } from './NotificationSettings'
 import { useAppUpdate } from '../updates/AppUpdateProvider'
+import { DitherButton } from './dither-kit/button'
+import { DitherGradient } from './dither-kit/gradient'
+import { NotificationSettings } from './NotificationSettings'
+import { Page, PageHeader } from './ui/Layout'
+import { SettingRow, type Tone } from './ui/SettingRow'
 
-type SyncStatus = 'idle' | 'syncing' | 'done' | 'offline' | 'error'
-
+/**
+ * Reminders are the only real choice. Everything else — offline download, progress sync,
+ * app updates — runs by itself, so this page only reports how the device is doing.
+ */
 export function SettingsView({ offline }: { offline: OfflineDownload }) {
-  const queryClient = useQueryClient()
-  const saving = useIsMutating() > 0
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle')
   const update = useAppUpdate()
-  const { status, progress, download } = offline
-  const downloading = status === 'downloading' || status === 'checking'
-  const unavailable = status === 'unsupported' || status === 'development'
-  const percentage = progress?.total ? Math.floor(progress.completed / progress.total * 100) : null
+  const pending = useQuery({ queryKey: ['pending-progress'], queryFn: hasPendingProgress, refetchInterval: 3_000, networkMode: 'always' })
+  const percentage = offline.progress?.total ? Math.floor(offline.progress.completed / offline.progress.total * 100) : null
 
-  const sync = async () => {
-    if (!navigator.onLine) {
-      setSyncStatus('offline')
-      return
-    }
-    setSyncStatus('syncing')
-    try {
-      await flushProgress()
-      if (await hasPendingProgress()) throw new Error('Progress is waiting to sync')
-      await Promise.all([
-        queryClient.invalidateQueries(dashboardQueryOptions),
-        queryClient.invalidateQueries(libraryQueryOptions),
-        queryClient.invalidateQueries(palaceQueryOptions),
-      ])
-      setSyncStatus('done')
-    } catch {
-      setSyncStatus('error')
-    }
-  }
+  const offlineState: [Tone, string] = offline.status === 'ready' ? ['ok', 'saved on this device']
+    : offline.status === 'downloading' || offline.status === 'checking' ? ['busy', percentage === null ? 'downloading…' : `downloading · ${percentage}%`]
+    : offline.status === 'idle' ? ['warn', 'downloads when you’re back online']
+    : offline.status === 'error' ? ['error', 'interrupted · retries when online']
+    : offline.status === 'development' ? ['idle', 'published app only']
+    : ['idle', 'not supported in this browser']
+  const syncState: [Tone, string] = pending.data ? ['busy', 'changes waiting to sync'] : pending.isPending ? ['busy', 'checking…'] : ['ok', 'all progress synced']
+  const updateState: [Tone, string] = update.available ? ['warn', 'new version ready']
+    : update.status === 'applying' ? ['busy', 'updating…']
+    : update.status === 'error' ? ['error', 'could not check · retries on open']
+    : update.status === 'development' || update.status === 'unsupported' ? ['idle', 'published app only']
+    : update.status === 'checking' ? ['busy', 'checking…'] : ['ok', 'up to date']
 
   return <Page>
-    <PageHeader title="Settings" meta={<Button variant="ghost" disabled={saving} onClick={() => {
-      if (!queryClient.isMutating()) window.location.reload()
-    }}><RefreshCw size={16} />Refresh app</Button>} />
-    <div className="settings-sections">
+    <PageHeader title="Settings" />
+    <div className="dx-set">
       <NotificationSettings />
-      <section className="settings-section" aria-labelledby="updates-heading">
-        <div className="settings-copy">
-          <h2 id="updates-heading">App updates</h2>
-          <p>New versions are checked automatically when you open the app.</p>
-        </div>
-        <p className="settings-state" role="status">
-          {update.status === 'development' ? 'Updates are available in the published app.'
-            : update.status === 'unsupported' ? 'This browser does not support app updates.'
-              : update.status === 'applying' ? 'Applying update…'
-                : update.available ? 'Refresh to use the latest version.'
-                  : update.status === 'checking' ? 'Checking for updates…'
-                    : update.status === 'error' ? 'Could not check for updates. Connect to the internet and try again.'
-                      : 'You’re up to date.'}
-        </p>
-        <Button variant="secondary" disabled={update.status === 'checking' || update.status === 'applying' || update.status === 'unsupported' || update.status === 'development'} onClick={() => void update.check()}>
-          <RefreshCw size={16} />{update.available ? 'Refresh to update' : 'Check for updates'}
-        </Button>
-      </section>
-      <section className="settings-section" aria-labelledby="offline-heading">
-        <div className="settings-copy">
-          <h2 id="offline-heading">Offline practice</h2>
-          <p>Save lessons and all character recordings on this device.</p>
-        </div>
-        <div className="settings-download">
-          {downloading ? <>
-            <div className="settings-progress-label" role="status"><span>{percentage === 100 ? 'Finishing download…' : 'Downloading…'}</span><span>{percentage === null ? '' : `${percentage}%`}</span></div>
-            <progress className="settings-progress" aria-label="Offline download" max={100} value={percentage ?? undefined} />
-          </> : <p className="settings-state" role="status">
-            {status === 'ready' ? <><Check size={16} /> Saved on this device</>
-              : status === 'error' ? 'Download interrupted. Connect to the internet and try again.'
-                : status === 'unsupported' ? 'This browser does not support offline storage.'
-                  : status === 'development' ? 'Downloads are available in the published app.'
-                    : 'Not downloaded yet'}
-          </p>}
-          <Button variant="secondary" disabled={downloading || unavailable} onClick={download}>
-            {status === 'ready' ? <RefreshCw size={16} /> : <Download size={16} />}
-            {status === 'ready' ? 'Download again' : status === 'error' ? 'Retry download' : downloading ? 'Downloading…' : 'Download for offline use'}
-          </Button>
-        </div>
-        <p className="settings-note">Generated word and sentence audio needs internet. Stroke drawings save as you view them.</p>
-      </section>
-      <section className="settings-section" aria-labelledby="sync-heading">
-        <div className="settings-copy">
-          <h2 id="sync-heading">Practice progress</h2>
-          <p>Your reviews save on this device and sync automatically when you’re online.</p>
-        </div>
-        <Button variant="secondary" disabled={syncStatus === 'syncing'} onClick={() => void sync()}><RefreshCw size={16} />{syncStatus === 'syncing' ? 'Syncing…' : 'Sync now'}</Button>
-        {syncStatus !== 'idle' && syncStatus !== 'syncing' ? <p className="settings-state" role="status">
-          {syncStatus === 'done' ? <><Check size={16} /> Progress synced</>
-            : syncStatus === 'offline' ? 'You’re offline. Your progress will sync when you reconnect.'
-              : 'Could not sync. Your progress is saved here. Try again when connected.'}
-        </p> : null}
-      </section>
+      <h3 className="dx-set-group">this device</h3>
+      <SettingRow id="offline-heading" title="Offline" note="lessons, strokes and character audio" tone={offlineState[0]} status={offlineState[1]}>
+        {offline.status === 'downloading' && percentage !== null ? <span className="dx-set-meter" aria-hidden="true">
+          <span style={{ width: `${percentage}%` }}><DitherGradient from="blue" direction="left" cell={2} /></span>
+        </span> : null}
+      </SettingRow>
+      <SettingRow id="sync-heading" title="Progress" note="saved here first, synced in the background" tone={syncState[0]} status={syncState[1]} />
+      <SettingRow id="update-heading" title="Version" note="checked each time you open fluenc" tone={updateState[0]} status={updateState[1]}>
+        {update.available ? <DitherButton className="dx-tool" color="blue" variant="gradient" disabled={update.status === 'applying'} onClick={update.apply}><RefreshCw size={13} />refresh</DitherButton> : null}
+      </SettingRow>
     </div>
   </Page>
 }

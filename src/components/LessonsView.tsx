@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
 import type { DashboardData } from '../server/curriculum'
-import { CharacterStudio } from './CharacterStudio'
-import { WordStudio } from './WordStudio'
+import { CharacterLesson } from './CharacterLesson'
+import { WordLesson } from './WordLesson'
 import { Empty, Page, PageHeader } from './ui/Layout'
 
 export function LessonsView({ data }: { data: DashboardData }) {
@@ -12,31 +12,23 @@ export function LessonsView({ data }: { data: DashboardData }) {
   const lesson = data.buildQueue.find(item => item.type === selected?.type && item.id === selected.id)
     ?? data.buildQueue[0]
   if (lesson?.type !== selected?.type || lesson?.id !== selected?.id) setSelected(lesson)
-  const character = lesson?.type === 'character' ? lesson : null
 
-  if (character) {
-    return (
-      <section className="cs-host">
-        <CharacterStudio key={`character:${character.id}`} item={character} />
-      </section>
-    )
-  }
+  if (lesson?.type === 'character') return <CharacterLesson key={`character:${lesson.id}`} item={lesson} remaining={data.buildQueue.length} />
+  if (lesson?.type === 'word') return <WordLesson key={`word:${lesson.id}`} item={lesson} remaining={data.buildQueue.length} />
 
   return (
-    <Page>
-      <PageHeader
-        title="Build"
-        meta={lesson ? `${data.buildQueue.length} ready` : 'Nothing new'}
-      />
+    <div className="dx-lesson-page">
+      <Page>
+        <PageHeader
+          title="Build"
+          meta="Nothing new"
+        />
 
-      {lesson?.type === 'word' ? (
-        <WordStudio key={`word:${lesson.id}`} item={lesson} />
-      ) : (
         <Empty
           title="All lessons complete"
           detail="You’ve worked through the available characters and words. Keep practicing with reviews and reading."
         />
-      )}
-    </Page>
+      </Page>
+    </div>
   )
 }
