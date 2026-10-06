@@ -11,10 +11,11 @@ import { BrandMark } from './ui/BrandMark'
 import { PixelLoader, Rule } from './ui/Dither'
 import { ToastProvider } from './ui/Toast'
 
+// Learn is the home page and sits in the middle of the bar.
 const navigation = [
-  { to: '/review', label: 'review', icon: Brain },
-  { to: '/lessons', label: 'build', icon: GraduationCap },
   { to: '/reading', label: 'read', icon: BookOpen },
+  { to: '/review', label: 'review', icon: Brain },
+  { to: '/lessons', label: 'learn', icon: GraduationCap },
   { to: '/library', label: 'library', icon: LibraryBig },
   { to: '/palace', label: 'palace', icon: Clapperboard },
 ] as const

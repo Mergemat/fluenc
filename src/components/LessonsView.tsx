@@ -20,7 +20,7 @@ export function LessonsView({ data }: { data: DashboardData }) {
     <div className="dx-lesson-page">
       <Page>
         <PageHeader
-          title="Build"
+          title="Learn"
           meta="Nothing new"
         />
 
