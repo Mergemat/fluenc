@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite dev",
     "build": "bun scripts/build.ts",
+    "preview": "bun scripts/preview.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "data:sync": "bun scripts/sync-curriculum.ts",
