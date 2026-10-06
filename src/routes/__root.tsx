@@ -30,7 +30,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       { rel: 'preload', href: '/fonts/geist/GeistMono-Variable.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
       { rel: 'manifest', href: '/manifest.webmanifest' },
       { rel: 'icon', href: '/brand/favicon-32.png', type: 'image/png', sizes: '32x32' },
-      { rel: 'apple-touch-icon', href: '/brand/apple-touch-icon.png', sizes: '180x180' },
+      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' },
     ],
   }),
   component: RootComponent,

@@ -36,6 +36,7 @@ const result = await injectManifest({
     'assets/**/*.{css,js}',
     'fonts/**/*.woff2',
     'brand/**/*.png',
+    'apple-touch-icon.png',
     'manifest.webmanifest',
   ],
   maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
