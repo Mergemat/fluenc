@@ -7,6 +7,7 @@ import { isLearning, REVIEW_TIME_ZONE } from "../lib/review-schedule";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import { ReviewCard } from "./review-card";
+import { Empty, PageHeader } from "./ui/layout";
 
 function reviewTime(date: string, includeTime = false) {
   return new Date(date).toLocaleString("en-GB", {
@@ -122,24 +123,22 @@ export function ReviewView({ data }: { data: DashboardData }) {
 
   return (
     <section className="dx-review">
-      <header className="dx-bar">
-        <p className="dx-crumb">
-          <span>review</span>
-          {active ? (
+      <PageHeader
+        meta={
+          active ? (
             <>
-              <b>{data.reviewQueue.length}</b>{" "}
-              <span>
-                ready{learning.length ? ` · ${learning.length} learning` : ""} ·{" "}
-                {active.type === "character" &&
-                directCharacters.has(active.hanzi)
-                  ? "prop"
-                  : active.type}
-              </span>
+              <b>{data.reviewQueue.length}</b> ready
+              {learning.length ? ` · ${learning.length} learning` : ""} ·{" "}
+              {active.type === "character" && directCharacters.has(active.hanzi)
+                ? "prop"
+                : active.type}
             </>
           ) : (
-            <span>· {doneCopy[state].crumb}</span>
-          )}
-        </p>
+            doneCopy[state].crumb
+          )
+        }
+        title="review"
+      >
         <div
           aria-label="Session progress"
           aria-valuemax={sessionSize}
@@ -167,7 +166,7 @@ export function ReviewView({ data }: { data: DashboardData }) {
             />
           </span>
         </div>
-      </header>
+      </PageHeader>
 
       {active ? (
         <ReviewCard
@@ -242,20 +241,12 @@ function ReviewDone({
       data-state={state}
       role={state === "waiting" ? "status" : undefined}
     >
-      <div className="dx-done-body">
-        <span aria-hidden="true" className="dx-done-mark">
-          <DitherGradient
-            cell={2}
-            direction="up"
-            from={state === "waiting" ? "orange" : "green"}
-            opacity={0.55}
-          />
-          <span className="font-hanzi" lang="zh-CN">
-            {copy.mark}
-          </span>
-        </span>
-        <h1>{copy.title}</h1>
-        <p>{doneDetail(state, learning)}</p>
+      <Empty
+        detail={doneDetail(state, learning)}
+        mark={copy.mark}
+        title={copy.title}
+        tone={state === "waiting" ? "orange" : "green"}
+      >
         <dl className="dx-done-stats">
           {stats.map(([label, value]) => (
             <div key={label}>
@@ -264,7 +255,7 @@ function ReviewDone({
             </div>
           ))}
         </dl>
-      </div>
+      </Empty>
       {state === "waiting" ? null : (
         <footer className="dx-done-actions">
           <DitherButton

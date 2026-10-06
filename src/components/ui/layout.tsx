@@ -1,51 +1,83 @@
+// The page frame every route shares: one width and gutter, one header, one empty state and one
+// status line, so pages read as one app.
 import type { ReactNode } from "react";
 
-import { Rule } from "./dither";
+import { DitherGradient } from "../dither-kit/gradient";
+import type { PixelColor } from "../dither-kit/pixel";
+import { PixelLoader, Rule } from "./dither";
 
 export function Page({ children }: { children: ReactNode }) {
-  return <section className="study-page">{children}</section>;
+  return <section className="dx-page">{children}</section>;
 }
 
+/**
+ * Pixel title, a rule (or whatever stands in for it, like a progress bar) and mono meta on the
+ * right. Pages whose content has its own `h1` pass `heading={false}`.
+ */
 export function PageHeader({
   title,
   meta,
+  children,
+  heading = true,
 }: {
-  title: string;
+  title: ReactNode;
   meta?: ReactNode;
+  children?: ReactNode;
+  heading?: boolean;
 }) {
+  const Title = heading ? "h1" : "p";
   return (
-    <header className="page-header">
-      <h1 className="page-title">{title}</h1>
-      <Rule />
-      {meta ? <div className="page-meta">{meta}</div> : null}
+    <header className="dx-head">
+      <Title className="dx-head-title">{title}</Title>
+      {children ?? <Rule />}
+      {meta ? <div className="dx-head-meta">{meta}</div> : null}
     </header>
   );
 }
 
-export function Empty({ title, detail }: { title: string; detail: string }) {
+/** A dithered tile with a character in it, over a pixel title and a line of detail. */
+export function Empty({
+  title,
+  detail,
+  mark = "休",
+  tone = "green",
+  children,
+}: {
+  title: string;
+  detail: ReactNode;
+  mark?: string;
+  tone?: PixelColor;
+  children?: ReactNode;
+}) {
   return (
-    <div className="empty-state">
-      <span aria-hidden="true" className="empty-mark font-hanzi">
-        休
+    <div className="dx-empty">
+      <span aria-hidden="true" className="dx-empty-mark">
+        <DitherGradient cell={2} direction="up" from={tone} opacity={0.55} />
+        <span className="font-hanzi" lang="zh-CN">
+          {mark}
+        </span>
       </span>
-      <h2 className="m-0 font-semibold text-xl tracking-tight">{title}</h2>
-      <p className="m-0 max-w-[420px] text-muted text-sm leading-relaxed">
-        {detail}
-      </p>
+      <h2>{title}</h2>
+      <p>{detail}</p>
+      {children}
     </div>
   );
 }
 
+/** A one-line state (loading, missing, failed) with an optional way out. */
 export function Status({
   title,
   action,
+  loading = false,
 }: {
   title: string;
   action?: ReactNode;
+  loading?: boolean;
 }) {
   return (
-    <div className="status-panel">
-      <p className="m-0 font-medium text-sm">{title}</p>
+    <div className="dx-status" role={loading ? "status" : undefined}>
+      {loading ? <PixelLoader label={title} size={5} /> : null}
+      <p>{title}</p>
       {action}
     </div>
   );
@@ -53,10 +85,7 @@ export function Status({
 
 export function ErrorNote({ children }: { children: ReactNode }) {
   return (
-    <p
-      className="m-0 border-danger border-l-2 pt-0 pl-3 font-medium text-danger text-xs"
-      role="alert"
-    >
+    <p className="dx-error" role="alert">
       {children}
     </p>
   );

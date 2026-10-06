@@ -18,7 +18,6 @@ import { lessonClues } from "./character-studio/clues";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import type { DitherColor } from "./dither-kit/palette";
-import { SentenceReviewDeck } from "./sentence-review-deck";
 import { AudioButton, HanziGlyph, MoviePinyin, ToneContour } from "./ui/hanzi";
 import { partColor } from "./ui/part-colors";
 
@@ -35,6 +34,12 @@ const ratings: {
 ];
 
 const RATING_KEY = /^[1-4]$/;
+
+const ghostLabels: Record<ReviewItem["type"], string[]> = {
+  character: ["meaning", "sound", "scene"],
+  word: ["meaning", "use"],
+  sentence: ["hanzi", "sound"],
+};
 
 type CharacterReview = Extract<ReviewItem, { type: "character" }>;
 type WordReview = Extract<ReviewItem, { type: "word" }>;
@@ -66,6 +71,27 @@ function RatingButton({
       <small>{rating.note}</small>
       <kbd>{rating.value}</kbd>
     </DitherButton>
+  );
+}
+
+/** Placeholder bars, one per part of the answer, holding its place until it shows. */
+export function AnswerGhost({ labels }: { labels: string[] }) {
+  return (
+    <div aria-hidden="true" className="dx-answer-ghost">
+      {labels.map((label) => (
+        <div key={label}>
+          <span>{label}</span>
+          <i>
+            <DitherGradient
+              cell={2}
+              direction="right"
+              from="grey"
+              opacity={0.7}
+            />
+          </i>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -132,6 +158,71 @@ function WordAnswer({ item, also }: { item: WordReview; also: string | null }) {
   );
 }
 
+/** What is asked: the character, the word glossed, or the sentence's meaning. */
+function ReviewPrompt({
+  item,
+  clues,
+  revealed,
+}: {
+  item: ReviewItem;
+  clues: Clue[];
+  revealed: boolean;
+}) {
+  if (item.type === "character") {
+    return (
+      <div className="dx-glyph-box">
+        <HanziGlyph
+          concealed={!revealed}
+          hanzi={item.hanzi}
+          parts={clues.map((prop) => prop.code)}
+          xray={revealed}
+        />
+      </div>
+    );
+  }
+  if (item.type === "word") {
+    return (
+      <WordGloss
+        glosses={item.characterParts.map((part) => part.meaning)}
+        hanzi={item.hanzi}
+        revealed={revealed}
+        syllables={item.syllables ?? null}
+      />
+    );
+  }
+  return (
+    <div className="dx-sentence-prompt">
+      <p className="dx-sentence-cue">say it in mandarin</p>
+      <p className="dx-sentence-meaning">{item.meaning}</p>
+    </div>
+  );
+}
+
+function ReviewAnswer({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
+  if (item.type === "sentence") {
+    return (
+      <>
+        <p className="dx-sentence font-hanzi" lang="zh-CN">
+          {item.hanzi}
+        </p>
+        <p className="dx-word-reading">{item.pinyin}</p>
+        <AudioButton label="listen" pinyin={item.pinyin} text={item.hanzi} />
+      </>
+    );
+  }
+  const meaning = getItemMeaning(item);
+  return (
+    <>
+      <h2 className="dx-meaning">{meaning.primary}</h2>
+      {item.type === "character" ? (
+        <CharacterAnswer also={meaning.also} clues={clues} item={item} />
+      ) : (
+        <WordAnswer also={meaning.also} item={item} />
+      )}
+    </>
+  );
+}
+
 export function ReviewCard({ item }: { item: ReviewItem }) {
   const [startedAt] = useState(Date.now);
   const [revealed, setRevealed] = useState(false);
@@ -171,34 +262,16 @@ export function ReviewCard({ item }: { item: ReviewItem }) {
       rate(Number(event.key));
     }
   });
-  const sentence = item.type === "sentence";
   useEffect(() => {
-    if (sentence) {
-      return;
-    }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [sentence]);
+  }, []);
 
   const error = mutation.isError ? (
     <p className="dx-review-error" role="alert">
       could not save this review — try again
     </p>
   ) : null;
-  if (item.type === "sentence") {
-    return (
-      <div className="dx-review-legacy">
-        <SentenceReviewDeck
-          item={item}
-          onRate={rate}
-          pending={mutation.isPending}
-        />
-        {error}
-      </div>
-    );
-  }
-
-  const meaning = getItemMeaning(item);
   const character = item.type === "character" ? item : null;
   const clues = character ? lessonClues(character) : [];
   const props = clues.filter((clue) => clue.kind === "prop");
@@ -207,54 +280,16 @@ export function ReviewCard({ item }: { item: ReviewItem }) {
   return (
     <div className="dx-card" data-revealed={revealed} data-type={item.type}>
       <div className="dx-card-stage">
-        {item.type === "character" ? (
-          <div className="dx-glyph-box">
-            <HanziGlyph
-              concealed={!revealed}
-              hanzi={item.hanzi}
-              parts={props.map((prop) => prop.code)}
-              xray={revealed}
-            />
-          </div>
-        ) : (
-          <WordGloss
-            glosses={item.characterParts.map((part) => part.meaning)}
-            hanzi={item.hanzi}
-            revealed={revealed}
-            syllables={item.syllables ?? null}
-          />
-        )}
+        <ReviewPrompt clues={props} item={item} revealed={revealed} />
 
         <div className="dx-answer">
-          <div aria-hidden="true" className="dx-answer-ghost">
-            {(character
-              ? ["meaning", "sound", "scene"]
-              : ["meaning", "use"]
-            ).map((label) => (
-              <div key={label}>
-                <span>{label}</span>
-                <i>
-                  <DitherGradient
-                    cell={2}
-                    direction="right"
-                    from="grey"
-                    opacity={0.7}
-                  />
-                </i>
-              </div>
-            ))}
-          </div>
+          <AnswerGhost labels={ghostLabels[item.type]} />
           <div
             aria-hidden={!revealed}
             className="dx-answer-real"
             inert={!revealed}
           >
-            <h2 className="dx-meaning">{meaning.primary}</h2>
-            {item.type === "character" ? (
-              <CharacterAnswer also={meaning.also} clues={clues} item={item} />
-            ) : (
-              <WordAnswer also={meaning.also} item={item} />
-            )}
+            <ReviewAnswer clues={clues} item={item} />
           </div>
         </div>
       </div>

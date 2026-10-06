@@ -13,6 +13,7 @@ import {
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import { NotificationSettings } from "./notification-settings";
+import { Rule } from "./ui/dither";
 import { Page, PageHeader } from "./ui/layout";
 import { SettingRow, type Tone } from "./ui/setting-row";
 
@@ -81,20 +82,36 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
 
   return (
     <Page>
-      <PageHeader title="Settings" />
+      <PageHeader title="settings" />
       <div className="dx-set">
+        <h2 className="dx-label dx-set-group">
+          <span>reminders</span>
+          <Rule />
+        </h2>
         <NotificationSettings />
-        <h3 className="dx-set-group">this device</h3>
+        <h2 className="dx-label dx-set-group">
+          <span>this device</span>
+          <Rule />
+        </h2>
         <SettingRow
           id="offline-heading"
           note="lessons, strokes and character audio"
           status={offlineText}
-          title="Offline"
+          title="offline"
           tone={offlineTone}
         >
           {offline.status === "downloading" && percentage !== null ? (
-            <span aria-hidden="true" className="dx-set-meter">
-              <span style={{ width: `${percentage}%` }}>
+            <span aria-hidden="true" className="dx-progress dx-set-meter">
+              <DitherGradient
+                cell={2}
+                direction="right"
+                from="grey"
+                opacity={0.5}
+              />
+              <span
+                className="dx-progress-fill"
+                style={{ width: `${percentage}%` }}
+              >
                 <DitherGradient cell={2} direction="left" from="blue" />
               </span>
             </span>
@@ -104,14 +121,14 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
           id="sync-heading"
           note="saved here first, synced in the background"
           status={syncText}
-          title="Progress"
+          title="progress"
           tone={syncTone}
         />
         <SettingRow
           id="update-heading"
           note="checked each time you open fluenc"
           status={updateText}
-          title="Version"
+          title="version"
           tone={updateTone}
         >
           {update.available ? (

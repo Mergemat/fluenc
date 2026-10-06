@@ -7,7 +7,6 @@ import {
 import { useCallback } from "react";
 
 import { LibraryEntryPage } from "../components/library-entry-page";
-import { Button } from "../components/ui/button";
 import { Page, Status } from "../components/ui/layout";
 import type { LibraryEntry } from "../lib/library-search";
 import { oneOf } from "../lib/search-params";
@@ -48,7 +47,7 @@ export const Route = createFileRoute("/_app/library_/$kind/$id")({
   }),
   pendingComponent: () => (
     <Page>
-      <Status title="Loading details…" />
+      <Status loading title="loading details" />
     </Page>
   ),
   errorComponent: DetailError,
@@ -60,7 +59,7 @@ export const Route = createFileRoute("/_app/library_/$kind/$id")({
             back to library
           </Link>
         }
-        title="This entry is not in the library"
+        title="this entry isn’t in the library"
       />
     </Page>
   ),
@@ -82,11 +81,11 @@ function DetailError() {
     <Page>
       <Status
         action={
-          <Button onClick={retry} type="button">
-            Retry
-          </Button>
+          <button className="dx-chip" onClick={retry} type="button">
+            retry
+          </button>
         }
-        title="Could not load these details"
+        title="couldn’t load these details"
       />
     </Page>
   );

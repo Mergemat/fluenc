@@ -18,6 +18,7 @@ import { DitherButton } from "./dither-kit/button";
 import { WordGloss } from "./review-card";
 import { Rule } from "./ui/dither";
 import { AudioButton } from "./ui/hanzi";
+import { PageHeader } from "./ui/layout";
 import { useToast } from "./ui/toast";
 
 type WordItem = Extract<BuildItem, { type: "word" }>;
@@ -124,6 +125,7 @@ export function WordLesson({ item }: { item: WordItem }) {
       data-hanzi={item.hanzi}
       data-leaving={finish.isPending}
     >
+      <PageHeader heading={false} meta="new word" title="learn" />
       <section aria-label="Word" className="dx-read dx-word-read">
         <WordGloss
           glosses={item.characterParts.map((part) => part.meaning)}

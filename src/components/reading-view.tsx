@@ -8,16 +8,16 @@ export function ReadingView({ data }: { data: DashboardData }) {
   return (
     <Page>
       <PageHeader
-        meta={sentence ? `${data.getQueue.length} sentences` : "Nothing yet"}
-        title="Read"
+        meta={sentence ? `${data.getQueue.length} sentences` : "nothing yet"}
+        title="read"
       />
 
       {sentence ? (
         <ReadingLesson item={sentence} key={sentence.id} />
       ) : (
         <Empty
-          detail="New sentences unlock as you learn the characters and words they are built from."
-          title="Nothing to read yet"
+          detail="sentences unlock as you learn the characters and words they’re built from"
+          title="nothing to read yet"
         />
       )}
     </Page>

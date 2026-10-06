@@ -22,7 +22,7 @@ import { Tile } from "./library-view";
 import { WordGloss } from "./review-card";
 import { Rule } from "./ui/dither";
 import { AudioButton, HanziGlyph, MoviePinyin } from "./ui/hanzi";
-import { Page } from "./ui/layout";
+import { Page, PageHeader } from "./ui/layout";
 import { partColor } from "./ui/part-colors";
 
 const statusLabel = {
@@ -46,27 +46,34 @@ export function LibraryEntryPage({
 
   return (
     <Page>
-      <nav aria-label="Breadcrumb" className="dx-crumbs">
-        {canGoBack ? (
-          <button onClick={goBack} type="button">
-            <ArrowLeft size={14} />
-            {back}
-          </button>
-        ) : (
-          <Link to={from === "palace" ? "/palace" : "/library"}>
-            <ArrowLeft size={14} />
-            {back}
-          </Link>
-        )}
-        <span aria-hidden="true">/</span>
-        <span className="font-hanzi" lang="zh-CN">
-          {item.hanzi}
-        </span>
-        <span className="dx-entry-status" data-status={item.status}>
-          <i aria-hidden="true" />
-          {statusLabel[item.status]}
-        </span>
-      </nav>
+      <PageHeader
+        heading={false}
+        meta={
+          <span className="dx-entry-status" data-status={item.status}>
+            <i aria-hidden="true" />
+            {statusLabel[item.status]}
+          </span>
+        }
+        title={
+          <>
+            {canGoBack ? (
+              <button onClick={goBack} type="button">
+                <ArrowLeft size={14} />
+                {back}
+              </button>
+            ) : (
+              <Link to={from === "palace" ? "/palace" : "/library"}>
+                <ArrowLeft size={14} />
+                {back}
+              </Link>
+            )}
+            <span aria-hidden="true">/</span>
+            <span className="font-hanzi" lang="zh-CN">
+              {item.hanzi}
+            </span>
+          </>
+        }
+      />
       {item.kind === "characters" ? (
         <CharacterEntry
           item={item}

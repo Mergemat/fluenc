@@ -131,7 +131,7 @@ async function show(course: Course, session: string) {
 async function reveal() {
   const button = expectDefined(
     [...host.querySelectorAll("button")].find((candidate) =>
-      candidate.textContent?.includes("Reveal answer")
+      candidate.textContent?.includes("show answer")
     )
   );
   await act(() => button.click());
@@ -168,7 +168,7 @@ test("a last missed card waits and returns concealed instead of falsely completi
   let data = fixture();
   await show(data, "miss");
   await reveal();
-  expect(host.querySelector(".sentence-answer")?.closest("[inert]")).toBeNull();
+  expect(host.querySelector(".dx-answer-real")?.closest("[inert]")).toBeNull();
   data = rate(data, "s0", Rating.Again);
   await show(data, "miss");
   expect(host.textContent).toContain("1 card still needs practice");
@@ -181,9 +181,9 @@ test("a last missed card waits and returns concealed instead of falsely completi
   };
   await show(data, "miss");
   expect(
-    host.querySelector(".sentence-answer")?.closest("[inert]")
+    host.querySelector(".dx-answer-real")?.closest("[inert]")
   ).not.toBeNull();
-  expect(host.textContent).toContain("Reveal answer");
+  expect(host.textContent).toContain("show answer");
 });
 
 /** Rate each card Easy in turn, showing the session after every rating. */
@@ -217,7 +217,7 @@ test("all overdue cards remain in one session beyond twenty reviews", async () =
   // Every sentence is already in reviews, so there is nothing new to read.
   expect(dashboard(data).getQueue).toHaveLength(0);
   expect(host.querySelector('a[href="/reading"]')).toBeNull();
-  expect(host.querySelector(".recall-frame")).toBeNull();
+  expect(host.querySelector(".dx-card")).toBeNull();
 });
 
 test("a learning step becoming due does not replace the currently revealed card", async () => {
@@ -232,12 +232,12 @@ test("a learning step becoming due does not replace the currently revealed card"
   ]);
   await show(data, "stable");
   expect(host.textContent).toContain("Sentence 1");
-  expect(host.querySelector(".sentence-answer")?.closest("[inert]")).toBeNull();
+  expect(host.querySelector(".dx-answer-real")?.closest("[inert]")).toBeNull();
   data = rate(data, "s1", Rating.Easy, "2026-09-23T02:01:00.000Z");
   await show(data, "stable");
   expect(host.textContent).toContain("Sentence 0");
   expect(
-    host.querySelector(".sentence-answer")?.closest("[inert]")
+    host.querySelector(".dx-answer-real")?.closest("[inert]")
   ).not.toBeNull();
 });
 
@@ -245,5 +245,5 @@ test("no introduced material leads to learning rather than an invented review se
   await show(fixture(0), "empty");
   expect(host.textContent).toContain("start with a lesson");
   expect(host.textContent).toContain("start your first lesson");
-  expect(host.querySelector(".recall-frame")).toBeNull();
+  expect(host.querySelector(".dx-card")).toBeNull();
 });

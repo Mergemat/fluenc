@@ -8,7 +8,6 @@ import {
 import { useCallback } from "react";
 
 import { AppShell } from "../components/app-shell";
-import { Button } from "../components/ui/button";
 import { Status } from "../components/ui/layout";
 import { OfflineDownloadProvider } from "../offline/offline-download-provider";
 import { dashboardQueryOptions, loadLearner } from "../offline/queries";
@@ -19,7 +18,7 @@ export const Route = createFileRoute("/_app")({
   loader: async ({ context }) => {
     await loadLearner(context.queryClient);
   },
-  pendingComponent: () => <Status title="Opening Fluenc…" />,
+  pendingComponent: () => <Status loading title="opening fluenc" />,
   pendingMinMs: 0,
   errorComponent: StartupError,
   component: AppLayout,
@@ -49,11 +48,11 @@ function StartupError() {
   return (
     <Status
       action={
-        <Button onClick={retry} type="button">
-          Try again
-        </Button>
+        <button className="dx-chip" onClick={retry} type="button">
+          try again
+        </button>
       }
-      title="Could not open your lessons. Connect to the internet to prepare Fluenc for offline use."
+      title="couldn’t open your lessons. connect once to prepare fluenc for offline use"
     />
   );
 }
