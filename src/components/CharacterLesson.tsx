@@ -149,6 +149,17 @@ export function CharacterLesson({ item, remaining }: { item: CharacterItem; rema
       </div>
     </section>
 
+    {/* Words that use the character, collapsed to one line: read them before the scene. */}
+    <section className="dx-usage" aria-label="In words" aria-busy={usage.pending}>
+      {usage.pending ? <span className="dx-usage-skeleton"><DitherGradient from="grey" direction="right" cell={2} opacity={.6} /></span>
+        : usage.error ? <p className="dx-usage-empty">words unavailable offline · <button type="button" onClick={usage.retry}>retry</button></p>
+        : usage.data?.words.length ? <p className="dx-usage-line">{usage.data.words.map(word => <span key={word.id} className="dx-usage-item"
+            title={`${word.pinyin}${word.unknown ? ` · ${word.unknown} new character${word.unknown > 1 ? 's' : ''}` : ''}`}>
+            <UsageHanzi chars={word.chars} /><span>{word.meaning}</span>
+          </span>)}</p>
+        : <p className="dx-usage-empty">used on its own — no course words yet</p>}
+    </section>
+
     <section className="dx-clues" aria-label="Clues">
       <div className="dx-label"><span>{direct ? 'prop' : 'clues'}</span><Rule />
         {item.movie.componentNote ? <button type="button" className="dx-note-toggle" aria-expanded={noteOpen} onClick={() => setNoteOpen(!noteOpen)}><Info size={12} /> note</button> : null}
@@ -160,18 +171,6 @@ export function CharacterLesson({ item, remaining }: { item: CharacterItem; rema
       {noteOpen && item.movie.componentNote ? <div className="dx-popover" role="note"><p>{item.movie.componentNote}</p><button type="button" aria-label="Close note" onClick={() => setNoteOpen(false)}><X size={14} /></button></div> : null}
     </section>
 
-    <section className="dx-usage" aria-label="In use">
-      <div className="dx-usage-list" aria-busy={usage.pending}>
-        {usage.pending ? [0, 1, 2].map(index => <span key={index} className="dx-skeleton"><DitherGradient from="grey" direction="up" cell={2} opacity={.6} /></span>)
-          : usage.error ? <p className="dx-usage-empty">words unavailable offline · <button type="button" onClick={usage.retry}>retry</button></p>
-          : usage.data && (usage.data.words.length || usage.data.sentence) ? <>
-            {usage.data.words.map(word => <div key={word.id} className="dx-word" title={word.unknown ? `${word.unknown} new character${word.unknown > 1 ? 's' : ''}` : 'all characters known'}>
-              <UsageHanzi chars={word.chars} /><span className="dx-word-py">{word.pinyin}</span><span className="dx-word-en">{word.meaning}</span>
-            </div>)}
-            {usage.data.sentence ? <div className="dx-word dx-sentence"><UsageHanzi chars={usage.data.sentence.chars} /><span className="dx-word-en">{usage.data.sentence.meaning}</span></div> : null}
-          </> : <p className="dx-usage-empty">used on its own — no course words yet</p>}
-      </div>
-    </section>
 
     <footer className="dx-actions">
       {/* Grey dotted until every clue is named, then the blue gradient with bloom. */}

@@ -144,7 +144,7 @@
 .dx-studio {
   position: relative; width: 100%; max-width: 1120px; height: 100%; margin: 0 auto; padding: 10px 16px 12px; box-sizing: border-box;
   display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto auto;
-  grid-template-areas: "bar" "read" "clues" "usage" "actions"; gap: 12px; animation: dx-enter .24s ease-out;
+  grid-template-areas: "bar" "read" "usage" "clues" "actions"; gap: 12px; animation: dx-enter .24s ease-out;
 }
 @keyframes dx-enter { from { opacity: 0; } }
 .dx-studio p, .dx-studio h1 { margin: 0; }
@@ -182,18 +182,16 @@
 .dx-popover { position: absolute; z-index: 5; left: 0; right: 0; top: 24px; padding: 12px 40px 12px 14px; border: 1px solid var(--dx-line-strong); border-radius: var(--dx-radius); background: var(--dx-raised); box-shadow: 0 18px 40px -18px var(--dx-shadow); animation: dx-enter .16s ease-out; }
 .dx-popover p { font: 13px/1.55 var(--dx-sans); color: var(--dx-fg); }
 .dx-popover button { position: absolute; top: 9px; right: 9px; display: grid; place-items: center; width: 24px; height: 24px; color: var(--dx-muted); }
-.dx-usage { grid-area: usage; display: grid; gap: 8px; min-width: 0; }
-.dx-usage-list { display: flex; gap: 8px; height: 56px; min-width: 0; }
-.dx-word { flex: 1 1 0; min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 8px; row-gap: 3px; align-content: center; padding: 0 11px; border: 1px solid var(--dx-line); border-radius: var(--dx-radius); background: var(--dx-surface); }
-.dx-usage-hanzi { font-size: 19px; line-height: 1.15; white-space: nowrap; overflow: hidden; }
+.dx-usage { grid-area: usage; min-width: 0; display: flex; align-items: center; height: 26px; }
+.dx-usage-line { margin: 0; display: flex; align-items: baseline; gap: 16px; min-width: 0; overflow: hidden; white-space: nowrap; -webkit-mask: linear-gradient(to right, #000 88%, transparent); mask: linear-gradient(to right, #000 88%, transparent); }
+.dx-usage-item { display: inline-flex; align-items: baseline; gap: 7px; flex-shrink: 0; font: 13px var(--dx-sans); color: var(--dx-muted); }
+.dx-usage-item + .dx-usage-item::before { content: '·'; margin-right: 9px; color: var(--dx-faint); }
+.dx-usage-hanzi { font-size: 18px; line-height: 1; white-space: nowrap; }
 .dx-usage-hanzi > [data-target=true] { color: var(--dx-blue); text-shadow: 0 0 12px color-mix(in srgb, var(--dx-blue) 60%, transparent); }
 .dx-usage-hanzi > [data-known=false] { color: var(--dx-faint); text-decoration: underline dotted; text-underline-offset: 4px; }
-.dx-word-py { align-self: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 10.5px var(--dx-mono); color: var(--dx-muted); }
-.dx-word-en { grid-column: 1 / -1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 12px var(--dx-sans); color: var(--dx-fg); opacity: .85; }
-.dx-sentence { flex: 1.8 1 0; display: none; }
-.dx-usage-empty { align-self: center; font: 11px var(--dx-mono); color: var(--dx-faint); }
+.dx-usage-empty { margin: 0; font: 11px var(--dx-mono); color: var(--dx-faint); }
 .dx-usage-empty button { text-decoration: underline; color: var(--dx-muted); }
-.dx-skeleton { position: relative; overflow: hidden; flex: 1 1 0; border: 1px solid var(--dx-line); border-radius: var(--dx-radius); animation: dx-pulse 1.1s ease-in-out infinite; }
+.dx-usage-skeleton { position: relative; overflow: hidden; width: min(100%, 280px); height: 12px; border-radius: 2px; animation: dx-pulse 1.1s ease-in-out infinite; }
 .dx-actions { grid-area: actions; }
 .dx-studio > * { transition: opacity 160ms; }
 .dx-studio[data-leaving=true] > :not(.dx-actions) { opacity: .35; }
@@ -211,15 +209,11 @@
 @media (min-width: 960px) {
   .dx-studio { padding: 18px 32px 24px; column-gap: 48px; row-gap: 14px;
     grid-template-columns: minmax(0, 1fr) minmax(400px, 460px); grid-template-rows: auto minmax(0, 1fr) auto auto auto minmax(0, 1fr);
-    grid-template-areas: "bar bar" "read ." "read clues" "read usage" "read actions" "read ."; }
+    grid-template-areas: "bar bar" "read ." "read usage" "read clues" "read actions" "read ."; }
   .dx-read { --glyph-max: 440px; justify-content: center; gap: 18px; }
   .dx-read > .dx-glyph-box { flex: 0 1 var(--glyph-max); }
   .dx-meaning { font-size: 32px; }
   .dx-py { font-size: 30px; }
-  .dx-sentence { display: grid; flex-basis: 100%; }
-  .dx-usage-list { height: auto; flex-wrap: wrap; }
-  .dx-word, .dx-skeleton { height: 54px; flex: 1 1 120px; }
-  .dx-sentence { height: 54px; }
   .dx-actions { justify-self: stretch; }
 }
 /* Phones: the character comes first. Meaning and pinyin sit beside it so the glyph gets the
@@ -240,11 +234,6 @@
   .dx-studio[data-dense=true] .dx-rows-props .dx-row > .dx-code { grid-row: 1 / 3; }
   .dx-studio[data-dense=true] .dx-rows-props .dx-row > .dx-role { grid-column: 2; grid-row: 1; max-width: none; text-align: left; }
   .dx-studio[data-dense=true] .dx-rows-props .dx-row > .dx-input { grid-row: 2; height: 22px; }
-  .dx-usage-list { height: 42px; }
-  .dx-word { grid-template-rows: auto; padding: 0 10px; }
-  .dx-word-py { display: none; }
-  .dx-usage-hanzi { grid-column: 1; grid-row: 1; font-size: 17px; }
-  .dx-word-en { grid-column: 2; grid-row: 1; }
 }
 @media (max-height: 680px) and (max-width: 959px) {
   .dx-studio { gap: 7px; }
