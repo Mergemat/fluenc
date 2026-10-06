@@ -59,6 +59,8 @@
 .dx-boot { position: fixed; inset: 0; display: grid; place-items: center; color: var(--dx-muted); }
 .dx-main { position: relative; flex: 1; min-height: 0; min-width: 0; overflow: hidden; display: flex; flex-direction: column; }
 .dx-main > * { flex: 1; min-height: 0; }
+.dx-stage { height: 100%; display: flex; flex-direction: column; }
+.dx-stage > * { flex: 1; min-height: 0; }
 .dx-lesson-page { overflow-y: auto; overscroll-behavior: contain; }
 .dx-tabbar { display: none; }
 @media (max-width: 767px) {
