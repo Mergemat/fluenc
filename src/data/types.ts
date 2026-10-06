@@ -25,6 +25,8 @@ export type Word = {
   meaning: string
   dictionaryMeanings: string[]
   characterIds: string[]
+  /** One curriculum syllable per character, or null when the reading does not split cleanly. */
+  syllables: string[] | null
 }
 
 export type Curriculum = {

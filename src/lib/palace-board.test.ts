@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test'
 
 import { buildPalaceBoard } from './palace-board'
 import { getMovieCoordinates } from './pinyin'
-import type { LibraryData } from '../server/curriculum'
+import type { LibraryData } from './learner-views'
 
 type Character = LibraryData['characters'][number]
 const character = (hanzi: string, pinyin: string, components: string[], status: Character['status'] = 'new'): Character => ({

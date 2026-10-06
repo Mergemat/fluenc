@@ -4,9 +4,9 @@ import { act } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { Root } from 'react-dom/client'
 
-import type { BuildItem, DashboardData } from '../server/curriculum'
+import { deriveDashboard, type BuildItem, type DashboardData } from '../lib/learner-views'
 import { getMovieCoordinates } from '../lib/pinyin'
-import { applyOperation } from '../offline/progress-state'
+import { applyOperation, emptyLearnerState } from '../lib/learner-state'
 
 const browser = new Window()
 const globals = ['window', 'document', 'navigator', 'HTMLElement', 'HTMLInputElement', 'IS_REACT_ACT_ENVIRONMENT'] as const
@@ -54,7 +54,7 @@ function character(id: string, pinyin: string): Extract<BuildItem, { type: 'char
 
 const word: Extract<BuildItem, { type: 'word' }> = {
   type: 'word', id: '5', hanzi: '我们', pinyin: 'wǒmen', meaning: 'we',
-  dictionaryMeanings: [], rank: 5, characterIds: ['我', '们'], livingLink: '', queueKind: 'new',
+  dictionaryMeanings: [], rank: 5, characterIds: ['我', '们'], syllables: ['wǒ', 'men'], livingLink: '', queueKind: 'new',
   characterParts: [{ hanzi: '我', meaning: 'I' }, { hanzi: '们', meaning: 'plural marker' }],
 }
 
@@ -101,32 +101,26 @@ test('sync unlocks a word without replacing the next character or discarding its
 
 test('learning the final prerequisite opens a word immediately without a server refresh', async () => {
   await show([])
-  const first = character('我', 'wǒ')
-  const second = character('们', 'men')
-  const next = character('了', 'le')
-  let data = await show([first, next, second], [word])
-  const enroll = (id: string) => {
-    data = applyOperation(data, {
-      kind: 'enroll', data: { itemType: 'character', itemId: id, enrolledAt: new Date().toISOString() },
-    })
+  let state = emptyLearnerState
+  const enroll = (itemType: 'character' | 'word', itemId: string) => {
+    state = applyOperation(state, { kind: 'enroll', data: { itemType, itemId, enrolledAt: new Date().toISOString() } })
+    return deriveDashboard(state, new Date())
   }
 
-  enroll('我')
-  await show(data.buildQueue)
+  let data = enroll('character', '我')
+  await show(data.buildQueue, data.lockedWords)
   expect(host.querySelector('.dx-glyph-ghost')?.textContent).toBe('们')
-  expect(data.lockedWords.map(item => item.hanzi)).toEqual(['我们'])
+  expect(data.lockedWords.map(item => item.hanzi)).toContain('我们')
 
-  enroll('们')
-  await show(data.buildQueue)
+  data = enroll('character', '们')
+  await show(data.buildQueue, data.lockedWords)
   expect(host.querySelector('.dx-word-lesson')?.getAttribute('data-hanzi')).toBe('我们')
-  expect(data.lockedWords).toHaveLength(0)
+  expect(data.lockedWords.map(item => item.hanzi)).not.toContain('我们')
 
-  data = applyOperation(data, {
-    kind: 'enroll', data: { itemType: 'word', itemId: word.id, enrolledAt: new Date().toISOString() },
-  })
-  await show(data.buildQueue)
-  expect(host.querySelector('.dx-glyph-ghost')?.textContent).toBe('了')
-  enroll('了')
-  expect(data.buildQueue).toHaveLength(0)
-  expect(data.reviewQueue.filter(item => item.type === 'word' && item.id === word.id)).toHaveLength(1)
+  const wordId = data.buildQueue[0]!.id
+  data = enroll('word', wordId)
+  await show(data.buildQueue, data.lockedWords)
+  expect(host.querySelector('.dx-word-lesson')).toBeNull()
+  expect(host.querySelector('.dx-glyph-ghost')?.textContent).toBe(data.buildQueue[0]!.hanzi)
+  expect(data.reviewQueue.filter(item => item.type === 'word' && item.id === wordId)).toHaveLength(1)
 })

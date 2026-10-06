@@ -67,13 +67,12 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
 
   const finish = useProgressMutation(async () => {
     const name = (kind: Cue['kind']) => clues.find(clue => clue.kind === kind)?.name.trim() ?? ''
-    const movie = await saveMovieOffline({
+    await saveMovieOffline({
       characterId: item.id, actorKey: item.movie.actorKey, actorName: name('actor'),
       finalKey: item.movie.finalKey, setName: name('set'), tone: item.movie.tone, roomName: name('room'),
       props: props.map(prop => ({ component: prop.code, propName: prop.name.trim() })),
     })
-    const enrollment = await saveEnrollment({ itemType: 'character', itemId: item.id })
-    return { ...enrollment, palace: movie.palace }
+    return saveEnrollment({ itemType: 'character', itemId: item.id })
   })
 
   const focusClue = (clue?: Clue) => { if (clue) inputs.current.get(clue.id)?.focus() }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { OFFLINE_CACHES, OFFLINE_FILES_URL, type OfflineFile, type OfflineFiles } from './files'
-import { getCachedDashboard } from './progress'
+import { getCachedLearner } from './progress'
 
 export type DownloadProgress = { completed: number; total: number }
 type DownloadStatus = 'checking' | 'idle' | 'downloading' | 'ready' | 'error' | 'unsupported' | 'development'
@@ -82,9 +82,9 @@ export function useOfflineDownload() {
         await group.cache.put(REVISIONS_KEY, new Response(JSON.stringify(revisions), { headers: { 'content-type': 'application/json' } }))
       }
 
-      // The app shell installs in the service worker; lessons come from the saved dashboard.
+      // The app shell and course install in the service worker; progress comes from the saved learner state.
       await withTimeout(navigator.serviceWorker.ready)
-      if (!await getCachedDashboard()) throw new Error('Lessons are not saved yet')
+      if (!await getCachedLearner()) throw new Error('Lessons are not saved yet')
       if (!active) return
       setStatus('ready')
       void navigator.storage?.persist?.().catch(() => undefined)

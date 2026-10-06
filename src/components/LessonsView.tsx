@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import type { DashboardData } from '../server/curriculum'
+import type { DashboardData } from '../lib/learner-views'
 import { CharacterLesson } from './CharacterLesson'
 import { WordLesson } from './WordLesson'
 import { Empty, Page, PageHeader } from './ui/Layout'

@@ -5,10 +5,9 @@ import { Rating } from 'ts-fsrs'
 
 import { getItemMeaning } from '../lib/meaning'
 import { getMovieCoordinates } from '../lib/pinyin'
-import { wordSyllables } from '../lib/word-syllables'
 import { saveReview } from '../offline/progress'
 import { useProgressMutation } from '../offline/useProgressMutation'
-import type { ReviewItem } from '../server/curriculum'
+import type { ReviewItem } from '../lib/learner-views'
 import { clueCode, lessonClues } from './CharacterLesson'
 import { DitherButton } from './dither-kit/button'
 import type { DitherColor } from './dither-kit/palette'
@@ -54,7 +53,7 @@ export function ReviewCard({ item }: { item: ReviewItem }) {
   const props = clues.filter(clue => clue.kind === 'prop')
 
   const word = item.type === 'word' ? item : null
-  const syllables = word ? wordSyllables(word.hanzi, word.pinyin) : null
+  const syllables = word?.syllables ?? null
 
   // Prompt and answer are one centred block; the answer slot is a fixed height.
   return <div className="dx-card" data-revealed={revealed} data-type={item.type}>

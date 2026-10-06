@@ -4,7 +4,7 @@ import { Link } from '@tanstack/react-router'
 import { BookOpen, Brain, Clapperboard, GraduationCap, LibraryBig, Settings } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 
-import type { DashboardData } from '../server/curriculum'
+import type { DashboardData } from '../lib/learner-views'
 import { AppScroll } from './AppScroll'
 import { DitherGradient } from './dither-kit/gradient'
 import { BrandMark } from './ui/BrandMark'

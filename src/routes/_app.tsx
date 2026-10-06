@@ -5,12 +5,12 @@ import { AppShell } from '../components/AppShell'
 import { Status } from '../components/ui/Layout'
 import { Button } from '../components/ui/Button'
 import { OfflineDownloadProvider } from '../offline/OfflineDownloadProvider'
-import { dashboardQueryOptions, loadDashboard } from '../offline/queries'
+import { dashboardQueryOptions, loadLearner } from '../offline/queries'
 import { useOfflineSync } from '../offline/useOfflineSync'
 import { AppUpdateProvider } from '../updates/AppUpdateProvider'
 
 export const Route = createFileRoute('/_app')({
-  loader: ({ context }) => loadDashboard(context.queryClient),
+  loader: async ({ context }) => { await loadLearner(context.queryClient) },
   pendingComponent: () => <Status title="Opening Fluenc…" />,
   pendingMinMs: 0,
   errorComponent: StartupError,

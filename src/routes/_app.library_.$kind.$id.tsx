@@ -1,17 +1,17 @@
 import { createFileRoute, Link, notFound, useRouter } from '@tanstack/react-router'
-import { z } from 'zod'
 
 import { LibraryEntryPage } from '../components/LibraryEntryPage'
 import { Button } from '../components/ui/Button'
 import { Page, Status } from '../components/ui/Layout'
 import type { LibraryEntry } from '../lib/library-search'
-import { libraryQueryOptions } from '../offline/queries'
+import { oneOf } from '../lib/search-params'
+import { learnerQueryOptions, selectLibrary } from '../offline/queries'
 
 export const Route = createFileRoute('/_app/library_/$kind/$id')({
-  validateSearch: z.object({ from: z.enum(['palace']).optional().catch(undefined) }),
+  validateSearch: (search: Record<string, unknown>): { from?: 'palace' } => ({ from: oneOf(search.from, ['palace']) }),
   loader: async ({ context, params }) => {
     if (params.kind !== 'characters' && params.kind !== 'words') throw notFound()
-    const library = await context.queryClient.ensureQueryData(libraryQueryOptions)
+    const library = selectLibrary(await context.queryClient.ensureQueryData(learnerQueryOptions))
     const entry: LibraryEntry | undefined = params.kind === 'characters'
       ? (({ found }) => found && { ...found, kind: 'characters' as const })({ found: library.characters.find(item => item.id === params.id) })
       : (({ found }) => found && { ...found, kind: 'words' as const })({ found: library.words.find(item => item.id === params.id) })

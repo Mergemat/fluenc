@@ -1,4 +1,4 @@
-import type { BuildItem } from '../../server/curriculum'
+import type { BuildItem } from '../../lib/learner-views'
 
 export type CharacterItem = Extract<BuildItem, { type: 'character' }>
 export type CueKind = 'actor' | 'set' | 'room' | 'prop'

@@ -6,8 +6,9 @@ import { createMemoryHistory, createRootRoute, createRouter, RouterContextProvid
 import type { Root } from 'react-dom/client'
 import { Rating } from 'ts-fsrs'
 
-import { applyOperation, refreshDueQueues } from '../offline/progress-state'
-import type { DashboardData } from '../server/curriculum'
+import { createCatalog, type Catalog } from '../lib/catalog'
+import { applyOperation, emptyLearnerState, type LearnerState } from '../lib/learner-state'
+import { deriveDashboard, type DashboardData } from '../lib/learner-views'
 
 const browser = new Window()
 const globals = ['window', 'document', 'navigator', 'HTMLElement', 'IS_REACT_ACT_ENVIRONMENT'] as const
@@ -41,25 +42,25 @@ afterAll(async () => {
   }
 })
 
-function fixture(count = 1): DashboardData {
-  let data: DashboardData = {
-    curriculum: { version: 'test', characters: 0, words: 0 },
-    progress: { introducedCharacters: 0, introducedWords: 0 },
-    reviewQueue: [], buildQueue: [], lockedWords: [], scheduledQueue: [], nextReviewAt: null,
-    getQueue: Array.from({ length: count }, (_, index) => ({
-      id: `s${index}`, hanzi: '你好。', pinyin: 'Nǐ hǎo.', meaning: `Sentence ${index}`,
-      words: ['你', '好'], coverage: 1, missingWords: [], missingCharacters: [],
-    })),
-  }
-  for (const item of data.getQueue) data = applyOperation(data, { kind: 'enroll', data: {
-    itemType: 'sentence', itemId: item.id, enrolledAt: '2026-09-01T02:00:00.000Z',
-  } })
-  return data
+type Course = { catalog: Catalog; state: LearnerState; now: string }
+
+function fixture(count = 1): Course {
+  const sentences = Array.from({ length: count }, (_, index) => ({
+    id: `s${index}`, hanzi: '你好。', pinyin: 'Nǐ hǎo.', meaning: `Sentence ${index}`, words: ['你', '好'],
+  }))
+  const catalog = createCatalog({ version: 'test', characters: [], words: [] }, sentences)
+  const enrolledAt = '2026-09-01T02:00:00.000Z'
+  const state = sentences.reduce((next, item) => applyOperation(next, { kind: 'enroll', data: {
+    itemType: 'sentence', itemId: item.id, enrolledAt,
+  } }, catalog), emptyLearnerState)
+  return { catalog, state, now: enrolledAt }
 }
 
-async function show(data: DashboardData, session: string) {
+const dashboard = (course: Course): DashboardData => deriveDashboard(course.state, new Date(course.now), course.catalog)
+
+async function show(course: Course, session: string) {
   await act(async () => root.render(<RouterContextProvider router={router}><QueryClientProvider client={client}>
-    <ReviewView key={session} data={data} />
+    <ReviewView key={session} data={dashboard(course)} />
   </QueryClientProvider></RouterContextProvider>))
 }
 
@@ -69,10 +70,10 @@ async function reveal() {
   await act(async () => button!.click())
 }
 
-function rate(data: DashboardData, id: string, rating: number, reviewedAt = '2026-09-23T02:00:00.000Z') {
-  return applyOperation(data, { kind: 'review', data: {
+function rate(course: Course, id: string, rating: number, reviewedAt = '2026-09-23T02:00:00.000Z'): Course {
+  return { ...course, now: reviewedAt, state: applyOperation(course.state, { kind: 'review', data: {
     eventId: crypto.randomUUID(), itemType: 'sentence', itemId: id, rating, reviewedAt, durationMs: 100,
-  } })
+  } }, course.catalog) }
 }
 
 test('a last missed card waits and returns concealed instead of falsely completing the reviews', async () => {
@@ -85,7 +86,7 @@ test('a last missed card waits and returns concealed instead of falsely completi
   expect(host.textContent).toContain('1 card still needs practice')
   expect(host.textContent).not.toContain('reviews finished')
   expect(host.textContent).not.toContain('learn new characters')
-  data = refreshDueQueues(JSON.parse(JSON.stringify(data)), new Date('2026-09-23T02:01:00.000Z'))
+  data = { ...data, state: JSON.parse(JSON.stringify(data.state)), now: '2026-09-23T02:01:00.000Z' }
   await show(data, 'miss')
   expect(host.querySelector('.sentence-answer')?.closest('[inert]')).not.toBeNull()
   expect(host.textContent).toContain('Reveal answer')
@@ -107,7 +108,7 @@ test('all overdue cards remain in one session beyond twenty reviews', async () =
   expect(host.textContent).toContain('reviews finished')
   expect(host.textContent).toContain('learn new characters')
   // Every sentence is already in reviews, so there is nothing new to read.
-  expect(data.getQueue).toHaveLength(0)
+  expect(dashboard(data).getQueue).toHaveLength(0)
   expect(host.querySelector('a[href="/reading"]')).toBeNull()
   expect(host.querySelector('.recall-frame')).toBeNull()
 })
@@ -117,8 +118,8 @@ test('a learning step becoming due does not replace the currently revealed card'
   await show(data, 'stable')
   expect(host.textContent).toContain('Sentence 1')
   await reveal()
-  data = refreshDueQueues(data, new Date('2026-09-23T02:01:00.000Z'))
-  expect(data.reviewQueue.map(item => item.id)).toEqual(['s0', 's1'])
+  data = { ...data, now: '2026-09-23T02:01:00.000Z' }
+  expect(dashboard(data).reviewQueue.map(item => item.id)).toEqual(['s0', 's1'])
   await show(data, 'stable')
   expect(host.textContent).toContain('Sentence 1')
   expect(host.querySelector('.sentence-answer')?.closest('[inert]')).toBeNull()

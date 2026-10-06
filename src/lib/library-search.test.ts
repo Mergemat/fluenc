@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test'
 
 import { createLibrarySearch } from './library-search'
 import { getMovieCoordinates } from './pinyin'
-import type { LibraryData } from '../server/curriculum'
+import type { LibraryData } from './learner-views'
 
 type Character = LibraryData['characters'][number]
 type Word = LibraryData['words'][number]
@@ -10,7 +10,7 @@ const character = (entry: Pick<Character, 'id' | 'hanzi' | 'pinyin' | 'keyword' 
   ...entry, movie: getMovieCoordinates(entry.pinyin), components: components.map(hanzi => ({ hanzi, count: 1 })), structure: 'atomic', componentNote: null,
 })
 const word = (entry: Pick<Word, 'id' | 'hanzi' | 'pinyin' | 'meaning' | 'dictionaryMeanings' | 'rank' | 'status'>, livingLink = ''): Word => ({
-  ...entry, characterParts: [], livingLink,
+  ...entry, syllables: null, characterParts: [], livingLink,
 })
 
 const library: LibraryData = {

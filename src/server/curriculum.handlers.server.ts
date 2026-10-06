@@ -1,9 +1,7 @@
 import { and, eq, inArray } from 'drizzle-orm'
-import { createEmptyCard, State, type Card, type Grade } from 'ts-fsrs'
+import { createEmptyCard, type Card, type Grade } from 'ts-fsrs'
 
-import curriculumJson from '../data/curriculum.generated.json'
-import { sentences } from '../data/sentences'
-import { studyItemTypes, type Character, type Curriculum, type Word } from '../data/types'
+import { studyItemTypes } from '../data/types'
 import { db } from '../db'
 import {
   componentProps,
@@ -18,12 +16,10 @@ import {
   type ItemType,
   type LearnerItem,
 } from '../db/schema'
-import { characterForWord, characterIsWord, studyIdentity } from '../lib/character-words'
-import { nextWordCharacters } from '../lib/word-prerequisites'
-import { compareReviewOrder, reviewDueAt, scheduleReview } from '../lib/review-schedule'
-import { directCharacters } from '../lib/character-props'
-import { groupHanziComponents } from '../lib/hanzi'
-import { defaultToneRooms, getMovieCoordinates } from '../lib/pinyin'
+import { catalog } from '../lib/catalog'
+import { studyIdentity } from '../lib/character-words'
+import { cardKey, reviewTime, toCard, type CardSnapshot, type LearnerState } from '../lib/learner-state'
+import { scheduleReview } from '../lib/review-schedule'
 import type {
   EnrollInput,
   LivingLinkInput,
@@ -32,15 +28,6 @@ import type {
 } from './curriculum.contract'
 
 const LEARNER_ID = 'default'
-const curriculum = curriculumJson as Curriculum
-const charactersById = new Map(curriculum.characters.map((item) => [item.id, item]))
-const wordsById = new Map(curriculum.words.map((item) => [String(item.id), item]))
-const sentencesById = new Map(sentences.map((item) => [item.id, item]))
-const uniqueWords = [...curriculum.words.reduce((items, item) => {
-  if (!items.has(item.hanzi)) items.set(item.hanzi, item)
-  return items
-}, new Map<string, Word>()).values()]
-const starterCharacterIds = ['一', '人', '个', '大', '太', '了', '也', '他', '不', '在', '有', '是', '马', '吗']
 
 let learnerReady: Promise<unknown> | undefined
 
@@ -52,21 +39,6 @@ function ensureLearner() {
       throw error
     })
   return learnerReady
-}
-
-function fromLearnerItem(item: LearnerItem): Card {
-  return {
-    due: item.due,
-    stability: item.stability,
-    difficulty: item.difficulty,
-    elapsed_days: item.elapsedDays,
-    scheduled_days: item.scheduledDays,
-    learning_steps: item.learningSteps,
-    reps: item.reps,
-    lapses: item.lapses,
-    state: item.state as State,
-    last_review: item.lastReview ?? undefined,
-  }
 }
 
 function learnerItemValues(itemType: ItemType, itemId: string, card: Card, introducedAt?: Date) {
@@ -88,7 +60,7 @@ function learnerItemValues(itemType: ItemType, itemId: string, card: Card, intro
   }
 }
 
-function scheduledCard(item: LearnerItem) {
+function cardSnapshot(item: LearnerItem): CardSnapshot {
   return {
     due: item.due.toISOString(),
     stability: item.stability,
@@ -103,229 +75,23 @@ function scheduledCard(item: LearnerItem) {
   }
 }
 
-type MappingRows = Awaited<ReturnType<typeof getMappings>>
-
-async function getMappings() {
-  const [actors, sets, rooms, props, stories] = await db.batch([
+/** The learner's stored progress. Devices derive their dashboard, library and palace from it. */
+export async function getLearnerStateHandler(): Promise<LearnerState> {
+  const [items, actors, sets, rooms, props, stories] = await db.batch([
+    db.select().from(learnerItems).where(and(eq(learnerItems.learnerId, LEARNER_ID), inArray(learnerItems.itemType, studyItemTypes))),
     db.select().from(palaceActors).where(eq(palaceActors.learnerId, LEARNER_ID)),
     db.select().from(palaceSets).where(eq(palaceSets.learnerId, LEARNER_ID)),
     db.select().from(toneRooms).where(eq(toneRooms.learnerId, LEARNER_ID)),
     db.select().from(componentProps).where(eq(componentProps.learnerId, LEARNER_ID)),
-    db.select().from(mnemonics).where(eq(mnemonics.learnerId, LEARNER_ID)),
+    db.select().from(mnemonics).where(and(eq(mnemonics.learnerId, LEARNER_ID), eq(mnemonics.itemType, 'word'))),
   ])
-  return { actors, sets, rooms, props, stories }
-}
-
-function characterStudyItem(character: Character, mappings: MappingRows) {
-  const coordinates = getMovieCoordinates(character.pinyin)
-  const actor = mappings.actors.find((item) => item.actorKey === coordinates.actorKey)
-  const set = mappings.sets.find((item) => item.finalKey === coordinates.finalKey)
-  const room = mappings.rooms.find((item) => item.tone === coordinates.tone)
-  const movieComponents = groupHanziComponents(directCharacters.has(character.hanzi) ? [character.hanzi] : character.components)
   return {
-    type: 'character' as const,
-    id: character.id,
-    hanzi: character.hanzi,
-    pinyin: character.pinyin,
-    keyword: character.keyword,
-    dictionaryMeanings: character.dictionaryMeanings,
-    rank: character.frequencyRank,
-    unlocks: character.unlocks,
-    movie: {
-      ...coordinates,
-      actorName: actor?.actorName ?? '',
-      setName: set?.setName ?? '',
-      roomName: room?.roomName ?? defaultToneRooms[coordinates.tone],
-      isPrimitive: character.componentStructure === 'atomic',
-      componentNote: character.componentNote,
-      components: movieComponents.map(({ hanzi: component, count }) => {
-        const componentCharacter = charactersById.get(component)
-        return {
-          hanzi: component,
-          count,
-          propName: mappings.props.find((item) => item.component === component)?.propName ?? '',
-          character: componentCharacter ? {
-            pinyin: componentCharacter.pinyin,
-            keyword: componentCharacter.keyword,
-          } : null,
-        }
-      }),
-      configured: Boolean(
-        (directCharacters.has(character.hanzi) || (actor?.actorName && set?.setName && (room?.roomName || defaultToneRooms[coordinates.tone]))) &&
-        movieComponents.every(({ hanzi: component }) => mappings.props.some((item) => item.component === component && item.propName)),
-      ),
-    },
-  }
-}
-
-function wordStudyItem(word: Word, mappings: MappingRows) {
-  const story = mappings.stories.find(
-    (item) => item.itemType === 'word' && item.itemId === String(word.id),
-  )
-  return {
-    type: 'word' as const,
-    id: String(word.id),
-    hanzi: word.hanzi,
-    pinyin: word.pinyin,
-    meaning: word.meaning,
-    dictionaryMeanings: word.dictionaryMeanings,
-    rank: word.rank,
-    characterIds: word.characterIds,
-    characterParts: word.characterIds.map(id => {
-      const character = charactersById.get(id)
-      if (!character) throw new Error(`Missing curriculum character: ${id}`)
-      return { hanzi: character.hanzi, meaning: character.keyword }
-    }),
-    livingLink: story?.story ?? '',
-  }
-}
-
-function resolveStudyItem(type: ItemType, id: string, mappings: MappingRows) {
-  if (type === 'character') {
-    const character = charactersById.get(id)
-    return character ? characterStudyItem(character, mappings) : null
-  }
-  if (type === 'word') {
-    const word = wordsById.get(id)
-    return word ? wordStudyItem(word, mappings) : null
-  }
-  if (type === 'sentence') {
-    const sentence = sentencesById.get(id)
-    return sentence ? {
-      type: 'sentence' as const,
-      id: sentence.id,
-      hanzi: sentence.hanzi,
-      pinyin: sentence.pinyin,
-      meaning: sentence.meaning,
-    } : null
-  }
-  return null
-}
-
-export async function getDashboardHandler() {
-  const [mappings, rows] = await Promise.all([
-    getMappings(),
-    db.select().from(learnerItems).where(and(
-      eq(learnerItems.learnerId, LEARNER_ID),
-      inArray(learnerItems.itemType, studyItemTypes),
-    )),
-  ])
-  const now = new Date()
-
-  const items = rows
-    .filter(item => item.itemType !== 'word' || !characterForWord(item.itemId))
-    .map(item => ({ ...item, due: reviewDueAt(item.due, item.state) }))
-
-  const itemKey = (type: ItemType, id: string) => `${type}:${id}`
-  const introduced = new Set(items.map((item) => itemKey(item.itemType, item.itemId)))
-  const introducedCharacters = new Set(
-    items.filter((item) => item.itemType === 'character').map((item) => item.itemId),
-  )
-  const wordItems = items.filter((item) => item.itemType === 'word')
-  const learnedWords = new Set([
-    ...wordItems.flatMap(item => { const word = wordsById.get(item.itemId); return word ? [word.hanzi] : [] }),
-    ...[...introducedCharacters].filter(characterIsWord),
-  ])
-  const introducedSentences = new Set(
-    items.filter((item) => item.itemType === 'sentence').map((item) => item.itemId),
-  )
-  const dueItems = items
-    .filter((item) => item.due <= now)
-    .sort(compareReviewOrder)
-    .map((progress) => {
-      const item = resolveStudyItem(progress.itemType, progress.itemId, mappings)
-      return item ? {
-        ...item,
-        queueKind: 'review' as const,
-        srsState: progress.state,
-        reps: progress.reps,
-        card: scheduledCard(progress),
-      } : null
-    })
-    .filter((item) => item !== null)
-
-  const unintroducedWords = uniqueWords
-    .filter(item => !characterForWord(String(item.id)) &&
-      !introduced.has(itemKey('word', String(item.id))) && !learnedWords.has(item.hanzi))
-    .map(item => ({ ...wordStudyItem(item, mappings), queueKind: 'new' as const }))
-  const wordReady = (item: typeof unintroducedWords[number]) => item.characterIds.every(character => introducedCharacters.has(character))
-  const newWords = unintroducedWords.filter(wordReady)
-  const lockedWords = unintroducedWords.filter(item => !wordReady(item))
-  const nextWordParts = nextWordCharacters(lockedWords, introducedCharacters)
-  const knownProps = new Set(mappings.props.map((item) => item.component))
-  const newCharacters = curriculum.characters
-    .filter((item) => !introduced.has(itemKey('character', item.id)))
-    .map((character) => ({
-      character,
-      missingProps: [...new Set(character.components)].filter((component) => !knownProps.has(component)).length,
-    }))
-    .sort(({ character: left, missingProps: leftMissing }, { character: right, missingProps: rightMissing }) => {
-      const wordPriority = Number(nextWordParts.has(right.id)) - Number(nextWordParts.has(left.id))
-      if (wordPriority) return wordPriority
-      const leftStarter = starterCharacterIds.indexOf(left.id)
-      const rightStarter = starterCharacterIds.indexOf(right.id)
-      if (leftStarter >= 0 || rightStarter >= 0) {
-        if (leftStarter < 0) return 1
-        if (rightStarter < 0) return -1
-        return leftStarter - rightStarter
-      }
-      return leftMissing - rightMissing || left.frequencyRank - right.frequencyRank
-    })
-    .map(({ character }) => ({ ...characterStudyItem(character, mappings), queueKind: 'new' as const }))
-
-  const getQueue = sentences
-    .filter((sentence) => !introducedSentences.has(sentence.id))
-    .map((sentence) => {
-      const missingWords = sentence.words.filter((word) => !learnedWords.has(word))
-      const characters = [...new Set(Array.from(sentence.hanzi).filter((character) => charactersById.has(character)))]
-      const missingCharacters = characters.filter((character) => !introducedCharacters.has(character))
-      const wordCoverage = sentence.words.length
-        ? (sentence.words.length - missingWords.length) / sentence.words.length
-        : 1
-      const characterCoverage = characters.length
-        ? (characters.length - missingCharacters.length) / characters.length
-        : 1
-      return {
-        ...sentence,
-        coverage: Math.min(wordCoverage, characterCoverage),
-        missingWords,
-        missingCharacters,
-      }
-    })
-    .filter((sentence) => sentence.coverage >= 0.9)
-    .sort((left, right) => right.coverage - left.coverage)
-    .slice(0, 6)
-
-  const scheduledQueue = items
-    .filter((item) => item.due > now)
-    .map((progress) => {
-      const item = resolveStudyItem(progress.itemType, progress.itemId, mappings)
-      return item ? {
-        ...item,
-        queueKind: 'review' as const,
-        srsState: progress.state,
-        reps: progress.reps,
-        card: scheduledCard(progress),
-      } : null
-    })
-    .filter((item) => item !== null)
-
-  return {
-    curriculum: {
-      version: curriculum.version,
-      characters: curriculum.characters.length,
-      words: uniqueWords.length,
-    },
-    progress: {
-      introducedCharacters: introducedCharacters.size,
-      introducedWords: learnedWords.size,
-    },
-    reviewQueue: dueItems,
-    buildQueue: [...newWords, ...newCharacters],
-    lockedWords,
-    getQueue,
-    scheduledQueue,
-    nextReviewAt: scheduledQueue.reduce<string | null>((earliest, item) => !earliest || item.card.due < earliest ? item.card.due : earliest, null),
+    cards: Object.fromEntries(items.map(item => [cardKey(item.itemType, item.itemId), cardSnapshot(item)])),
+    actors: Object.fromEntries(actors.map(item => [item.actorKey, item.actorName])),
+    sets: Object.fromEntries(sets.map(item => [item.finalKey, item.setName])),
+    rooms: Object.fromEntries(rooms.map(item => [item.tone, item.roomName])),
+    props: Object.fromEntries(props.map(item => [item.component, item.propName])),
+    livingLinks: Object.fromEntries(stories.map(item => [item.itemId, item.story])),
   }
 }
 
@@ -333,13 +99,13 @@ export async function enrollItemHandler(input: EnrollInput) {
   const data = { ...input, ...studyIdentity(input.itemType, input.itemId) }
   await ensureLearner()
 
-  if (data.itemType === 'character' && !charactersById.has(data.itemId)) {
+  if (data.itemType === 'character' && !catalog.charactersById.has(data.itemId)) {
     throw new Error('Character not found')
   }
-  if (data.itemType === 'word' && !wordsById.has(data.itemId)) {
+  if (data.itemType === 'word' && !catalog.wordsById.has(data.itemId)) {
     throw new Error('Word not found')
   }
-  if (data.itemType === 'sentence' && !sentencesById.has(data.itemId)) {
+  if (data.itemType === 'sentence' && !catalog.sentencesById.has(data.itemId)) {
     throw new Error('Sentence not found')
   }
 
@@ -378,11 +144,8 @@ export async function reviewItemHandler(input: ReviewInput) {
 
     if (!existing[0]) throw new Error('Card is not in review yet')
 
-    const requestedReviewTime = new Date(data.reviewedAt)
-    const reviewedAt = existing[0].lastReview && requestedReviewTime <= existing[0].lastReview
-      ? new Date(existing[0].lastReview.getTime() + 1)
-      : requestedReviewTime
-    const currentCard = fromLearnerItem(existing[0])
+    const reviewedAt = reviewTime(existing[0].lastReview, new Date(data.reviewedAt))
+    const currentCard = toCard(cardSnapshot(existing[0]))
     const nextCard = scheduleReview(currentCard, reviewedAt, data.rating as Grade)
     const values = learnerItemValues(data.itemType, data.itemId, nextCard)
 
@@ -475,81 +238,4 @@ export async function saveLivingLinkHandler(data: LivingLinkInput) {
       set: { story: data.story, updatedAt: new Date() },
     })
   return { saved: true }
-}
-
-export async function getLibraryHandler() {
-  const [items, stories] = await db.batch([
-    db.select().from(learnerItems).where(eq(learnerItems.learnerId, LEARNER_ID)),
-    db.select().from(mnemonics).where(and(eq(mnemonics.learnerId, LEARNER_ID), eq(mnemonics.itemType, 'word'))),
-  ])
-  const livingLinks = new Map(stories.map(story => [story.itemId, story.story]))
-  const progress = new Map(
-    items.map((item) => [
-      `${item.itemType}:${item.itemId}`,
-      item.state === State.Review ? 'review' as const : 'learning' as const,
-    ]),
-  )
-  const wordProgress = new Map<string, 'learning' | 'review'>()
-  for (const item of items.filter((entry) => entry.itemType === 'word')) {
-    const word = wordsById.get(item.itemId)
-    if (!word) continue
-    const status = item.state === State.Review ? 'review' as const : 'learning' as const
-    if (status === 'review' || !wordProgress.has(word.hanzi)) wordProgress.set(word.hanzi, status)
-  }
-
-  return {
-    characters: curriculum.characters.map((character) => ({
-      id: character.id,
-      hanzi: character.hanzi,
-      pinyin: character.pinyin,
-      keyword: character.keyword,
-      dictionaryMeanings: character.dictionaryMeanings,
-      rank: character.frequencyRank,
-      status: progress.get(`character:${character.id}`) ?? 'new' as const,
-      // Everything an entry page needs, so it renders offline from this one payload.
-      movie: getMovieCoordinates(character.pinyin),
-      components: groupHanziComponents(directCharacters.has(character.hanzi) ? [character.hanzi] : character.components),
-      structure: character.componentStructure,
-      componentNote: character.componentNote,
-    })),
-    words: uniqueWords.map((word) => ({
-      id: String(word.id),
-      hanzi: word.hanzi,
-      pinyin: word.pinyin,
-      meaning: word.meaning,
-      dictionaryMeanings: word.dictionaryMeanings,
-      rank: word.rank,
-      characterParts: word.characterIds.map(id => {
-        const character = charactersById.get(id)
-        if (!character) throw new Error(`Missing curriculum character: ${id}`)
-        return { id, hanzi: character.hanzi, meaning: character.keyword }
-      }),
-      livingLink: livingLinks.get(String(word.id)) ?? '',
-      status: (characterForWord(String(word.id))
-        ? progress.get(`character:${characterForWord(String(word.id))}`)
-        : wordProgress.get(word.hanzi)) ?? 'new' as const,
-    })),
-  }
-}
-
-export async function getPalaceHandler() {
-  const mappings = await getMappings()
-  return {
-    actors: mappings.actors
-      .map(({ actorKey, actorName }) => ({ key: actorKey, name: actorName }))
-      .sort((left, right) => left.key.localeCompare(right.key)),
-    sets: mappings.sets
-      .map(({ finalKey, setName }) => ({ key: finalKey, name: setName }))
-      .sort((left, right) => left.key.localeCompare(right.key)),
-    rooms: Object.entries(defaultToneRooms).map(([toneKey, defaultName]) => {
-      const tone = Number(toneKey)
-      return {
-        tone,
-        name: mappings.rooms.find((room) => room.tone === tone)?.roomName ?? defaultName,
-      }
-    }),
-    props: mappings.props
-      .map(({ component, propName }) => ({ key: component, name: propName }))
-      .sort((left, right) => left.key.localeCompare(right.key)),
-  }
 }
