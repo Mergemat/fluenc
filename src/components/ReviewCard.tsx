@@ -71,7 +71,7 @@ export function ReviewCard({ item }: { item: ReviewItem }) {
       <div className="dx-answer-real" inert={!revealed} aria-hidden={!revealed}>
         <h2 className="dx-meaning">{meaning.primary}</h2>
         {character ? <>
-          {meaning.alternatives[0] ? <p className="dx-alt">also {meaning.alternatives[0]}</p> : null}
+          {meaning.also ? <p className="dx-alt">also {meaning.also}</p> : null}
           <div className="dx-sound"><MoviePinyin pinyin={item.pinyin} tone={character.movie.tone} actorKey={character.movie.actorKey} finalKey={character.movie.finalKey} /><AudioButton text={item.hanzi} pinyin={item.pinyin} /></div>
           <ul className="dx-scene-chips">
             {clues.map(clue => <li key={clue.id} data-kind={clue.kind} style={clue.kind === 'prop' ? { '--part': partColor(clue.partIndex) } as CSSProperties : undefined}>
@@ -79,7 +79,7 @@ export function ReviewCard({ item }: { item: ReviewItem }) {
             </li>)}
           </ul>
         </> : word ? <>
-          {word.livingLink ? <p className="dx-link">{word.livingLink}</p> : <p className="dx-alt">{meaning.alternatives[0] ?? ' '}</p>}
+          {word.livingLink ? <p className="dx-link">{word.livingLink}</p> : <p className="dx-alt">{meaning.also ?? ' '}</p>}
           {syllables ? null : <p className="dx-word-reading">{word.pinyin}</p>}
           <AudioButton text={item.hanzi} pinyin={item.pinyin} label="listen" />
         </> : null}

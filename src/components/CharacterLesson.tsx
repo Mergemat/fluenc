@@ -109,7 +109,7 @@ export function CharacterLesson({ item, remaining }: { item: CharacterItem; rema
       <span className={`dx-code ${clue.kind === 'prop' ? 'font-hanzi-props' : ''}`} lang={clue.kind === 'prop' ? 'zh-CN' : undefined}>
         {clueCode(clue)}{clue.count && clue.count > 1 ? <sup>×{clue.count}</sup> : null}
       </span>
-      <span className="dx-role">{clue.kind === 'prop' ? (clue.meaning ?? 'prop') : clue.kind === 'room' ? `area in the set · ${getToneDetail(Number(clue.code))?.label.toLowerCase()} tone` : clue.role.toLowerCase()}</span>
+      <span className="dx-role">{clue.kind === 'prop' ? (clue.meaning ?? 'prop') : clue.kind === 'room' ? `${getToneDetail(Number(clue.code))?.label.toLowerCase()} tone` : clue.role.toLowerCase()}</span>
       <input ref={element => { if (element) inputs.current.set(clue.id, element); else inputs.current.delete(clue.id) }}
         className="dx-input" value={clue.name} placeholder={empty ? prompt(clue) : undefined}
         aria-label={`${clue.role} ${clue.code}${clue.meaning ? `, ${clue.meaning}` : ''}`} aria-invalid={finish.isError && empty}
@@ -144,7 +144,7 @@ export function CharacterLesson({ item, remaining }: { item: CharacterItem; rema
       </div>
       <div className="dx-ident">
         <h1 className="dx-meaning">{meaning.primary}</h1>
-        <p className="dx-alt">{meaning.alternatives[0] ? `also ${meaning.alternatives[0]}` : ' '}</p>
+        <p className="dx-alt">{meaning.also ? `also ${meaning.also}` : ' '}</p>
         <div className="dx-sound"><MoviePinyin pinyin={item.pinyin} tone={item.movie.tone} actorKey={item.movie.actorKey} finalKey={item.movie.finalKey} /><AudioButton text={item.hanzi} pinyin={item.pinyin} /></div>
       </div>
     </section>

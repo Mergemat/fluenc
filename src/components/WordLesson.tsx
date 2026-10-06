@@ -61,7 +61,7 @@ export function WordLesson({ item, remaining }: { item: WordItem; remaining: num
       <WordGloss hanzi={item.hanzi} syllables={syllables} glosses={item.characterParts.map(part => part.meaning)} revealed />
       <div className="dx-ident">
         <h1 className="dx-meaning">{meaning.primary}</h1>
-        <p className="dx-alt">{meaning.alternatives[0] ? `also ${meaning.alternatives[0]}` : ' '}</p>
+        <p className="dx-alt">{meaning.also ? `also ${meaning.also}` : ' '}</p>
         <div className="dx-sound">{syllables ? null : <span className="dx-py dx-py-plain">{item.pinyin}</span>}<AudioButton text={item.hanzi} pinyin={item.pinyin} label="listen" /></div>
       </div>
     </section>
