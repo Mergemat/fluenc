@@ -135,7 +135,7 @@ function WordEntry({ item, library }: { item: LibraryWord; library?: LibraryData
 
     <section className="dx-entry-section" aria-label="Memory link">
       <div className="dx-label"><span>memory link</span><Rule /></div>
-      {item.livingLink ? <p className="dx-entry-link">{item.livingLink}</p> : <p className="dx-entry-empty">no memory link yet — add one in its build lesson</p>}
+      {item.livingLink ? <p className="dx-entry-link">{item.livingLink}</p> : <p className="dx-entry-empty">no memory link yet — add one in its lesson</p>}
     </section>
   </>
 }

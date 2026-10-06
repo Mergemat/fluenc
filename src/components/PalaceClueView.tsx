@@ -47,7 +47,7 @@ export function PalaceClueView({ kind, clueKey }: { kind: ClueKind; clueKey: str
         <p className="dx-clue-stats">{row.characters} characters · {row.started} started</p>
       </div>
     </header>
-    {row.name ? null : <p className="dx-entry-empty">it gets its name in the build lesson of its first character</p>}
+    {row.name ? null : <p className="dx-entry-empty">it gets its name in the lesson of its first character</p>}
     <section className="dx-entry-section" aria-label="Characters">
       <div className="dx-label"><span>in characters</span><Rule /><span>{characters.length}</span></div>
       <div className="dx-wall">{characters.map(character => <Tile key={character.id} item={{ ...character, kind: 'characters' }} />)}</div>
