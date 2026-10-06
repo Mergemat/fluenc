@@ -3,17 +3,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
     "build": "bun scripts/build.ts",
-    "preview": "bun scripts/preview.ts",
-    "test": "bun test",
-    "typecheck": "tsc --noEmit",
+    "check": "ultracite check",
+    "data:font": "bun scripts/sync-hanzi-font.ts",
+    "data:strokes": "bun scripts/sync-character-strokes.ts",
     "data:sync": "bun scripts/sync-curriculum.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "data:strokes": "bun scripts/sync-character-strokes.ts",
-    "data:font": "bun scripts/sync-hanzi-font.ts"
+    "dev": "vite dev",
+    "doctor": "react-doctor",
+    "fix": "ultracite fix",
+    "preview": "bun scripts/preview.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@ionic/core": "^9.0.6",
@@ -48,6 +51,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.15",
     "@tailwindcss/vite": "^4.3.3",
     "@types/bun": "^1.4.2",
     "@types/node": "^26.6.4",
@@ -58,8 +62,10 @@
     "drizzle-kit": "^0.31.11",
     "fake-indexeddb": "^6.2.5",
     "happy-dom": "^20.14.5",
+    "react-doctor": "^0.9.17",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
+    "ultracite": "7.12.4",
     "vite": "^8.3.2",
     "workbox-build": "^7.4.1"
   }
