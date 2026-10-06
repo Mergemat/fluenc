@@ -1,10 +1,32 @@
 import { useEffect, useState } from 'react'
 
+import { OFFLINE_CACHES, OFFLINE_FILES_URL, type OfflineFile, type OfflineFiles } from './files'
 import { getCachedDashboard } from './progress'
 
 export type DownloadProgress = { completed: number; total: number }
 type DownloadStatus = 'checking' | 'idle' | 'downloading' | 'ready' | 'error' | 'unsupported' | 'development'
 
+// Each cache keeps the list it was last filled from, so a changed file is fetched again.
+const REVISIONS_KEY = '/__revisions'
+const PARALLEL = 6
+const STEP_TIMEOUT = 30_000
+
+const withTimeout = <T,>(promise: Promise<T>, ms = STEP_TIMEOUT) => new Promise<T>((resolve, reject) => {
+  const timer = window.setTimeout(() => reject(new Error('Timed out')), ms)
+  promise.then(value => { window.clearTimeout(timer); resolve(value) }, error => { window.clearTimeout(timer); reject(error) })
+})
+
+async function staleFiles(cache: Cache, files: OfflineFile[]) {
+  const stored = await cache.match(REVISIONS_KEY)
+  const revisions: Record<string, string> = stored ? await stored.json() : {}
+  const cached = new Set((await cache.keys()).map(request => request.url))
+  return files.filter(file => revisions[file.url] !== file.revision || !cached.has(new URL(file.url, location.origin).href))
+}
+
+/**
+ * Downloads pinyin audio and stroke data straight into the caches the service worker serves
+ * them from. Runs in the page, so progress is exact and doesn't wait on the worker's install.
+ */
 export function useOfflineDownload() {
   const [status, setStatus] = useState<DownloadStatus>('checking')
   const [progress, setProgress] = useState<DownloadProgress | null>(null)
@@ -21,72 +43,55 @@ export function useOfflineDownload() {
     }
 
     let active = true
-    let poll: number | undefined
-    let timeout: number | undefined
-    let cleanup = () => {}
-    let completed = -1
-    const stopTimers = () => {
-      window.clearInterval(poll)
-      window.clearTimeout(timeout)
-    }
-    const fail = () => {
-      stopTimers()
-      if (active) setStatus('error')
-    }
-    const watchProgress = () => {
-      window.clearTimeout(timeout)
-      timeout = window.setTimeout(fail, 30_000)
-    }
-
-    const prepare = async () => {
+    const download = async () => {
       // Offline practice downloads by itself; without a connection it waits for one.
       if (!navigator.onLine) {
         setStatus('idle')
         return
       }
       setStatus('downloading')
-      watchProgress()
-      const { Workbox, messageSW } = await import('workbox-window')
+      const response = await withTimeout(fetch(OFFLINE_FILES_URL, { cache: 'no-cache' }))
+      if (!response.ok) throw new Error('Offline file list unavailable')
+      const lists = await response.json() as OfflineFiles
+
+      const groups = await Promise.all((Object.keys(OFFLINE_CACHES) as (keyof OfflineFiles)[]).map(async key => {
+        const cache = await caches.open(OFFLINE_CACHES[key])
+        return { cache, files: lists[key], stale: await staleFiles(cache, lists[key]) }
+      }))
+      const total = groups.reduce((sum, group) => sum + group.files.length, 0)
+      let completed = total - groups.reduce((sum, group) => sum + group.stale.length, 0)
       if (!active) return
-      const workbox = new Workbox('/sw.js')
-      const registration = await workbox.register({ immediate: true })
-      if (!active || !registration) return
+      setProgress({ completed, total })
 
-      const check = async () => {
-        const worker = registration.active ?? registration.installing
-        if (!worker) return
-        const download: DownloadProgress = await messageSW(worker, { type: 'DOWNLOAD_PROGRESS' })
+      for (const group of groups) {
+        const queue = [...group.stale]
+        const worker = async () => {
+          for (let file = queue.shift(); file && active; file = queue.shift()) {
+            // The worker answers cache-first, so drop an outdated copy before fetching it again.
+            await group.cache.delete(file.url)
+            const fetched = await withTimeout(fetch(file.url, { cache: 'no-cache' }))
+            if (!fetched.ok) throw new Error(`Could not download ${file.url}`)
+            await group.cache.put(file.url, fetched)
+            completed += 1
+            if (active) setProgress({ completed, total })
+          }
+        }
+        await Promise.all(Array.from({ length: PARALLEL }, worker))
         if (!active) return
-        setProgress(download)
-        if (download.completed > completed) {
-          completed = download.completed
-          watchProgress()
-        }
-        if (download.completed === download.total && worker.state === 'activated' && navigator.serviceWorker.controller && await getCachedDashboard()) {
-          stopTimers()
-          if (active) setStatus('ready')
-          void navigator.storage?.persist?.().catch(() => undefined)
-        }
+        const revisions = Object.fromEntries(group.files.map(file => [file.url, file.revision]))
+        await group.cache.put(REVISIONS_KEY, new Response(JSON.stringify(revisions), { headers: { 'content-type': 'application/json' } }))
       }
-      const checkProgress = () => void check().catch(fail)
-      workbox.addEventListener('activated', checkProgress)
-      workbox.addEventListener('controlling', checkProgress)
-      workbox.addEventListener('redundant', fail)
-      cleanup = () => {
-        workbox.removeEventListener('activated', checkProgress)
-        workbox.removeEventListener('controlling', checkProgress)
-        workbox.removeEventListener('redundant', fail)
-      }
-      poll = window.setInterval(checkProgress, 1000)
-      checkProgress()
+
+      // The app shell installs in the service worker; lessons come from the saved dashboard.
+      await withTimeout(navigator.serviceWorker.ready)
+      if (!await getCachedDashboard()) throw new Error('Lessons are not saved yet')
+      if (!active) return
+      setStatus('ready')
+      void navigator.storage?.persist?.().catch(() => undefined)
     }
 
-    void prepare().catch(fail)
-    return () => {
-      active = false
-      stopTimers()
-      cleanup()
-    }
+    void download().catch(() => { if (active) setStatus('error') })
+    return () => { active = false }
   }, [attempt])
 
   // Retry an interrupted or deferred download as soon as the device is back online.
