@@ -3,6 +3,7 @@ import { getRouteApi, Link } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
 import {
   type ChangeEvent,
+  type MouseEvent,
   useCallback,
   useDeferredValue,
   useEffect,
@@ -10,20 +11,35 @@ import {
   useRef,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 
+import {
+  type LibraryGroup,
+  type LibrarySection,
+  librarySections,
+  queueKey,
+} from "../lib/library-index";
 import { createLibrarySearch, type LibraryEntry } from "../lib/library-search";
 import { getItemMeaning } from "../lib/meaning";
-import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
+import {
+  dashboardQueryOptions,
+  libraryQueryOptions,
+  palaceQueryOptions,
+} from "../offline/queries";
 import { DitherGradient } from "./dither-kit/gradient";
 import { Chip } from "./ui/chip";
+import { Rule } from "./ui/dither";
 import { Page, PageHeader, Status } from "./ui/layout";
 
 const route = getRouteApi("/_app/library");
 const PAGE = 120;
 const kinds = [
-  { id: "all", label: "all" },
   { id: "characters", label: "characters" },
   { id: "words", label: "words" },
+] as const;
+const groups = [
+  { id: "course", label: "course" },
+  { id: "sound", label: "sound" },
 ] as const;
 const statuses = [
   { id: "review", label: "learned" },
@@ -42,6 +58,18 @@ type StatusId = (typeof statuses)[number]["id"];
 function usePagedResults(filters: string) {
   const [paging, setPaging] = useState({ filters, shown: PAGE });
   const shown = paging.filters === filters ? paging.shown : PAGE;
+  const showAtLeast = useCallback(
+    (count: number) => {
+      setPaging((previous) => ({
+        filters,
+        shown: Math.max(
+          previous.filters === filters ? previous.shown : PAGE,
+          count
+        ),
+      }));
+    },
+    [filters]
+  );
   // Recreated per filter set, so the sentinel's observer always grows the current results.
   const observeSentinel = useCallback(
     (element: HTMLDivElement | null) => {
@@ -65,15 +93,30 @@ function usePagedResults(filters: string) {
     },
     [filters]
   );
-  return { shown, observeSentinel };
+  return { shown, showAtLeast, observeSentinel };
 }
 
-/** The course as a wall of tiles that light up as you learn them; search covers your own clues. */
+const sectionId = (key: string) => `library-${key}`;
+
+/**
+ * A lookup: search reaches every character and word; without a query the course is browsed in
+ * sections, in learning order or by sound, with a strip to jump between them.
+ */
 export function LibraryView() {
-  const { kind = "all", status = "all", q = "" } = route.useSearch();
+  const {
+    kind = "characters",
+    group = "course",
+    status = "all",
+    q = "",
+  } = route.useSearch();
   const navigate = route.useNavigate();
   const update = useCallback(
-    (next: { kind?: Kind; status?: StatusId | "all"; q?: string }) => {
+    (next: {
+      kind?: Kind;
+      group?: LibraryGroup;
+      status?: StatusId | "all";
+      q?: string;
+    }) => {
       navigate({
         search: (previous) => ({ ...previous, ...next }),
         replace: true,
@@ -84,19 +127,53 @@ export function LibraryView() {
   );
   const library = useQuery(libraryQueryOptions);
   const palace = useQuery(palaceQueryOptions);
+  const dashboard = useQuery(dashboardQueryOptions);
+  // The order lessons will teach new entries in: ready words, then characters, then locked words.
+  const queue = useMemo(
+    () =>
+      new Map(
+        [
+          ...(dashboard.data?.buildQueue ?? []),
+          ...(dashboard.data?.lockedWords ?? []),
+        ].map((item, index) => [
+          queueKey(item.type === "word" ? "words" : "characters", item.id),
+          index,
+        ])
+      ),
+    [dashboard.data]
+  );
   const query = useDeferredValue(q);
+  const searching = query.trim() !== "";
   const search = useMemo(
     () =>
       library.data ? createLibrarySearch(library.data, palace.data) : null,
     [library.data, palace.data]
   );
   const matches = useMemo(() => search?.(query) ?? [], [search, query]);
-  const byKind = matches.filter((item) => kind === "all" || item.kind === kind);
-  const items = byKind.filter(
-    (item) => status === "all" || item.status === status
+  // Search spans both kinds; browsing shows one kind at a time.
+  const pool = useMemo(
+    () => (searching ? matches : matches.filter((item) => item.kind === kind)),
+    [matches, searching, kind]
   );
-  const { shown, observeSentinel } = usePagedResults(
-    `${query}\n${kind}\n${status}`
+  const sections = useMemo(
+    () =>
+      searching
+        ? []
+        : librarySections(pool, group, queue)
+            .map((section) => ({
+              ...section,
+              shown: section.entries.filter(
+                (item) => status === "all" || item.status === status
+              ),
+            }))
+            .filter((section) => section.shown.length),
+    [pool, searching, group, queue, status]
+  );
+  const items = searching
+    ? pool.filter((item) => status === "all" || item.status === status)
+    : sections.flatMap((section) => section.shown);
+  const { shown, showAtLeast, observeSentinel } = usePagedResults(
+    `${query}\n${kind}\n${group}\n${status}`
   );
   const input = useRef<HTMLInputElement>(null);
 
@@ -130,17 +207,39 @@ export function LibraryView() {
     (next: Kind) => update({ kind: next }),
     [update]
   );
+  const selectGroup = useCallback(
+    (next: LibraryGroup) => update({ group: next }),
+    [update]
+  );
   const toggleStatus = useCallback(
     (next: StatusId) => update({ status: status === next ? "all" : next }),
     [status, update]
   );
   const clearAll = useCallback(
-    () => update({ q: "", kind: "all", status: "all" }),
+    () => update({ q: "", status: "all" }),
     [update]
   );
   const retry = useCallback(() => {
     library.refetch();
   }, [library]);
+  // Render every section up to the target, then bring it under the strip.
+  const jumpTo = useCallback(
+    (event: MouseEvent<HTMLButtonElement>) => {
+      const key = event.currentTarget.value;
+      let end = 0;
+      for (const section of sections) {
+        end += section.shown.length;
+        if (section.key === key) {
+          break;
+        }
+      }
+      flushSync(() => showAtLeast(end));
+      document
+        .getElementById(sectionId(key))
+        ?.scrollIntoView({ block: "start" });
+    },
+    [sections, showAtLeast]
+  );
 
   const learned = library.data
     ? library.data.characters.filter((item) => item.status === "review")
@@ -192,16 +291,54 @@ export function LibraryView() {
         />
       );
     }
+    const more =
+      items.length > shown ? (
+        <div className="dx-lib-sentinel" ref={observeSentinel} />
+      ) : null;
+    if (searching) {
+      return (
+        <>
+          <div aria-busy={q !== query} className="dx-wall">
+            {items.slice(0, shown).map((item) => (
+              <Tile item={item} key={`${item.kind}:${item.id}`} />
+            ))}
+          </div>
+          {more}
+        </>
+      );
+    }
+    let budget = shown;
     return (
       <>
-        <div aria-busy={q !== query} className="dx-wall">
-          {items.slice(0, shown).map((item) => (
-            <Tile item={item} key={`${item.kind}:${item.id}`} />
+        <nav aria-label="Jump to section" className="dx-lib-index">
+          {sections.map((section) => (
+            <button
+              data-learned={section.learned > 0}
+              key={section.key}
+              onClick={jumpTo}
+              type="button"
+              value={section.key}
+            >
+              {section.label}
+            </button>
           ))}
-        </div>
-        {items.length > shown ? (
-          <div className="dx-lib-sentinel" ref={observeSentinel} />
-        ) : null}
+        </nav>
+        {sections.map((section) => {
+          if (budget <= 0) {
+            return null;
+          }
+          const tiles = section.shown.slice(0, budget);
+          budget -= tiles.length;
+          return (
+            <LibrarySectionBlock
+              entries={tiles}
+              key={section.key}
+              progress={group === "sound"}
+              section={section}
+            />
+          );
+        })}
+        {more}
       </>
     );
   };
@@ -238,23 +375,37 @@ export function LibraryView() {
           )}
         </label>
         <div className="dx-lib-filters">
-          <fieldset aria-label="Kind" className="dx-group">
-            {kinds.map((entry) => (
-              <Chip
-                key={entry.id}
-                onSelect={selectKind}
-                pressed={kind === entry.id}
-                value={entry.id}
-              >
-                {entry.label}
-                <small>
-                  {entry.id === "all"
-                    ? matches.length
-                    : matches.filter((item) => item.kind === entry.id).length}
-                </small>
-              </Chip>
-            ))}
-          </fieldset>
+          {searching ? null : (
+            <div>
+              <fieldset aria-label="Kind" className="dx-group">
+                {kinds.map((entry) => (
+                  <Chip
+                    key={entry.id}
+                    onSelect={selectKind}
+                    pressed={kind === entry.id}
+                    value={entry.id}
+                  >
+                    {entry.label}
+                    <small>
+                      {matches.filter((item) => item.kind === entry.id).length}
+                    </small>
+                  </Chip>
+                ))}
+              </fieldset>
+              <fieldset aria-label="Browse by" className="dx-group">
+                {groups.map((entry) => (
+                  <Chip
+                    key={entry.id}
+                    onSelect={selectGroup}
+                    pressed={group === entry.id}
+                    value={entry.id}
+                  >
+                    {entry.label}
+                  </Chip>
+                ))}
+              </fieldset>
+            </div>
+          )}
           <fieldset aria-label="Status" className="dx-group">
             {statuses.map((entry) => (
               <Chip
@@ -267,7 +418,7 @@ export function LibraryView() {
                 <i aria-hidden="true" />
                 {entry.label}
                 <small>
-                  {byKind.filter((item) => item.status === entry.id).length}
+                  {pool.filter((item) => item.status === entry.id).length}
                 </small>
               </Chip>
             ))}
@@ -288,6 +439,68 @@ export function LibraryView() {
         </a>
       </p>
     </Page>
+  );
+}
+
+/** One section: a pixel label, a count (with how much is learned, by sound) and its tiles. */
+function LibrarySectionBlock({
+  section,
+  entries,
+  progress,
+}: {
+  section: LibrarySection;
+  entries: LibraryEntry[];
+  progress: boolean;
+}) {
+  const id = sectionId(section.key);
+  const size = section.entries.length;
+  return (
+    <section aria-labelledby={`${id}-title`} className="dx-lib-section" id={id}>
+      <header className="dx-head">
+        <h2 className="dx-head-title" id={`${id}-title`}>
+          {section.label}
+        </h2>
+        {progress ? (
+          <div
+            aria-label={`${section.label} learned`}
+            aria-valuemax={size}
+            aria-valuemin={0}
+            aria-valuenow={section.learned}
+            className="dx-progress"
+            role="progressbar"
+          >
+            <DitherGradient
+              cell={2}
+              direction="right"
+              from="grey"
+              opacity={0.5}
+            />
+            <span
+              className="dx-progress-fill"
+              style={{ width: `${(section.learned / size) * 100}%` }}
+            >
+              <DitherGradient cell={2} direction="left" from="green" />
+            </span>
+          </div>
+        ) : (
+          <Rule />
+        )}
+        <div className="dx-head-meta">
+          {progress ? (
+            <>
+              <b>{section.learned}</b> / {size}
+            </>
+          ) : (
+            size
+          )}
+        </div>
+      </header>
+      <div className="dx-wall">
+        {entries.map((item) => (
+          <Tile item={item} key={`${item.kind}:${item.id}`} />
+        ))}
+      </div>
+    </section>
   );
 }
 
