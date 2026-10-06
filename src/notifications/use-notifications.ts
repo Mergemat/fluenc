@@ -33,7 +33,7 @@ async function updateSubscription(
   });
   const result = (await response.json()) as { error?: string };
   if (!response.ok) {
-    throw new Error(result.error ?? "Could not update notifications.");
+    throw new Error(result.error ?? "couldn’t update notifications");
   }
 }
 
@@ -65,7 +65,7 @@ async function activeRegistration() {
       } else if (worker.state === "redundant") {
         finish(
           new Error(
-            "App preparation failed. Check your connection and try again."
+            "preparing the app failed. check your connection and try again"
           )
         );
       }
@@ -74,7 +74,7 @@ async function activeRegistration() {
       () =>
         finish(
           new Error(
-            "App preparation timed out. Check your connection and try again."
+            "preparing the app timed out. check your connection and try again"
           )
         ),
       120_000
@@ -119,7 +119,7 @@ async function readPushSetup() {
   });
   if (!response.ok) {
     throw new Error(
-      "Could not check notifications. Connect to the internet and retry."
+      "couldn’t check notifications. connect to the internet and retry"
     );
   }
   const config = (await response.json()) as { publicKey: string | null };
@@ -137,7 +137,7 @@ async function subscribeDevice(publicKey: string | null) {
     return { permission, subscription: null };
   }
   if (!publicKey) {
-    throw new Error("Notifications are not configured yet.");
+    throw new Error("notifications aren’t set up yet");
   }
   const registration = await activeRegistration();
   const subscription =
@@ -180,7 +180,7 @@ async function readPushState(): Promise<PushState> {
       publicKey,
       subscription,
       status: "error",
-      message: errorMessage(error, "Could not check notifications."),
+      message: errorMessage(error, "couldn’t check notifications"),
     };
   }
   return { publicKey, subscription, status: "on" };
@@ -204,7 +204,7 @@ function notificationState(
   if (push.isError) {
     return {
       status: "error",
-      message: errorMessage(push.error, "Could not check notifications."),
+      message: errorMessage(push.error, "couldn’t check notifications"),
     };
   }
   if (push.data) {
@@ -274,15 +274,12 @@ export function useNotifications() {
               status: publicKey ? "off" : "unconfigured",
             });
           } else {
-            setActionMessage("Test sent. Tap the notification to open Review.");
+            setActionMessage("test sent. tap the notification to open review");
           }
         }
       } catch (error) {
         setActionMessage(
-          errorMessage(
-            error,
-            "Could not update notifications. Please try again."
-          )
+          errorMessage(error, "couldn’t update notifications. try again")
         );
       } finally {
         setBusy(null);

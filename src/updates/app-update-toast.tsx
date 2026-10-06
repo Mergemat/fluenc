@@ -16,7 +16,7 @@ export function AppUpdateToast({
   return (
     <div className="app-update-toast">
       <span role="status">
-        {updating ? "Refreshing…" : "Refresh to update"}
+        {updating ? "refreshing…" : "refresh to update"}
       </span>
       <button
         className="app-update-refresh"

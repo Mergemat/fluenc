@@ -39,6 +39,7 @@ import {
   UsageHanzi,
   useUsage,
 } from "./ui/hanzi";
+import { PageHeader } from "./ui/layout";
 import { partColor } from "./ui/part-colors";
 import { useToast } from "./ui/toast";
 import { WritingModal } from "./writing-modal";
@@ -507,6 +508,16 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
       data-dense={props.length > 3}
       data-leaving={finish.isPending}
     >
+      <PageHeader
+        heading={false}
+        meta={
+          <>
+            {direct ? "new prop" : "new character"}
+            <UsageWords hanzi={item.hanzi} usage={usage} />
+          </>
+        }
+        title="learn"
+      />
       <section aria-label="Character" className="dx-read dx-read-character">
         <div className="dx-read-layout">
           <div className="dx-glyph-box">
@@ -536,8 +547,6 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
           </div>
         </div>
       </section>
-
-      <UsageWords hanzi={item.hanzi} usage={usage} />
 
       <section aria-label="Clues" className="dx-clues">
         <div className="dx-label">

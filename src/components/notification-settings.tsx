@@ -47,7 +47,7 @@ export function NotificationSettings() {
       id="notifications-heading"
       note="daily · 14:00 shanghai, may arrive within the hour"
       status={text}
-      title="Review reminders"
+      title="review reminders"
       tone={tone}
     >
       {status === "off" ? (

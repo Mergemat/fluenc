@@ -12,7 +12,7 @@ export function NotFound() {
             back to learn
           </Link>
         }
-        title="This page is not in Fluenc"
+        title="this page isn’t in fluenc"
       />
     </Page>
   );

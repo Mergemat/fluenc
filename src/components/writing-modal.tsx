@@ -153,6 +153,66 @@ function PracticeGrid() {
   );
 }
 
+/** Outline, hint, the strokes written so far painting in, and where the next one starts. */
+function StrokeLayers({
+  id,
+  strokes,
+  medians,
+  written,
+  misses,
+  done,
+  colors,
+}: {
+  id: string;
+  strokes: string[];
+  medians: Point[][];
+  written: number;
+  misses: number;
+  done: boolean;
+  colors: string[];
+}) {
+  const current = done ? undefined : medians[written];
+  return (
+    <>
+      {strokes.map((stroke) => (
+        <path className="dx-writing-outline" d={stroke} key={stroke} />
+      ))}
+      {current && misses > 0 ? (
+        <path
+          className="dx-writing-hint"
+          d={strokes[written]}
+          key={`hint-${written}`}
+          style={{ "--part": colors[written] } as CSSProperties}
+        />
+      ) : null}
+      {strokes.slice(0, written).map((stroke, index) => (
+        <g key={stroke}>
+          <clipPath id={`${id}-${index}`}>
+            <path d={stroke} />
+          </clipPath>
+          <path
+            className="dx-writing-paint"
+            clipPath={`url(#${id}-${index})`}
+            d={paintPath(medians[index])}
+            pathLength={1}
+            style={{ "--part": colors[index] } as CSSProperties}
+          />
+        </g>
+      ))}
+      {current ? (
+        <circle
+          className="dx-writing-start"
+          cx={current[0].x}
+          cy={current[0].y}
+          key={`start-${written}`}
+          r={30}
+          style={{ "--part": colors[written] } as CSSProperties}
+        />
+      ) : null}
+    </>
+  );
+}
+
 export function WritingModal({
   hanzi,
   parts,
@@ -178,10 +238,12 @@ export function WritingModal({
   const total = data?.strokes.length ?? 0;
   const done = total > 0 && written >= total;
   const codes = parts.map((part) => part.code);
-  const colorOf = (stroke: number) => {
-    const part = codes.indexOf(data?.owners[stroke] ?? "");
-    return part >= 0 ? partColor(part) : "var(--dx-fg)";
-  };
+  // Each stroke in the colour of the prop it belongs to.
+  const colors =
+    data?.owners.map((owner) => {
+      const part = codes.indexOf(owner);
+      return part >= 0 ? partColor(part) : "var(--dx-fg)";
+    }) ?? [];
 
   // A modal dialog: Escape and a tap on the backdrop close it.
   useEffect(() => {
@@ -222,11 +284,11 @@ export function WritingModal({
     const { isMatch } = gradeStroke(points, medians, written, LENIENCY);
     if (isMatch || misses + 1 >= MISSES_BEFORE_DRAWN) {
       path.dataset.result = "hit";
-      setWritten(written + 1);
+      setWritten((count) => count + 1);
       setMisses(0);
     } else {
       path.dataset.result = "miss";
-      setMisses(misses + 1);
+      setMisses((count) => count + 1);
     }
   });
 
@@ -292,7 +354,6 @@ export function WritingModal({
     };
   }, []);
 
-  const current = !done && medians ? medians[written] : undefined;
   const nextIndex = done ? -1 : codes.indexOf(data?.owners[written] ?? "");
 
   return (
@@ -322,39 +383,15 @@ export function WritingModal({
           <svg aria-hidden="true" ref={svg} viewBox="0 0 1024 1024">
             <PracticeGrid />
             <g ref={glyph} transform={data?.transform}>
-              {data?.strokes.map((stroke) => (
-                <path className="dx-writing-outline" d={stroke} key={stroke} />
-              ))}
-              {current && misses > 0 ? (
-                <path
-                  className="dx-writing-hint"
-                  d={data?.strokes[written]}
-                  key={`hint-${written}`}
-                  style={{ "--part": colorOf(written) } as CSSProperties}
-                />
-              ) : null}
-              {data?.strokes.slice(0, written).map((stroke, index) => (
-                <g key={stroke}>
-                  <clipPath id={`${id}-${index}`}>
-                    <path d={stroke} />
-                  </clipPath>
-                  <path
-                    className="dx-writing-paint"
-                    clipPath={`url(#${id}-${index})`}
-                    d={medians ? paintPath(medians[index]) : undefined}
-                    pathLength={1}
-                    style={{ "--part": colorOf(index) } as CSSProperties}
-                  />
-                </g>
-              ))}
-              {current ? (
-                <circle
-                  className="dx-writing-start"
-                  cx={current[0].x}
-                  cy={current[0].y}
-                  key={`start-${written}`}
-                  r={30}
-                  style={{ "--part": colorOf(written) } as CSSProperties}
+              {data && medians ? (
+                <StrokeLayers
+                  colors={colors}
+                  done={done}
+                  id={id}
+                  medians={medians}
+                  misses={misses}
+                  strokes={data.strokes}
+                  written={written}
                 />
               ) : null}
               <path className="dx-writing-ink" ref={ink} />

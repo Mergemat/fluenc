@@ -171,7 +171,7 @@ test("sync unlocks a word without replacing the next character or discarding its
     host.querySelector(".dx-word-lesson")?.getAttribute("data-hanzi")
   ).toBe("我们");
   await show([]);
-  expect(host.textContent).toContain("All lessons complete");
+  expect(host.textContent).toContain("all lessons learned");
   await show([first]);
   expect(host.querySelector(".dx-glyph-ghost")?.textContent).toBe("太");
 });

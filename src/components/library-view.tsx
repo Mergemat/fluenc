@@ -15,9 +15,8 @@ import { createLibrarySearch, type LibraryEntry } from "../lib/library-search";
 import { getItemMeaning } from "../lib/meaning";
 import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
 import { DitherGradient } from "./dither-kit/gradient";
-import { Button } from "./ui/button";
 import { Chip } from "./ui/chip";
-import { Page, PageHeader } from "./ui/layout";
+import { Page, PageHeader, Status } from "./ui/layout";
 
 const route = getRouteApi("/_app/library");
 const PAGE = 120;
@@ -37,7 +36,7 @@ const skeletonTiles = Array.from(
 );
 
 type Kind = (typeof kinds)[number]["id"];
-type Status = (typeof statuses)[number]["id"];
+type StatusId = (typeof statuses)[number]["id"];
 
 /** Results grow by a page as you scroll, starting over whenever the search or filters change. */
 function usePagedResults(filters: string) {
@@ -74,7 +73,7 @@ export function LibraryView() {
   const { kind = "all", status = "all", q = "" } = route.useSearch();
   const navigate = route.useNavigate();
   const update = useCallback(
-    (next: { kind?: Kind; status?: Status | "all"; q?: string }) => {
+    (next: { kind?: Kind; status?: StatusId | "all"; q?: string }) => {
       navigate({
         search: (previous) => ({ ...previous, ...next }),
         replace: true,
@@ -132,7 +131,7 @@ export function LibraryView() {
     [update]
   );
   const toggleStatus = useCallback(
-    (next: Status) => update({ status: status === next ? "all" : next }),
+    (next: StatusId) => update({ status: status === next ? "all" : next }),
     [status, update]
   );
   const clearAll = useCallback(
@@ -155,12 +154,14 @@ export function LibraryView() {
   const results = () => {
     if (library.isError) {
       return (
-        <div className="dx-lib-empty">
-          <p>the library is not available offline yet</p>
-          <Button onClick={retry} type="button" variant="secondary">
-            retry
-          </Button>
-        </div>
+        <Status
+          action={
+            <button className="dx-chip" onClick={retry} type="button">
+              retry
+            </button>
+          }
+          title="the library isn’t available offline yet"
+        />
       );
     }
     if (!library.data) {
@@ -181,12 +182,14 @@ export function LibraryView() {
     }
     if (!items.length) {
       return (
-        <div className="dx-lib-empty">
-          <p>nothing matches{q ? ` “${q}”` : ""}</p>
-          <Button onClick={clearAll} type="button" variant="secondary">
-            clear search &amp; filters
-          </Button>
-        </div>
+        <Status
+          action={
+            <button className="dx-chip" onClick={clearAll} type="button">
+              clear search &amp; filters
+            </button>
+          }
+          title={`nothing matches${q ? ` “${q}”` : ""}`}
+        />
       );
     }
     return (
@@ -207,7 +210,7 @@ export function LibraryView() {
     <Page>
       <PageHeader
         meta={library.data ? `${learned} learned · ${total}` : undefined}
-        title="Library"
+        title="library"
       />
       <div className="dx-lib-controls">
         <label className="dx-search">

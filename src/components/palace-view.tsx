@@ -17,10 +17,9 @@ import { buildPalaceBoard, type ClueKind } from "../lib/palace-board";
 import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
 import { DitherGradient } from "./dither-kit/gradient";
 import { type ClueRow, clueRows } from "./palace-rows";
-import { Button } from "./ui/button";
 import { Chip } from "./ui/chip";
 
-import { Page, PageHeader } from "./ui/layout";
+import { Page, PageHeader, Status } from "./ui/layout";
 
 const route = getRouteApi("/_app/palace");
 const tabs: { id: ClueKind; label: string }[] = [
@@ -100,12 +99,14 @@ export function PalaceView() {
   const results = () => {
     if (!(library.data && palace.data)) {
       return library.isError || palace.isError ? (
-        <div className="dx-lib-empty">
-          <p>your palace is not available offline yet</p>
-          <Button onClick={retry} type="button" variant="secondary">
-            retry
-          </Button>
-        </div>
+        <Status
+          action={
+            <button className="dx-chip" onClick={retry} type="button">
+              retry
+            </button>
+          }
+          title="your palace isn’t available offline yet"
+        />
       ) : (
         <div aria-busy="true" className="dx-pal-list">
           {skeletonRows.map((id) => (
@@ -123,12 +124,14 @@ export function PalaceView() {
     }
     if (!shown.length) {
       return (
-        <div className="dx-lib-empty">
-          <p>nothing matches{q ? ` “${q}”` : ""}</p>
-          <Button onClick={clearAll} type="button" variant="secondary">
-            clear
-          </Button>
-        </div>
+        <Status
+          action={
+            <button className="dx-chip" onClick={clearAll} type="button">
+              clear
+            </button>
+          }
+          title={`nothing matches${q ? ` “${q}”` : ""}`}
+        />
       );
     }
     return (
@@ -149,7 +152,7 @@ export function PalaceView() {
     <Page>
       <PageHeader
         meta={rows.length ? `${named}/${rows.length} named` : undefined}
-        title="Palace"
+        title="palace"
       />
       <div className="dx-lib-controls">
         <label className="dx-search">

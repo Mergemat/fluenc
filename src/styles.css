@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "./app.css";
 @import "./dither.css";
 
 @font-face {
@@ -95,14 +94,6 @@
   ::selection {
     color: var(--color-paper);
     background: var(--color-glaze);
-  }
-}
-
-@layer components {
-  .study-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--color-muted);
   }
 }
 

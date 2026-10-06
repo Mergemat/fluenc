@@ -27,11 +27,11 @@ export function LessonsView({ data }: { data: DashboardData }) {
   return (
     <div className="dx-lesson-page">
       <Page>
-        <PageHeader meta="Nothing new" title="Learn" />
+        <PageHeader meta="nothing new" title="learn" />
 
         <Empty
-          detail="You’ve worked through the available characters and words. Keep practicing with reviews and reading."
-          title="All lessons complete"
+          detail="you’ve learned every character and word here. keep going with reviews and reading"
+          title="all lessons learned"
         />
       </Page>
     </div>

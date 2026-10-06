@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useCanGoBack } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { type CSSProperties, useMemo } from "react";
+import { type CSSProperties, type ReactNode, useMemo } from "react";
 import { useGoBack } from "../hooks/use-go-back";
 import { buildPalaceBoard, type ClueKind } from "../lib/palace-board";
 import { getToneDetail } from "../lib/tones";
@@ -10,7 +10,7 @@ import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
 import { Tile } from "./library-view";
 import { clueRows } from "./palace-rows";
 import { Rule } from "./ui/dither";
-import { Page, Status } from "./ui/layout";
+import { Page, PageHeader, Status } from "./ui/layout";
 
 const kindLabel: Record<ClueKind, string> = {
   cast: "actor",
@@ -42,6 +42,57 @@ function clueKindText(
     : `${kindLabel[kind]} · ${row.hint}`;
 }
 
+/** Back to the palace, the clue's code, and whether it has a name yet. */
+function ClueHeader({
+  kind,
+  code,
+  named,
+}: {
+  kind: ClueKind;
+  code: ReactNode;
+  named: boolean;
+}) {
+  const goBack = useGoBack();
+  const canGoBack = useCanGoBack();
+  const props = kind === "props";
+  return (
+    <PageHeader
+      heading={false}
+      meta={
+        <span
+          className="dx-entry-status"
+          data-status={named ? "review" : "new"}
+        >
+          <i aria-hidden="true" />
+          {named ? "named" : "open"}
+        </span>
+      }
+      title={
+        <>
+          {canGoBack ? (
+            <button onClick={goBack} type="button">
+              <ArrowLeft size={14} />
+              palace
+            </button>
+          ) : (
+            <Link search={{ tab: kind }} to="/palace">
+              <ArrowLeft size={14} />
+              palace
+            </Link>
+          )}
+          <span aria-hidden="true">/</span>
+          <span
+            className={props ? "font-hanzi-props" : undefined}
+            lang={props ? "zh-CN" : undefined}
+          >
+            {code}
+          </span>
+        </>
+      }
+    />
+  );
+}
+
 export function PalaceClueView({
   kind,
   clueKey,
@@ -49,8 +100,6 @@ export function PalaceClueView({
   kind: ClueKind;
   clueKey: string;
 }) {
-  const goBack = useGoBack();
-  const canGoBack = useCanGoBack();
   const library = useQuery(libraryQueryOptions);
   const palace = useQuery(palaceQueryOptions);
   const row = useMemo(
@@ -73,10 +122,11 @@ export function PalaceClueView({
     return (
       <Page>
         <Status
+          loading={!(library.isError || palace.isError)}
           title={
             library.isError || palace.isError
-              ? "Your palace is not available offline yet"
-              : "Loading…"
+              ? "your palace isn’t available offline yet"
+              : "loading your palace"
           }
         />
       </Page>
@@ -91,7 +141,7 @@ export function PalaceClueView({
               back to palace
             </Link>
           }
-          title="This clue is not in your palace"
+          title="this clue isn’t in your palace"
         />
       </Page>
     );
@@ -101,19 +151,7 @@ export function PalaceClueView({
 
   return (
     <Page>
-      <nav aria-label="Breadcrumb" className="dx-crumbs">
-        {canGoBack ? (
-          <button onClick={goBack} type="button">
-            <ArrowLeft size={14} />
-            palace
-          </button>
-        ) : (
-          <Link search={{ tab: kind }} to="/palace">
-            <ArrowLeft size={14} />
-            palace
-          </Link>
-        )}
-      </nav>
+      <ClueHeader code={row.code} kind={kind} named={Boolean(row.name)} />
       <header
         className="dx-clue-hero"
         data-kind={kind}

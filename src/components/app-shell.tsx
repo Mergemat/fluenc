@@ -1,5 +1,7 @@
 // Every route sits in the pull-to-refresh scroller. Study routes (/lessons, /review) get a stage
 // exactly the scroller's height, so they never scroll. Older pages use the shared colour tokens.
+// Desktop gets a sidebar (navigation, course progress, settings) so pages keep the full height;
+// tablets get a top bar and phones a tab bar.
 import { Link } from "@tanstack/react-router";
 import {
   BookOpen,
@@ -27,6 +29,60 @@ const navigation = [
   { to: "/library", label: "library", icon: LibraryBig },
   { to: "/palace", label: "palace", icon: Clapperboard },
 ] as const;
+
+/** How far through the course the learner is; shown in the desktop sidebar. */
+function CourseProgress({ data }: { data: DashboardData }) {
+  const meters = [
+    {
+      label: "characters",
+      done: data.progress.introducedCharacters,
+      total: data.curriculum.characters,
+    },
+    {
+      label: "words",
+      done: data.progress.introducedWords,
+      total: data.curriculum.words,
+    },
+  ];
+  return (
+    <section aria-label="Course progress" className="dx-course">
+      {meters.map((meter) => (
+        <div className="dx-course-meter" key={meter.label}>
+          <p>
+            <span>{meter.label}</span>
+            <b>
+              {meter.done}
+              <small>/{meter.total}</small>
+            </b>
+          </p>
+          <div
+            aria-label={`${meter.label} learned`}
+            aria-valuemax={meter.total}
+            aria-valuemin={0}
+            aria-valuenow={meter.done}
+            className="dx-progress"
+            role="progressbar"
+          >
+            <DitherGradient
+              cell={2}
+              direction="right"
+              from="grey"
+              opacity={0.5}
+            />
+            <span
+              className="dx-progress-fill"
+              style={{
+                width: `${meter.total ? (meter.done / meter.total) * 100 : 0}%`,
+              }}
+            >
+              <DitherGradient cell={2} direction="left" from="green" />
+            </span>
+          </div>
+        </div>
+      ))}
+    </section>
+  );
+}
 
 export function AppShell({
   data,
@@ -78,6 +134,12 @@ export function AppShell({
                       />
                     ) : null}
                     <span>
+                      <item.icon
+                        aria-hidden="true"
+                        className="dx-nav-icon"
+                        size={16}
+                        strokeWidth={1.75}
+                      />
                       {item.label}
                       {item.to === "/review" && due ? <b>{due}</b> : null}
                     </span>
@@ -86,13 +148,27 @@ export function AppShell({
               </Link>
             ))}
           </nav>
+          <CourseProgress data={data} />
           <Link
             activeProps={{ "aria-current": "page" }}
             aria-label="Settings"
-            className="dx-icon-button"
+            className="dx-icon-button dx-settings-link"
             to="/settings"
           >
-            <Settings size={16} />
+            {({ isActive }) => (
+              <>
+                {isActive ? (
+                  <DitherGradient
+                    cell={2}
+                    direction="up"
+                    from="blue"
+                    opacity={0.45}
+                  />
+                ) : null}
+                <Settings size={16} strokeWidth={1.75} />
+                <span className="dx-nav-label">settings</span>
+              </>
+            )}
           </Link>
           <Rule className="dx-edge dx-edge-bottom" />
         </header>
