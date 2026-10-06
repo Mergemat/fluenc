@@ -14,7 +14,7 @@ export type LibraryWord = LibraryData["words"][number] & {
 export type LibraryEntry = LibraryCharacter | LibraryWord;
 
 /** Toneless pinyin with ü as v: decomposing splits tone marks (and ü's diaeresis) off their letters. */
-function normalizePinyin(value: string) {
+export function normalizePinyin(value: string) {
   return value
     .toLowerCase()
     .normalize("NFD")
@@ -89,21 +89,51 @@ function directScore(entry: SearchEntry, text: string, reading: string) {
   return null;
 }
 
+/**
+ * The entries the library lists. A word spelled with a single course character is that
+ * character's entry, so it is listed once; its senses stay searchable through the character.
+ */
+export function libraryEntries(library: LibraryData): LibraryEntry[] {
+  const characters = new Set(library.characters.map((item) => item.hanzi));
+  return [
+    ...library.characters.map((item) => ({
+      ...item,
+      kind: "characters" as const,
+    })),
+    ...library.words
+      .filter((item) => !characters.has(item.hanzi))
+      .map((item) => ({ ...item, kind: "words" as const })),
+  ];
+}
+
+const searchEntry = (item: LibraryEntry, palace?: PalaceData): SearchEntry => {
+  const meaning = getItemMeaning(item);
+  return {
+    item,
+    hanzi: item.hanzi,
+    pinyin: normalizePinyin(item.pinyin),
+    meanings: [meaning.primary, ...meaning.alternatives],
+    notes: entryClueNames(item, palace),
+  };
+};
+
 export function createLibrarySearch(library: LibraryData, palace?: PalaceData) {
-  const entries: SearchEntry[] = (["characters", "words"] as const).flatMap(
-    (kind) =>
-      library[kind].map((raw) => {
-        const item = { ...raw, kind } as LibraryEntry;
-        const meaning = getItemMeaning(item);
-        return {
-          item,
-          hanzi: item.hanzi,
-          pinyin: normalizePinyin(item.pinyin),
-          meanings: [meaning.primary, ...meaning.alternatives],
-          notes: entryClueNames(item, palace),
-        };
-      })
+  const entries = libraryEntries(library).map((item) =>
+    searchEntry(item, palace)
   );
+  const byHanzi = new Map(
+    entries
+      .filter((entry) => entry.item.kind === "characters")
+      .map((entry) => [entry.hanzi, entry])
+  );
+  for (const raw of library.words) {
+    const character = byHanzi.get(raw.hanzi);
+    if (character) {
+      const folded = searchEntry({ ...raw, kind: "words" }, palace);
+      character.meanings.push(...folded.meanings);
+      character.notes.push(...folded.notes);
+    }
+  }
   const options = {
     includeScore: true,
     ignoreLocation: true,
