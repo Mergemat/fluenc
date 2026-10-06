@@ -79,7 +79,6 @@
 .dx-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 28px; flex-shrink: 0; }
 .dx-crumb { margin: 0; display: flex; align-items: baseline; gap: 7px; font: 11px var(--dx-mono); color: var(--dx-muted); }
 .dx-crumb > b { font: 16px var(--dx-pixel); color: var(--dx-fg); font-weight: 400; }
-.dx-tools { display: flex; gap: 6px; }
 .dx-chip { display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 10px; border: 1px solid var(--dx-line); border-radius: 7px; font: 11.5px var(--dx-mono); color: var(--dx-muted); transition: color 150ms, border-color 150ms, background 150ms; }
 .dx-chip:hover:not(:disabled) { color: var(--dx-fg); border-color: var(--dx-line-strong); }
 .dx-chip[data-accent=true] { border-color: color-mix(in srgb, var(--dx-blue) 60%, transparent); color: var(--dx-blue); }
@@ -143,12 +142,11 @@
 /* ── Studio ──────────────────────────────────────── */
 .dx-studio {
   position: relative; width: 100%; max-width: 1120px; height: 100%; margin: 0 auto; padding: 10px 16px 12px; box-sizing: border-box;
-  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto auto;
-  grid-template-areas: "bar" "read" "usage" "clues" "actions"; gap: 12px; animation: dx-enter .24s ease-out;
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto auto auto;
+  grid-template-areas: "read" "usage" "clues" "actions"; gap: 12px; animation: dx-enter .24s ease-out;
 }
 @keyframes dx-enter { from { opacity: 0; } }
 .dx-studio p, .dx-studio h1 { margin: 0; }
-.dx-studio > .dx-bar { grid-area: bar; }
 .dx-read { grid-area: read; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 /* The character area picks its own layout from the shape it gets: stacked when tall, side by side
    when wide for its height — whichever gives the bigger glyph. */
@@ -205,7 +203,9 @@
 .dx-usage-empty { margin: 0; font: 11px var(--dx-mono); color: var(--dx-faint); }
 .dx-usage-empty button { text-decoration: underline; color: var(--dx-muted); }
 .dx-usage-skeleton { position: relative; overflow: hidden; width: min(100%, 280px); height: 12px; border-radius: 2px; animation: dx-pulse 1.1s ease-in-out infinite; }
-.dx-actions { grid-area: actions; }
+.dx-actions { grid-area: actions; display: flex; gap: 8px; }
+.dx-actions > .dx-action { flex: 1; min-width: 0; }
+.dx-action-side { flex-shrink: 0; display: grid; place-items: center; width: 50px; height: 50px; border-radius: var(--dx-radius); color: #fff; }
 .dx-studio > * { transition: opacity 160ms; }
 .dx-studio[data-leaving=true] > :not(.dx-actions) { opacity: .35; }
 
@@ -221,8 +221,8 @@
 
 @media (min-width: 960px) {
   .dx-studio { padding: 18px 32px 24px; column-gap: 48px; row-gap: 14px;
-    grid-template-columns: minmax(0, 1fr) minmax(400px, 460px); grid-template-rows: auto minmax(0, 1fr) auto auto auto minmax(0, 1fr);
-    grid-template-areas: "bar bar" "read ." "read usage" "read clues" "read actions" "read ."; }
+    grid-template-columns: minmax(0, 1fr) minmax(400px, 460px); grid-template-rows: minmax(0, 1fr) auto auto auto minmax(0, 1fr);
+    grid-template-areas: "read ." "read usage" "read clues" "read actions" "read ."; }
   .dx-read { --glyph-max: 440px; justify-content: center; gap: 18px; }
   .dx-read-layout { gap: 18px; }
   .dx-read-layout > .dx-glyph-box { flex: 0 1 var(--glyph-max); }
@@ -250,7 +250,8 @@
   .dx-studio { gap: 7px; }
   .dx-alt { display: none; }
   .dx-row { height: 42px; }
-  .dx-action { height: 44px; }
+  .dx-action, .dx-action-side { height: 44px; }
+  .dx-action-side { width: 44px; }
   .dx-code.font-hanzi-props { font-size: 24px; }
 }
 /* Keyboard hints mean nothing on a touchscreen. */

@@ -13,8 +13,8 @@ export function LessonsView({ data }: { data: DashboardData }) {
     ?? data.buildQueue[0]
   if (lesson?.type !== selected?.type || lesson?.id !== selected?.id) setSelected(lesson)
 
-  if (lesson?.type === 'character') return <CharacterLesson key={`character:${lesson.id}`} item={lesson} remaining={data.buildQueue.length} />
-  if (lesson?.type === 'word') return <WordLesson key={`word:${lesson.id}`} item={lesson} remaining={data.buildQueue.length} />
+  if (lesson?.type === 'character') return <CharacterLesson key={`character:${lesson.id}`} item={lesson} />
+  if (lesson?.type === 'word') return <WordLesson key={`word:${lesson.id}`} item={lesson} />
 
   return (
     <div className="dx-lesson-page">

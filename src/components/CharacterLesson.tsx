@@ -1,7 +1,7 @@
 // A character lesson reads in movie-method order: character → meaning → pinyin → clues
 // (saved ones already written in) → imagine the scene → name only what is missing, inline.
 // Enter drives the whole lesson; nothing scrolls and nothing shifts while it loads.
-import { Info, X } from 'lucide-react'
+import { Info, PenLine, X } from 'lucide-react'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 
 import { directCharacters } from '../lib/character-props'
@@ -46,7 +46,7 @@ export function lessonClues(item: Pick<CharacterItem, 'hanzi' | 'movie'>, drafts
   })
 }
 
-export function CharacterLesson({ item, remaining }: { item: CharacterItem; remaining: number }) {
+export function CharacterLesson({ item }: { item: CharacterItem }) {
   const [drafts, setDrafts] = useState<Record<string, string>>({})
   const clues = lessonClues(item, drafts)
   const props = clues.filter(clue => clue.kind === 'prop')
@@ -129,13 +129,6 @@ export function CharacterLesson({ item, remaining }: { item: CharacterItem; rema
   }
 
   return <article className="dx-studio" data-leaving={finish.isPending} data-dense={props.length > 3}>
-    <header className="dx-bar">
-      <p className="dx-crumb"><span>build</span><b>{String(remaining).padStart(2, '0')}</b><span>left</span></p>
-      <div className="dx-tools">
-        <DitherButton className="dx-tool" color={xray ? 'blue' : 'grey'} variant={xray ? 'gradient' : 'dotted'} aria-pressed={xray} onClick={() => setXray(!xray)}><span>parts <kbd>x</kbd></span></DitherButton>
-        <DitherButton className="dx-tool" color="grey" variant="dotted" onClick={() => setWriting(true)}><span>write <kbd>w</kbd></span></DitherButton>
-      </div>
-    </header>
 
     <section className="dx-read dx-read-character" aria-label="Character"><div className="dx-read-layout">
         <div className="dx-glyph-box">
@@ -178,6 +171,9 @@ export function CharacterLesson({ item, remaining }: { item: CharacterItem; rema
         disabled={finish.isPending} onClick={primary}>
         <span role={finish.isError ? 'alert' : undefined}>{finish.isPending ? 'saving' : missing.length ? `name ${missing.length} clue${missing.length > 1 ? 's' : ''}` : finish.isError ? 'could not save — try again' : 'add to reviews'}</span>
         <kbd>↵</kbd>
+      </DitherButton>
+      <DitherButton className="dx-action-side" color="grey" variant="dotted" aria-label={`Write ${item.hanzi}`} title="write (w)" onClick={() => setWriting(true)}>
+        <PenLine size={17} />
       </DitherButton>
     </footer>
 
