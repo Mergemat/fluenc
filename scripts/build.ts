@@ -2,6 +2,8 @@ import { injectManifest } from 'workbox-build'
 import { rm } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
+import { OFFLINE_FILES_URL, type OfflineFile, type OfflineFiles } from '../src/offline/files'
+
 const outputDirectory = process.env.VERCEL ? '.vercel/output' : '.output'
 await rm(outputDirectory, { recursive: true, force: true })
 
@@ -32,7 +34,6 @@ const result = await injectManifest({
   globDirectory: publicDirectory,
   globPatterns: [
     'offline.html',
-    'audio/pinyin/**/*.mp3',
     'assets/**/*.{css,js}',
     'fonts/**/*.woff2',
     'brand/**/*.png',
@@ -48,4 +49,18 @@ if (!(await Bun.file(resolve(publicDirectory, 'offline.html')).exists())) {
 }
 
 if (!result.count) throw new Error('Service worker has no assets to precache')
+
+// Audio and strokes download from the page after install; see src/offline/files.ts.
+const listFiles = async (pattern: string): Promise<OfflineFile[]> => {
+  const files: OfflineFile[] = []
+  for await (const path of new Bun.Glob(pattern).scan({ cwd: publicDirectory })) {
+    const hasher = new Bun.CryptoHasher('md5')
+    hasher.update(await Bun.file(resolve(publicDirectory, path)).arrayBuffer())
+    files.push({ url: `/${path}`, revision: hasher.digest('hex').slice(0, 12) })
+  }
+  return files.sort((a, b) => a.url.localeCompare(b.url))
+}
+const offlineFiles: OfflineFiles = { audio: await listFiles('audio/pinyin/*.mp3'), strokes: await listFiles('hanzi/*.json') }
+if (!offlineFiles.audio.length || !offlineFiles.strokes.length) throw new Error('Offline practice files are missing')
+await Bun.write(resolve(publicDirectory, OFFLINE_FILES_URL.slice(1)), JSON.stringify(offlineFiles))
 console.info(`Service worker: ${result.count} files, ${result.size} bytes precached`)

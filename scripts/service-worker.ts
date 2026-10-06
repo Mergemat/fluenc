@@ -1,21 +1,18 @@
 /// <reference lib="webworker" />
 
-import { cacheNames, clientsClaim } from 'workbox-core'
-import { ExpirationPlugin } from 'workbox-expiration'
-import { addPlugins, cleanupOutdatedCaches, createHandlerBoundToURL, getCacheKeyForURL, precacheAndRoute, type PrecacheEntry } from 'workbox-precaching'
+import { clientsClaim } from 'workbox-core'
+import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute, type PrecacheEntry } from 'workbox-precaching'
 import { RangeRequestsPlugin } from 'workbox-range-requests'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
 import { CacheFirst } from 'workbox-strategies'
-import type { DownloadProgress } from '../src/offline/useOfflineDownload'
+import { OFFLINE_CACHES } from '../src/offline/files'
 import { openReview, showPushNotification } from '../src/notifications/worker'
 
 declare const self: ServiceWorkerGlobalScope & { __WB_MANIFEST: PrecacheEntry[] }
 
 void self.skipWaiting()
 clientsClaim()
-addPlugins([new RangeRequestsPlugin()])
-const entries = self.__WB_MANIFEST
-precacheAndRoute(entries)
+precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()
 
 self.addEventListener('push', event => {
@@ -27,19 +24,6 @@ self.addEventListener('notificationclick', event => {
   event.waitUntil(openReview(self.clients, self.location.origin))
 })
 
-self.addEventListener('message', event => {
-  if (event.data?.type !== 'DOWNLOAD_PROGRESS') return
-  event.waitUntil((async () => {
-    const cache = await caches.open(cacheNames.precache)
-    const cached = new Set((await cache.keys()).map(request => request.url))
-    const progress: DownloadProgress = {
-      completed: entries.filter(entry => cached.has(getCacheKeyForURL(typeof entry === 'string' ? entry : entry.url) ?? '')).length,
-      total: entries.length,
-    }
-    event.ports[0]?.postMessage(progress)
-  })())
-})
-
 registerRoute(new NavigationRoute(createHandlerBoundToURL('/offline.html'), {
   allowlist: [
     /^\/(?:review|lessons|reading|library|palace|settings)?\/?(?:\?.*)?$/,
@@ -48,10 +32,12 @@ registerRoute(new NavigationRoute(createHandlerBoundToURL('/offline.html'), {
   ],
 }))
 
+// The page fills these caches (useOfflineDownload); anything it hasn't reached yet is cached on first use.
 registerRoute(
   ({ url }) => url.origin === self.location.origin && /^\/hanzi\/[^/]+\.json$/.test(url.pathname),
-  new CacheFirst({
-    cacheName: 'fluenc-strokes',
-    plugins: [new ExpirationPlugin({ maxEntries: 1000, maxAgeSeconds: 365 * 24 * 60 * 60 })],
-  }),
+  new CacheFirst({ cacheName: OFFLINE_CACHES.strokes }),
+)
+registerRoute(
+  ({ url }) => url.origin === self.location.origin && /^\/audio\/pinyin\/[^/]+\.mp3$/.test(url.pathname),
+  new CacheFirst({ cacheName: OFFLINE_CACHES.audio, plugins: [new RangeRequestsPlugin()] }),
 )

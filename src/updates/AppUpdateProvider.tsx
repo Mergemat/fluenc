@@ -71,7 +71,8 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
       if (!active) return
       if (!result) throw new Error('App registration failed')
       registration.current = result
-      if (!result.installing) setStatus('current')
+      // Only an install that replaces a running version is an update; the first one is this version.
+      if (!result.installing || !navigator.serviceWorker.controller) setStatus('current')
     }
     void prepare().catch(() => { if (active) setStatus('error') })
     return () => {
