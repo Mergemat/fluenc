@@ -1,9 +1,8 @@
-import { createClient } from '@libsql/client'
-import { drizzle } from 'drizzle-orm/libsql'
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
+import { getTursoCredentials } from "./config";
+import { schema } from "./schema";
 
-import * as schema from './schema'
-import { getTursoCredentials } from './config'
+const client = createClient(getTursoCredentials());
 
-const client = createClient(getTursoCredentials())
-
-export const db = drizzle(client, { schema })
+export const db = drizzle(client, { schema });

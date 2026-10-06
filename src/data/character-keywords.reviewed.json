@@ -146,7 +146,7 @@
   {
     "character": "会",
     "pinyin": "huì",
-    "keyword": "know how",
+    "keyword": "know how to",
     "sourcePinyin": "hui4",
     "sourceSense": "can; to have the skill; to know how to",
     "note": "Selected sense is learned ability; bare can obscures the useful distinction from 能. Example: 我会游泳。 / I know how to swim. Usage evidence: https://resources.allsetlearning.com/chinese/grammar/ASGZL717"
@@ -250,10 +250,10 @@
   {
     "character": "能",
     "pinyin": "néng",
-    "keyword": "can",
+    "keyword": "be able to",
     "sourcePinyin": "neng2",
-    "sourceSense": "can",
-    "note": "common ability/modal reading"
+    "sourceSense": "to be able to",
+    "note": "Ability or circumstances make an action possible; distinct from learned skill in 会."
   },
   {
     "character": "还",
@@ -434,10 +434,10 @@
   {
     "character": "可",
     "pinyin": "kě",
-    "keyword": "can",
+    "keyword": "may",
     "sourcePinyin": "ke3",
     "sourceSense": "(prefix) can; may; able to; -able",
-    "note": "Chosen for the common modern can sense."
+    "note": "Selected modal sense expresses possibility or permission; may distinguishes it from 能 and 会."
   },
   {
     "character": "谢",

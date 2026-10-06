@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": [
+    "ultracite/biome/core",
+    "ultracite/biome/react",
+    "ultracite/biome/tanstack"
+  ],
+  "javascript": {
+    // Scripts and tests run on Bun.
+    "globals": ["Bun"]
+  },
+  "files": {
+    // The preset already includes everything else. Generated or pinned data: written by scripts
+    // and drizzle-kit, served as-is, or kept verbatim.
+    "includes": [
+      "!!**/public/hanzi",
+      "!!**/drizzle",
+      "!!**/src/data/dictionary.source.json",
+      "!!**/docs"
+    ]
+  }
+}

@@ -1,9 +1,55 @@
-.app-update-toast { position: fixed; z-index: 30; right: 16px; bottom: calc(84px + env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 12px; max-width: calc(100% - 32px); padding: 8px 8px 8px 16px; border: 1px solid var(--color-line); border-radius: 10px; background: var(--color-paper); color: var(--color-ink); box-shadow: 0 4px 20px rgb(0 0 0 / 12%); font-size: 13px; }
-.app-update-toast > span { min-width: 0; }
-.app-update-refresh, .app-update-dismiss { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; min-height: 44px; border-radius: 6px; }
-.app-update-refresh { padding: 0 12px; color: var(--color-glaze); font-weight: 650; }
-.app-update-dismiss { width: 36px; color: var(--color-muted); }
-.app-update-toast button:hover { background: var(--color-canvas); }
-.app-update-toast button:focus-visible { outline: 2px solid var(--color-glaze); outline-offset: 2px; }
-.app-update-toast button:disabled { opacity: .5; cursor: default; }
-@media (min-width: 768px) { .app-update-toast { bottom: calc(20px + env(safe-area-inset-bottom)); right: 20px; } }
+.app-update-toast {
+  position: fixed;
+  right: 16px;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  z-index: 30;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  max-width: calc(100% - 32px);
+  padding: 8px 8px 8px 16px;
+  font-size: 13px;
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgb(0 0 0 / 12%);
+}
+.app-update-toast > span {
+  min-width: 0;
+}
+.app-update-refresh,
+.app-update-dismiss {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 6px;
+}
+.app-update-refresh {
+  padding: 0 12px;
+  font-weight: 650;
+  color: var(--color-glaze);
+}
+.app-update-dismiss {
+  width: 36px;
+  color: var(--color-muted);
+}
+.app-update-toast button:hover {
+  background: var(--color-canvas);
+}
+.app-update-toast button:focus-visible {
+  outline: 2px solid var(--color-glaze);
+  outline-offset: 2px;
+}
+.app-update-toast button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+@media (min-width: 768px) {
+  .app-update-toast {
+    right: 20px;
+    bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+}

@@ -1,13 +1,19 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
+import { createFileRoute } from "@tanstack/react-router";
 
-import { LibraryView } from '../components/LibraryView'
+import { LibraryView } from "../components/library-view";
+import { oneOf, optionalString } from "../lib/search-params";
 
-export const Route = createFileRoute('/_app/library')({
-  validateSearch: z.object({
-    kind: z.enum(['all', 'characters', 'words']).optional().catch(undefined),
-    status: z.enum(['all', 'new', 'learning', 'review']).optional().catch(undefined),
-    q: z.string().optional().catch(undefined),
+interface LibrarySearch {
+  kind?: "all" | "characters" | "words";
+  q?: string;
+  status?: "all" | "new" | "learning" | "review";
+}
+
+export const Route = createFileRoute("/_app/library")({
+  validateSearch: (search: Record<string, unknown>): LibrarySearch => ({
+    kind: oneOf(search.kind, ["all", "characters", "words"]),
+    status: oneOf(search.status, ["all", "new", "learning", "review"]),
+    q: optionalString(search.q),
   }),
   component: LibraryView,
-})
+});
