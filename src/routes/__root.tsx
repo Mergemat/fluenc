@@ -16,7 +16,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     meta: [
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
-      { name: 'theme-color', content: '#f1eee5' },
+      { name: 'theme-color', content: '#0b0b0d' },
       { title: 'Fluenc — learn Mandarin characters' },
       {
         name: 'description',
@@ -26,6 +26,8 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     links: [
       { rel: 'stylesheet', href: appCss },
       { rel: 'preload', href: '/fonts/fluenc-hanzi.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+      { rel: 'preload', href: '/fonts/geist/Geist-Variable.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+      { rel: 'preload', href: '/fonts/geist/GeistMono-Variable.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
       { rel: 'manifest', href: '/manifest.webmanifest' },
       { rel: 'icon', href: '/brand/favicon-32.png', type: 'image/png', sizes: '32x32' },
       { rel: 'apple-touch-icon', href: '/brand/apple-touch-icon.png', sizes: '180x180' },

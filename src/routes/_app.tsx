@@ -1,8 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Outlet, useLocation, useRouter } from '@tanstack/react-router'
 
-import { AppHeader, AppTabBar } from '../components/AppNav'
-import { AppScroll } from '../components/AppScroll'
+import { AppShell } from '../components/AppShell'
 import { Status } from '../components/ui/Layout'
 import { Button } from '../components/ui/Button'
 import { OfflineDownloadProvider } from '../offline/OfflineDownloadProvider'
@@ -24,15 +23,7 @@ function AppLayout() {
   useOfflineSync(data)
 
   return <AppUpdateProvider><OfflineDownloadProvider>
-    <div className="app-viewport">
-      <AppScroll pathname={pathname}>
-        <div className="app-layout">
-          <AppHeader data={data} />
-          <div className="min-w-0"><Outlet /></div>
-        </div>
-      </AppScroll>
-      <AppTabBar data={data} />
-    </div>
+    <AppShell data={data} pathname={pathname}><Outlet /></AppShell>
   </OfflineDownloadProvider></AppUpdateProvider>
 }
 

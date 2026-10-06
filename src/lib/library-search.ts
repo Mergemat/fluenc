@@ -2,11 +2,12 @@ import Fuse from 'fuse.js'
 import { convert } from 'pinyin-pro'
 
 import { getItemMeaning } from './meaning'
-import { characterForWord } from './character-words'
-import type { DashboardData, LibraryData, PalaceData } from '../server/curriculum'
+import type { LibraryData, PalaceData } from '../server/curriculum'
 
 export type LibraryKind = 'characters' | 'words'
-export type LibraryEntry = (LibraryData[LibraryKind][number]) & { kind: LibraryKind; approximate?: boolean }
+export type LibraryCharacter = LibraryData['characters'][number] & { kind: 'characters'; approximate?: boolean }
+export type LibraryWord = LibraryData['words'][number] & { kind: 'words'; approximate?: boolean }
+export type LibraryEntry = LibraryCharacter | LibraryWord
 
 function normalizePinyin(value: string) {
   return convert(value.toLowerCase().normalize('NFC'), { format: 'toneNone' })
@@ -14,27 +15,28 @@ function normalizePinyin(value: string) {
     .replace(/[1-5\s'’\-]/g, '')
 }
 
-export function createLibrarySearch(library: LibraryData, dashboard?: DashboardData, palace?: PalaceData) {
-  const studyItems = new Map(dashboard
-    ? [...dashboard.buildQueue, ...dashboard.reviewQueue, ...dashboard.scheduledQueue, ...dashboard.lockedWords].map(item => [`${item.type}:${item.id}`, item])
-    : [])
-  const entries = (['characters', 'words'] as const).flatMap(kind => library[kind].map(item => {
+/** The learner's clue names for an entry, from its movie codes and saved palace names. */
+export function entryClueNames(item: LibraryEntry, palace?: PalaceData): string[] {
+  if (item.kind === 'words') return item.livingLink ? [item.livingLink] : []
+  if (!palace) return []
+  return [
+    palace.actors.find(actor => actor.key === item.movie.actorKey)?.name,
+    palace.sets.find(set => set.key === item.movie.finalKey)?.name,
+    palace.rooms.find(room => room.tone === item.movie.tone)?.name,
+    ...item.components.map(part => palace.props.find(prop => prop.key === part.hanzi)?.name),
+  ].filter((name): name is string => Boolean(name))
+}
+
+export function createLibrarySearch(library: LibraryData, palace?: PalaceData) {
+  const entries = (['characters', 'words'] as const).flatMap(kind => library[kind].map(raw => {
+    const item = { ...raw, kind } as LibraryEntry
     const meaning = getItemMeaning(item)
-    const characterId = kind === 'characters' ? item.id : characterForWord(item.id)
-    const study = studyItems.get(characterId ? `character:${characterId}` : `word:${item.id}`)
-    const movie = study?.type === 'character' ? study.movie : undefined
-    const notes = movie ? [
-      palace?.actors.find(actor => actor.key === movie.actorKey)?.name || movie.actorName,
-      palace?.sets.find(set => set.key === movie.finalKey)?.name || movie.setName,
-      palace?.rooms.find(room => room.tone === movie.tone)?.name || movie.roomName,
-      ...movie.components.map(part => palace?.props.find(prop => prop.key === part.hanzi)?.name || part.propName),
-    ].filter(Boolean) : study?.type === 'word' ? [study.livingLink] : []
     return {
-      item: { ...item, kind } as LibraryEntry,
+      item,
       hanzi: item.hanzi,
       pinyin: normalizePinyin(item.pinyin),
       meanings: [meaning.primary, ...meaning.alternatives],
-      notes,
+      notes: entryClueNames(item, palace),
     }
   }))
   const options = { includeScore: true, ignoreLocation: true, threshold: 0.35, minMatchCharLength: 2 }

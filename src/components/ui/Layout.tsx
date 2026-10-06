@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import { Rule } from './Dither'
+
 export function Page({ children }: { children: ReactNode }) {
   return <section className="study-page">{children}</section>
 }
@@ -8,6 +10,7 @@ export function PageHeader({ title, meta }: { title: string; meta?: ReactNode })
   return (
     <header className="page-header">
       <h1 className="page-title">{title}</h1>
+      <Rule />
       {meta ? <div className="page-meta">{meta}</div> : null}
     </header>
   )

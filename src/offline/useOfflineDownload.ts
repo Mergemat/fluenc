@@ -39,9 +39,8 @@ export function useOfflineDownload() {
     }
 
     const prepare = async () => {
-      const existing = await navigator.serviceWorker.getRegistration('/')
-      if (!active) return
-      if (!existing && attempt === 0) {
+      // Offline practice downloads by itself; without a connection it waits for one.
+      if (!navigator.onLine) {
         setStatus('idle')
         return
       }
@@ -90,7 +89,15 @@ export function useOfflineDownload() {
     }
   }, [attempt])
 
-  return { status, progress, download: () => setAttempt(value => value + 1) }
+  // Retry an interrupted or deferred download as soon as the device is back online.
+  useEffect(() => {
+    if (status !== 'error' && status !== 'idle') return
+    const retry = () => setAttempt(value => value + 1)
+    window.addEventListener('online', retry)
+    return () => window.removeEventListener('online', retry)
+  }, [status])
+
+  return { status, progress }
 }
 
 export type OfflineDownload = ReturnType<typeof useOfflineDownload>

@@ -5,8 +5,9 @@ import { PalaceView } from '../components/PalaceView'
 
 export const Route = createFileRoute('/_app/palace')({
   validateSearch: z.object({
-    kind: z.enum(['characters', 'words']).optional().catch(undefined),
-    limit: z.number().int().min(48).optional().catch(undefined),
+    tab: z.enum(['cast', 'sets', 'areas', 'props']).optional().catch(undefined),
+    q: z.string().optional().catch(undefined),
+    show: z.enum(['all', 'named', 'open']).optional().catch(undefined),
   }),
   component: PalaceView,
 })

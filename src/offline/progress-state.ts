@@ -178,6 +178,10 @@ export function applyOperation(data: DashboardData, operation: ProgressOperation
 }
 
 export function applyLibraryOperation(data: LibraryData, dashboard: DashboardData, operation: ProgressOperation) {
+  if (operation.kind === 'livingLink') {
+    const { wordId, story } = operation.data
+    return { ...data, words: data.words.map(item => item.id === wordId ? { ...item, livingLink: story } : item) }
+  }
   if (operation.kind !== 'enroll' && operation.kind !== 'review') return data
   if (operation.data.itemType !== 'character' && operation.data.itemType !== 'word') return data
   const target = studyIdentity(operation.data.itemType, operation.data.itemId)

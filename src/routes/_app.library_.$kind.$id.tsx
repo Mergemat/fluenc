@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 
-import { LibraryDetailPage } from '../components/LibraryDetailPage'
+import { LibraryEntryPage } from '../components/LibraryEntryPage'
 import { Button } from '../components/ui/Button'
 import { Page, Status } from '../components/ui/Layout'
 import type { LibraryEntry } from '../lib/library-search'
@@ -12,21 +12,23 @@ export const Route = createFileRoute('/_app/library_/$kind/$id')({
   loader: async ({ context, params }) => {
     if (params.kind !== 'characters' && params.kind !== 'words') throw notFound()
     const library = await context.queryClient.ensureQueryData(libraryQueryOptions)
-    const item = library[params.kind].find(item => item.id === params.id)
-    if (!item) throw notFound()
-    return { ...item, kind: params.kind } satisfies LibraryEntry
+    const entry: LibraryEntry | undefined = params.kind === 'characters'
+      ? (({ found }) => found && { ...found, kind: 'characters' as const })({ found: library.characters.find(item => item.id === params.id) })
+      : (({ found }) => found && { ...found, kind: 'words' as const })({ found: library.words.find(item => item.id === params.id) })
+    if (!entry) throw notFound()
+    return entry
   },
   head: ({ loaderData }) => ({ meta: [{ title: loaderData ? `${loaderData.hanzi} · ${loaderData.pinyin} | Fluenc` : 'Fluenc' }] }),
   pendingComponent: () => <Page><Status title="Loading details…" /></Page>,
   errorComponent: DetailError,
-  notFoundComponent: () => <Page><Status title="This entry is not in the library" action={<Link className="ui-button ui-secondary" to="/library">Back to library</Link>} /></Page>,
+  notFoundComponent: () => <Page><Status title="This entry is not in the library" action={<Link className="dx-chip" to="/library">back to library</Link>} /></Page>,
   component: Detail,
 })
 
 function Detail() {
   const item = Route.useLoaderData()
   const { from } = Route.useSearch()
-  return <LibraryDetailPage item={item} from={from} />
+  return <LibraryEntryPage item={item} from={from} />
 }
 
 function DetailError() {
