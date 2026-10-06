@@ -1,7 +1,7 @@
 // A character lesson reads in movie-method order: character → meaning → pinyin → clues
 // (saved ones already written in) → imagine the scene → name only what is missing, inline.
 // Enter drives the whole lesson; nothing scrolls and nothing shifts while it loads.
-import { Info, PenLine, X } from "lucide-react";
+import { ChevronDown, Info, PenLine, X } from "lucide-react";
 import {
   type ChangeEvent,
   type CSSProperties,
@@ -10,6 +10,7 @@ import {
   useCallback,
   useEffect,
   useEffectEvent,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -154,8 +155,8 @@ function ClueRow({
   );
 }
 
-/** Words that use the character, collapsed to one line: read them before the scene. */
-function UsageLine({ usage }: { usage: ReturnType<typeof useUsage> }) {
+/** The words list itself: loading, unavailable offline, or one word per line. */
+function UsageList({ usage }: { usage: ReturnType<typeof useUsage> }) {
   if (usage.pending) {
     return (
       <span className="dx-usage-skeleton">
@@ -173,24 +174,94 @@ function UsageLine({ usage }: { usage: ReturnType<typeof useUsage> }) {
       </p>
     );
   }
-  if (!usage.data?.words.length) {
-    return (
-      <p className="dx-usage-empty">used on its own — no course words yet</p>
-    );
-  }
   return (
-    <p className="dx-usage-line">
-      {usage.data.words.map((word) => (
-        <span
-          className="dx-usage-item"
+    <ul className="dx-words-list">
+      {usage.data?.words.map((word) => (
+        <li
+          className="dx-words-item"
           key={word.id}
-          title={`${word.pinyin}${word.unknown ? ` · ${word.unknown} new character${word.unknown > 1 ? "s" : ""}` : ""}`}
+          title={
+            word.unknown
+              ? `${word.unknown} new character${word.unknown > 1 ? "s" : ""}`
+              : undefined
+          }
         >
           <UsageHanzi chars={word.chars} />
+          <span className="dx-words-py">{word.pinyin}</span>
           <span>{word.meaning}</span>
-        </span>
+        </li>
       ))}
-    </p>
+    </ul>
+  );
+}
+
+/**
+ * Words that use the character, behind a button in the lesson's corner so they take no room
+ * until wanted. Escape or a tap anywhere else closes the list.
+ */
+function UsageWords({
+  hanzi,
+  usage,
+}: {
+  hanzi: string;
+  usage: ReturnType<typeof useUsage>;
+}) {
+  const [open, setOpen] = useState(false);
+  const panel = useId();
+  const root = useRef<HTMLDivElement>(null);
+  const toggle = useCallback(() => setOpen((value) => !value), []);
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    const closeOnKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+    const closeOutside = (event: globalThis.PointerEvent) => {
+      if (!root.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("keydown", closeOnKey);
+    document.addEventListener("pointerdown", closeOutside);
+    return () => {
+      document.removeEventListener("keydown", closeOnKey);
+      document.removeEventListener("pointerdown", closeOutside);
+    };
+  }, [open]);
+
+  const count = usage.data?.words.length;
+  // A character used on its own has nothing to show.
+  if (usage.data && !count) {
+    return null;
+  }
+  return (
+    <div className="dx-words" ref={root}>
+      <button
+        aria-controls={panel}
+        aria-expanded={open}
+        aria-label={`Words with ${hanzi}`}
+        className="dx-words-toggle"
+        onClick={toggle}
+        type="button"
+      >
+        words
+        {count ? <span className="dx-words-count">{count}</span> : null}
+        <ChevronDown aria-hidden="true" size={12} />
+      </button>
+      {open ? (
+        <section
+          aria-busy={usage.pending}
+          aria-label={`Words with ${hanzi}`}
+          className="dx-words-panel"
+          id={panel}
+        >
+          <UsageList usage={usage} />
+        </section>
+      ) : null}
+    </div>
   );
 }
 
@@ -466,13 +537,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
         </div>
       </section>
 
-      <section
-        aria-busy={usage.pending}
-        aria-label="In words"
-        className="dx-usage"
-      >
-        <UsageLine usage={usage} />
-      </section>
+      <UsageWords hanzi={item.hanzi} usage={usage} />
 
       <section aria-label="Clues" className="dx-clues">
         <div className="dx-label">
