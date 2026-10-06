@@ -1,10 +1,12 @@
-import { and, eq, inArray } from 'drizzle-orm'
-import { createEmptyCard, type Card, type Grade } from 'ts-fsrs'
+import { and, eq, inArray } from "drizzle-orm";
+import { type Card, createEmptyCard, type Grade } from "ts-fsrs";
 
-import { studyItemTypes } from '../data/types'
-import { db } from '../db'
+import { studyItemTypes } from "../data/types";
+import { db } from "../db";
 import {
   componentProps,
+  type ItemType,
+  type LearnerItem,
   learnerItems,
   learners,
   mnemonics,
@@ -13,35 +15,47 @@ import {
   reviewLogs,
   syncEvents,
   toneRooms,
-  type ItemType,
-  type LearnerItem,
-} from '../db/schema'
-import { catalog } from '../lib/catalog'
-import { studyIdentity } from '../lib/character-words'
-import { cardKey, reviewTime, toCard, type CardSnapshot, type LearnerState } from '../lib/learner-state'
-import { scheduleReview } from '../lib/review-schedule'
+} from "../db/schema";
+import { catalog } from "../lib/catalog";
+import { studyIdentity } from "../lib/character-words";
+import {
+  type CardSnapshot,
+  cardKey,
+  type LearnerState,
+  reviewTime,
+  toCard,
+} from "../lib/learner-state";
+import { scheduleReview } from "../lib/review-schedule";
 import type {
   EnrollInput,
   LivingLinkInput,
   MovieInput,
   ReviewInput,
-} from './curriculum.contract'
+} from "./curriculum.contract";
 
-const LEARNER_ID = 'default'
+const LEARNER_ID = "default";
 
-let learnerReady: Promise<unknown> | undefined
+let learnerReady: Promise<unknown> | undefined;
 
 function ensureLearner() {
-  learnerReady ??= db.insert(learners).values({ id: LEARNER_ID }).onConflictDoNothing()
+  learnerReady ??= db
+    .insert(learners)
+    .values({ id: LEARNER_ID })
+    .onConflictDoNothing()
     .then(() => undefined)
     .catch((error: unknown) => {
-      learnerReady = undefined
-      throw error
-    })
-  return learnerReady
+      learnerReady = undefined;
+      throw error;
+    });
+  return learnerReady;
 }
 
-function learnerItemValues(itemType: ItemType, itemId: string, card: Card, introducedAt?: Date) {
+function learnerItemValues(
+  itemType: ItemType,
+  itemId: string,
+  card: Card,
+  introducedAt?: Date
+) {
   return {
     learnerId: LEARNER_ID,
     itemType,
@@ -57,7 +71,7 @@ function learnerItemValues(itemType: ItemType, itemId: string, card: Card, intro
     state: card.state,
     lastReview: card.last_review,
     ...(introducedAt ? { introducedAt } : {}),
-  }
+  };
 }
 
 function cardSnapshot(item: LearnerItem): CardSnapshot {
@@ -72,63 +86,98 @@ function cardSnapshot(item: LearnerItem): CardSnapshot {
     lapses: item.lapses,
     state: item.state,
     lastReview: item.lastReview?.toISOString() ?? null,
-  }
+  };
 }
 
 /** The learner's stored progress. Devices derive their dashboard, library and palace from it. */
 export async function getLearnerStateHandler(): Promise<LearnerState> {
   const [items, actors, sets, rooms, props, stories] = await db.batch([
-    db.select().from(learnerItems).where(and(eq(learnerItems.learnerId, LEARNER_ID), inArray(learnerItems.itemType, studyItemTypes))),
-    db.select().from(palaceActors).where(eq(palaceActors.learnerId, LEARNER_ID)),
+    db
+      .select()
+      .from(learnerItems)
+      .where(
+        and(
+          eq(learnerItems.learnerId, LEARNER_ID),
+          inArray(learnerItems.itemType, studyItemTypes)
+        )
+      ),
+    db
+      .select()
+      .from(palaceActors)
+      .where(eq(palaceActors.learnerId, LEARNER_ID)),
     db.select().from(palaceSets).where(eq(palaceSets.learnerId, LEARNER_ID)),
     db.select().from(toneRooms).where(eq(toneRooms.learnerId, LEARNER_ID)),
-    db.select().from(componentProps).where(eq(componentProps.learnerId, LEARNER_ID)),
-    db.select().from(mnemonics).where(and(eq(mnemonics.learnerId, LEARNER_ID), eq(mnemonics.itemType, 'word'))),
-  ])
+    db
+      .select()
+      .from(componentProps)
+      .where(eq(componentProps.learnerId, LEARNER_ID)),
+    db
+      .select()
+      .from(mnemonics)
+      .where(
+        and(eq(mnemonics.learnerId, LEARNER_ID), eq(mnemonics.itemType, "word"))
+      ),
+  ]);
   return {
-    cards: Object.fromEntries(items.map(item => [cardKey(item.itemType, item.itemId), cardSnapshot(item)])),
-    actors: Object.fromEntries(actors.map(item => [item.actorKey, item.actorName])),
-    sets: Object.fromEntries(sets.map(item => [item.finalKey, item.setName])),
-    rooms: Object.fromEntries(rooms.map(item => [item.tone, item.roomName])),
-    props: Object.fromEntries(props.map(item => [item.component, item.propName])),
-    livingLinks: Object.fromEntries(stories.map(item => [item.itemId, item.story])),
-  }
+    cards: Object.fromEntries(
+      items.map((item) => [
+        cardKey(item.itemType, item.itemId),
+        cardSnapshot(item),
+      ])
+    ),
+    actors: Object.fromEntries(
+      actors.map((item) => [item.actorKey, item.actorName])
+    ),
+    sets: Object.fromEntries(sets.map((item) => [item.finalKey, item.setName])),
+    rooms: Object.fromEntries(rooms.map((item) => [item.tone, item.roomName])),
+    props: Object.fromEntries(
+      props.map((item) => [item.component, item.propName])
+    ),
+    livingLinks: Object.fromEntries(
+      stories.map((item) => [item.itemId, item.story])
+    ),
+  };
 }
 
 export async function enrollItemHandler(input: EnrollInput) {
-  const data = { ...input, ...studyIdentity(input.itemType, input.itemId) }
-  await ensureLearner()
+  const data = { ...input, ...studyIdentity(input.itemType, input.itemId) };
+  await ensureLearner();
 
-  if (data.itemType === 'character' && !catalog.charactersById.has(data.itemId)) {
-    throw new Error('Character not found')
+  if (
+    data.itemType === "character" &&
+    !catalog.charactersById.has(data.itemId)
+  ) {
+    throw new Error("Character not found");
   }
-  if (data.itemType === 'word' && !catalog.wordsById.has(data.itemId)) {
-    throw new Error('Word not found')
+  if (data.itemType === "word" && !catalog.wordsById.has(data.itemId)) {
+    throw new Error("Word not found");
   }
-  if (data.itemType === 'sentence' && !catalog.sentencesById.has(data.itemId)) {
-    throw new Error('Sentence not found')
+  if (data.itemType === "sentence" && !catalog.sentencesById.has(data.itemId)) {
+    throw new Error("Sentence not found");
   }
 
-  const introducedAt = new Date(data.enrolledAt)
-  const card = createEmptyCard(introducedAt)
+  const introducedAt = new Date(data.enrolledAt);
+  const card = createEmptyCard(introducedAt);
   await db
     .insert(learnerItems)
     .values(learnerItemValues(data.itemType, data.itemId, card, introducedAt))
-    .onConflictDoNothing()
+    .onConflictDoNothing();
 
-  return { due: card.due.toISOString(), state: card.state }
+  return { due: card.due.toISOString(), state: card.state };
 }
 
 export async function reviewItemHandler(input: ReviewInput) {
-  const data = { ...input, ...studyIdentity(input.itemType, input.itemId) }
-  await ensureLearner()
+  const data = { ...input, ...studyIdentity(input.itemType, input.itemId) };
+  await ensureLearner();
   return db.transaction(async (transaction) => {
     const claimed = await transaction
       .insert(syncEvents)
       .values({ id: data.eventId, learnerId: LEARNER_ID })
       .onConflictDoNothing()
-      .returning({ id: syncEvents.id })
-    if (!claimed.length) return { duplicate: true as const }
+      .returning({ id: syncEvents.id });
+    if (!claimed.length) {
+      return { duplicate: true as const };
+    }
 
     const existing = await transaction
       .select()
@@ -137,25 +186,38 @@ export async function reviewItemHandler(input: ReviewInput) {
         and(
           eq(learnerItems.learnerId, LEARNER_ID),
           eq(learnerItems.itemType, data.itemType),
-          eq(learnerItems.itemId, data.itemId),
-        ),
+          eq(learnerItems.itemId, data.itemId)
+        )
       )
-      .limit(1)
+      .limit(1);
 
-    if (!existing[0]) throw new Error('Card is not in review yet')
+    if (!existing[0]) {
+      throw new Error("Card is not in review yet");
+    }
 
-    const reviewedAt = reviewTime(existing[0].lastReview, new Date(data.reviewedAt))
-    const currentCard = toCard(cardSnapshot(existing[0]))
-    const nextCard = scheduleReview(currentCard, reviewedAt, data.rating as Grade)
-    const values = learnerItemValues(data.itemType, data.itemId, nextCard)
+    const reviewedAt = reviewTime(
+      existing[0].lastReview,
+      new Date(data.reviewedAt)
+    );
+    const currentCard = toCard(cardSnapshot(existing[0]));
+    const nextCard = scheduleReview(
+      currentCard,
+      reviewedAt,
+      data.rating as Grade
+    );
+    const values = learnerItemValues(data.itemType, data.itemId, nextCard);
 
     await transaction
       .insert(learnerItems)
       .values(values)
       .onConflictDoUpdate({
-        target: [learnerItems.learnerId, learnerItems.itemType, learnerItems.itemId],
+        target: [
+          learnerItems.learnerId,
+          learnerItems.itemType,
+          learnerItems.itemId,
+        ],
         set: values,
-      })
+      });
     await transaction.insert(reviewLogs).values({
       learnerId: LEARNER_ID,
       itemType: data.itemType,
@@ -163,20 +225,28 @@ export async function reviewItemHandler(input: ReviewInput) {
       rating: data.rating,
       durationMs: data.durationMs,
       reviewedAt,
-    })
+    });
 
-    return { due: nextCard.due.toISOString(), state: nextCard.state, duplicate: false as const }
-  })
+    return {
+      due: nextCard.due.toISOString(),
+      state: nextCard.state,
+      duplicate: false as const,
+    };
+  });
 }
 
 export async function saveMovieHandler(data: MovieInput) {
-  await ensureLearner()
+  await ensureLearner();
   await Promise.all([
     ...(data.actorName
       ? [
           db
             .insert(palaceActors)
-            .values({ learnerId: LEARNER_ID, actorKey: data.actorKey, actorName: data.actorName })
+            .values({
+              learnerId: LEARNER_ID,
+              actorKey: data.actorKey,
+              actorName: data.actorName,
+            })
             .onConflictDoUpdate({
               target: [palaceActors.learnerId, palaceActors.actorKey],
               set: { actorName: data.actorName },
@@ -187,7 +257,11 @@ export async function saveMovieHandler(data: MovieInput) {
       ? [
           db
             .insert(palaceSets)
-            .values({ learnerId: LEARNER_ID, finalKey: data.finalKey, setName: data.setName })
+            .values({
+              learnerId: LEARNER_ID,
+              finalKey: data.finalKey,
+              setName: data.setName,
+            })
             .onConflictDoUpdate({
               target: [palaceSets.learnerId, palaceSets.finalKey],
               set: { setName: data.setName },
@@ -198,7 +272,11 @@ export async function saveMovieHandler(data: MovieInput) {
       ? [
           db
             .insert(toneRooms)
-            .values({ learnerId: LEARNER_ID, tone: data.tone, roomName: data.roomName })
+            .values({
+              learnerId: LEARNER_ID,
+              tone: data.tone,
+              roomName: data.roomName,
+            })
             .onConflictDoUpdate({
               target: [toneRooms.learnerId, toneRooms.tone],
               set: { roomName: data.roomName },
@@ -216,19 +294,19 @@ export async function saveMovieHandler(data: MovieInput) {
         .onConflictDoUpdate({
           target: [componentProps.learnerId, componentProps.component],
           set: { propName: prop.propName },
-        }),
+        })
     ),
-  ])
-  return { saved: true }
+  ]);
+  return { saved: true };
 }
 
 export async function saveLivingLinkHandler(data: LivingLinkInput) {
-  await ensureLearner()
+  await ensureLearner();
   await db
     .insert(mnemonics)
     .values({
       learnerId: LEARNER_ID,
-      itemType: 'word',
+      itemType: "word",
       itemId: data.wordId,
       story: data.story,
       updatedAt: new Date(),
@@ -236,6 +314,6 @@ export async function saveLivingLinkHandler(data: LivingLinkInput) {
     .onConflictDoUpdate({
       target: [mnemonics.learnerId, mnemonics.itemType, mnemonics.itemId],
       set: { story: data.story, updatedAt: new Date() },
-    })
-  return { saved: true }
+    });
+  return { saved: true };
 }

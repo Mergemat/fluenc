@@ -1,12 +1,12 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 
-import { LessonsView } from '../components/LessonsView'
-import { dashboardQueryOptions } from '../offline/queries'
+import { LessonsView } from "../components/lessons-view";
+import { dashboardQueryOptions } from "../offline/queries";
 
-export const Route = createFileRoute('/_app/lessons')({ component: Page })
+export const Route = createFileRoute("/_app/lessons")({ component: Page });
 
 function Page() {
-  const { data } = useSuspenseQuery(dashboardQueryOptions)
-  return <LessonsView data={data} />
+  const { data } = useSuspenseQuery(dashboardQueryOptions);
+  return <LessonsView data={data} />;
 }
