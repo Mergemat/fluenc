@@ -104,9 +104,10 @@ export async function getOfflineDashboard(signal?: AbortSignal) {
   }
 }
 
-async function getOfflineQuery<T>(key: Exclude<CacheKey, 'dashboard'>, remote: () => Promise<T>, signal?: AbortSignal) {
+async function getOfflineQuery<T>(key: Exclude<CacheKey, 'dashboard'>, remote: () => Promise<T>, signal?: AbortSignal, isCurrent: (value: T) => boolean = () => true) {
   if (!isBrowser()) return remote()
-  const cached = await readCache<T>(key)
+  const stored = await readCache<T>(key)
+  const cached = stored && isCurrent(stored) ? stored : null
   if (cached && (!navigator.onLine || await hasPendingProgress())) return cached
   const revision = progressRevision
   try {
@@ -117,13 +118,14 @@ async function getOfflineQuery<T>(key: Exclude<CacheKey, 'dashboard'>, remote: (
     signal?.throwIfAborted()
     // Read again because a local save may have happened during the request.
     const latest = await readCache<T>(key)
-    if (latest) return latest
+    if (latest && isCurrent(latest)) return latest
     throw error
   }
 }
 
 export function getOfflineLibrary(signal?: AbortSignal) {
-  return getOfflineQuery<LibraryData>('library', () => getLibrary({ signal }), signal)
+  // Libraries cached before entries carried components and word parts must be refetched.
+  return getOfflineQuery<LibraryData>('library', () => getLibrary({ signal }), signal, library => 'components' in (library.characters[0] ?? {}) && 'characterParts' in (library.words[0] ?? {}))
 }
 
 export function getOfflinePalace(signal?: AbortSignal) {
@@ -149,7 +151,7 @@ async function enqueue(operation: ProgressOperation): Promise<ProgressSnapshot> 
   })
   const snapshot: ProgressSnapshot = { dashboard: nextDashboard }
   const library = await transaction.objectStore('cache').get(cacheKey('library'))
-  if (library && (operation.kind === 'enroll' || operation.kind === 'review')) {
+  if (library && (operation.kind === 'enroll' || operation.kind === 'review' || operation.kind === 'livingLink')) {
     snapshot.library = applyLibraryOperation(library.value as LibraryData, nextDashboard, operation)
     await transaction.objectStore('cache').put({
       key: cacheKey('library'),

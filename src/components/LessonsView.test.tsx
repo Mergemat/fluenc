@@ -68,43 +68,35 @@ async function show(buildQueue: BuildItem[], lockedWords: DashboardData['lockedW
   return data
 }
 
-async function click(text: string) {
-  const button = [...host.querySelectorAll('button')].find(button => button.textContent?.includes(text))
-  expect(button).toBeDefined()
-  await act(async () => button!.click())
-}
-
 test('sync unlocks a word without replacing the next character or discarding its draft clues', async () => {
   const first = character('太', 'tài')
   const next = character('了', 'le')
   await show([first, next])
-  expect(host.querySelector('.cs-target-hanzi')?.textContent).toBe('太')
+  expect(host.querySelector('.dx-glyph-ghost')?.textContent).toBe('太')
 
   // The local completion publishes the remaining queue before the server sync finishes.
   await show([next])
-  expect(host.querySelector('.cs-target-hanzi')?.textContent).toBe('了')
-  await click('Fill in clues')
+  expect(host.querySelector('.dx-glyph-ghost')?.textContent).toBe('了')
+  // Clues are named inline; the first slot is the actor.
   const input = host.querySelector('input')!
   await act(async () => {
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input, 'My actor')
     input.dispatchEvent(new browser.Event('input', { bubbles: true }) as unknown as Event)
   })
-  await click('All clues')
-  expect(host.textContent).toContain('My actor')
-  await click('Fill in clues')
+  expect(host.querySelector('input')?.value).toBe('My actor')
 
   // The server adds an unlocked word ahead of the character currently being edited.
   await show([word, { ...next, movie: { ...next.movie, actorName: 'Server actor' } }])
-  expect(host.querySelector('.cs-target-hanzi')?.textContent).toBe('了')
+  expect(host.querySelector('.dx-glyph-ghost')?.textContent).toBe('了')
   expect(host.querySelector('input')?.value).toBe('My actor')
-  expect(host.querySelector('.word-studio')).toBeNull()
+  expect(host.querySelector('.dx-word-lesson')).toBeNull()
 
   await show([word])
-  expect(host.querySelector('.recall-word')?.textContent).toBe('我们')
+  expect(host.querySelector('.dx-word-lesson')?.getAttribute('data-hanzi')).toBe('我们')
   await show([])
   expect(host.textContent).toContain('All lessons complete')
   await show([first])
-  expect(host.querySelector('.cs-target-hanzi')?.textContent).toBe('太')
+  expect(host.querySelector('.dx-glyph-ghost')?.textContent).toBe('太')
 })
 
 test('learning the final prerequisite opens a word immediately without a server refresh', async () => {
@@ -121,19 +113,19 @@ test('learning the final prerequisite opens a word immediately without a server 
 
   enroll('我')
   await show(data.buildQueue)
-  expect(host.querySelector('.cs-target-hanzi')?.textContent).toBe('们')
+  expect(host.querySelector('.dx-glyph-ghost')?.textContent).toBe('们')
   expect(data.lockedWords.map(item => item.hanzi)).toEqual(['我们'])
 
   enroll('们')
   await show(data.buildQueue)
-  expect(host.querySelector('.recall-word')?.textContent).toBe('我们')
+  expect(host.querySelector('.dx-word-lesson')?.getAttribute('data-hanzi')).toBe('我们')
   expect(data.lockedWords).toHaveLength(0)
 
   data = applyOperation(data, {
     kind: 'enroll', data: { itemType: 'word', itemId: word.id, enrolledAt: new Date().toISOString() },
   })
   await show(data.buildQueue)
-  expect(host.querySelector('.cs-target-hanzi')?.textContent).toBe('了')
+  expect(host.querySelector('.dx-glyph-ghost')?.textContent).toBe('了')
   enroll('了')
   expect(data.buildQueue).toHaveLength(0)
   expect(data.reviewQueue.filter(item => item.type === 'word' && item.id === word.id)).toHaveLength(1)

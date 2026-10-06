@@ -7,12 +7,6 @@
 .app-brand { display: flex; align-items: center; min-height: 44px; }
 .app-brand > img { display: block; width: 132px; height: auto; filter: brightness(1.04); mix-blend-mode: darken; }
 .nav-day, .desktop-nav { display: none; }
-.dictionary-meanings { margin-top: 10px; font-size: 11px; color: var(--color-muted); text-align: left; }
-.dictionary-meanings > summary { width: fit-content; cursor: pointer; }
-.dictionary-meanings > ul { margin: 10px 0 0; padding-left: 18px; line-height: 1.6; }
-.dictionary-meanings li + li { margin-top: 5px; }
-.word-target > .dictionary-meanings { max-width: 380px; margin-inline: auto; }
-.word-target > .dictionary-meanings > summary { margin-inline: auto; }
 .mobile-nav { position: fixed; inset: auto 0 0; z-index: 10; display: flex; height: calc(68px + env(safe-area-inset-bottom)); padding: 5px 8px calc(5px + env(safe-area-inset-bottom)); background: var(--color-canvas); border-top: 1px solid var(--color-line); }
 .mobile-nav > a { display: flex; flex: 1; min-width: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; border-radius: 10px; font-size: 10px; color: var(--color-muted); }
 .mobile-nav > a[aria-current] { color: var(--color-glaze); background: #e6eeea; }
@@ -77,25 +71,6 @@
 .sentence-answer > p { margin: 0; font-size: clamp(30px, 6vw, 48px); }
 .sentence-answer > strong { font-size: 14px; font-weight: 500; }
 /* Word and reading lessons share a quiet target and a single next action. */
-.word-studio, .reading-lesson { min-height: calc(100dvh - 205px - env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 20px; }
-.word-target { flex: 1; min-height: 220px; gap: 10px; }
-.word-connections { display: grid; gap: 10px; }
-.word-parts, .word-link { padding: 16px; border-radius: 13px 13px 3px 13px; background: #fcf9ed; }
-.word-parts > div { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
-.word-part-group { display: flex; align-items: flex-start; gap: 12px; max-width: 100%; }
-.word-part-detail { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; max-width: 140px; text-align: center; }
-.word-part-plus { line-height: 48px; }
-.word-part { font-size: 40px; line-height: 1.2; color: #987031; }
-.word-part-meaning { font-size: 13px; line-height: 1.4; color: var(--color-muted); overflow-wrap: anywhere; }
-.word-link { background: #e5edf4; border-radius: 13px 13px 13px 3px; }
-.word-link > label { display: flex; justify-content: space-between; }
-.word-link > label > span { font-size: 10px; opacity: .7; }
-.word-link > button { display: flex; align-items: center; gap: 8px; padding-block: 18px 4px; font-size: 13px; color: #315b79; }
-.word-link textarea { width: 100%; min-height: 85px; margin-top: 8px; padding: 8px 0; resize: vertical; font-size: 14px; line-height: 1.5; background: transparent; }
-.word-link textarea[aria-invalid=true] { outline: 1px solid var(--color-danger); }
-.lesson-footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: auto; }
-.lesson-footer > p { margin: 0; color: var(--color-muted); font-size: 11px; max-width: 25ch; }
-.lesson-footer > button { width: auto; flex-shrink: 0; }
 .reading-content { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 24px; text-align: center; padding: 24px 0; }
 .reading-content > p { margin: 0; }
 .reading-hanzi { font-size: clamp(38px, 6vw, 64px); line-height: 1.45; text-wrap: balance; }
@@ -103,22 +78,10 @@
 .reading-answer p { margin: 0; color: #315b79; font-size: 14px; line-height: 1.6; }
 .reading-answer h2 { margin: 12px 0 0; font-size: 21px; line-height: 1.4; font-weight: 550; }
 /* Reference screens use the same actor, set, room and prop colors. */
-.library-search { display: block; width: 100%; height: 46px; border: 1px solid var(--color-line); border-radius: 9px; padding: 0 14px; background: var(--color-paper); font-size: 13px; margin-bottom: 16px; }
-.library-tabs { display: flex; gap: 6px; margin-bottom: 18px; }
-.library-tab { display: inline-flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 8px; font-size: 12px; color: var(--color-muted); }
-.library-tab[aria-pressed=true] { background: #e6eeea; color: #337465; }
-.library-tab > span { font-size: 10px; opacity: .7; }
-.library-row { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 14px; min-height: 82px; padding: 14px 4px; border-bottom: 1px solid var(--color-line); }
-.library-words .library-glyph { font-size: 26px; }
-.library-glyph { font-size: 32px; line-height: 1.15; overflow-wrap: anywhere; }
-.library-definition { display: grid; gap: 6px; min-width: 0; }
-.library-meaning { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; color: var(--color-muted); font-size: 12px; }
-.library-status { display: flex; align-items: center; gap: 8px; }
 .status-tag { font-size: 10px; color: var(--color-muted); }
 .status-review { color: #337465; }
 .status-learning { color: #987031; }
 .status-new { color: #8a877f; }
-@media (min-width: 640px) { .word-connections { grid-template-columns: 1fr 1.5fr; } }
 @media (min-width: 768px) {
   .app-layout { display: grid; grid-template-columns: 184px minmax(0,1fr); }
   .app-header { position: sticky; top: 0; z-index: 10; height: 100dvh; flex-direction: column; align-items: stretch; padding: 24px 14px; border-right: 1px solid var(--color-line); }
@@ -137,7 +100,6 @@
   .page-header { margin-bottom: 28px; }
   .session-page { height: calc(100dvh - env(safe-area-inset-top)); padding-bottom: 22px; }
   .session-page > .page-header { margin-bottom: 18px; }
-  .word-studio, .reading-lesson { min-height: calc(100dvh - 113px); }
   .rating-buttons { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 /* Mobile review reserves space for the header, safe areas, and navigation. */
@@ -155,9 +117,6 @@
   .rating-buttons { gap: 5px; }
   .rating-button { font-size: 12px; }
   .key-hint { display: none; }
-  .library-row { gap: 10px; }
-  .library-status { flex-direction: column; gap: 2px; }
-  .lesson-footer > p { max-width: 16ch; font-size: 10px; }
 }
 @media (max-height: 650px) {
   .recall-target { gap: 10px; padding-block: 10px; }
@@ -173,103 +132,3 @@
   .sentence-answer { padding: 14px; gap: 8px; }
   .sentence-answer > p { font-size: 26px; }
 }
-
-.settings-nav { display: flex; align-items: center; justify-content: center; gap: 11px; margin-left: auto; width: 44px; height: 44px; border-radius: 9px; color: var(--color-muted); }
-.settings-nav > span { display: none; }
-.settings-nav:hover, .settings-nav[aria-current] { background: #e6eeea; color: var(--color-glaze); }
-.settings-sections { display: grid; gap: 32px; }
-.settings-section { display: grid; justify-items: start; gap: 20px; padding-bottom: 28px; border-bottom: 1px solid var(--color-line); }
-.settings-copy h2 { margin: 0 0 8px; font-size: 16px; font-weight: 650; }
-.settings-copy p, .settings-note { margin: 0; max-width: 52ch; color: var(--color-muted); font-size: 13px; line-height: 1.65; }
-.settings-note { font-size: 11px; }
-.settings-download { display: grid; gap: 14px; width: 100%; max-width: 360px; justify-items: start; }
-.settings-state { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 12px; line-height: 1.6; }
-.settings-progress-label { display: flex; width: 100%; justify-content: space-between; gap: 12px; font-size: 12px; font-variant-numeric: tabular-nums; }
-.settings-progress { width: 100%; height: 6px; border: 0; border-radius: 3px; overflow: hidden; accent-color: var(--color-glaze); background: var(--color-line); }
-.settings-progress::-webkit-progress-bar { background: var(--color-line); }
-.settings-progress::-webkit-progress-value { background: var(--color-glaze); }
-.settings-progress::-moz-progress-bar { background: var(--color-glaze); }
-@media (min-width: 768px) {
-  .settings-nav { width: 100%; margin: auto 0 0; justify-content: flex-start; padding: 0 11px; font-size: 13px; }
-  .settings-nav > span { display: inline; }
-}
-
-.library-filters { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 16px; }
-.library-filters .library-tabs { margin: 0; flex-wrap: wrap; }
-.library-filters select { background: var(--color-paper); border: 1px solid var(--color-line); border-radius: 8px; padding: 8px; font-size: 12px; }
-.library-open { display: grid; grid-template-columns: 68px minmax(0, 1fr) 16px; align-items: center; gap: 14px; text-align: left; width: 100%; min-height: 54px; border-radius: 6px; }
-.library-open:hover { background: var(--color-paper); }
-.library-open:focus-visible { outline: 2px solid var(--color-glaze); outline-offset: 4px; }
-.detail-navigation { margin-bottom: 16px; }
-.detail-navigation > :is(a, button) { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--color-muted); font-size: 12px; }
-.detail-navigation > :is(a, button):hover { color: var(--color-ink); }
-.detail-navigation > a:focus-visible, .palace-tiles > a:focus-visible { outline: 2px solid var(--color-glaze); outline-offset: 3px; }
-.detail-hero { display: grid; justify-items: center; gap: 20px; padding: 16px 0 36px; text-align: center; border-bottom: 1px solid var(--color-line); }
-.detail-hanzi { margin: 0; max-width: 100%; font-size: 140px; line-height: 1.1; overflow-wrap: anywhere; }
-.detail-word { font-size: clamp(56px, 12vw, 100px); }
-.detail-definition { min-width: 0; max-width: 100%; }
-.detail-definition h2 { margin: 12px 0 0; font-size: 20px; font-weight: 500; overflow-wrap: anywhere; }
-.detail-definition .dictionary-meanings { font-size: 13px; line-height: 1.6; }
-.detail-definition .dictionary-meanings > summary { margin-inline: auto; }
-.library-details { display: grid; gap: 28px; padding-block: 28px; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
-.library-details h2 { font-size: 14px; font-weight: 650; margin: 0 0 16px; }
-.library-details > section { min-width: 0; }
-.library-parts { font-size: 26px; margin: 8px 0; }
-.library-clues { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-.library-clues dt { color: var(--color-muted); font-size: 11px; margin-bottom: 4px; }
-.library-clues dd { margin: 0; white-space: pre-wrap; }
-.library-note { white-space: pre-wrap; }
-@media (min-width: 640px) {
-  .detail-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); align-items: center; text-align: left; padding-block: 24px 40px; }
-  .detail-definition { justify-self: start; }
-  .detail-definition .answer-sound { justify-content: flex-start; }
-  .detail-definition .dictionary-meanings > summary { margin-inline: 0; }
-  .library-details { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 32px; }
-}
-@media (max-width: 520px) {
-  .library-open { grid-template-columns: 44px minmax(0, 1fr) 16px; gap: 8px; }
-  .library-entry .library-glyph { font-size: 25px; }
-  .library-clues { grid-template-columns: 1fr; }
-}
-
-.palace-progress { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-block: 1px solid var(--color-line); padding-block: 24px; gap: 24px; }
-.palace-progress-count { display: grid; gap: 8px; font-size: 12px; color: var(--color-muted); }
-.palace-progress-count + div { border-left: 1px solid var(--color-line); padding-left: 24px; }
-.palace-progress-count > span:first-child { font-size: 14px; color: var(--color-ink); }
-.palace-progress-count p { margin: 0; }
-.palace-progress-count strong { font-size: 48px; line-height: 1.2; color: var(--color-glaze); font-weight: 500; font-variant-numeric: tabular-nums; }
-.palace-progress-count progress { width: 100%; height: 4px; appearance: none; border: 0; background: var(--color-line); color: var(--color-glaze); }
-.palace-progress-count small { font-size: 11px; }
-.palace-progress-note { font-size: 11px; color: var(--color-muted); margin: 12px 0 32px; }
-.palace-collection > header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
-.palace-collection h2, .palace-memories h2 { font-size: 16px; margin: 0; font-weight: 600; }
-.palace-collection > header > span, .palace-memories > p { font-size: 12px; color: var(--color-muted); }
-.palace-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; margin-bottom: 16px; }
-.palace-tiles-words { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
-.palace-tiles > a { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 16px 8px; background: var(--color-paper); border: 1px solid var(--color-line); border-radius: 8px; overflow-wrap: anywhere; }
-.palace-tiles > a:hover { border-color: var(--color-glaze); background: #e6eeea; }
-.palace-tiles .font-hanzi { font-size: 30px; }
-.palace-tiles small { font-size: 11px; color: var(--color-muted); }
-.palace-empty { padding-block: 20px; font-size: 13px; color: var(--color-muted); }
-.palace-memories { margin-top: 36px; }
-.palace-clue-group { border-bottom: 1px solid var(--color-line); }
-.palace-clue-group summary { padding-block: 18px; cursor: pointer; font-size: 13px; }
-.palace-clue-group summary > span { font-size: 11px; color: var(--color-muted); margin-left: 12px; }
-.palace-clue-group summary > small { float: right; font-variant-numeric: tabular-nums; }
-.palace-clue-group > p { color: var(--color-muted); font-size: 12px; }
-.palace-mappings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding-bottom: 16px; }
-.palace-mappings > div { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 10px; align-items: baseline; }
-.palace-mappings dt { color: var(--color-glaze); }
-.palace-mappings dd { margin: 0; font-size: 13px; overflow-wrap: anywhere; white-space: pre-wrap; }
-.palace-tone-list { display: grid; gap: 8px; padding-bottom: 16px; }
-.palace-tone-list > div { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 12px; align-items: center; font-size: 13px; }
-@media (max-width: 520px) {
-  .palace-mappings { grid-template-columns: 1fr; }
-  .palace-collection > header { flex-direction: column; gap: 4px; }
-  .palace-progress { gap: 16px; }
-  .palace-progress-count + div { padding-left: 16px; }
-}
-
-.palace-progress-count progress::-webkit-progress-bar { background: var(--color-line); }
-.palace-progress-count progress::-webkit-progress-value { background: var(--color-glaze); }
-.palace-progress-count progress::-moz-progress-bar { background: var(--color-glaze); }

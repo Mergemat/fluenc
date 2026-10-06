@@ -83,8 +83,8 @@ test('a last missed card waits and returns concealed instead of falsely completi
   data = rate(data, 's0', Rating.Again)
   await show(data, 'miss')
   expect(host.textContent).toContain('1 card still needs practice')
-  expect(host.textContent).not.toContain('Reviews finished')
-  expect(host.querySelector('a[href="/lessons"]')).toBeNull()
+  expect(host.textContent).not.toContain('reviews finished')
+  expect(host.textContent).not.toContain('learn new characters')
   data = refreshDueQueues(JSON.parse(JSON.stringify(data)), new Date('2026-09-23T02:01:00.000Z'))
   await show(data, 'miss')
   expect(host.querySelector('.sentence-answer')?.closest('[inert]')).not.toBeNull()
@@ -101,12 +101,14 @@ test('all overdue cards remain in one session beyond twenty reviews', async () =
   }
   expect(host.textContent).toContain('6 ready')
   expect(host.textContent).toContain('Sentence 20')
-  expect(host.textContent).not.toContain('Reviews finished')
+  expect(host.textContent).not.toContain('reviews finished')
   for (let index = 20; index < 26; index += 1) data = rate(data, `s${index}`, Rating.Easy)
   await show(data, 'all-due')
-  expect(host.textContent).toContain('Reviews finished')
-  expect(host.querySelector('a[href="/lessons"]')).not.toBeNull()
-  expect(host.querySelector('a[href="/reading"]')).not.toBeNull()
+  expect(host.textContent).toContain('reviews finished')
+  expect(host.textContent).toContain('learn new characters')
+  // Every sentence is already in reviews, so there is nothing new to read.
+  expect(data.getQueue).toHaveLength(0)
+  expect(host.querySelector('a[href="/reading"]')).toBeNull()
   expect(host.querySelector('.recall-frame')).toBeNull()
 })
 
@@ -128,7 +130,7 @@ test('a learning step becoming due does not replace the currently revealed card'
 
 test('no introduced material leads to learning rather than an invented review session', async () => {
   await show(fixture(0), 'empty')
-  expect(host.textContent).toContain('Start with a lesson')
-  expect(host.querySelector('a[href="/lessons"]')).not.toBeNull()
+  expect(host.textContent).toContain('start with a lesson')
+  expect(host.textContent).toContain('start your first lesson')
   expect(host.querySelector('.recall-frame')).toBeNull()
 })

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./app.css";
+@import "./dither.css";
 
 @font-face {
   font-family: "Fluenc Hanzi";
@@ -16,16 +17,18 @@
 }
 
 @theme {
-  --color-ink: #151515;
-  --color-muted: #66645f;
-  --color-faint: #9b9890;
-  --color-line: #d8d4ca;
-  --color-paper: #fffdf7;
-  --color-canvas: #f1eee5;
-  --color-danger: #c43b27;
-  --color-glaze: #337465;
-  --font-ui: "Arial Nova", "Helvetica Neue", Arial, "Fluenc Hanzi", system-ui, sans-serif;
+  --color-ink: #ececef;
+  --color-muted: #9696a0;
+  --color-faint: #5a5a63;
+  --color-line: #232328;
+  --color-paper: #111114;
+  --color-canvas: #0b0b0d;
+  --color-danger: #ff5f57;
+  --color-glaze: rgb(53 143 243);
+  --color-foreground: #ececef;
+  --font-ui: "Geist", system-ui, "Fluenc Hanzi", sans-serif;
   --font-hanzi: "Fluenc Hanzi", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-hanzi-props: "Noto Sans CJK SC", "Fluenc Hanzi", sans-serif;
   --animate-pop: pop .2s ease-out;
 
@@ -33,7 +36,7 @@
 }
 
 @layer base {
-  :root { color: var(--color-ink); background: var(--color-canvas); font-family: var(--font-ui); font-synthesis: none; }
+  :root { color-scheme: dark; color: var(--color-ink); background: var(--color-canvas); font-family: var(--font-ui); font-synthesis: none; }
   html { -webkit-tap-highlight-color: transparent; }
   body { margin: 0; min-height: 100dvh; background: var(--color-canvas); -webkit-font-smoothing: antialiased; }
   button, input, textarea { font: inherit; }
@@ -50,8 +53,6 @@
 @layer components {
   .study-label { color: var(--color-muted); font-size: 11px; font-weight: 500; }
 }
-
-.writing-pad svg > g > path { filter: url(#fluenc-ink); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
