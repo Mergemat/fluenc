@@ -6,6 +6,17 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   resolve: { tsconfigPaths: true },
+  environments: {
+    client: {
+      build: {
+        rolldownOptions: {
+          // The course catalog ships with the app. Its own chunk keeps its hash, so a code change
+          // does not re-download the course.
+          output: { codeSplitting: { groups: [{ name: 'curriculum', test: /curriculum\.generated\.json/ }] } },
+        },
+      },
+    },
+  },
   optimizeDeps: {
     include: [
       '@ionic/core/components',

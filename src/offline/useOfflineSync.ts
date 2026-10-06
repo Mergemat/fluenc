@@ -1,9 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 
-import type { DashboardData } from '../server/curriculum'
-import { flushProgress, getCachedDashboard, hasPendingProgress, persistDashboard } from './progress'
-import { dashboardQueryOptions, libraryQueryOptions, palaceQueryOptions } from './queries'
+import type { DashboardData } from '../lib/learner-views'
+import { flushProgress, getCachedLearner, hasPendingProgress, persistLearner } from './progress'
+import { learnerQueryOptions } from './queries'
 
 export function useOfflineSync(data: DashboardData) {
   const queryClient = useQueryClient()
@@ -13,15 +13,12 @@ export function useOfflineSync(data: DashboardData) {
     const initialize = async () => {
       const restoreLocal = !navigator.onLine || await hasPendingProgress()
       if (restoreLocal) {
-        const cached = await getCachedDashboard()
-        if (active && cached) queryClient.setQueryData(dashboardQueryOptions.queryKey, cached)
+        const cached = await getCachedLearner()
+        if (active && cached) queryClient.setQueryData(learnerQueryOptions.queryKey, cached)
       } else {
-        const dashboard = queryClient.getQueryData(dashboardQueryOptions.queryKey)
-        if (dashboard) await persistDashboard(dashboard)
-      }
-      if (active) {
-        void queryClient.prefetchQuery(libraryQueryOptions)
-        void queryClient.prefetchQuery(palaceQueryOptions)
+        // State rendered on the server is not on this device yet.
+        const learner = queryClient.getQueryData(learnerQueryOptions.queryKey)
+        if (learner) await persistLearner(learner)
       }
     }
     void initialize().catch(() => undefined)
@@ -33,11 +30,7 @@ export function useOfflineSync(data: DashboardData) {
     const sync = async () => {
       const synced = await flushProgress()
       if (!active || !synced || await hasPendingProgress()) return
-      await Promise.all([
-        queryClient.invalidateQueries(dashboardQueryOptions),
-        queryClient.invalidateQueries(libraryQueryOptions),
-        queryClient.invalidateQueries(palaceQueryOptions),
-      ])
+      await queryClient.invalidateQueries(learnerQueryOptions)
     }
     const runSync = () => void sync().catch(() => undefined)
     // Batch rapid actions and keep retries independent of button completion.

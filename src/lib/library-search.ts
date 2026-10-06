@@ -1,18 +1,18 @@
 import Fuse from 'fuse.js'
-import { convert } from 'pinyin-pro'
 
 import { getItemMeaning } from './meaning'
-import type { LibraryData, PalaceData } from '../server/curriculum'
+import type { LibraryData, PalaceData } from './learner-views'
 
 export type LibraryKind = 'characters' | 'words'
 export type LibraryCharacter = LibraryData['characters'][number] & { kind: 'characters'; approximate?: boolean }
 export type LibraryWord = LibraryData['words'][number] & { kind: 'words'; approximate?: boolean }
 export type LibraryEntry = LibraryCharacter | LibraryWord
 
+/** Toneless pinyin with ü as v: decomposing splits tone marks (and ü's diaeresis) off their letters. */
 function normalizePinyin(value: string) {
-  return convert(value.toLowerCase().normalize('NFC'), { format: 'toneNone' })
-    .replace(/u:|ü|v/g, 'v')
-    .replace(/[1-5\s'’\-]/g, '')
+  return value.toLowerCase().normalize('NFD')
+    .replace(/u\u0308|u:|v/g, 'v')
+    .replace(/[\u0300-\u036f1-5\s'’\-]/g, '')
 }
 
 /** The learner's clue names for an entry, from its movie codes and saved palace names. */

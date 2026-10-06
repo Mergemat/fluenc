@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { persistDashboard, type ProgressSnapshot } from './progress'
-import { dashboardQueryOptions, libraryQueryOptions, palaceQueryOptions } from './queries'
+import { seedLearner, type LearnerSnapshot } from './progress'
+import { learnerQueryOptions } from './queries'
 
-export function useProgressMutation<T>(save: (input: T) => Promise<ProgressSnapshot>) {
+export function useProgressMutation<T>(save: (input: T) => Promise<LearnerSnapshot>) {
   const queryClient = useQueryClient()
   return useMutation({
     mutationKey: ['progress'],
@@ -11,18 +11,12 @@ export function useProgressMutation<T>(save: (input: T) => Promise<ProgressSnaps
     networkMode: 'always',
     mutationFn: save,
     onMutate: async () => {
-      await Promise.all([
-        queryClient.cancelQueries(dashboardQueryOptions),
-        queryClient.cancelQueries(libraryQueryOptions),
-        queryClient.cancelQueries(palaceQueryOptions),
-      ])
-      const dashboard = queryClient.getQueryData(dashboardQueryOptions.queryKey)
-      if (dashboard) await persistDashboard(dashboard)
+      await queryClient.cancelQueries(learnerQueryOptions)
+      const learner = queryClient.getQueryData(learnerQueryOptions.queryKey)
+      if (learner) await seedLearner(learner)
     },
     onSuccess: (snapshot) => {
-      queryClient.setQueryData(dashboardQueryOptions.queryKey, snapshot.dashboard)
-      if (snapshot.library) queryClient.setQueryData(libraryQueryOptions.queryKey, snapshot.library)
-      if (snapshot.palace) queryClient.setQueryData(palaceQueryOptions.queryKey, snapshot.palace)
+      queryClient.setQueryData(learnerQueryOptions.queryKey, snapshot)
     },
   })
 }

@@ -6,11 +6,19 @@ import {
   movieInput,
   reviewInput,
 } from './curriculum.contract'
+import type { LearnerState } from '../lib/learner-state'
 
-export const getDashboard = createServerFn({ method: 'GET' }).handler(async () => {
-  const { getDashboardHandler } = await import('./curriculum.handlers.server')
-  return getDashboardHandler()
+// Learner state is plain JSON; a raw response skips Seroval's larger encoding and slower decode.
+const fetchLearnerState = createServerFn({ method: 'GET' }).handler(async () => {
+  const { getLearnerStateHandler } = await import('./curriculum.handlers.server')
+  return Response.json(await getLearnerStateHandler())
 })
+
+export async function getLearnerState(options?: { signal?: AbortSignal }): Promise<LearnerState> {
+  const response = await fetchLearnerState(options)
+  if (!response.ok) throw new Error(`Request failed with status ${response.status}`)
+  return response.json()
+}
 
 export const reviewItem = createServerFn({ method: 'POST' })
   .validator(reviewInput)
@@ -39,20 +47,3 @@ export const saveLivingLink = createServerFn({ method: 'POST' })
     const { saveLivingLinkHandler } = await import('./curriculum.handlers.server')
     return saveLivingLinkHandler(data)
   })
-
-export const getLibrary = createServerFn({ method: 'GET' }).handler(async () => {
-  const { getLibraryHandler } = await import('./curriculum.handlers.server')
-  return getLibraryHandler()
-})
-
-export const getPalace = createServerFn({ method: 'GET' }).handler(async () => {
-  const { getPalaceHandler } = await import('./curriculum.handlers.server')
-  return getPalaceHandler()
-})
-
-export type DashboardData = Awaited<ReturnType<typeof getDashboard>>
-export type BuildItem = DashboardData['buildQueue'][number]
-export type ReviewItem = DashboardData['reviewQueue'][number]
-export type StudyItem = BuildItem | ReviewItem
-export type LibraryData = Awaited<ReturnType<typeof getLibrary>>
-export type PalaceData = Awaited<ReturnType<typeof getPalace>>

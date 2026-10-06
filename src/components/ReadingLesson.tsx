@@ -3,7 +3,7 @@ import { useState } from 'react'
 
 import { useProgressMutation } from '../offline/useProgressMutation'
 import { saveEnrollment } from '../offline/progress'
-import type { DashboardData } from '../server/curriculum'
+import type { DashboardData } from '../lib/learner-views'
 import { MandarinAudioButton } from './MandarinAudioButton'
 import { Button } from './ui/Button'
 import { ErrorNote } from './ui/Layout'

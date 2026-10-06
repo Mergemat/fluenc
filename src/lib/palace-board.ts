@@ -1,4 +1,4 @@
-import type { LibraryData, PalaceData } from '../server/curriculum'
+import type { LibraryData, PalaceData } from './learner-views'
 import { componentMeanings } from './component-meanings'
 import type { MovieCoordinates } from './pinyin'
 import { defaultToneRooms } from './pinyin'

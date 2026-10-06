@@ -8,6 +8,7 @@ import reviewedJson from '../src/data/reviewed-compositions.json'
 import wordReviews from '../src/data/word-meanings.reviewed.json'
 import { resolveCharacterKeywords } from '../src/lib/curriculum-readings'
 import { resolveWordMeanings } from '../src/lib/word-meanings'
+import { wordSyllables } from '../src/lib/word-syllables'
 import { findHanziComposition, type HanziIndex, type ReviewedComposition } from '../src/lib/hanzi'
 
 const WORDS_URL =
@@ -74,6 +75,8 @@ const frequencyWords = uniqueRecords.map((record) => ({
 const words = resolveWordMeanings(frequencyWords, wordReviews, dictionarySource.entries).map(word => ({
   ...word,
   characterIds: [...new Set(splitHanzi(word.hanzi))],
+  // Precomputed so the app never ships pinyin-pro's dictionary to split a reading.
+  syllables: wordSyllables(word.hanzi, word.pinyin),
 }))
 
 const stats = new Map<string, { rank: number; unlocks: number }>()

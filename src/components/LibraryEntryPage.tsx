@@ -8,9 +8,8 @@ import { useState, type CSSProperties } from 'react'
 import { defaultToneRooms } from '../lib/pinyin'
 import type { LibraryCharacter, LibraryEntry, LibraryWord } from '../lib/library-search'
 import { getItemMeaning } from '../lib/meaning'
-import { wordSyllables } from '../lib/word-syllables'
 import { libraryQueryOptions, palaceQueryOptions } from '../offline/queries'
-import type { LibraryData, PalaceData } from '../server/curriculum'
+import type { LibraryData, PalaceData } from '../lib/learner-views'
 import { clueCode, lessonClues, type Clue } from './CharacterLesson'
 import type { CharacterItem } from './character-studio/types'
 import { DitherButton } from './dither-kit/button'
@@ -114,7 +113,7 @@ function ClueRow({ clue, lit, onHover }: { clue: Clue; lit: boolean; onHover: (c
 
 function WordEntry({ item, library }: { item: LibraryWord; library?: LibraryData }) {
   const meaning = getItemMeaning(item)
-  const syllables = wordSyllables(item.hanzi, item.pinyin)
+  const syllables = item.syllables ?? null
   const characters = item.characterParts.map(part => library?.characters.find(entry => entry.id === part.id))
 
   return <>

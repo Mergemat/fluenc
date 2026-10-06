@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 
 import { directCharacters } from '../lib/character-props'
 import { isLearning, REVIEW_TIME_ZONE } from '../lib/review-schedule'
-import type { DashboardData } from '../server/curriculum'
+import type { DashboardData } from '../lib/learner-views'
 import { ReviewCard } from './ReviewCard'
 import { DitherButton } from './dither-kit/button'
 import { DitherGradient } from './dither-kit/gradient'

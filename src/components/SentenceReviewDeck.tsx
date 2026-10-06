@@ -1,5 +1,5 @@
 import { useReveal } from '../hooks/useReveal'
-import type { ReviewItem } from '../server/curriculum'
+import type { ReviewItem } from '../lib/learner-views'
 import { MandarinAudioButton } from './MandarinAudioButton'
 import { RecallAnswer } from './ui/RecallAnswer'
 import { RecallFrame } from './ui/RecallFrame'

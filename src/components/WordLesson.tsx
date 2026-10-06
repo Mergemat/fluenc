@@ -4,10 +4,9 @@ import { Link2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { getItemMeaning } from '../lib/meaning'
-import { wordSyllables } from '../lib/word-syllables'
 import { saveEnrollment, saveLivingLinkOffline } from '../offline/progress'
 import { useProgressMutation } from '../offline/useProgressMutation'
-import type { BuildItem } from '../server/curriculum'
+import type { BuildItem } from '../lib/learner-views'
 import { DitherButton } from './dither-kit/button'
 import { WordGloss } from './ReviewCard'
 import { Rule } from './ui/Dither'
@@ -18,7 +17,7 @@ type WordItem = Extract<BuildItem, { type: 'word' }>
 
 export function WordLesson({ item }: { item: WordItem }) {
   const meaning = getItemMeaning(item)
-  const syllables = wordSyllables(item.hanzi, item.pinyin)
+  const syllables = item.syllables ?? null
   const single = Array.from(item.hanzi).length === 1
   const [story, setStory] = useState(item.livingLink)
   const trimmed = story.trim()
