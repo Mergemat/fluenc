@@ -40,6 +40,8 @@ const result = await injectManifest({
     'apple-touch-icon.png',
     'manifest.webmanifest',
   ],
+  // Shipped with the Geist family but not used by any stylesheet.
+  globIgnores: ['fonts/geist/GeistPixel-Grid.woff2'],
   maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
 })
 await rm(workerSource)
