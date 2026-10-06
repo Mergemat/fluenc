@@ -137,17 +137,17 @@ export function CharacterLesson({ item, remaining }: { item: CharacterItem; rema
       </div>
     </header>
 
-    <section className="dx-read" aria-label="Character">
-      <div className="dx-glyph-box">
-        <HanziGlyph hanzi={item.hanzi} parts={props.map(prop => prop.code)} highlighted={highlighted} xray={xray}
-          onHover={setHover} onSelect={code => { setPinned(previous => previous === code ? null : code); focusClue(props.find(prop => prop.code === code && !prop.name.trim())) }} />
-      </div>
-      <div className="dx-ident">
-        <h1 className="dx-meaning">{meaning.primary}</h1>
-        <p className="dx-alt">{meaning.also ? `also ${meaning.also}` : ' '}</p>
-        <div className="dx-sound"><MoviePinyin pinyin={item.pinyin} tone={item.movie.tone} actorKey={item.movie.actorKey} finalKey={item.movie.finalKey} /><AudioButton text={item.hanzi} pinyin={item.pinyin} /></div>
-      </div>
-    </section>
+    <section className="dx-read dx-read-character" aria-label="Character"><div className="dx-read-layout">
+        <div className="dx-glyph-box">
+          <HanziGlyph hanzi={item.hanzi} parts={props.map(prop => prop.code)} highlighted={highlighted} xray={xray}
+            onHover={setHover} onSelect={code => { setPinned(previous => previous === code ? null : code); focusClue(props.find(prop => prop.code === code && !prop.name.trim())) }} />
+        </div>
+        <div className="dx-ident">
+          <h1 className="dx-meaning">{meaning.primary}</h1>
+          <p className="dx-alt">{meaning.also ? `also ${meaning.also}` : ' '}</p>
+          <div className="dx-sound"><MoviePinyin pinyin={item.pinyin} tone={item.movie.tone} actorKey={item.movie.actorKey} finalKey={item.movie.finalKey} /><AudioButton text={item.hanzi} pinyin={item.pinyin} /></div>
+        </div>
+    </div></section>
 
     {/* Words that use the character, collapsed to one line: read them before the scene. */}
     <section className="dx-usage" aria-label="In words" aria-busy={usage.pending}>

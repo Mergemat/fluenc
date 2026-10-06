@@ -150,6 +150,16 @@
 .dx-studio p, .dx-studio h1 { margin: 0; }
 .dx-studio > .dx-bar { grid-area: bar; }
 .dx-read { grid-area: read; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+/* The character area picks its own layout from the shape it gets: stacked when tall, side by side
+   when wide for its height — whichever gives the bigger glyph. */
+.dx-read-character { display: block; container: read / size; }
+.dx-read-layout { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+@container read (aspect-ratio > 1.15) {
+  .dx-read-layout { flex-direction: row; gap: 18px; }
+  .dx-read-layout > .dx-glyph-box { flex: 0 1 62%; height: 100%; }
+  .dx-read-layout > .dx-ident { flex: 0 1 36%; min-width: 0; justify-items: start; text-align: left; }
+  .dx-read-layout > .dx-ident .dx-meaning { overflow-wrap: anywhere; }
+}
 .dx-ident { flex-shrink: 0; display: grid; justify-items: center; gap: 3px; text-align: center; max-width: 100%; }
 .dx-meaning { font: 560 26px/1.15 var(--dx-sans); letter-spacing: -.025em; margin: 0; }
 .dx-alt { height: 15px; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font: 11px/15px var(--dx-mono); color: var(--dx-muted); margin: 0; }
@@ -211,7 +221,8 @@
     grid-template-columns: minmax(0, 1fr) minmax(400px, 460px); grid-template-rows: auto minmax(0, 1fr) auto auto auto minmax(0, 1fr);
     grid-template-areas: "bar bar" "read ." "read usage" "read clues" "read actions" "read ."; }
   .dx-read { --glyph-max: 440px; justify-content: center; gap: 18px; }
-  .dx-read > .dx-glyph-box { flex: 0 1 var(--glyph-max); }
+  .dx-read-layout { gap: 18px; }
+  .dx-read-layout > .dx-glyph-box { flex: 0 1 var(--glyph-max); }
   .dx-meaning { font-size: 32px; }
   .dx-py { font-size: 30px; }
   .dx-actions { justify-self: stretch; }
@@ -220,9 +231,6 @@
    height, and each clue is one line: code · name · category or meaning. */
 @media (max-width: 959px) {
   .dx-studio { gap: 10px; padding-top: 6px; }
-  .dx-read:not(.dx-word-read) { flex-direction: row; align-items: center; justify-content: center; gap: 18px; }
-  .dx-read:not(.dx-word-read) > .dx-glyph-box { flex: 0 1 54%; height: 100%; }
-  .dx-read:not(.dx-word-read) > .dx-ident { flex: 0 1 42%; justify-items: start; text-align: left; }
   .dx-meaning { font-size: 28px; }
   .dx-py { font-size: 24px; }
   .dx-alt { height: auto; max-height: 30px; white-space: normal; }
