@@ -3,7 +3,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useId, useMemo, type CSSProperties } from 'react'
 
-import { sentences } from '../../data/sentences'
 import { useMandarinSpeech } from '../../hooks/useMandarinSpeech'
 import { getToneDetail } from '../../lib/tones'
 import { libraryQueryOptions } from '../../offline/queries'
@@ -113,7 +112,7 @@ export function AudioButton({ text, pinyin, label }: { text: string; pinyin: str
 
 export type UsageWord = { id: string; hanzi: string; pinyin: string; meaning: string; chars: { char: string; target: boolean; known: boolean }[]; unknown: number }
 
-/** Words (and a sentence) that use the character, preferring ones built from characters you know. */
+/** Words that use the character, preferring ones built from characters you know. */
 const noExtraKnown: ReadonlySet<string> = new Set()
 export function useUsage(hanzi: string, alsoKnown = noExtraKnown) {
   const library = useQuery(libraryQueryOptions)
@@ -129,11 +128,7 @@ export function useUsage(hanzi: string, alsoKnown = noExtraKnown) {
       })
       .sort((a, b) => a.unknown - b.unknown || a.rank - b.rank)
       .slice(0, 3)
-    const sentence = sentences.find(entry => entry.hanzi.includes(hanzi))
-    return {
-      words,
-      sentence: sentence ? { ...sentence, chars: Array.from(sentence.hanzi).map(char => ({ char, target: char === hanzi, known: char === hanzi || known.has(char) || !/\p{Script=Han}/u.test(char) })) } : null,
-    }
+    return { words }
   }, [library.data, hanzi, alsoKnown])
   return { data: result, pending: library.isPending, error: library.isError, retry: () => void library.refetch() }
 }
