@@ -1,39 +1,27 @@
 [
   {
     "character": "人",
-    "components": [
-      "丿",
-      "㇏"
-    ],
+    "components": ["丿", "㇏"],
     "structure": "compound",
     "decomposition": "⿰丿㇏",
     "approximate": false,
     "note": "Mnemonic props: left-falling stroke and right-falling stroke.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "那",
-    "components": [
-      "𭃂",
-      "阝"
-    ],
+    "components": ["𭃂", "阝"],
     "structure": "compound",
     "decomposition": "⿰𭃂阝",
     "approximate": false,
     "note": "BabelStone selected IDS; preserve the sound-side shape 𭃂 and right 阝.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "已",
-    "components": [
-      "已"
-    ],
+    "components": ["已"],
     "structure": "atomic",
     "decomposition": "已",
     "approximate": false,
@@ -46,10 +34,7 @@
   },
   {
     "character": "先",
-    "components": [
-      "𠂒",
-      "儿"
-    ],
+    "components": ["𠂒", "儿"],
     "structure": "compound",
     "decomposition": "⿱𠂒儿",
     "approximate": false,
@@ -62,9 +47,7 @@
   },
   {
     "character": "又",
-    "components": [
-      "又"
-    ],
+    "components": ["又"],
     "structure": "atomic",
     "decomposition": "又",
     "approximate": false,
@@ -77,11 +60,7 @@
   },
   {
     "character": "會",
-    "components": [
-      "𠆢",
-      "一",
-      "𭥴"
-    ],
+    "components": ["𠆢", "一", "𭥴"],
     "structure": "compound",
     "decomposition": "⿱⿵𠆢一𭥴",
     "approximate": false,
@@ -94,12 +73,7 @@
   },
   {
     "character": "心",
-    "components": [
-      "㇒",
-      "乚",
-      "丶",
-      "丶"
-    ],
+    "components": ["㇒", "乚", "丶", "丶"],
     "structure": "compound",
     "decomposition": "⿰㇒⿻乚⿰丶丶",
     "approximate": false,
@@ -112,10 +86,7 @@
   },
   {
     "character": "世",
-    "components": [
-      "廿",
-      "𠃊"
-    ],
+    "components": ["廿", "𠃊"],
     "structure": "compound",
     "decomposition": "⿻廿𠃊",
     "approximate": false,
@@ -128,10 +99,7 @@
   },
   {
     "character": "择",
-    "components": [
-      "扌",
-      "𠬤"
-    ],
+    "components": ["扌", "𠬤"],
     "structure": "compound",
     "decomposition": "⿰扌𠬤",
     "approximate": false,
@@ -144,10 +112,7 @@
   },
   {
     "character": "衣",
-    "components": [
-      "亠",
-      "𧘇"
-    ],
+    "components": ["亠", "𧘇"],
     "structure": "compound",
     "decomposition": "⿱亠𧘇",
     "approximate": false,
@@ -160,10 +125,7 @@
   },
   {
     "character": "声",
-    "components": [
-      "士",
-      "𠃜"
-    ],
+    "components": ["士", "𠃜"],
     "structure": "compound",
     "decomposition": "⿱士𠃜",
     "approximate": false,
@@ -176,10 +138,7 @@
   },
   {
     "character": "赛",
-    "components": [
-      "𡨄",
-      "贝"
-    ],
+    "components": ["𡨄", "贝"],
     "structure": "compound",
     "decomposition": "⿱𡨄贝",
     "approximate": false,
@@ -192,9 +151,7 @@
   },
   {
     "character": "入",
-    "components": [
-      "入"
-    ],
+    "components": ["入"],
     "structure": "atomic",
     "decomposition": "入",
     "approximate": false,
@@ -207,10 +164,7 @@
   },
   {
     "character": "乎",
-    "components": [
-      "𠂌",
-      "丷"
-    ],
+    "components": ["𠂌", "丷"],
     "structure": "compound",
     "decomposition": "⿻𠂌丷",
     "approximate": false,
@@ -223,11 +177,7 @@
   },
   {
     "character": "尸",
-    "components": [
-      "㇕",
-      "一",
-      "丿"
-    ],
+    "components": ["㇕", "一", "丿"],
     "structure": "compound",
     "decomposition": null,
     "approximate": false,
@@ -240,11 +190,7 @@
   },
   {
     "character": "令",
-    "components": [
-      "𠆢",
-      "丶",
-      "龴"
-    ],
+    "components": ["𠆢", "丶", "龴"],
     "structure": "compound",
     "decomposition": "⿱⿵𠆢丶龴",
     "approximate": false,
@@ -257,10 +203,7 @@
   },
   {
     "character": "面",
-    "components": [
-      "丆",
-      "囬"
-    ],
+    "components": ["丆", "囬"],
     "structure": "compound",
     "decomposition": "⿱丆囬",
     "approximate": false,
@@ -273,10 +216,7 @@
   },
   {
     "character": "击",
-    "components": [
-      "𰀁",
-      "凵"
-    ],
+    "components": ["𰀁", "凵"],
     "structure": "compound",
     "decomposition": "⿱𰀁凵",
     "approximate": false,
@@ -289,11 +229,7 @@
   },
   {
     "character": "疑",
-    "components": [
-      "𠤕",
-      "龴",
-      "疋"
-    ],
+    "components": ["𠤕", "龴", "疋"],
     "structure": "compound",
     "decomposition": "⿰𠤕⿱龴疋",
     "approximate": false,
@@ -306,10 +242,7 @@
   },
   {
     "character": "坚",
-    "components": [
-      "𰀡",
-      "土"
-    ],
+    "components": ["𰀡", "土"],
     "structure": "compound",
     "decomposition": "⿱𰀡土",
     "approximate": false,
@@ -322,12 +255,7 @@
   },
   {
     "character": "黑",
-    "components": [
-      "囗",
-      "丷",
-      "土",
-      "灬"
-    ],
+    "components": ["囗", "丷", "土", "灬"],
     "structure": "compound",
     "decomposition": "⿱⿱⿴囗丷土灬",
     "approximate": true,
@@ -341,11 +269,7 @@
   },
   {
     "character": "介",
-    "components": [
-      "𠆢",
-      "丿",
-      "丨"
-    ],
+    "components": ["𠆢", "丿", "丨"],
     "structure": "compound",
     "decomposition": "⿱𠆢⿰丿丨",
     "approximate": false,
@@ -358,10 +282,7 @@
   },
   {
     "character": "斗",
-    "components": [
-      "十",
-      "⺀"
-    ],
+    "components": ["十", "⺀"],
     "structure": "compound",
     "decomposition": "⿽十⺀",
     "approximate": false,
@@ -374,560 +295,367 @@
   },
   {
     "character": "由",
-    "components": [
-      "日",
-      "丨"
-    ],
+    "components": ["日", "丨"],
     "structure": "compound",
     "decomposition": "⿻日丨",
     "approximate": false,
     "note": "Replaces the misleading whole-shape 田 split; BabelStone shows the central vertical overlaid through 日.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "也",
-    "components": [
-      "乜",
-      "丨"
-    ],
+    "components": ["乜", "丨"],
     "structure": "compound",
     "decomposition": "⿻乜丨",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "自",
-    "components": [
-      "㇒",
-      "目"
-    ],
+    "components": ["㇒", "目"],
     "structure": "compound",
     "decomposition": "⿱㇒目",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "才",
-    "components": [
-      "𬺰",
-      "㇒"
-    ],
+    "components": ["𬺰", "㇒"],
     "structure": "compound",
     "decomposition": "⿹𬺰㇒",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "白",
-    "components": [
-      "㇒",
-      "日"
-    ],
+    "components": ["㇒", "日"],
     "structure": "compound",
     "decomposition": "⿱㇒日",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "继",
-    "components": [
-      "纟",
-      "𠃊",
-      "米"
-    ],
+    "components": ["纟", "𠃊", "米"],
     "structure": "compound",
     "decomposition": "⿰纟⿺𠃊米",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "永",
-    "components": [
-      "丶",
-      "水"
-    ],
+    "components": ["丶", "水"],
     "structure": "compound",
     "decomposition": "〾⿱丶水",
     "approximate": true,
     "note": "The dot sits above a modified 水 shape. Its central stroke joins the top of the character.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "弟",
-    "components": [
-      "丷",
-      "𢎨"
-    ],
+    "components": ["丷", "𢎨"],
     "structure": "compound",
     "decomposition": "⿱丷𢎨",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "每",
-    "components": [
-      "𠂉",
-      "母"
-    ],
+    "components": ["𠂉", "母"],
     "structure": "compound",
     "decomposition": "⿱𠂉母",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "手",
-    "components": [
-      "㇒",
-      "二",
-      "亅"
-    ],
+    "components": ["㇒", "二", "亅"],
     "structure": "compound",
     "decomposition": "⿱㇒⿻二亅",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "沒",
-    "components": [
-      "氵",
-      "勹",
-      "又"
-    ],
+    "components": ["氵", "勹", "又"],
     "structure": "compound",
     "decomposition": "⿰氵⿱勹又",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "赢",
-    "components": [
-      "吂",
-      "月",
-      "贝",
-      "凡"
-    ],
+    "components": ["吂", "月", "贝", "凡"],
     "structure": "compound",
     "decomposition": "⿱吂⿲月贝凡",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "伤",
-    "components": [
-      "亻",
-      "𱐩"
-    ],
+    "components": ["亻", "𱐩"],
     "structure": "compound",
     "decomposition": "⿰亻𱐩",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "水",
-    "components": [
-      "㇇",
-      "𰛅"
-    ],
+    "components": ["㇇", "𰛅"],
     "structure": "compound",
     "decomposition": "⿰㇇𰛅",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "亡",
-    "components": [
-      "亠",
-      "𠃊"
-    ],
+    "components": ["亠", "𠃊"],
     "structure": "compound",
     "decomposition": "⿱亠𠃊",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "久",
-    "components": [
-      "久"
-    ],
+    "components": ["久"],
     "structure": "atomic",
     "decomposition": "久",
     "approximate": false,
     "note": "BabelStone marks this glyph as terminal; retain the whole glyph as one intentional atomic shape.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "派",
-    "components": [
-      "氵",
-      "𠂢"
-    ],
+    "components": ["氵", "𠂢"],
     "structure": "compound",
     "decomposition": "⿰氵𠂢",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "制",
-    "components": [
-      "牛",
-      "冂",
-      "刂"
-    ],
+    "components": ["牛", "冂", "刂"],
     "structure": "compound",
     "decomposition": "⿰⿻牛冂刂",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "承",
-    "components": [
-      "氶",
-      "三"
-    ],
+    "components": ["氶", "三"],
     "structure": "compound",
     "decomposition": "⿻氶三",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "足",
-    "components": [
-      "口",
-      "龰"
-    ],
+    "components": ["口", "龰"],
     "structure": "compound",
     "decomposition": "⿱口龰",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "乔",
-    "components": [
-      "夭",
-      "丿",
-      "丨"
-    ],
+    "components": ["夭", "丿", "丨"],
     "structure": "compound",
     "decomposition": "⿱夭⿰丿丨",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "族",
-    "components": [
-      "方",
-      "𠂉",
-      "矢"
-    ],
+    "components": ["方", "𠂉", "矢"],
     "structure": "compound",
     "decomposition": "⿰方⿱𠂉矢",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "万",
-    "components": [
-      "丆",
-      "𠃌"
-    ],
+    "components": ["丆", "𠃌"],
     "structure": "compound",
     "decomposition": "⿸丆𠃌",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "步",
-    "components": [
-      "止",
-      "𣥂"
-    ],
+    "components": ["止", "𣥂"],
     "structure": "compound",
     "decomposition": "⿱止𣥂",
     "approximate": false,
     "note": "Replaces the unparseable curriculum placeholder with the exact BabelStone selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "不",
-    "components": [
-      "丆",
-      "丨",
-      "丶"
-    ],
+    "components": ["丆", "丨", "丶"],
     "structure": "compound",
     "decomposition": "⿸丆⿰丨丶",
     "approximate": false,
     "note": "Outer left-falling/horizontal frame with the inner vertical and dot retained as separate visible shapes.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "有",
-    "components": [
-      "𠂇",
-      "⺝"
-    ],
+    "components": ["𠂇", "⺝"],
     "structure": "compound",
     "decomposition": "⿸𠂇⺝",
     "approximate": false,
     "note": "Left slanting frame over the moon-like lower box.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "一",
-    "components": [
-      "一"
-    ],
+    "components": ["一"],
     "structure": "atomic",
     "decomposition": null,
     "approximate": false,
     "note": "Single horizontal stroke is intentionally treated as a whole shape.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "己",
-    "components": [
-      "己"
-    ],
+    "components": ["己"],
     "structure": "atomic",
     "decomposition": null,
     "approximate": false,
     "note": "The complete hooked 己 silhouette is intentionally treated as one teaching shape.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "经",
-    "components": [
-      "纟",
-      "𢀖"
-    ],
+    "components": ["纟", "𢀖"],
     "structure": "compound",
     "decomposition": "⿰纟𢀖",
     "approximate": false,
     "note": "Silk radical beside the compact 𢀖 right-hand shape.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "方",
-    "components": [
-      "丶",
-      "万"
-    ],
+    "components": ["丶", "万"],
     "structure": "compound",
     "decomposition": "⿱丶万",
     "approximate": false,
     "note": "Top dot over the 万-shaped body.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "友",
-    "components": [
-      "𠂇",
-      "又"
-    ],
+    "components": ["𠂇", "又"],
     "structure": "compound",
     "decomposition": "⿸𠂇又",
     "approximate": false,
     "note": "Left slanting frame enclosing/overlapping 又.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "发",
-    "components": [
-      "𠃋",
-      "丿",
-      "又",
-      "丶"
-    ],
+    "components": ["𠃋", "丿", "又", "丶"],
     "structure": "compound",
     "decomposition": "⿺⿸⿻𠃋丿又丶",
     "approximate": false,
     "note": "Nested lower-right construction; retain both the crossing stroke group and the final dot.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "非",
-    "components": [
-      "三",
-      "丨",
-      "丨",
-      "三"
-    ],
+    "components": ["三", "丨", "丨", "三"],
     "structure": "compound",
     "decomposition": "⿰⿰三丨⿰丨三",
     "approximate": false,
     "note": "Two mirrored 三 groups with one inner vertical on each side; duplicate verticals are intentional.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "女",
-    "components": [
-      "女"
-    ],
+    "components": ["女"],
     "structure": "atomic",
     "decomposition": null,
     "approximate": false,
     "note": "The complete 女 silhouette is intentionally treated as one teaching shape.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "用",
-    "components": [
-      "⺆",
-      "𰀁"
-    ],
+    "components": ["⺆", "𰀁"],
     "structure": "compound",
     "decomposition": "⿵⺆𰀁",
     "approximate": false,
     "note": "Outer curved frame over the inner 𰀁 shape.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "年",
-    "components": [
-      "𠂉",
-      "㐄"
-    ],
+    "components": ["𠂉", "㐄"],
     "structure": "compound",
     "decomposition": "⿱𠂉㐄",
     "approximate": false,
     "note": "BabelStone {48} is expanded per its header as 㐄.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "马",
-    "components": [
-      "㇕",
-      "㇉",
-      "一"
-    ],
+    "components": ["㇕", "㇉", "一"],
     "structure": "compound",
     "decomposition": null,
     "approximate": true,
@@ -941,197 +669,127 @@
   },
   {
     "character": "司",
-    "components": [
-      "𠃌",
-      "𠮛"
-    ],
+    "components": ["𠃌", "𠮛"],
     "structure": "compound",
     "decomposition": "⿹𠃌𠮛",
     "approximate": false,
     "note": "Hooked outer stroke around the compact 𠮛 mouth-like body.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "长",
-    "components": [
-      "一",
-      "𠄌",
-      "㇒",
-      "乀"
-    ],
+    "components": ["一", "𠄌", "㇒", "乀"],
     "structure": "compound",
     "decomposition": "⿸⿺⿻一𠄌㇒乀",
     "approximate": false,
     "note": "Retain the four visible stroke/shape units in the nested long-form construction.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "母",
-    "components": [
-      "母"
-    ],
+    "components": ["母"],
     "structure": "atomic",
     "decomposition": null,
     "approximate": false,
     "note": "The complete 母 silhouette is intentionally treated as one teaching shape.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "士",
-    "components": [
-      "一",
-      "丄"
-    ],
+    "components": ["一", "丄"],
     "structure": "compound",
     "decomposition": "⿻一丄",
     "approximate": false,
     "note": "Top horizontal over the lower 丄 shape.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "片",
-    "components": [
-      "丿",
-      "丄",
-      "𠃍"
-    ],
+    "components": ["丿", "丄", "𠃍"],
     "structure": "compound",
     "decomposition": "⿰丿⿱丄𠃍",
     "approximate": false,
     "note": "Left falling stroke beside the stacked 丄/𠃍 body.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "力",
-    "components": [
-      "𠃌",
-      "丿"
-    ],
+    "components": ["𠃌", "丿"],
     "structure": "compound",
     "decomposition": "⿻𠃌丿",
     "approximate": false,
     "note": "Hooked stroke crossed/overlaid by a falling stroke.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "身",
-    "components": [
-      "𨈑",
-      "㇒"
-    ],
+    "components": ["𨈑", "㇒"],
     "structure": "compound",
     "decomposition": "⿻𨈑㇒",
     "approximate": false,
     "note": "Use the compact body 𨈑 plus the overlaid falling stroke.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "单",
-    "components": [
-      "丷",
-      "甲",
-      "一"
-    ],
+    "components": ["丷", "甲", "一"],
     "structure": "compound",
     "decomposition": "⿱丷⿻甲一",
     "approximate": false,
     "note": "Top 丷 over the 甲-like body with its added bottom horizontal.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "曾",
-    "components": [
-      "丷",
-      "𭥴"
-    ],
+    "components": ["丷", "𭥴"],
     "structure": "compound",
     "decomposition": "⿱丷𭥴",
     "approximate": false,
     "note": "Top 丷 over the compact lower 𭥴 shape.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "释",
-    "components": [
-      "釆",
-      "𠬤"
-    ],
+    "components": ["釆", "𠬤"],
     "structure": "compound",
     "decomposition": "⿰釆𠬤",
     "approximate": false,
     "note": "釆 beside the 𠬤 right-hand shape.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "鬼",
-    "components": [
-      "㇒",
-      "日",
-      "丿",
-      "乚",
-      "厶"
-    ],
+    "components": ["㇒", "日", "丿", "乚", "厶"],
     "structure": "compound",
     "decomposition": "⿷⿱㇒⿸⿻日丿乚厶",
     "approximate": false,
     "note": "Nested enclosing construction; preserve each visible terminal, including the final 厶.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "乐",
-    "components": [
-      "㇒",
-      "𠃋",
-      "小"
-    ],
+    "components": ["㇒", "𠃋", "小"],
     "structure": "compound",
     "decomposition": "⿻⿱㇒𠃋小",
     "approximate": false,
     "note": "Upper falling/crossing strokes over 小.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "飞",
-    "components": [
-      "㇤",
-      "冫"
-    ],
+    "components": ["㇤", "冫"],
     "structure": "compound",
     "decomposition": null,
     "approximate": true,
@@ -1145,106 +803,67 @@
   },
   {
     "character": "气",
-    "components": [
-      "𠂉",
-      "一",
-      "⺄"
-    ],
+    "components": ["𠂉", "一", "⺄"],
     "structure": "compound",
     "decomposition": "⿳𠂉一⺄",
     "approximate": false,
     "note": "Three visible stacked units: 𠂉, 一, and the hooked 乞-like tail.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "紧",
-    "components": [
-      "𰀡",
-      "糸"
-    ],
+    "components": ["𰀡", "糸"],
     "structure": "compound",
     "decomposition": "⿱𰀡糸",
     "approximate": false,
     "note": "Compact upper 𰀡 over 糸.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "门",
-    "components": [
-      "丨",
-      "丶",
-      "𠃌"
-    ],
+    "components": ["丨", "丶", "𠃌"],
     "structure": "compound",
     "decomposition": "⿲丨丶𠃌",
     "approximate": false,
     "note": "Three side-by-side visible strokes forming the simplified gate shape.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "监",
-    "components": [
-      "𰀢",
-      "皿"
-    ],
+    "components": ["𰀢", "皿"],
     "structure": "compound",
     "decomposition": "⿱𰀢皿",
     "approximate": false,
     "note": "Compact upper 𰀢 over the vessel-like 皿.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "书",
-    "components": [
-      "𠃍",
-      "𠃌",
-      "丨",
-      "丶"
-    ],
+    "components": ["𠃍", "𠃌", "丨", "丶"],
     "structure": "compound",
     "decomposition": "⿺⿻⿱𠃍𠃌丨丶",
     "approximate": false,
     "note": "Nested hooked body with the vertical and final dot retained.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "敢",
-    "components": [
-      "乛",
-      "耳",
-      "攵"
-    ],
+    "components": ["乛", "耳", "攵"],
     "structure": "compound",
     "decomposition": "⿰⿱乛耳攵",
     "approximate": false,
     "note": "Upper 乛 over 耳 beside 攵; G-form selected.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "之",
-    "components": [
-      "丶",
-      "㇇",
-      "㇝"
-    ],
+    "components": ["丶", "㇇", "㇝"],
     "structure": "compound",
     "decomposition": null,
     "approximate": true,
@@ -1258,174 +877,112 @@
   },
   {
     "character": "节",
-    "components": [
-      "艹",
-      "𰆊"
-    ],
+    "components": ["艹", "𰆊"],
     "structure": "compound",
     "decomposition": "⿱艹𰆊",
     "approximate": false,
     "note": "Grass radical over the compact lower 𰆊 shape.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "丢",
-    "components": [
-      "㇒",
-      "去"
-    ],
+    "components": ["㇒", "去"],
     "structure": "compound",
     "decomposition": "⿱㇒去",
     "approximate": false,
     "note": "Correct the existing 王/厶 split: BabelStone’s G shape is a falling stroke over 去.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "里",
-    "components": [
-      "日",
-      "土"
-    ],
+    "components": ["日", "土"],
     "structure": "compound",
     "decomposition": "⿻日土",
     "approximate": false,
     "note": "Correct the existing 田/土 split: the modern glyph shares the 日 and 土 forms with an overlaid vertical.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "医",
-    "components": [
-      "匚",
-      "矢"
-    ],
+    "components": ["匚", "矢"],
     "structure": "compound",
     "decomposition": "⿷匚矢",
     "approximate": false,
     "note": "G-source curriculum glyph uses 匚; the existing 匸 is the HT source variant. Replaces ⿷匸矢 with the exact selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "拜",
-    "components": [
-      "㇒",
-      "二",
-      "丿",
-      "干",
-      "二"
-    ],
+    "components": ["㇒", "二", "丿", "干", "二"],
     "structure": "compound",
     "decomposition": "⿰⿱㇒⿻二丿⿻干二",
     "approximate": false,
     "note": "Existing hand+hand split is visibly wrong; the right half is a 干-like stroke group, not 手. Replaces ⿰手手 with the exact selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "原",
-    "components": [
-      "厂",
-      "白",
-      "小"
-    ],
+    "components": ["厂", "白", "小"],
     "structure": "compound",
     "decomposition": "⿸厂⿱白小",
     "approximate": false,
     "note": "Existing 泉 adds the wrong water-bottom shape; the visible lower form is 白 over 小. Replaces ⿸厂泉 with the exact selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "同",
-    "components": [
-      "冂",
-      "𠮛"
-    ],
+    "components": ["冂", "𠮛"],
     "structure": "compound",
     "decomposition": "⿵冂𠮛",
     "approximate": false,
     "note": "Existing 凡 adds slanted/dot strokes absent from 同; the frame is 冂 around the inner 𠮛 group. Replaces ⿵凡口 with the exact selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "翰",
-    "components": [
-      "𠦝",
-      "𠆢",
-      "羽"
-    ],
+    "components": ["𠦝", "𠆢", "羽"],
     "structure": "compound",
     "decomposition": "⿰𠦝⿱𠆢羽",
     "approximate": false,
     "note": "Existing 倝+羽 misplaces the 𠆢 strokes; the source glyph is 𠦝 beside 𠆢 over 羽. Replaces ⿰倝羽 with the exact selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "尝",
-    "components": [
-      "龸",
-      "云"
-    ],
+    "components": ["龸", "云"],
     "structure": "compound",
     "decomposition": "⿱龸云",
     "approximate": false,
     "note": "Existing 尚 introduces the wrong enclosed top; the G glyph uses 龸 over 云. Replaces ⿱尚云 with the exact selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "半",
-    "components": [
-      "丷",
-      "𰀁"
-    ],
+    "components": ["丷", "𰀁"],
     "structure": "compound",
     "decomposition": "⿻丷𰀁",
     "approximate": false,
     "note": "Existing 牛 adds the wrong slant/stroke pattern; the lower form is the 二-plus-丨 group 𰀁. Replaces ⿻丷牛 with the exact selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
     "character": "班",
-    "components": [
-      "𤣩",
-      "丶",
-      "丿",
-      "王"
-    ],
+    "components": ["𤣩", "丶", "丿", "王"],
     "structure": "compound",
     "decomposition": "⿲𤣩⿰丶丿王",
     "approximate": false,
     "note": "Existing 刂 is the wrong middle shape; the G glyph has the paired 丶/丿 strokes between the two jade forms. Replaces ⿲王刂王 with the exact selected IDS.",
-    "sources": [
-      "https://babelstone.co.uk/CJK/IDS.TXT"
-    ],
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
   },
   {
@@ -1436,10 +993,7 @@
       "https://github.com/skishore/makemeahanzi/blob/master/graphics.txt"
     ],
     "confidence": "verified",
-    "components": [
-      "𠂉",
-      "土"
-    ],
+    "components": ["𠂉", "土"],
     "decomposition": "⿱𠂉土",
     "note": "The upper slant and horizontal form 𠂉; the remaining three strokes form 土."
   },
@@ -1451,11 +1005,7 @@
       "https://github.com/skishore/makemeahanzi/blob/master/graphics.txt"
     ],
     "confidence": "verified",
-    "components": [
-      "一",
-      "氺",
-      "丶"
-    ],
+    "components": ["一", "氺", "丶"],
     "decomposition": "⿻⿻一氺丶",
     "note": "The final upper-right dot is a separate prop alongside 一 and the water shape 氺."
   },
@@ -1467,11 +1017,7 @@
       "https://github.com/skishore/makemeahanzi/blob/master/graphics.txt"
     ],
     "confidence": "verified",
-    "components": [
-      "丷",
-      "一",
-      "自"
-    ],
+    "components": ["丷", "一", "自"],
     "decomposition": "⿳丷一自",
     "note": "The horizontal below 丷 is separate from the six strokes of 自."
   }

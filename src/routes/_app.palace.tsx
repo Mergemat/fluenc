@@ -1,19 +1,19 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-import { PalaceView } from '../components/PalaceView'
-import { oneOf, optionalString } from '../lib/search-params'
+import { PalaceView } from "../components/palace-view";
+import { oneOf, optionalString } from "../lib/search-params";
 
-type PalaceSearch = {
-  tab?: 'cast' | 'sets' | 'areas' | 'props'
-  q?: string
-  show?: 'all' | 'named' | 'open'
+interface PalaceSearch {
+  q?: string;
+  show?: "all" | "named" | "open";
+  tab?: "cast" | "sets" | "areas" | "props";
 }
 
-export const Route = createFileRoute('/_app/palace')({
+export const Route = createFileRoute("/_app/palace")({
   validateSearch: (search: Record<string, unknown>): PalaceSearch => ({
-    tab: oneOf(search.tab, ['cast', 'sets', 'areas', 'props']),
+    tab: oneOf(search.tab, ["cast", "sets", "areas", "props"]),
     q: optionalString(search.q),
-    show: oneOf(search.show, ['all', 'named', 'open']),
+    show: oneOf(search.show, ["all", "named", "open"]),
   }),
   component: PalaceView,
-})
+});
