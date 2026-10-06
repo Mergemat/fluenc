@@ -220,32 +220,39 @@
   .dx-sentence { height: 54px; }
   .dx-actions { justify-self: stretch; }
 }
-@media (max-height: 760px) and (max-width: 959px) {
-  .dx-studio { gap: 9px; padding-top: 6px; }
-  .dx-meaning { font-size: 22px; }
-  .dx-py { font-size: 22px; }
-  .dx-row { height: 48px; }
-  .dx-usage-list { height: 46px; }
-  .dx-word-en { font-size: 11px; }
+/* Phones: the character comes first. Meaning and pinyin sit beside it so the glyph gets the
+   height, and each clue is one line: code · name · category or meaning. */
+@media (max-width: 959px) {
+  .dx-studio { gap: 10px; padding-top: 6px; }
+  .dx-read:not(.dx-word-read) { flex-direction: row; align-items: center; justify-content: center; gap: 18px; }
+  .dx-read:not(.dx-word-read) > .dx-glyph-box { flex: 0 1 54%; height: 100%; }
+  .dx-read:not(.dx-word-read) > .dx-ident { flex: 0 1 42%; justify-items: start; text-align: left; }
+  .dx-meaning { font-size: 28px; }
+  .dx-py { font-size: 24px; }
+  .dx-alt { height: auto; max-height: 30px; white-space: normal; }
+  .dx-row { grid-template-columns: 46px minmax(0, 1fr) auto; grid-template-rows: auto; align-items: center; column-gap: 10px; height: 48px; }
+  .dx-row > .dx-code { grid-row: 1; }
+  .dx-row > .dx-input { grid-column: 2; grid-row: 1; }
+  .dx-row > .dx-role { grid-column: 3; grid-row: 1; max-width: 9em; text-align: right; }
+  .dx-studio[data-dense=true] .dx-rows-props .dx-row { grid-template-columns: 42px minmax(0, 1fr); grid-template-rows: auto auto; height: 52px; }
+  .dx-studio[data-dense=true] .dx-rows-props .dx-row > .dx-code { grid-row: 1 / 3; }
+  .dx-studio[data-dense=true] .dx-rows-props .dx-row > .dx-role { grid-column: 2; grid-row: 1; max-width: none; text-align: left; }
+  .dx-studio[data-dense=true] .dx-rows-props .dx-row > .dx-input { grid-row: 2; height: 22px; }
+  .dx-usage-list { height: 42px; }
+  .dx-word { grid-template-rows: auto; padding: 0 10px; }
+  .dx-word-py { display: none; }
+  .dx-usage-hanzi { grid-column: 1; grid-row: 1; font-size: 17px; }
+  .dx-word-en { grid-column: 2; grid-row: 1; }
 }
-/* Short phones: character beside its meaning and pinyin, so the clue rows can stay large. */
-@media (max-height: 700px) and (max-width: 959px) {
-  .dx-read { flex-direction: row; justify-content: center; gap: 18px; }
-  .dx-read > .dx-glyph-box { flex: 0 1 46%; height: 100%; }
-  .dx-ident { justify-items: start; text-align: left; }
-}
-@media (max-height: 660px) and (max-width: 959px) {
+@media (max-height: 680px) and (max-width: 959px) {
   .dx-studio { gap: 7px; }
   .dx-alt { display: none; }
-  .dx-sound { margin-top: 2px; }
-  .dx-usage-list { height: 38px; }
-  .dx-word { grid-template-rows: auto; padding: 0 9px; }
-  .dx-word-py { display: none; }
-  .dx-word-en { grid-column: auto; grid-row: 1; }
+  .dx-row { height: 42px; }
   .dx-action { height: 44px; }
-  .dx-row { height: 44px; }
-  .dx-code.font-hanzi-props { font-size: 26px; }
+  .dx-code.font-hanzi-props { font-size: 24px; }
 }
+/* Keyboard hints mean nothing on a touchscreen. */
+@media (pointer: coarse) { .dx-shell kbd { display: none; } }
 
 /* ── Writing sheet ───────────────────────────────── */
 .dx-sheet-backdrop { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; background: color-mix(in srgb, var(--dx-bg) 70%, transparent); backdrop-filter: blur(3px); animation: dx-enter .16s ease-out; }
