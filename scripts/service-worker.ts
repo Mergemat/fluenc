@@ -44,6 +44,7 @@ registerRoute(new NavigationRoute(createHandlerBoundToURL('/offline.html'), {
   allowlist: [
     /^\/(?:review|lessons|reading|library|palace|settings)?\/?(?:\?.*)?$/,
     /^\/library\/(?:characters|words)\/[^/?]+\/?(?:\?.*)?$/,
+    /^\/palace\/(?:cast|sets|areas|props)\/[^/?]+\/?(?:\?.*)?$/,
   ],
 }))
 
