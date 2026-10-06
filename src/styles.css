@@ -1,16 +1,15 @@
 @import "tailwindcss";
-@import "./app.css";
 @import "./dither.css";
 
 @font-face {
   font-family: "Fluenc Hanzi";
-  src: url('/fonts/fluenc-hanzi.woff2') format('woff2');
+  src: url("/fonts/fluenc-hanzi.woff2") format("woff2");
   font-display: swap;
 }
 
 @font-face {
   font-family: "Noto Sans CJK SC";
-  src: url('/fonts/noto-sans-sc-props.woff2') format('woff2');
+  src: url("/fonts/noto-sans-sc-props.woff2") format("woff2");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -27,33 +26,83 @@
   --color-glaze: rgb(53 143 243);
   --color-foreground: #ececef;
   --font-ui: "Geist", system-ui, "Fluenc Hanzi", sans-serif;
-  --font-hanzi: "Fluenc Hanzi", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  --font-hanzi:
+    "Fluenc Hanzi", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei",
+    sans-serif;
   --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-hanzi-props: "Noto Sans CJK SC", "Fluenc Hanzi", sans-serif;
-  --animate-pop: pop .2s ease-out;
+  --animate-pop: pop 0.2s ease-out;
 
-  @keyframes pop { from { scale: .8; opacity: 0; } }
+  @keyframes pop {
+    from {
+      scale: 0.8;
+      opacity: 0;
+    }
+  }
 }
 
 @layer base {
-  :root { color-scheme: dark; color: var(--color-ink); background: var(--color-canvas); font-family: var(--font-ui); font-synthesis: none; }
-  html { -webkit-tap-highlight-color: transparent; }
-  body { margin: 0; min-height: 100dvh; background: var(--color-canvas); -webkit-font-smoothing: antialiased; }
-  button, input, textarea { font: inherit; }
-  button { cursor: pointer; }
-  button:disabled { cursor: not-allowed; opacity: .4; }
-  button:not(:disabled):active { transform: translateY(1px); }
-  button:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--color-glaze); outline-offset: 2px; }
-  input, textarea { outline: 0; }
-  input::placeholder, textarea::placeholder { color: var(--color-faint); }
-  summary { cursor: pointer; }
-  ::selection { color: var(--color-paper); background: var(--color-glaze); }
-}
-
-@layer components {
-  .study-label { color: var(--color-muted); font-size: 11px; font-weight: 500; }
+  :root {
+    font-family: var(--font-ui);
+    font-synthesis: none;
+    color: var(--color-ink);
+    color-scheme: dark;
+    background: var(--color-canvas);
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    min-height: 100dvh;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    background: var(--color-canvas);
+  }
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
+  button {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+  button:not(:disabled):active {
+    transform: translateY(1px);
+  }
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--color-glaze);
+    outline-offset: 2px;
+  }
+  input,
+  textarea {
+    outline: 0;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-faint);
+  }
+  summary {
+    cursor: pointer;
+  }
+  ::selection {
+    color: var(--color-paper);
+    background: var(--color-glaze);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

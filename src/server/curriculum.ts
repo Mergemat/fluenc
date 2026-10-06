@@ -1,58 +1,58 @@
-import { createServerFn } from '@tanstack/react-start'
-
+import { createServerFn } from "@tanstack/react-start";
+import type { LearnerState } from "../lib/learner-state";
 import {
   enrollInput,
   livingLinkInput,
   movieInput,
   reviewInput,
-} from './curriculum.contract'
+} from "./curriculum.contract";
 
-export const getDashboard = createServerFn({ method: 'GET' }).handler(async () => {
-  const { getDashboardHandler } = await import('./curriculum.handlers.server')
-  return getDashboardHandler()
-})
+// Learner state is plain JSON; a raw response skips Seroval's larger encoding and slower decode.
+const fetchLearnerState = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const { getLearnerStateHandler } = await import(
+      "./curriculum.handlers.server"
+    );
+    return Response.json(await getLearnerStateHandler());
+  }
+);
 
-export const reviewItem = createServerFn({ method: 'POST' })
+export async function getLearnerState(options?: {
+  signal?: AbortSignal;
+}): Promise<LearnerState> {
+  const response = await fetchLearnerState(options);
+  if (!response.ok) {
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+  return response.json();
+}
+
+export const reviewItem = createServerFn({ method: "POST" })
   .validator(reviewInput)
   .handler(async ({ data }) => {
-    const { reviewItemHandler } = await import('./curriculum.handlers.server')
-    return reviewItemHandler(data)
-  })
+    const { reviewItemHandler } = await import("./curriculum.handlers.server");
+    return reviewItemHandler(data);
+  });
 
-export const enrollItem = createServerFn({ method: 'POST' })
+export const enrollItem = createServerFn({ method: "POST" })
   .validator(enrollInput)
   .handler(async ({ data }) => {
-    const { enrollItemHandler } = await import('./curriculum.handlers.server')
-    return enrollItemHandler(data)
-  })
+    const { enrollItemHandler } = await import("./curriculum.handlers.server");
+    return enrollItemHandler(data);
+  });
 
-export const saveMovie = createServerFn({ method: 'POST' })
+export const saveMovie = createServerFn({ method: "POST" })
   .validator(movieInput)
   .handler(async ({ data }) => {
-    const { saveMovieHandler } = await import('./curriculum.handlers.server')
-    return saveMovieHandler(data)
-  })
+    const { saveMovieHandler } = await import("./curriculum.handlers.server");
+    return saveMovieHandler(data);
+  });
 
-export const saveLivingLink = createServerFn({ method: 'POST' })
+export const saveLivingLink = createServerFn({ method: "POST" })
   .validator(livingLinkInput)
   .handler(async ({ data }) => {
-    const { saveLivingLinkHandler } = await import('./curriculum.handlers.server')
-    return saveLivingLinkHandler(data)
-  })
-
-export const getLibrary = createServerFn({ method: 'GET' }).handler(async () => {
-  const { getLibraryHandler } = await import('./curriculum.handlers.server')
-  return getLibraryHandler()
-})
-
-export const getPalace = createServerFn({ method: 'GET' }).handler(async () => {
-  const { getPalaceHandler } = await import('./curriculum.handlers.server')
-  return getPalaceHandler()
-})
-
-export type DashboardData = Awaited<ReturnType<typeof getDashboard>>
-export type BuildItem = DashboardData['buildQueue'][number]
-export type ReviewItem = DashboardData['reviewQueue'][number]
-export type StudyItem = BuildItem | ReviewItem
-export type LibraryData = Awaited<ReturnType<typeof getLibrary>>
-export type PalaceData = Awaited<ReturnType<typeof getPalace>>
+    const { saveLivingLinkHandler } = await import(
+      "./curriculum.handlers.server"
+    );
+    return saveLivingLinkHandler(data);
+  });

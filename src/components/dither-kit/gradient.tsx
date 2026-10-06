@@ -1,45 +1,74 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from "react"
-import { cn } from "./lib"
-import { rgb } from "./palette"
+import { useEffect, useRef } from "react";
+import { cn } from "./lib";
+import { type Rgb, rgb } from "./palette";
 import {
   BAYER4,
   fillOf,
   type PixelBloom,
   type PixelColor,
   pixelBloomStyle,
-} from "./pixel"
+} from "./pixel";
 
 // Backing-resolution caps — a background wash never needs more cells than this.
-const MAX_COLS = 960
-const MAX_ROWS = 600
+const MAX_COLS = 960;
+const MAX_ROWS = 600;
 
-export type GradientDirection = "up" | "down" | "left" | "right"
+export type GradientDirection = "up" | "down" | "left" | "right";
 
-export type DitherGradientProps = {
+export interface DitherGradientProps {
+  /** Glow on the dither fill. */
+  bloom?: PixelBloom;
+  /** CSS px per dither cell — bigger is chunkier. */
+  cell?: number;
+  className?: string;
+  /** Where `to` ends up — "up" reads as a glow rising from the bottom edge. */
+  direction?: GradientDirection;
   /** The colour the gradient starts solid as — a palette name or a hue. */
-  from: PixelColor
+  from: PixelColor;
+  /** Overall opacity multiplier. */
+  opacity?: number;
   /** What it dissolves into: another colour for a two-tone dither blend, or
    * "transparent" (default) so the background shows through. */
-  to?: PixelColor | "transparent"
-  /** Where `to` ends up — "up" reads as a glow rising from the bottom edge. */
-  direction?: GradientDirection
-  /** CSS px per dither cell — bigger is chunkier. */
-  cell?: number
-  /** Overall opacity multiplier. */
-  opacity?: number
-  /** Glow on the dither fill. */
-  bloom?: PixelBloom
-  className?: string
+  to?: PixelColor | "transparent";
 }
 
-type PaintSpec = {
-  from: PixelColor
-  to: PixelColor | "transparent"
-  direction: GradientDirection
-  cell: number
+interface PaintSpec {
+  cell: number;
+  direction: GradientDirection;
+  from: PixelColor;
+  opacity: number;
+  to: PixelColor | "transparent";
+}
+
+// Where a cell sits along the ramp: 0 at the `from` edge → 1 at the `to` edge.
+const RAMP: Record<
+  GradientDirection,
+  (x: number, y: number, cols: number, rows: number) => number
+> = {
+  up: (_x, y, _cols, rows) => 1 - (y + 0.5) / rows,
+  down: (_x, y, _cols, rows) => (y + 0.5) / rows,
+  left: (x, _y, cols) => 1 - (x + 0.5) / cols,
+  right: (x, _y, cols) => (x + 0.5) / cols,
+};
+
+/** One cell's colour and alpha, or null when it stays clear. */
+function cellPaint(
+  lit: boolean,
+  density: number,
+  fromFill: Rgb,
+  toFill: Rgb | null,
   opacity: number
+) {
+  if (toFill) {
+    // Two-tone: every cell is painted, the dither decides which colour.
+    return { fill: lit ? fromFill : toFill, alpha: opacity };
+  }
+  // Dissolve to transparent: lit cells carry the ramp, off cells keep a
+  // faint tint that also fades out, so the falloff reads smooth.
+  const alpha = (lit ? 0.35 + 0.65 * density : 0.12 * density) * opacity;
+  return alpha > 0.004 ? { fill: fromFill, alpha } : null;
 }
 
 /**
@@ -54,50 +83,36 @@ function paintGradient(
   height: number,
   spec: PaintSpec
 ): void {
-  const ctx = canvas.getContext("2d")
-  if (!ctx || width <= 0 || height <= 0) return
-  const cols = Math.min(MAX_COLS, Math.max(4, Math.round(width / spec.cell)))
-  const rows = Math.min(MAX_ROWS, Math.max(4, Math.round(height / spec.cell)))
-  canvas.width = cols
-  canvas.height = rows
+  const ctx = canvas.getContext("2d");
+  if (!ctx || width <= 0 || height <= 0) {
+    return;
+  }
+  const cols = Math.min(MAX_COLS, Math.max(4, Math.round(width / spec.cell)));
+  const rows = Math.min(MAX_ROWS, Math.max(4, Math.round(height / spec.cell)));
+  canvas.width = cols;
+  canvas.height = rows;
 
-  const fromFill = fillOf(spec.from)
-  const toFill = spec.to === "transparent" ? null : fillOf(spec.to)
-  const o = spec.opacity
+  const fromFill = fillOf(spec.from);
+  const toFill = spec.to === "transparent" ? null : fillOf(spec.to);
+  const ramp = RAMP[spec.direction];
 
-  for (let y = 0; y < rows; y++) {
-    for (let x = 0; x < cols; x++) {
-      // t runs 0 at the `from` edge → 1 at the `to` edge.
-      const t =
-        spec.direction === "up"
-          ? 1 - (y + 0.5) / rows
-          : spec.direction === "down"
-            ? (y + 0.5) / rows
-            : spec.direction === "left"
-              ? 1 - (x + 0.5) / cols
-              : (x + 0.5) / cols
-      const density = 1 - t
-      const lit = density > BAYER4[y & 3][x & 3]
-      if (toFill) {
-        // Two-tone: every cell is painted, the dither decides which colour.
-        ctx.fillStyle = rgb(lit ? fromFill : toFill, 1, o)
-        ctx.fillRect(x, y, 1, 1)
-      } else {
-        // Dissolve to transparent: lit cells carry the ramp, off cells keep a
-        // faint tint that also fades out, so the falloff reads smooth.
-        const alpha = (lit ? 0.35 + 0.65 * density : 0.12 * density) * o
-        if (alpha <= 0.004) continue
-        ctx.fillStyle = rgb(fromFill, 1, alpha)
-        ctx.fillRect(x, y, 1, 1)
+  for (let y = 0; y < rows; y += 1) {
+    for (let x = 0; x < cols; x += 1) {
+      const density = 1 - ramp(x, y, cols, rows);
+      const lit = density > BAYER4[y % 4][x % 4];
+      const paint = cellPaint(lit, density, fromFill, toFill, spec.opacity);
+      if (paint) {
+        ctx.fillStyle = rgb(paint.fill, 1, paint.alpha);
+        ctx.fillRect(x, y, 1, 1);
       }
     }
   }
 
-  const bloomCtx = bloomCanvas?.getContext("2d") ?? null
+  const bloomCtx = bloomCanvas?.getContext("2d") ?? null;
   if (bloomCanvas && bloomCtx) {
-    bloomCanvas.width = cols
-    bloomCanvas.height = rows
-    bloomCtx.drawImage(canvas, 0, 0)
+    bloomCanvas.width = cols;
+    bloomCanvas.height = rows;
+    bloomCtx.drawImage(canvas, 0, 0);
   }
 }
 
@@ -116,54 +131,60 @@ export function DitherGradient({
   bloom = "off",
   className,
 }: DitherGradientProps) {
-  const wrapRef = useRef<HTMLDivElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const bloomRef = useRef<HTMLCanvasElement>(null)
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const bloomRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const wrap = wrapRef.current
-    const canvas = canvasRef.current
-    if (!wrap || !canvas) return
+    const wrap = wrapRef.current;
+    const canvas = canvasRef.current;
+    if (!(wrap && canvas)) {
+      return;
+    }
+    // The glow canvas only exists while bloom is on.
+    const bloomCanvas = bloom === "off" ? null : bloomRef.current;
     const paint = () => {
-      const box = wrap.getBoundingClientRect()
-      paintGradient(canvas, bloomRef.current, box.width, box.height, {
+      const box = wrap.getBoundingClientRect();
+      paintGradient(canvas, bloomCanvas, box.width, box.height, {
         from,
         to,
         direction,
         cell,
         opacity,
-      })
+      });
+    };
+    paint();
+    if (typeof ResizeObserver === "undefined") {
+      return;
     }
-    paint()
-    if (typeof ResizeObserver === "undefined") return
-    const ro = new ResizeObserver(paint)
-    ro.observe(wrap)
-    return () => ro.disconnect()
-  }, [from, to, direction, cell, opacity, bloom])
+    const ro = new ResizeObserver(paint);
+    ro.observe(wrap);
+    return () => ro.disconnect();
+  }, [from, to, direction, cell, opacity, bloom]);
 
-  const bloomStyle = pixelBloomStyle(bloom)
+  const bloomStyle = pixelBloomStyle(bloom);
 
   return (
     <div
-      ref={wrapRef}
       aria-hidden
       className={cn(
         "pointer-events-none absolute inset-0 overflow-hidden",
         className
       )}
+      ref={wrapRef}
     >
       <canvas
-        ref={canvasRef}
         className="absolute inset-0 h-full w-full"
+        ref={canvasRef}
         style={{ imageRendering: "pixelated" }}
       />
       {bloomStyle && (
         <canvas
-          ref={bloomRef}
           className="absolute inset-0 h-full w-full"
+          ref={bloomRef}
           style={bloomStyle}
         />
       )}
     </div>
-  )
+  );
 }

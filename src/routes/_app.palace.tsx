@@ -1,13 +1,19 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
+import { createFileRoute } from "@tanstack/react-router";
 
-import { PalaceView } from '../components/PalaceView'
+import { PalaceView } from "../components/palace-view";
+import { oneOf, optionalString } from "../lib/search-params";
 
-export const Route = createFileRoute('/_app/palace')({
-  validateSearch: z.object({
-    tab: z.enum(['cast', 'sets', 'areas', 'props']).optional().catch(undefined),
-    q: z.string().optional().catch(undefined),
-    show: z.enum(['all', 'named', 'open']).optional().catch(undefined),
+interface PalaceSearch {
+  q?: string;
+  show?: "all" | "named" | "open";
+  tab?: "cast" | "sets" | "areas" | "props";
+}
+
+export const Route = createFileRoute("/_app/palace")({
+  validateSearch: (search: Record<string, unknown>): PalaceSearch => ({
+    tab: oneOf(search.tab, ["cast", "sets", "areas", "props"]),
+    q: optionalString(search.q),
+    show: oneOf(search.show, ["all", "named", "open"]),
   }),
   component: PalaceView,
-})
+});

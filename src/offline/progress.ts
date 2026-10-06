@@ -1,246 +1,280 @@
-import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
+import { type DBSchema, type IDBPDatabase, openDB } from "idb";
 
-import { isStudyItemType } from '../data/types'
-import { applyOperation, applyLibraryOperation, applyPalaceOperation, refreshDueQueues, type ProgressOperation } from './progress-state'
-
+import { isStudyItemType } from "../data/types";
+import {
+  applyOperation,
+  type LearnerState,
+  type ProgressOperation,
+} from "../lib/learner-state";
+import {
+  enrollItem,
+  getLearnerState,
+  reviewItem,
+  saveLivingLink,
+  saveMovie,
+} from "../server/curriculum";
 import type {
   EnrollInput,
   LivingLinkInput,
   MovieInput,
   ReviewInput,
-} from '../server/curriculum.contract'
-import {
-  enrollItem,
-  getDashboard,
-  getLibrary,
-  getPalace,
-  reviewItem,
-  saveLivingLink,
-  saveMovie,
-  type DashboardData,
-  type LibraryData,
-  type PalaceData,
-} from '../server/curriculum'
+} from "../server/curriculum.contract";
+import { learnerStateFromLegacy, legacyCacheKeys } from "./legacy-cache";
 
 type OutboxEntry = ProgressOperation & {
-  sequence?: number
-}
+  sequence?: number;
+};
 
-type CacheKey = 'dashboard' | 'library' | 'palace'
-const cacheKey = (key: CacheKey) => `lessons-v3:${key}` as const
-type StoredCacheKey = ReturnType<typeof cacheKey>
+const STATE_KEY = "learner-v1";
 
 interface FluencOfflineDatabase extends DBSchema {
   cache: {
-    key: StoredCacheKey
-    value: { key: StoredCacheKey; value: unknown }
-  }
+    key: string;
+    value: { key: string; value: unknown };
+  };
   outbox: {
-    key: number
-    value: OutboxEntry
-  }
+    key: number;
+    value: OutboxEntry;
+  };
 }
 
-let databasePromise: Promise<IDBPDatabase<FluencOfflineDatabase>> | null = null
-let activeFlush: Promise<number> | null = null
-let progressRevision = 0
+/** Learner state and the moment its due queues were read; a newer moment moves due cards into review. */
+export interface LearnerSnapshot {
+  at: number;
+  state: LearnerState;
+}
+
+const snapshotOf = (state: LearnerState): LearnerSnapshot => ({
+  state,
+  at: Date.now(),
+});
+
+let databasePromise: Promise<IDBPDatabase<FluencOfflineDatabase>> | null = null;
+let activeFlush: Promise<number> | null = null;
+let progressRevision = 0;
 
 function getDatabase() {
-  databasePromise ??= openDB<FluencOfflineDatabase>('fluenc-offline', 1, {
+  databasePromise ??= openDB<FluencOfflineDatabase>("fluenc-offline", 1, {
     upgrade(database) {
-      database.createObjectStore('cache', { keyPath: 'key' })
-      database.createObjectStore('outbox', { keyPath: 'sequence', autoIncrement: true })
+      database.createObjectStore("cache", { keyPath: "key" });
+      database.createObjectStore("outbox", {
+        keyPath: "sequence",
+        autoIncrement: true,
+      });
     },
-  })
-  return databasePromise
+  });
+  return databasePromise;
 }
 
 function isBrowser() {
-  return typeof window !== 'undefined' && typeof indexedDB !== 'undefined'
+  return typeof window !== "undefined" && typeof indexedDB !== "undefined";
 }
 
-async function readCache<T>(key: CacheKey) {
-  if (!isBrowser()) return null
-  const cached = await (await getDatabase()).get('cache', cacheKey(key))
-  return cached?.value as T | undefined ?? null
+async function readState(): Promise<LearnerState | null> {
+  if (!isBrowser()) {
+    return null;
+  }
+  const database = await getDatabase();
+  const stored = await database.get("cache", STATE_KEY);
+  return stored ? (stored.value as LearnerState) : migrateLegacyCache(database);
+}
+
+// Progress saved before devices stored learner state survives an update, even one made offline.
+async function migrateLegacyCache(
+  database: IDBPDatabase<FluencOfflineDatabase>
+) {
+  const transaction = database.transaction("cache", "readwrite");
+  const [stored, dashboard, library, palace] = await Promise.all(
+    [STATE_KEY, ...legacyCacheKeys].map((key) => transaction.store.get(key))
+  );
+  if (stored || !dashboard) {
+    await transaction.done;
+    return stored ? (stored.value as LearnerState) : null;
+  }
+  const state = learnerStateFromLegacy(
+    dashboard.value as Parameters<typeof learnerStateFromLegacy>[0],
+    library?.value as Parameters<typeof learnerStateFromLegacy>[1],
+    palace?.value as Parameters<typeof learnerStateFromLegacy>[2]
+  );
+  await transaction.store.put({ key: STATE_KEY, value: state });
+  await Promise.all(
+    legacyCacheKeys.map((key) => transaction.store.delete(key))
+  );
+  await transaction.done;
+  return state;
 }
 
 // Check and write in one transaction so a response cannot overwrite unsynced work.
-async function acceptRemoteCache<T>(key: CacheKey, data: T, revision: number) {
-  const database = await getDatabase()
-  const transaction = database.transaction(['cache', 'outbox'], 'readwrite')
-  const pending = await transaction.objectStore('outbox').count()
-  const cache = transaction.objectStore('cache')
+async function acceptRemoteState(remote: LearnerState, revision: number) {
+  await readState();
+  const database = await getDatabase();
+  const transaction = database.transaction(["cache", "outbox"], "readwrite");
+  const outbox = transaction.objectStore("outbox");
+  const cache = transaction.objectStore("cache");
+  const pending = await outbox.count();
   if (!pending && revision === progressRevision) {
-    await cache.put({ key: cacheKey(key), value: data })
-    await transaction.done
-    return data
+    await cache.put({ key: STATE_KEY, value: remote });
+    await Promise.all(legacyCacheKeys.map((key) => cache.delete(key)));
+    await transaction.done;
+    return remote;
   }
-  const cached = await cache.get(cacheKey(key))
-  await transaction.done
-  return cached ? cached.value as T : data
+  const cached = await cache.get(STATE_KEY);
+  if (cached) {
+    await transaction.done;
+    return cached.value as LearnerState;
+  }
+  // No local copy to protect: replay unsynced saves on the server's state.
+  const state = (await outbox.getAll()).reduce(
+    (next, operation) => applyOperation(next, operation),
+    remote
+  );
+  await cache.put({ key: STATE_KEY, value: state });
+  await transaction.done;
+  return state;
 }
 
-export async function persistDashboard(data: DashboardData) {
-  if (isBrowser()) await acceptRemoteCache('dashboard', data, progressRevision)
+/** Store learner state received outside a query, such as one rendered on the server. */
+export async function persistLearner(data: LearnerSnapshot) {
+  if (isBrowser()) {
+    await acceptRemoteState(data.state, progressRevision);
+  }
 }
 
-export async function getOfflineDashboard(signal?: AbortSignal) {
-  if (!isBrowser()) return getDashboard({ signal })
-  if (!navigator.onLine || await hasPendingProgress()) {
-    const cached = await getCachedDashboard()
-    if (cached) return cached
+/** Store learner state only when the device has none yet. */
+export async function seedLearner(data: LearnerSnapshot) {
+  if (isBrowser() && !(await readState())) {
+    await acceptRemoteState(data.state, progressRevision);
   }
-  const revision = progressRevision
+}
+
+export async function getCachedLearner() {
+  const state = await readState();
+  return state ? snapshotOf(state) : null;
+}
+
+export async function getOfflineLearner(
+  signal?: AbortSignal
+): Promise<LearnerSnapshot> {
+  if (!isBrowser()) {
+    return snapshotOf(await getLearnerState({ signal }));
+  }
+  if (!navigator.onLine || (await hasPendingProgress())) {
+    const cached = await getCachedLearner();
+    if (cached) {
+      return cached;
+    }
+  }
+  const revision = progressRevision;
   try {
-    const data = await getDashboard({ signal })
-    signal?.throwIfAborted()
-    return refreshDueQueues(await acceptRemoteCache('dashboard', data, revision))
+    const remote = await getLearnerState({ signal });
+    signal?.throwIfAborted();
+    return snapshotOf(await acceptRemoteState(remote, revision));
   } catch (error) {
-    signal?.throwIfAborted()
-    const cached = await getCachedDashboard()
-    if (cached) return cached
-    throw error
+    signal?.throwIfAborted();
+    const cached = await getCachedLearner();
+    if (cached) {
+      return cached;
+    }
+    throw error;
   }
 }
 
-async function getOfflineQuery<T>(key: Exclude<CacheKey, 'dashboard'>, remote: () => Promise<T>, signal?: AbortSignal, isCurrent: (value: T) => boolean = () => true) {
-  if (!isBrowser()) return remote()
-  const stored = await readCache<T>(key)
-  const cached = stored && isCurrent(stored) ? stored : null
-  if (cached && (!navigator.onLine || await hasPendingProgress())) return cached
-  const revision = progressRevision
+async function enqueue(operation: ProgressOperation): Promise<LearnerSnapshot> {
+  progressRevision += 1;
+  const database = await getDatabase();
+  const transaction = database.transaction(["cache", "outbox"], "readwrite");
+  const cached = await transaction.objectStore("cache").get(STATE_KEY);
+  if (!cached) {
+    throw new Error("Open Fluenc online once before saving progress offline");
+  }
+  const state = applyOperation(cached.value as LearnerState, operation);
+  await transaction.objectStore("cache").put({ key: STATE_KEY, value: state });
+  await transaction.objectStore("outbox").add(operation);
+  await transaction.done;
+  return snapshotOf(state);
+}
+
+function sendOperation(operation: ProgressOperation) {
+  if (operation.kind === "review") {
+    return reviewItem({ data: operation.data });
+  }
+  if (operation.kind === "enroll") {
+    return enrollItem({ data: operation.data });
+  }
+  if (operation.kind === "movie") {
+    return saveMovie({ data: operation.data });
+  }
+  return saveLivingLink({ data: operation.data });
+}
+
+/** Send the oldest unsynced save, then the next, in order, stopping at the first failure. */
+async function flushFrom(
+  database: IDBPDatabase<FluencOfflineDatabase>,
+  synced: number
+): Promise<number> {
+  if (!navigator.onLine) {
+    return synced;
+  }
+  const transaction = database.transaction("outbox", "readonly");
+  const cursor = await transaction.store.openCursor();
+  await transaction.done;
+  if (!cursor) {
+    return synced;
+  }
   try {
-    const data = await remote()
-    signal?.throwIfAborted()
-    return acceptRemoteCache(key, data, revision)
-  } catch (error) {
-    signal?.throwIfAborted()
-    // Read again because a local save may have happened during the request.
-    const latest = await readCache<T>(key)
-    if (latest && isCurrent(latest)) return latest
-    throw error
+    if (
+      cursor.value.kind !== "review" ||
+      isStudyItemType(cursor.value.data.itemType)
+    ) {
+      await sendOperation(cursor.value);
+    }
+    await database.delete("outbox", cursor.primaryKey);
+  } catch {
+    return synced;
   }
-}
-
-export function getOfflineLibrary(signal?: AbortSignal) {
-  // Libraries cached before entries carried components and word parts must be refetched.
-  return getOfflineQuery<LibraryData>('library', () => getLibrary({ signal }), signal, library => 'components' in (library.characters[0] ?? {}) && 'characterParts' in (library.words[0] ?? {}))
-}
-
-export function getOfflinePalace(signal?: AbortSignal) {
-  return getOfflineQuery<PalaceData>('palace', () => getPalace({ signal }), signal)
-}
-
-export type ProgressSnapshot = {
-  dashboard: DashboardData
-  library?: LibraryData
-  palace?: PalaceData
-}
-
-async function enqueue(operation: ProgressOperation): Promise<ProgressSnapshot> {
-  progressRevision += 1
-  const database = await getDatabase()
-  const transaction = database.transaction(['cache', 'outbox'], 'readwrite')
-  const cached = await transaction.objectStore('cache').get(cacheKey('dashboard'))
-  if (!cached) throw new Error('Open Fluenc online once before saving progress offline')
-  const nextDashboard = applyOperation(cached.value as DashboardData, operation)
-  await transaction.objectStore('cache').put({
-    key: cacheKey('dashboard'),
-    value: nextDashboard,
-  })
-  const snapshot: ProgressSnapshot = { dashboard: nextDashboard }
-  const library = await transaction.objectStore('cache').get(cacheKey('library'))
-  if (library && (operation.kind === 'enroll' || operation.kind === 'review' || operation.kind === 'livingLink')) {
-    snapshot.library = applyLibraryOperation(library.value as LibraryData, nextDashboard, operation)
-    await transaction.objectStore('cache').put({
-      key: cacheKey('library'),
-      value: snapshot.library,
-    })
-  }
-  const palace = await transaction.objectStore('cache').get(cacheKey('palace'))
-  if (palace && operation.kind === 'movie') {
-    snapshot.palace = applyPalaceOperation(palace.value as PalaceData, operation)
-    await transaction.objectStore('cache').put({
-      key: cacheKey('palace'),
-      value: snapshot.palace,
-    })
-  }
-  await transaction.objectStore('outbox').add(operation)
-  await transaction.done
-  return snapshot
-}
-
-async function sendOperation(operation: ProgressOperation) {
-  if (operation.kind === 'review') return reviewItem({ data: operation.data })
-  if (operation.kind === 'enroll') return enrollItem({ data: operation.data })
-  if (operation.kind === 'movie') return saveMovie({ data: operation.data })
-  return saveLivingLink({ data: operation.data })
+  return flushFrom(database, synced + 1);
 }
 
 async function performFlush() {
-  if (!isBrowser() || !navigator.onLine) return 0
-  const database = await getDatabase()
-  let synced = 0
-  while (navigator.onLine) {
-    const transaction = database.transaction('outbox', 'readonly')
-    const cursor = await transaction.store.openCursor()
-    await transaction.done
-    if (!cursor) break
-    try {
-      if (cursor.value.kind !== 'review' || isStudyItemType(cursor.value.data.itemType)) {
-        await sendOperation(cursor.value)
-      }
-      await database.delete('outbox', cursor.primaryKey)
-      synced += 1
-    } catch {
-      break
-    }
+  if (!(isBrowser() && navigator.onLine)) {
+    return 0;
   }
-  return synced
+  return flushFrom(await getDatabase(), 0);
 }
 
-export async function flushProgress() {
-  if (!activeFlush) {
-    activeFlush = performFlush().finally(() => {
-      activeFlush = null
-    })
-  }
-  return activeFlush
+export function flushProgress() {
+  activeFlush ??= performFlush().finally(() => {
+    activeFlush = null;
+  });
+  return activeFlush;
 }
 
-export function saveEnrollment(data: Omit<EnrollInput, 'enrolledAt'>) {
+export function saveEnrollment(data: Omit<EnrollInput, "enrolledAt">) {
   return enqueue({
-    kind: 'enroll',
+    kind: "enroll",
     data: { ...data, enrolledAt: new Date().toISOString() },
-  })
+  });
 }
 
 export function saveLivingLinkOffline(data: LivingLinkInput) {
-  return enqueue({ kind: 'livingLink', data })
+  return enqueue({ kind: "livingLink", data });
 }
 
 export function saveMovieOffline(data: MovieInput) {
-  return enqueue({ kind: 'movie', data })
+  return enqueue({ kind: "movie", data });
 }
 
-export function saveReview(data: Omit<ReviewInput, 'eventId' | 'reviewedAt'>) {
+export function saveReview(data: Omit<ReviewInput, "eventId" | "reviewedAt">) {
   return enqueue({
-    kind: 'review',
+    kind: "review",
     data: {
       ...data,
       eventId: crypto.randomUUID(),
       reviewedAt: new Date().toISOString(),
     },
-  })
-}
-
-export async function getCachedDashboard() {
-  const cached = await readCache<DashboardData>('dashboard')
-  if (!cached) return null
-  return refreshDueQueues(cached)
+  });
 }
 
 export async function hasPendingProgress() {
-  return isBrowser() && (await (await getDatabase()).count('outbox')) > 0
+  return isBrowser() && (await (await getDatabase()).count("outbox")) > 0;
 }

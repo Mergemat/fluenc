@@ -1,6 +1,6 @@
-import { z } from 'zod'
+import { z } from "zod";
 
-import { studyItemTypes } from '../data/types'
+import { studyItemTypes } from "../data/types";
 
 export const reviewInput = z.object({
   eventId: z.uuid(),
@@ -9,13 +9,13 @@ export const reviewInput = z.object({
   rating: z.number().int().min(1).max(4),
   durationMs: z.number().int().min(0).max(3_600_000).default(0),
   reviewedAt: z.iso.datetime(),
-})
+});
 
 export const enrollInput = z.object({
   itemType: z.enum(studyItemTypes),
   itemId: z.string().min(1),
   enrolledAt: z.iso.datetime(),
-})
+});
 
 export const movieInput = z.object({
   characterId: z.string().min(1),
@@ -29,16 +29,16 @@ export const movieInput = z.object({
     z.object({
       component: z.string().min(1),
       propName: z.string().trim().min(1),
-    }),
+    })
   ),
-})
+});
 
 export const livingLinkInput = z.object({
   wordId: z.string().min(1),
   story: z.string().trim().min(4),
-})
+});
 
-export type ReviewInput = z.infer<typeof reviewInput>
-export type EnrollInput = z.infer<typeof enrollInput>
-export type MovieInput = z.infer<typeof movieInput>
-export type LivingLinkInput = z.infer<typeof livingLinkInput>
+export type ReviewInput = z.infer<typeof reviewInput>;
+export type EnrollInput = z.infer<typeof enrollInput>;
+export type MovieInput = z.infer<typeof movieInput>;
+export type LivingLinkInput = z.infer<typeof livingLinkInput>;
