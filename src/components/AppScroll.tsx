@@ -8,7 +8,6 @@ import '@ionic/core/css/core.css'
 export function AppScroll({ children, pathname }: { children: ReactNode; pathname: string }) {
   const queryClient = useQueryClient()
   const pending = useIsMutating() > 0
-  const scrollable = pathname !== '/review'
   const content = useRef<HTMLIonContentElement>(null)
   const refresher = useRef<HTMLIonRefresherElement>(null)
   const touching = useRef(false)
@@ -60,19 +59,21 @@ export function AppScroll({ children, pathname }: { children: ReactNode; pathnam
     reloadAfterPull.current = false
   }
 
-  if (!ready) return <div className="app-scroll-placeholder" style={{ overflowY: scrollable ? 'auto' : 'hidden' }}>{children}</div>
+  if (!ready) return <div className="app-scroll-placeholder" style={{ overflowY: 'auto' }}>{children}</div>
 
   return (
     <IonContent
       ref={content}
       className="app-scroll"
-      scrollY={scrollable}
-      forceOverscroll={scrollable}
+      // Every page can be pulled to refresh. Study stages fit the viewport exactly, so on them
+      // the scroller only rubber-bands; it never scrolls.
+      scrollY
+      forceOverscroll
       onTouchStartCapture={() => { touching.current = true; clearTimeout(reloadTimer.current) }}
       onTouchEndCapture={finishTouch}
       onTouchCancelCapture={cancelTouch}
     >
-      <IonRefresher ref={refresher} slot="fixed" disabled={!scrollable || !standalone || pending} onIonRefresh={refresh}>
+      <IonRefresher ref={refresher} slot="fixed" disabled={!standalone || pending} onIonRefresh={refresh}>
         <IonRefresherContent />
       </IonRefresher>
       {children}

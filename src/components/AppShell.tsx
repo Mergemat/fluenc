@@ -1,5 +1,5 @@
-// Study routes (/lessons, /review) get a fixed stage that never scrolls; reference pages keep
-// the pull-to-refresh scroller. Older pages are re-skinned through the shared colour tokens.
+// Every route sits in the pull-to-refresh scroller. Study routes (/lessons, /review) get a stage
+// exactly the scroller's height, so they never scroll. Older pages use the shared colour tokens.
 import { Link } from '@tanstack/react-router'
 import { BookOpen, Brain, Clapperboard, GraduationCap, LibraryBig, Settings } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
@@ -42,7 +42,7 @@ export function AppShell({ data, pathname, children }: { data: DashboardData; pa
       <Link to="/settings" className="dx-icon-button" aria-label="Settings" activeProps={{ 'aria-current': 'page' }}><Settings size={16} /></Link>
       <Rule className="dx-edge dx-edge-bottom" />
     </header>
-    <main className="dx-main" data-fixed={fixed}>{fixed ? children : <AppScroll pathname={pathname}>{children}</AppScroll>}</main>
+    <main className="dx-main" data-fixed={fixed}><AppScroll pathname={pathname}>{fixed ? <div className="dx-stage">{children}</div> : children}</AppScroll></main>
     <nav className="dx-tabbar" aria-label="Main"><Rule className="dx-edge dx-edge-top" />{navigation.map(item => <Link key={item.to} to={item.to} activeProps={{ 'aria-current': 'page' }}>
       {({ isActive }) => <>
         {isActive ? <DitherGradient from="blue" direction="up" cell={2} opacity={.35} /> : null}
