@@ -1154,10 +1154,10 @@
   }
 }
 
-/* ── Writing sheet ───────────────────────────────── */
-.dx-sheet-dialog {
-  width: min(calc(100% - 32px), 380px);
+/* ── Writing ─────────────────────────────────────── */
+.dx-writing-modal {
   max-width: none;
+  max-height: none;
   padding: 0;
   /* Centred in the viewport; the base reset would otherwise pin it to the top left. */
   margin: auto;
@@ -1167,63 +1167,171 @@
   border: 0;
   animation: dx-enter 0.16s ease-out;
 }
-.dx-sheet-dialog::backdrop {
-  background: color-mix(in srgb, var(--dx-bg) 70%, transparent);
-  backdrop-filter: blur(3px);
+.dx-writing-modal::backdrop {
+  background: color-mix(in srgb, var(--dx-bg) 82%, transparent);
+  backdrop-filter: blur(6px);
 }
-.dx-sheet {
-  position: relative;
+.dx-writing {
+  /* The pad is as large as the screen allows, leaving room for the header and the pips. */
+  --pad: min(calc(100vw - 48px), calc(100dvh - 190px), 480px);
   box-sizing: border-box;
   display: grid;
-  gap: 14px;
+  gap: 12px;
   justify-items: center;
-  width: 100%;
-  padding: 16px;
-  overflow: hidden;
+  width: calc(var(--pad) + 28px);
+  padding: 10px 14px 16px;
   background: var(--dx-surface);
   border: 1px solid var(--dx-line-strong);
-  border-radius: 16px;
+  border-radius: 18px;
   box-shadow: 0 30px 80px -30px var(--dx-shadow);
 }
-.dx-sheet > :not(.dx-wash) {
-  position: relative;
-  z-index: 1;
-}
-.dx-sheet > header {
-  display: flex;
+.dx-writing > header {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
-}
-.dx-label-text {
   font: 11px var(--dx-mono);
   color: var(--dx-muted);
 }
-.dx-pad {
-  position: relative;
-  background:
-    linear-gradient(var(--dx-line), var(--dx-line)) 50% 0 / 1px 100% no-repeat,
-    linear-gradient(var(--dx-line), var(--dx-line)) 0 50% / 100% 1px no-repeat,
-    var(--dx-bg);
-  border: 1px solid var(--dx-line);
-  border-radius: 12px;
+.dx-writing-hanzi {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--dx-fg);
 }
-.dx-pad-loader {
-  position: absolute;
-  inset: 0;
+.dx-writing-count {
+  font-variant-numeric: tabular-nums;
+}
+.dx-writing-pad {
+  position: relative;
+  display: grid;
+  width: var(--pad);
+  height: var(--pad);
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  background: var(--dx-bg);
+  border: 1px solid var(--dx-line);
+  border-radius: 14px;
+  transition: border-color 200ms;
+}
+.dx-writing-pad > * {
+  grid-area: 1 / 1;
+}
+.dx-writing-pad[data-done="true"] {
+  border-color: var(--dx-green);
+}
+.dx-writing-pad > svg {
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+.dx-writing-grid {
+  fill: none;
+  stroke: var(--dx-line);
+  stroke-width: 1px;
+}
+.dx-writing-grid-diagonal {
+  stroke-dasharray: 4 6;
+}
+.dx-writing-outline {
+  fill: var(--dx-line);
+}
+/* A miss brings up the stroke to write, breathing in its prop's colour. */
+.dx-writing-hint {
+  opacity: 0.35;
+  fill: var(--part);
+  animation: dx-writing-hint 1.4s ease-in-out infinite;
+}
+@keyframes dx-writing-hint {
+  50% {
+    opacity: 0.12;
+  }
+}
+/* A written stroke paints in along its centre line, clipped to its shape. */
+.dx-writing-paint {
+  fill: none;
+  stroke: var(--part);
+  stroke-width: 260;
+  stroke-dasharray: 1 2;
+  animation: dx-writing-paint 260ms ease-out both;
+}
+@keyframes dx-writing-paint {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+/* Where the next stroke begins. */
+.dx-writing-start {
+  opacity: 0.8;
+  fill: var(--part);
+  animation: dx-writing-start 1.2s ease-in-out infinite;
+}
+@keyframes dx-writing-start {
+  50% {
+    opacity: 0.25;
+  }
+}
+.dx-writing-ink {
+  pointer-events: none;
+  fill: none;
+  stroke: var(--dx-fg);
+  stroke-width: 34;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* A fitting stroke hands over to the paint; a miss goes red and fades. */
+.dx-writing-ink[data-result="hit"] {
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+.dx-writing-ink[data-result="miss"] {
+  opacity: 0;
+  stroke: var(--dx-red);
+  transition: opacity 400ms ease-in 120ms;
+}
+.dx-writing-loader {
   display: grid;
   place-items: center;
-  color: var(--dx-muted);
 }
-.dx-sheet-status {
-  height: 16px;
-  margin: 0;
-  font: 11px / 16px var(--dx-mono);
-  color: var(--dx-muted);
+.dx-writing-pips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+  max-width: var(--pad);
+  min-height: 10px;
 }
-.dx-sheet > footer {
+.dx-writing-pips > i {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  overflow: hidden;
+  border: 1px solid var(--dx-line-strong);
+  border-radius: 2px;
+}
+.dx-writing-pips > i[data-next="true"] {
+  border-color: var(--dx-blue);
+}
+.dx-writing-part {
   display: flex;
   gap: 8px;
+  align-items: baseline;
+  height: 22px;
+  margin: 0;
+  font: 12px / 22px var(--dx-mono);
+  color: var(--dx-muted);
+}
+.dx-writing-code {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--part);
+}
+.dx-writing-part[data-done="true"] {
+  color: var(--dx-green);
 }
 
 /* ── Toast ───────────────────────────────────────── */

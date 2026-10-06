@@ -31,6 +31,8 @@ export function useStrokes(hanzi: string) {
       }
       const data = (await response.json()) as {
         strokes: string[];
+        /** Each stroke's centre line, start to end, in the strokes' 1024-unit space. */
+        medians: [number, number][][];
         owners: string[];
       };
       return {

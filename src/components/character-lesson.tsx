@@ -41,7 +41,7 @@ import {
 } from "./ui/hanzi";
 import { partColor } from "./ui/part-colors";
 import { useToast } from "./ui/toast";
-import { WriteSheet } from "./write-sheet";
+import { WritingModal } from "./writing-modal";
 
 interface ClueRowEvents {
   /** Move on from a clue: to the next one still empty, or finish the lesson. */
@@ -585,7 +585,14 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
       />
 
       {writing ? (
-        <WriteSheet hanzi={item.hanzi} onClose={closeWriting} />
+        <WritingModal
+          hanzi={item.hanzi}
+          onClose={closeWriting}
+          parts={props.map((prop) => ({
+            code: prop.code,
+            label: prop.name.trim() || prop.meaning || "",
+          }))}
+        />
       ) : null}
     </article>
   );
