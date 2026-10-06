@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { DitherButton } from './dither-kit/button'
 import { DitherGradient } from './dither-kit/gradient'
-import { PixelLoader } from './ui/Dither'
+import { ditherColor, PixelLoader } from './ui/Dither'
 
 export function WriteSheet({ hanzi, onClose }: { hanzi: string; onClose: () => void }) {
   const target = useRef<HTMLDivElement>(null)
@@ -22,7 +22,8 @@ export function WriteSheet({ hanzi, onClose }: { hanzi: string; onClose: () => v
       if (!active || !target.current) return
       const styles = getComputedStyle(target.current)
       const ink = styles.getPropertyValue('--dx-fg').trim() || '#ededed'
-      const accent = styles.getPropertyValue('--dx-blue').trim() || '#4d8ef7'
+      // hanzi-writer only parses hex and comma rgb(a), so take the accent from the kit palette.
+      const accent = ditherColor('blue')
       target.current.replaceChildren()
       const quiz = () => writer.current?.quiz({ showHintAfterMisses: 2, onMistake: () => setMisses(value => value + 1), onComplete: () => setState('done') })
       writer.current = HanziWriter.create(target.current, hanzi, {

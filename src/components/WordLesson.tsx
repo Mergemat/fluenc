@@ -16,7 +16,7 @@ import { useToast } from './ui/Toast'
 
 type WordItem = Extract<BuildItem, { type: 'word' }>
 
-export function WordLesson({ item, remaining }: { item: WordItem; remaining: number }) {
+export function WordLesson({ item }: { item: WordItem }) {
   const meaning = getItemMeaning(item)
   const syllables = wordSyllables(item.hanzi, item.pinyin)
   const single = Array.from(item.hanzi).length === 1
@@ -53,10 +53,6 @@ export function WordLesson({ item, remaining }: { item: WordItem; remaining: num
   const prompt = single ? 'what makes this reading stick?' : `why ${item.characterParts.map(part => part.meaning).join(' + ')} means “${meaning.primary}”`
 
   return <article className="dx-studio dx-word-lesson" data-hanzi={item.hanzi} data-leaving={finish.isPending}>
-    <header className="dx-bar">
-      <p className="dx-crumb"><span>build</span><b>{String(remaining).padStart(2, '0')}</b><span>left · {single ? 'new reading' : 'word'}</span></p>
-    </header>
-
     <section className="dx-read dx-word-read" aria-label="Word">
       <WordGloss hanzi={item.hanzi} syllables={syllables} glosses={item.characterParts.map(part => part.meaning)} revealed />
       <div className="dx-ident">
