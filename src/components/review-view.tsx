@@ -9,17 +9,6 @@ import { DitherGradient } from "./dither-kit/gradient";
 import { ReviewCard } from "./review-card";
 import { Empty, PageHeader } from "./ui/layout";
 
-function reviewTime(date: string, includeTime = false) {
-  return new Date(date).toLocaleString("en-GB", {
-    timeZone: REVIEW_TIME_ZONE,
-    day: "numeric",
-    month: "long",
-    ...(includeTime
-      ? { hour: "2-digit", minute: "2-digit", hourCycle: "h23" as const }
-      : {}),
-  });
-}
-
 type DoneState = "waiting" | "finished" | "empty";
 
 const doneCopy: Record<
@@ -55,30 +44,18 @@ function doneDetail(state: DoneState, learning: number) {
     : "learn a character or word first — reviews keep what you already understand";
 }
 
-function doneStats(
+/** The one thing worth knowing once the queue is empty: when cards come back. */
+function doneNext(
   data: DashboardData,
-  reviewed: number,
   waitingUntil: string | null,
   now: number
-): [string, string][] {
+): [string, string] | null {
   if (waitingUntil) {
-    return [
-      ["back in", countdown(Date.parse(waitingUntil) - now)],
-      ["at · shanghai", reviewTime(waitingUntil, true).split(" ").at(-1) ?? ""],
-    ];
+    return ["back in", countdown(Date.parse(waitingUntil) - now)];
   }
-  const stats: [string, string][] = [];
-  if (reviewed) {
-    stats.push(["reviewed now", String(reviewed)]);
-  }
-  if (data.nextReviewAt) {
-    stats.push(["next reviews", reviewDay(data.nextReviewAt, now)]);
-  }
-  stats.push(
-    ["characters", String(data.progress.introducedCharacters)],
-    ["new ready", String(data.buildQueue.length)]
-  );
-  return stats;
+  return data.nextReviewAt
+    ? ["next reviews", reviewDay(data.nextReviewAt, now)]
+    : null;
 }
 
 export function ReviewView({ data }: { data: DashboardData }) {
@@ -178,7 +155,6 @@ export function ReviewView({ data }: { data: DashboardData }) {
           data={data}
           learning={learning.length}
           nextLearningAt={nextLearningAt}
-          reviewed={done}
           state={state}
         />
       )}
@@ -190,13 +166,11 @@ export function ReviewView({ data }: { data: DashboardData }) {
 function ReviewDone({
   state,
   data,
-  reviewed,
   learning,
   nextLearningAt,
 }: {
   state: "waiting" | "finished" | "empty";
   data: DashboardData;
-  reviewed: number;
   learning: number;
   nextLearningAt: string | null;
 }) {
@@ -233,7 +207,7 @@ function ReviewDone({
   }, [waiting]);
 
   const copy = doneCopy[state];
-  const stats = doneStats(data, reviewed, waiting ? nextLearningAt : null, now);
+  const nextUp = doneNext(data, waiting ? nextLearningAt : null, now);
 
   return (
     <div
@@ -247,14 +221,11 @@ function ReviewDone({
         title={copy.title}
         tone={state === "waiting" ? "orange" : "green"}
       >
-        <dl className="dx-done-stats">
-          {stats.map(([label, value]) => (
-            <div key={label}>
-              <dt>{label}</dt>
-              <dd>{value}</dd>
-            </div>
-          ))}
-        </dl>
+        {nextUp ? (
+          <p className="dx-done-next">
+            {nextUp[0]} <b>{nextUp[1]}</b>
+          </p>
+        ) : null}
       </Empty>
       {state === "waiting" ? null : (
         <footer className="dx-done-actions">
