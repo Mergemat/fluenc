@@ -17,6 +17,8 @@ export interface CardSnapshot {
   difficulty: number;
   due: string;
   elapsedDays: number;
+  /** When the learner first met the item; absent in progress saved before it was recorded. */
+  introducedAt?: string;
   lapses: number;
   lastReview: string | null;
   learningSteps: number;
@@ -136,7 +138,10 @@ export function applyOperation(
       ...state,
       cards: {
         ...state.cards,
-        [key]: toSnapshot(createEmptyCard(new Date(operation.data.enrolledAt))),
+        [key]: {
+          ...toSnapshot(createEmptyCard(new Date(operation.data.enrolledAt))),
+          introducedAt: operation.data.enrolledAt,
+        },
       },
     };
   }
@@ -159,7 +164,10 @@ export function applyOperation(
       reviewedAt,
       operation.data.rating as Grade
     );
-    return { ...state, cards: { ...state.cards, [key]: toSnapshot(next) } };
+    const snapshot = card.introducedAt
+      ? { ...toSnapshot(next), introducedAt: card.introducedAt }
+      : toSnapshot(next);
+    return { ...state, cards: { ...state.cards, [key]: snapshot } };
   }
   if (operation.kind === "movie") {
     const { actorKey, actorName, finalKey, setName, tone, roomName, props } =

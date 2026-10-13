@@ -17,8 +17,16 @@ Learning new material in dependency order: pronunciation associations, character
 _Avoid_: Timed stage, bulk study session
 
 **Get**:
-An independent reading activity with messages made almost entirely from material the learner already knows. An understood sentence can then enter Review for spoken retrieval.
+An independent reading activity with messages made almost entirely from material the learner already knows. Sentences that use the newest word come first. An understood sentence is shadowed before it enters Review for spoken retrieval.
 _Avoid_: Session reward, leftover time, locked content
+
+**Shadowing**:
+Hearing a sentence and saying it aloud right after, about five times. Required at least three times before a sentence joins Review. Never graded.
+_Avoid_: Pronunciation test, listening quiz
+
+**Listen**:
+An independent, hands-free activity that plays sentences the learner has already shadowed, each followed by a pause to say it back. Meant for the gaps in a day.
+_Avoid_: Podcast, review mode
 
 ## Memory system
 

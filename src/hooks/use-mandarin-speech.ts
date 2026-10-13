@@ -24,6 +24,7 @@ export function useMandarinSpeech() {
     []
   );
 
+  /** Resolves true once the audio plays to its end; false if it fails or another call cuts it off. */
   const speak = useCallback(async (text: string, pinyin: string) => {
     const requestId = requestRef.current + 1;
     requestRef.current = requestId;
@@ -49,7 +50,7 @@ export function useMandarinSpeech() {
         audioSourceCache.set(cacheKey, source);
       }
       if (requestRef.current !== requestId) {
-        return;
+        return false;
       }
 
       const audio = new Audio();
@@ -57,15 +58,36 @@ export function useMandarinSpeech() {
       audio.src = source;
       audioRef.current = audio;
       audio.onplaying = () => setStatus("speaking");
-      audio.onended = () => setStatus("idle");
-      audio.onerror = () => setStatus("error");
+      const finished = new Promise<boolean>((resolve) => {
+        audio.onended = () => {
+          setStatus("idle");
+          resolve(true);
+        };
+        audio.onerror = () => {
+          setStatus("error");
+          resolve(false);
+        };
+        audio.onpause = () => {
+          if (!audio.ended) {
+            resolve(false);
+          }
+        };
+      });
       await audio.play();
+      return await finished;
     } catch {
       if (requestRef.current === requestId) {
         setStatus("error");
       }
+      return false;
     }
   }, []);
 
-  return { speak, status };
+  const stop = useCallback(() => {
+    requestRef.current += 1;
+    audioRef.current?.pause();
+    setStatus("idle");
+  }, []);
+
+  return { speak, status, stop };
 }

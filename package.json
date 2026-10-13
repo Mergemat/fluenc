@@ -6,6 +6,7 @@
     "build": "bun scripts/build.ts",
     "check": "ultracite check",
     "data:font": "bun scripts/sync-hanzi-font.ts",
+    "data:sentences": "bun scripts/sync-sentences.ts",
     "data:strokes": "bun scripts/sync-character-strokes.ts",
     "data:sync": "bun scripts/sync-curriculum.ts",
     "db:generate": "drizzle-kit generate",

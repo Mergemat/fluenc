@@ -193,6 +193,25 @@ export function deriveDashboard(
   const introducedSentences = new Set(
     items.filter((item) => item.type === "sentence").map((item) => item.id)
   );
+  // When each known word arrived, so Get can show the newest word's sentences first.
+  const wordIntroducedAt = new Map<string, number>();
+  for (const item of items) {
+    let hanzi: string | undefined;
+    if (item.type === "word") {
+      hanzi = catalog.wordsById.get(item.id)?.hanzi;
+    } else if (item.type === "character" && characterIsWord(item.id)) {
+      hanzi = item.id;
+    }
+    if (hanzi) {
+      const at = item.card.introducedAt
+        ? Date.parse(item.card.introducedAt)
+        : 0;
+      wordIntroducedAt.set(
+        hanzi,
+        Math.max(at, wordIntroducedAt.get(hanzi) ?? 0)
+      );
+    }
+  }
   const scheduled = (item: (typeof items)[number]) => {
     const resolved = studyItem(item.type, item.id, state, catalog);
     return resolved
@@ -303,8 +322,14 @@ export function deriveDashboard(
       };
     })
     .filter((sentence) => sentence.coverage >= 0.9)
-    .sort((left, right) => right.coverage - left.coverage)
-    .slice(0, 6);
+    // Mandarin Blueprint pairs Build with Get: a new word comes with sentences that use it.
+    // Fully known sentences come before ones with an unknown left in them.
+    .sort(
+      (left, right) =>
+        (wordIntroducedAt.get(right.anchor) ?? -1) -
+          (wordIntroducedAt.get(left.anchor) ?? -1) ||
+        right.coverage - left.coverage
+    );
 
   return {
     curriculum: {
@@ -320,6 +345,23 @@ export function deriveDashboard(
     buildQueue: [...newWords, ...newCharacters],
     lockedWords,
     getQueue,
+    // Sentences already read and shadowed: what Listen plays back.
+    listenQueue: items.flatMap((item) => {
+      const sentence =
+        item.type === "sentence"
+          ? catalog.sentencesById.get(item.id)
+          : undefined;
+      return sentence
+        ? [
+            {
+              id: sentence.id,
+              hanzi: sentence.hanzi,
+              pinyin: sentence.pinyin,
+              meaning: sentence.meaning,
+            },
+          ]
+        : [];
+    }),
     scheduledQueue,
     nextReviewAt: scheduledQueue.reduce<string | null>(
       (earliest, item) =>
