@@ -3,6 +3,7 @@ import { getRouteApi, Link } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
 import {
   type ChangeEvent,
+  type CompositionEvent,
   type MouseEvent,
   useCallback,
   useDeferredValue,
@@ -142,7 +143,30 @@ export function LibraryView() {
       ),
     [dashboard.data]
   );
-  const query = useDeferredValue(q);
+  // The field owns its text: echoing it through the URL lands a render late, and resetting the
+  // value mid-composition breaks IME input (iOS pinyin). The URL follows once a word is committed.
+  const [draft, setDraft] = useState(q);
+  const composing = useRef<boolean>(false);
+  // What the field has sent to the URL and not yet seen land; navigations can skip values.
+  const sent = useRef<string[]>([]);
+  useEffect(() => {
+    const echo = sent.current.indexOf(q);
+    if (echo === -1) {
+      // Changed from outside the field (the sidebar link, clearing): adopt it.
+      sent.current = [];
+      setDraft(q);
+    } else {
+      sent.current = sent.current.slice(echo + 1);
+    }
+  }, [q]);
+  const commitQuery = useCallback(
+    (value: string) => {
+      sent.current.push(value);
+      update({ q: value });
+    },
+    [update]
+  );
+  const query = useDeferredValue(draft);
   const searching = query.trim() !== "";
   const search = useMemo(
     () =>
@@ -196,8 +220,24 @@ export function LibraryView() {
   }, []);
 
   const typeQuery = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => update({ q: event.target.value }),
-    [update]
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setDraft(event.target.value);
+      if (!composing.current) {
+        commitQuery(event.target.value);
+      }
+    },
+    [commitQuery]
+  );
+  const startComposing = useCallback(() => {
+    composing.current = true;
+  }, []);
+  const endComposing = useCallback(
+    (event: CompositionEvent<HTMLInputElement>) => {
+      composing.current = false;
+      setDraft(event.currentTarget.value);
+      commitQuery(event.currentTarget.value);
+    },
+    [commitQuery]
   );
   const clearQuery = useCallback(() => {
     update({ q: "" });
@@ -287,7 +327,7 @@ export function LibraryView() {
               clear search &amp; filters
             </button>
           }
-          title={`nothing matches${q ? ` “${q}”` : ""}`}
+          title={`nothing matches${query ? ` “${query}”` : ""}`}
         />
       );
     }
@@ -298,7 +338,7 @@ export function LibraryView() {
     if (searching) {
       return (
         <>
-          <div aria-busy={q !== query} className="dx-wall">
+          <div aria-busy={draft !== query} className="dx-wall">
             {items.slice(0, shown).map((item) => (
               <Tile item={item} key={`${item.kind}:${item.id}`} />
             ))}
@@ -356,13 +396,15 @@ export function LibraryView() {
             aria-label="Search the library"
             autoComplete="off"
             onChange={typeQuery}
+            onCompositionEnd={endComposing}
+            onCompositionStart={startComposing}
             placeholder="hanzi, pinyin, meaning, or your clues"
             ref={input}
             spellCheck={false}
             type="search"
-            value={q}
+            value={draft}
           />
-          {q ? (
+          {draft ? (
             <button
               aria-label="Clear search"
               onClick={clearQuery}
