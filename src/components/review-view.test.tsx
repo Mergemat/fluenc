@@ -88,6 +88,8 @@ function fixture(count = 1): Course {
     pinyin: "Nǐ hǎo.",
     meaning: `Sentence ${index}`,
     words: ["你", "好"],
+    anchor: "好",
+    source: null,
   }));
   const catalog = createCatalog(
     { version: "test", characters: [], words: [] },

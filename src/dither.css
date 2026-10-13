@@ -1925,6 +1925,50 @@
 .dx-card-actions > [inert] {
   visibility: hidden;
 }
+/* Shadowing: the replay and the next step sit side by side once both are available. */
+.dx-shadow-actions {
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 8px;
+}
+.dx-shadow-actions > * {
+  grid-area: auto;
+}
+.dx-shadow-pips {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin: 4px 0 0;
+}
+.dx-shadow-pips > i {
+  width: 18px;
+  height: 6px;
+  background: var(--dx-line);
+  border-radius: 2px;
+  transition: background 160ms;
+}
+.dx-shadow-pips > i[data-done="true"] {
+  background: var(--dx-green);
+}
+/* Listen: the whole line stays visible; the cue flips between hearing and saying. */
+.dx-listen .dx-sentence-prompt {
+  gap: 10px;
+}
+.dx-listen-meaning {
+  max-width: 32ch;
+  margin: 0;
+  font: var(--dx-text-md) / 1.4 var(--dx-sans);
+  color: var(--dx-muted);
+}
+.dx-listen[data-phase="repeat"] .dx-sentence-cue {
+  color: var(--dx-green);
+}
+.dx-listen-count {
+  margin: 0;
+  font: var(--dx-text-xs) var(--dx-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--dx-faint);
+}
 .dx-ratings {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

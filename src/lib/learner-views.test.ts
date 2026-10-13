@@ -1,5 +1,7 @@
 import { expect, test } from "bun:test";
 
+import type { Word } from "../data/types";
+import { createCatalog } from "./catalog";
 import {
   applyOperation,
   emptyLearnerState,
@@ -107,4 +109,67 @@ test("enrolling twice or reviewing an unknown card leaves the state unchanged, l
       },
     })
   ).toBe(once);
+});
+
+test("a reviewed card keeps the moment it was introduced", () => {
+  const enrolled = applyOperation(
+    emptyLearnerState,
+    enroll("sentence", "s01", "2026-09-01T02:00:00.000Z")
+  );
+  const reviewed = applyOperation(enrolled, {
+    kind: "review",
+    data: {
+      eventId: crypto.randomUUID(),
+      itemType: "sentence",
+      itemId: "s01",
+      rating: 3,
+      durationMs: 0,
+      reviewedAt: "2026-09-05T02:00:00.000Z",
+    },
+  });
+  expect(reviewed.cards["sentence:s01"]).toMatchObject({
+    introducedAt: "2026-09-01T02:00:00.000Z",
+    lastReview: "2026-09-05T02:00:00.000Z",
+  });
+});
+
+test("reading offers the newest word's sentences first, and listening plays back read ones", () => {
+  const word = (id: number, hanzi: string) =>
+    ({ id, hanzi, rank: id, characterIds: [] }) as unknown as Word;
+  const sentence = (id: string, hanzi: string, anchor: string) => ({
+    id,
+    hanzi,
+    pinyin: "",
+    meaning: id,
+    words: Array.from(new Set(["我", anchor])),
+    anchor,
+    source: null,
+  });
+  const catalog = createCatalog(
+    {
+      version: "test",
+      characters: [],
+      words: [word(9001, "我"), word(9002, "吃饭"), word(9003, "喜欢")],
+    },
+    [
+      sentence("about-eating", "我吃饭。", "吃饭"),
+      sentence("about-liking", "我喜欢。", "喜欢"),
+      sentence("about-me", "我。", "我"),
+    ]
+  );
+  const state = [
+    enroll("word", "9001", "2026-09-01T02:00:00.000Z"),
+    enroll("word", "9002", "2026-09-02T02:00:00.000Z"),
+    enroll("word", "9003", "2026-09-03T02:00:00.000Z"),
+    enroll("sentence", "about-me", "2026-09-03T03:00:00.000Z"),
+  ].reduce(
+    (next, operation) => applyOperation(next, operation, catalog),
+    emptyLearnerState
+  );
+  const dashboard = deriveDashboard(state, new Date(), catalog);
+  expect(dashboard.getQueue.map((item) => item.id)).toEqual([
+    "about-liking",
+    "about-eating",
+  ]);
+  expect(dashboard.listenQueue.map((item) => item.id)).toEqual(["about-me"]);
 });

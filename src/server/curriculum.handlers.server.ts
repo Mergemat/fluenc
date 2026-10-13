@@ -86,6 +86,7 @@ function cardSnapshot(item: LearnerItem): CardSnapshot {
     lapses: item.lapses,
     state: item.state,
     lastReview: item.lastReview?.toISOString() ?? null,
+    introducedAt: item.introducedAt.toISOString(),
   };
 }
 
