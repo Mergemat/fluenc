@@ -513,6 +513,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
         meta={
           <>
             {direct ? "new prop" : "new character"}
+            {item.focus ? <b className="dx-head-source">{item.focus}</b> : null}
             <UsageWords hanzi={item.hanzi} usage={usage} />
           </>
         }

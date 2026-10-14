@@ -1,10 +1,11 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { type Card, createEmptyCard, type Grade } from "ts-fsrs";
 
 import { studyItemTypes } from "../data/types";
 import { db } from "../db";
 import {
   componentProps,
+  focusEntries,
   type ItemType,
   type LearnerItem,
   learnerItems,
@@ -16,7 +17,7 @@ import {
   syncEvents,
   toneRooms,
 } from "../db/schema";
-import { catalog } from "../lib/catalog";
+import { catalogFor } from "../lib/catalog";
 import { studyIdentity } from "../lib/character-words";
 import {
   type CardSnapshot,
@@ -90,9 +91,30 @@ function cardSnapshot(item: LearnerItem): CardSnapshot {
   };
 }
 
+function focusQuery() {
+  return db
+    .select()
+    .from(focusEntries)
+    .where(eq(focusEntries.learnerId, LEARNER_ID))
+    .orderBy(asc(focusEntries.addedAt));
+}
+
+function focusState(
+  entries: Awaited<ReturnType<typeof focusQuery>>
+): LearnerState["focus"] {
+  return entries.map((entry) => ({
+    kind: entry.kind,
+    hanzi: entry.hanzi,
+    pinyin: entry.pinyin,
+    meaning: entry.meaning,
+    label: entry.label,
+    addedAt: entry.addedAt.toISOString(),
+  }));
+}
+
 /** The learner's stored progress. Devices derive their dashboard, library and palace from it. */
 export async function getLearnerStateHandler(): Promise<LearnerState> {
-  const [items, actors, sets, rooms, props, stories] = await db.batch([
+  const [items, actors, sets, rooms, props, stories, focus] = await db.batch([
     db
       .select()
       .from(learnerItems)
@@ -118,6 +140,7 @@ export async function getLearnerStateHandler(): Promise<LearnerState> {
       .where(
         and(eq(mnemonics.learnerId, LEARNER_ID), eq(mnemonics.itemType, "word"))
       ),
+    focusQuery(),
   ]);
   return {
     cards: Object.fromEntries(
@@ -126,6 +149,7 @@ export async function getLearnerStateHandler(): Promise<LearnerState> {
         cardSnapshot(item),
       ])
     ),
+    focus: focusState(focus),
     actors: Object.fromEntries(
       actors.map((item) => [item.actorKey, item.actorName])
     ),
@@ -143,6 +167,8 @@ export async function getLearnerStateHandler(): Promise<LearnerState> {
 export async function enrollItemHandler(input: EnrollInput) {
   const data = { ...input, ...studyIdentity(input.itemType, input.itemId) };
   await ensureLearner();
+  // The learner's own words and sentences are only in the catalog built with their focus.
+  const catalog = catalogFor({ focus: focusState(await focusQuery()) });
 
   if (
     data.itemType === "character" &&
@@ -317,4 +343,39 @@ export async function saveLivingLinkHandler(data: LivingLinkInput) {
       set: { story: data.story, updatedAt: new Date() },
     });
   return { saved: true };
+}
+
+/** Add words and sentences to the learner's focus. One already there keeps its place and label. */
+export async function addFocusHandler(entries: LearnerState["focus"]) {
+  await ensureLearner();
+  if (!entries.length) {
+    return;
+  }
+  await db
+    .insert(focusEntries)
+    .values(
+      entries.map((entry) => ({
+        ...entry,
+        learnerId: LEARNER_ID,
+        addedAt: new Date(entry.addedAt),
+      }))
+    )
+    .onConflictDoNothing();
+}
+
+/** Remove focus entries by spelling. Progress on them is kept. */
+export async function removeFocusHandler(hanzi: string[]) {
+  if (!hanzi.length) {
+    return 0;
+  }
+  const removed = await db
+    .delete(focusEntries)
+    .where(
+      and(
+        eq(focusEntries.learnerId, LEARNER_ID),
+        inArray(focusEntries.hanzi, hanzi)
+      )
+    )
+    .returning({ hanzi: focusEntries.hanzi });
+  return removed.length;
 }

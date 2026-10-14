@@ -15,6 +15,7 @@
     "dev": "vite dev",
     "doctor": "react-doctor",
     "fix": "ultracite fix",
+    "focus": "bun scripts/focus.ts",
     "preview": "bun scripts/preview.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit"

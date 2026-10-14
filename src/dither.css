@@ -540,6 +540,16 @@
   font-weight: 500;
   color: var(--dx-fg);
 }
+/* Where a focus lesson came from. It gives way first when the header runs out of room. */
+.dx-head-meta:has(.dx-head-source) {
+  flex-shrink: 1;
+  min-width: 0;
+}
+.dx-head-source {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 /* A page with nothing else on it centres its empty state or status in the space left. */
 .dx-page > :is(.dx-empty, .dx-status) {
   flex: 1;
