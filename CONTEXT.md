@@ -24,6 +24,10 @@ _Avoid_: Session reward, leftover time, locked content
 Hearing a sentence and saying it aloud right after, about five times. Required at least three times before a sentence joins Review. Never graded.
 _Avoid_: Pronunciation test, listening quiz
 
+**Focus**:
+Words and sentences the learner wants taught next, usually from a class they take alongside Fluenc. Lessons teach focus first, starting with the characters a focus word still needs; focus sentences come first in Get. A focus entry with a course spelling is that course item; otherwise it becomes the learner's own entry, as long as every character is in the course. Added with `bun run focus`.
+_Avoid_: Custom deck, import, override
+
 **Listen**:
 An independent, hands-free activity that plays sentences the learner has already shadowed, each followed by a pause to say it back. Meant for the gaps in a day.
 _Avoid_: Podcast, review mode

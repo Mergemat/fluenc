@@ -145,6 +145,25 @@ export const mnemonics = sqliteTable(
   ]
 );
 
+/** Words and sentences the learner wants taught next; see `FocusEntry`. */
+export const focusEntries = sqliteTable(
+  "focus_entries",
+  {
+    learnerId: text("learner_id")
+      .notNull()
+      .references(() => learners.id, { onDelete: "cascade" }),
+    kind: text("kind", { enum: ["word", "sentence"] }).notNull(),
+    hanzi: text("hanzi").notNull(),
+    pinyin: text("pinyin").notNull(),
+    meaning: text("meaning").notNull(),
+    label: text("label").notNull(),
+    addedAt: integer("added_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.learnerId, table.kind, table.hanzi] }),
+  ]
+);
+
 export type LearnerItem = typeof learnerItems.$inferSelect;
 export type ItemType = LearnerItem["itemType"];
 
@@ -166,5 +185,6 @@ export const schema = {
   toneRooms,
   componentProps,
   mnemonics,
+  focusEntries,
   pushSubscriptions,
 };

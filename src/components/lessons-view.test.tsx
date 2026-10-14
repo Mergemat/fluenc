@@ -80,6 +80,7 @@ function character(
     rank: 1,
     unlocks: 1,
     queueKind: "new",
+    focus: null,
     movie: {
       ...getMovieCoordinates(pinyin),
       actorName: "",
@@ -105,6 +106,7 @@ const word: Extract<BuildItem, { type: "word" }> = {
   syllables: ["wǒ", "men"],
   livingLink: "",
   queueKind: "new",
+  focus: null,
   characterParts: [
     { hanzi: "我", meaning: "I" },
     { hanzi: "们", meaning: "plural marker" },
