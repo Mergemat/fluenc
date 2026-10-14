@@ -1,13 +1,17 @@
 import { type Card, createEmptyCard, type Grade } from "ts-fsrs";
 
-import { isStudyItemType, type studyItemTypes } from "../data/types";
+import {
+  type FocusEntry,
+  isStudyItemType,
+  type studyItemTypes,
+} from "../data/types";
 import type {
   EnrollInput,
   LivingLinkInput,
   MovieInput,
   ReviewInput,
 } from "../server/curriculum.contract";
-import { type Catalog, catalog as courseCatalog } from "./catalog";
+import { type Catalog, catalogFor } from "./catalog";
 import { studyIdentity } from "./character-words";
 import { scheduleReview } from "./review-schedule";
 
@@ -37,6 +41,8 @@ export interface LearnerState {
   actors: Record<string, string>;
   /** Introduced material keyed by `cardKey`, in the order it was introduced. */
   cards: Record<string, CardSnapshot>;
+  /** What the learner wants taught next, oldest first. Saved outside the app, such as by a script. */
+  focus: FocusEntry[];
   /** Living Link stories keyed by word id. */
   livingLinks: Record<string, string>;
   props: Record<string, string>;
@@ -46,6 +52,7 @@ export interface LearnerState {
 
 export const emptyLearnerState: LearnerState = {
   cards: {},
+  focus: [],
   actors: {},
   sets: {},
   rooms: {},
@@ -120,7 +127,7 @@ function isInCatalog(type: StudyItemType, id: string, catalog: Catalog) {
 export function applyOperation(
   state: LearnerState,
   operation: ProgressOperation,
-  catalog: Catalog = courseCatalog
+  catalog: Catalog = catalogFor(state)
 ): LearnerState {
   if (operation.kind === "enroll") {
     const target = studyIdentity(

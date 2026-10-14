@@ -23,7 +23,8 @@ export interface Word {
   characterIds: string[];
   dictionaryMeanings: string[];
   hanzi: string;
-  id: number;
+  /** A course word's number, or the spelling of a word the learner added. */
+  id: number | string;
   meaning: string;
   pinyin: string;
   rank: number;
@@ -43,4 +44,20 @@ export interface Curriculum {
   };
   version: string;
   words: Word[];
+}
+
+/**
+ * A word or sentence the learner wants taught next, usually from a class. Spellings that match the
+ * course use the course entry; the rest become the learner's own entries, as long as every
+ * character is in the course.
+ */
+export interface FocusEntry {
+  /** ISO time it was added; earlier entries are taught first. */
+  addedAt: string;
+  hanzi: string;
+  kind: "word" | "sentence";
+  /** Where it came from, such as "HSK 1 · Lesson 3". */
+  label: string;
+  meaning: string;
+  pinyin: string;
 }
