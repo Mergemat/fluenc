@@ -125,7 +125,16 @@ export function WordLesson({ item }: { item: WordItem }) {
       data-hanzi={item.hanzi}
       data-leaving={finish.isPending}
     >
-      <PageHeader heading={false} meta="new word" title="learn" />
+      <PageHeader
+        heading={false}
+        meta={
+          <>
+            new word
+            {item.focus ? <b className="dx-head-source">{item.focus}</b> : null}
+          </>
+        }
+        title="learn"
+      />
       <section aria-label="Word" className="dx-read dx-word-read">
         <WordGloss
           glosses={item.characterParts.map((part) => part.meaning)}

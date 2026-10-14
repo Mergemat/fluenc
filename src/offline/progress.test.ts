@@ -337,6 +337,7 @@ test("progress cached by an older version migrates to learner state, even offlin
   const migrated = await getCachedLearner();
   expect(migrated?.state).toEqual({
     cards: { "sentence:s01": card },
+    focus: [],
     actors: { m: "Mia" },
     sets: { a: "Garden" },
     rooms: {},

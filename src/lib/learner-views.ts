@@ -1,7 +1,7 @@
 import { State } from "ts-fsrs";
 
 import type { Character, Word } from "../data/types";
-import { type Catalog, catalog as courseCatalog } from "./catalog";
+import { type Catalog, catalogFor } from "./catalog";
 import { directCharacters } from "./character-props";
 import { characterForWord, characterIsWord } from "./character-words";
 import { groupHanziComponents } from "./hanzi";
@@ -165,11 +165,36 @@ function introducedCards(state: LearnerState) {
     });
 }
 
+/**
+ * Focus is taught first, in the order it was added: a focus item, or a character a focus word
+ * still needs, takes the place and label of the earliest entry that asks for it. Keyed by `cardKey`.
+ */
+function focusPriorities(catalog: Catalog, learnedWords: ReadonlySet<string>) {
+  const focus = new Map<string, { place: number; label: string }>();
+  const prioritize = (key: string, place: number, label: string) => {
+    if (!focus.has(key)) {
+      focus.set(key, { place, label });
+    }
+  };
+  for (const [place, target] of catalog.focus.entries()) {
+    prioritize(target.key, place, target.label);
+    const parsed = parseCardKey(target.key);
+    const word =
+      parsed?.type === "word" ? catalog.wordsById.get(parsed.id) : undefined;
+    if (word && !learnedWords.has(word.hanzi)) {
+      for (const id of word.characterIds) {
+        prioritize(cardKey("character", id), place, target.label);
+      }
+    }
+  }
+  return focus;
+}
+
 /** Review, Build and Get queues at a moment in time. */
 export function deriveDashboard(
   state: LearnerState,
   now: Date,
-  catalog: Catalog = courseCatalog
+  catalog: Catalog = catalogFor(state)
 ) {
   const items = introducedCards(state).map((item) => ({
     ...item,
@@ -235,6 +260,10 @@ export function deriveDashboard(
     .map(scheduled)
     .filter((item) => item !== null);
 
+  const focus = focusPriorities(catalog, learnedWords);
+  const focusPlace = (key: string) =>
+    focus.get(key)?.place ?? Number.MAX_SAFE_INTEGER;
+
   const unintroducedWords = catalog.uniqueWords
     .filter(
       (item) =>
@@ -247,10 +276,17 @@ export function deriveDashboard(
     .map((item) => ({
       ...wordStudyItem(item, state, catalog),
       queueKind: "new" as const,
+      focus: focus.get(cardKey("word", String(item.id)))?.label ?? null,
     }));
   const wordReady = (item: (typeof unintroducedWords)[number]) =>
     item.characterIds.every((character) => introducedCharacters.has(character));
-  const newWords = unintroducedWords.filter(wordReady);
+  const newWords = unintroducedWords
+    .filter(wordReady)
+    .sort(
+      (left, right) =>
+        focusPlace(cardKey("word", left.id)) -
+        focusPlace(cardKey("word", right.id))
+    );
   const lockedWords = unintroducedWords.filter((item) => !wordReady(item));
   const nextWordParts = nextWordCharacters(lockedWords, introducedCharacters);
   const missingProps = (character: Character) =>
@@ -265,6 +301,12 @@ export function deriveDashboard(
         { character: left, missingProps: leftMissing },
         { character: right, missingProps: rightMissing }
       ) => {
+        const focusPriority =
+          focusPlace(cardKey("character", left.id)) -
+          focusPlace(cardKey("character", right.id));
+        if (focusPriority) {
+          return focusPriority;
+        }
         const wordPriority =
           Number(nextWordParts.has(right.id)) -
           Number(nextWordParts.has(left.id));
@@ -290,6 +332,7 @@ export function deriveDashboard(
     .map(({ character }) => ({
       ...characterStudyItem(character, state, catalog),
       queueKind: "new" as const,
+      focus: focus.get(cardKey("character", character.id))?.label ?? null,
     }));
 
   const getQueue = catalog.sentences
@@ -322,10 +365,12 @@ export function deriveDashboard(
       };
     })
     .filter((sentence) => sentence.coverage >= 0.9)
-    // Mandarin Blueprint pairs Build with Get: a new word comes with sentences that use it.
-    // Fully known sentences come before ones with an unknown left in them.
+    // Focus sentences first. Then, as Mandarin Blueprint pairs Build with Get, a new word comes
+    // with sentences that use it. Fully known sentences come before ones with an unknown left.
     .sort(
       (left, right) =>
+        focusPlace(cardKey("sentence", left.id)) -
+          focusPlace(cardKey("sentence", right.id)) ||
         (wordIntroducedAt.get(right.anchor) ?? -1) -
           (wordIntroducedAt.get(left.anchor) ?? -1) ||
         right.coverage - left.coverage
@@ -342,7 +387,12 @@ export function deriveDashboard(
       introducedWords: learnedWords.size,
     },
     reviewQueue,
-    buildQueue: [...newWords, ...newCharacters],
+    buildQueue: [
+      ...newWords.filter((item) => item.focus !== null),
+      ...newCharacters.filter((item) => item.focus !== null),
+      ...newWords.filter((item) => item.focus === null),
+      ...newCharacters.filter((item) => item.focus === null),
+    ],
     lockedWords,
     getQueue,
     // Sentences already read and shadowed: what Listen plays back.
@@ -374,7 +424,7 @@ export function deriveDashboard(
 /** Every course entry with the learner's status, so entry pages render offline. */
 export function deriveLibrary(
   state: LearnerState,
-  catalog: Catalog = courseCatalog
+  catalog: Catalog = catalogFor(state)
 ) {
   const status = (card: CardSnapshot) =>
     card.state === State.Review ? ("review" as const) : ("learning" as const);
