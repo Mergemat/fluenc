@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { pinyin } from "pinyin-pro";
 import curriculumJson from "../src/data/curriculum.generated.json";
 import dictionarySource from "../src/data/dictionary.source.json";
+import meaningReviews from "../src/data/sentence-meanings.reviewed.json";
 import authoredSentences from "../src/data/sentences.authored.json";
 import type { Curriculum, Word } from "../src/data/types";
 import { type SentenceToken, segmentSentence } from "../src/lib/sentence-words";
@@ -25,6 +26,9 @@ const MAX_UNKNOWN = 1;
 const PER_ANCHOR = 3;
 
 const curriculum = curriculumJson as Curriculum;
+// Tatoeba translations that mislead about the Chinese (tense, content, or meaning), by sentence number.
+const reviewedMeanings: Record<string, { meaning: string; was: string }> =
+  meaningReviews;
 const characters = new Set(curriculum.characters.map((item) => item.hanzi));
 const wordsByHanzi = new Map<string, Word[]>();
 for (const word of curriculum.words) {
@@ -278,7 +282,7 @@ try {
       id: `t${item.id}`,
       hanzi: item.hanzi,
       pinyin: sentencePinyin(item.hanzi, item.tokens),
-      meaning: item.meaning,
+      meaning: reviewedMeanings[item.id]?.meaning ?? item.meaning,
       words: item.words,
       anchor: item.anchor,
       source: Number(item.id),
