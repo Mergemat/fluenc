@@ -229,8 +229,8 @@ export function MoviePinyin({
   const syllable = pinyin.split(SYLLABLE_SEPARATOR)[0] ?? pinyin;
   const letters = Array.from(syllable);
   const actorLength = actorLetters(letters.length, actorKey, finalKey);
-  const initial = letters.slice(0, actorLength).join("");
-  const final = letters.slice(actorLength).join("");
+  const actor = letters.slice(0, actorLength).join("");
+  const set = letters.slice(actorLength).join("");
   const detail = getToneDetail(tone);
   return (
     <span
@@ -239,14 +239,14 @@ export function MoviePinyin({
       role="img"
       title={`${actorKey}- actor · -${finalKey} set`}
     >
-      {initial ? (
+      {actor ? (
         <span aria-hidden="true" data-k="actor">
-          {initial}
+          {actor}
         </span>
       ) : null}
-      {final ? (
+      {set ? (
         <span aria-hidden="true" data-k="set">
-          {final}
+          {set}
         </span>
       ) : null}
       <ToneContour className="dx-py-tone" tone={tone} />
