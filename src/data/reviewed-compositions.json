@@ -1020,5 +1020,38 @@
     "components": ["丷", "一", "自"],
     "decomposition": "⿳丷一自",
     "note": "The horizontal below 丷 is separate from the six strokes of 自."
+  },
+  {
+    "character": "五",
+    "components": ["一", "丨", "㇕", "一"],
+    "structure": "compound",
+    "decomposition": null,
+    "approximate": false,
+    "note": "Use four stroke props: 一 across the top, 丨 slanting down, ㇕ across and down, and 一 along the base.",
+    "sources": [
+      "https://babelstone.co.uk/CJK/IDS.TXT",
+      "https://data.dong-chinese.com/dictionary/dong-chinese-dictionary-2026-09-01.jsonl"
+    ],
+    "confidence": "editorial"
+  },
+  {
+    "character": "八",
+    "components": ["丿", "㇏"],
+    "structure": "compound",
+    "decomposition": "⿰丿㇏",
+    "approximate": false,
+    "note": "Mnemonic props: left-falling stroke and right-falling stroke, set apart instead of meeting as in 人.",
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
+    "confidence": "verified"
+  },
+  {
+    "character": "今",
+    "components": ["𠆢", "丶", "乛"],
+    "structure": "compound",
+    "decomposition": "⿱⿵𠆢丶乛",
+    "approximate": false,
+    "note": "The 𠆢 roof covers a dot, with 乛 below.",
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
+    "confidence": "verified"
   }
 ]

@@ -36,6 +36,7 @@ const neutralToneExamples: Record<string, { text: string; pinyin: string }> = {
   了: { text: "好了", pinyin: "hǎo le" },
   吗: { text: "好吗", pinyin: "hǎo ma" },
   嗎: { text: "好嗎", pinyin: "hǎo ma" },
+  呢: { text: "你呢", pinyin: "nǐ ne" },
   着: { text: "看着", pinyin: "kànzhe" },
   著: { text: "看著", pinyin: "kànzhe" },
   吧: { text: "走吧", pinyin: "zǒu ba" },

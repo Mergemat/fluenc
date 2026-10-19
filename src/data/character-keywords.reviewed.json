@@ -5814,5 +5814,149 @@
     "sourcePinyin": "zong1",
     "sourceSense": "(bound form) footprint; trace; tracks",
     "note": "Footprint is a literal attestation, but trace or tracks better carries the modern root visible in 失踪/跟踪. Example: 无影无踪 / without a trace Usage evidence: https://www.chinesepod.com/dictionary/%E8%B8%AA"
+  },
+  {
+    "character": "四",
+    "pinyin": "sì",
+    "keyword": "four",
+    "sourcePinyin": "si4",
+    "sourceSense": "four",
+    "note": "Basic numeral."
+  },
+  {
+    "character": "五",
+    "pinyin": "wǔ",
+    "keyword": "five",
+    "sourcePinyin": "wu3",
+    "sourceSense": "five",
+    "note": "Basic numeral."
+  },
+  {
+    "character": "六",
+    "pinyin": "liù",
+    "keyword": "six",
+    "sourcePinyin": "liu4",
+    "sourceSense": "six",
+    "note": "Basic numeral."
+  },
+  {
+    "character": "七",
+    "pinyin": "qī",
+    "keyword": "seven",
+    "sourcePinyin": "qi1",
+    "sourceSense": "seven",
+    "note": "Basic numeral."
+  },
+  {
+    "character": "八",
+    "pinyin": "bā",
+    "keyword": "eight",
+    "sourcePinyin": "ba1",
+    "sourceSense": "eight",
+    "note": "Basic numeral."
+  },
+  {
+    "character": "九",
+    "pinyin": "jiǔ",
+    "keyword": "nine",
+    "sourcePinyin": "jiu3",
+    "sourceSense": "nine",
+    "note": "Basic numeral."
+  },
+  {
+    "character": "十",
+    "pinyin": "shí",
+    "keyword": "ten",
+    "sourcePinyin": "shi2",
+    "sourceSense": "ten",
+    "note": "Basic numeral."
+  },
+  {
+    "character": "汉",
+    "pinyin": "hàn",
+    "keyword": "Chinese",
+    "sourcePinyin": "Han4",
+    "sourceSense": "Chinese (language)",
+    "note": "Chosen for the Chinese sense in 汉语 and 汉字."
+  },
+  {
+    "character": "菜",
+    "pinyin": "cài",
+    "keyword": "dish",
+    "sourcePinyin": "cai4",
+    "sourceSense": "dish (of food) (CL:樣|样[yang4],道[dao4],盤|盘[pan2])",
+    "note": "Chosen for the common food sense."
+  },
+  {
+    "character": "口",
+    "pinyin": "kǒu",
+    "keyword": "mouth",
+    "sourcePinyin": "kou3",
+    "sourceSense": "mouth",
+    "note": "Concrete primary sense; the family-member classifier is taught as a word."
+  },
+  {
+    "character": "今",
+    "pinyin": "jīn",
+    "keyword": "now",
+    "sourcePinyin": "jin1",
+    "sourceSense": "now",
+    "note": "Chosen for the present-time sense in 今天 and 今年."
+  },
+  {
+    "character": "李",
+    "pinyin": "lǐ",
+    "keyword": "plum",
+    "sourcePinyin": "li3",
+    "sourceSense": "plum",
+    "note": "Concrete sense makes a better prop; the surname Li is taught as a word."
+  },
+  {
+    "character": "呢",
+    "pinyin": "ne",
+    "keyword": "what-about particle",
+    "sourcePinyin": "ne5",
+    "sourceSense": "(sentence-final particle) used in questions to link back to prior discourse or context (\"what about...?\", \"and...?\")",
+    "note": "Follow-up question particle, as in 你呢？"
+  },
+  {
+    "character": "茶",
+    "pinyin": "chá",
+    "keyword": "tea",
+    "sourcePinyin": "cha2",
+    "sourceSense": "tea",
+    "note": "Chosen for the common modern tea sense."
+  },
+  {
+    "character": "星",
+    "pinyin": "xīng",
+    "keyword": "star",
+    "sourcePinyin": "xing1",
+    "sourceSense": "star",
+    "note": "Chosen for the common modern star sense."
+  },
+  {
+    "character": "期",
+    "pinyin": "qī",
+    "keyword": "period",
+    "sourcePinyin": "qi1",
+    "sourceSense": "a period of time",
+    "note": "Time-period sense, as in 星期."
+  },
+  {
+    "character": "海",
+    "pinyin": "hǎi",
+    "keyword": "sea",
+    "sourcePinyin": "hai3",
+    "sourceSense": "sea",
+    "note": "Chosen for the common modern sea sense."
+  },
+  {
+    "character": "语",
+    "pinyin": "yǔ",
+    "keyword": "language",
+    "sourcePinyin": "yu3",
+    "sourceSense": "language",
+    "note": "Chosen for the language sense in 汉语."
   }
 ]

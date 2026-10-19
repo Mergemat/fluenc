@@ -108,20 +108,20 @@ test("an entry with a character the course lacks is left out", () => {
   const state = {
     ...emptyLearnerState,
     focus: [
-      entry("word", "上海", "shànghǎi", "Shanghai"),
+      entry("word", "北京", "běijīng", "Beijing"),
       entry(
         "sentence",
-        "我是上海人。",
-        "wǒ shì shànghǎi rén.",
-        "I'm from Shanghai."
+        "我是北京人。",
+        "wǒ shì běijīng rén.",
+        "I'm from Beijing."
       ),
     ],
   };
   expect(build(state)).toEqual(build(emptyLearnerState));
-  expect(deriveLibrary(state).words.some((word) => word.hanzi === "上海")).toBe(
+  expect(deriveLibrary(state).words.some((word) => word.hanzi === "北京")).toBe(
     false
   );
-  expect(learn(state, "word", "上海")).toBe(state);
+  expect(learn(state, "word", "北京")).toBe(state);
 });
 
 test("a focus sentence is read before sentences for a newer word", () => {

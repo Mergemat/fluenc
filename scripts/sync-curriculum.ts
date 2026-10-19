@@ -4,6 +4,7 @@ import keywordReviews from "../src/data/character-keywords.reviewed.json";
 import dictionarySource from "../src/data/dictionary.source.json";
 import reviewedJson from "../src/data/reviewed-compositions.json";
 import wordReviews from "../src/data/word-meanings.reviewed.json";
+import supplement from "../src/data/words.supplement.json";
 import { characterWordEquivalences } from "../src/lib/character-word-equivalence";
 import { resolveCharacterKeywords } from "../src/lib/curriculum-readings";
 import {
@@ -85,11 +86,24 @@ const uniqueRecords = [
     .values(),
 ];
 
-const frequencyWords = uniqueRecords.map((record) => ({
+const listedWords = uniqueRecords.map((record) => ({
   id: Number(record.rank),
   rank: Number(record.rank),
   hanzi: record.word,
 }));
+// Supplementary words follow the frequency list, which lacks basics such as 四 and 汉语.
+const lastRank = Math.max(...listedWords.map((word) => word.rank));
+const listed = new Set(listedWords.map((word) => word.hanzi));
+const frequencyWords = [
+  ...listedWords,
+  ...supplement.words.map((hanzi, index) => {
+    if (listed.has(hanzi)) {
+      throw new Error(`Supplementary word is already listed: ${hanzi}`);
+    }
+    const rank = lastRank + index + 1;
+    return { id: rank, rank, hanzi };
+  }),
+];
 const words = resolveWordMeanings(
   frequencyWords,
   wordReviews,
@@ -164,9 +178,10 @@ const characters = [...stats.entries()]
   );
 
 const curriculum = {
-  version: "2026-09-23.2",
+  version: "2026-10-19.1",
   sources: {
     words: WORDS_URL,
+    supplementaryWords: "src/data/words.supplement.json",
     characters: CHARACTERS_URL,
     decompositionReviews: "src/data/reviewed-compositions.json",
     keywordReviews: "src/data/character-keywords.reviewed.json",

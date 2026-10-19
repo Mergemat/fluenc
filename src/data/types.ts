@@ -36,6 +36,7 @@ export interface Curriculum {
   characters: Character[];
   sources: {
     words: string;
+    supplementaryWords: string;
     characters: string;
     decompositionReviews: string;
     keywordReviews: string;
