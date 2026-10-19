@@ -9453,5 +9453,167 @@
     "sourcePinyin": "tong1 chang2",
     "sourceSense": "usually; normally",
     "note": "Retained the clear teaching sense \"usually\" after comparing the supplied readings and senses."
+  },
+  {
+    "id": 1001,
+    "hanzi": "四",
+    "pinyin": "sì",
+    "meaning": "four",
+    "sourcePinyin": "si4",
+    "sourceSense": "four",
+    "note": "Basic numeral."
+  },
+  {
+    "id": 1002,
+    "hanzi": "五",
+    "pinyin": "wǔ",
+    "meaning": "five",
+    "sourcePinyin": "wu3",
+    "sourceSense": "five",
+    "note": "Basic numeral."
+  },
+  {
+    "id": 1003,
+    "hanzi": "六",
+    "pinyin": "liù",
+    "meaning": "six",
+    "sourcePinyin": "liu4",
+    "sourceSense": "six",
+    "note": "Basic numeral."
+  },
+  {
+    "id": 1004,
+    "hanzi": "七",
+    "pinyin": "qī",
+    "meaning": "seven",
+    "sourcePinyin": "qi1",
+    "sourceSense": "seven",
+    "note": "Basic numeral."
+  },
+  {
+    "id": 1005,
+    "hanzi": "八",
+    "pinyin": "bā",
+    "meaning": "eight",
+    "sourcePinyin": "ba1",
+    "sourceSense": "eight",
+    "note": "Basic numeral."
+  },
+  {
+    "id": 1006,
+    "hanzi": "九",
+    "pinyin": "jiǔ",
+    "meaning": "nine",
+    "sourcePinyin": "jiu3",
+    "sourceSense": "nine",
+    "note": "Basic numeral."
+  },
+  {
+    "id": 1007,
+    "hanzi": "十",
+    "pinyin": "shí",
+    "meaning": "ten",
+    "sourcePinyin": "shi2",
+    "sourceSense": "ten",
+    "note": "Basic numeral."
+  },
+  {
+    "id": 1008,
+    "hanzi": "汉语",
+    "pinyin": "hànyǔ",
+    "meaning": "Chinese (language)",
+    "sourcePinyin": "Han4 yu3",
+    "sourceSense": "Chinese language",
+    "note": "Reviewed primary sense and reading against the supplied dictionary entry."
+  },
+  {
+    "id": 1009,
+    "hanzi": "汉字",
+    "pinyin": "hànzì",
+    "meaning": "Chinese character",
+    "sourcePinyin": "han4 zi4",
+    "sourceSense": "Chinese character(s)",
+    "note": "Reviewed primary sense and reading against the supplied dictionary entry."
+  },
+  {
+    "id": 1010,
+    "hanzi": "菜",
+    "pinyin": "cài",
+    "meaning": "dish (of food)",
+    "sourcePinyin": "cai4",
+    "sourceSense": "dish (of food) (CL:樣|样[yang4],道[dao4],盤|盘[pan2])",
+    "note": "Chosen for the food sense in 中国菜; the vegetable sense stays in dictionary meanings."
+  },
+  {
+    "id": 1011,
+    "hanzi": "口",
+    "pinyin": "kǒu",
+    "meaning": "measure word for family members",
+    "sourcePinyin": "kou3",
+    "sourceSense": "classifier for things with mouths (people, domestic animals, cannons, wells etc)",
+    "note": "Taught as the classifier in 我家有三口人; mouth is the character keyword."
+  },
+  {
+    "id": 1012,
+    "hanzi": "今天",
+    "pinyin": "jīntiān",
+    "meaning": "today",
+    "sourcePinyin": "jin1 tian1",
+    "sourceSense": "today",
+    "note": "Reviewed primary sense and reading against the supplied dictionary entry."
+  },
+  {
+    "id": 1013,
+    "hanzi": "今年",
+    "pinyin": "jīnnián",
+    "meaning": "this year",
+    "sourcePinyin": "jin1 nian2",
+    "sourceSense": "this year",
+    "note": "Reviewed primary sense and reading against the supplied dictionary entry."
+  },
+  {
+    "id": 1014,
+    "hanzi": "李",
+    "pinyin": "lǐ",
+    "meaning": "Li (surname)",
+    "sourcePinyin": "Li3",
+    "sourceSense": "surname Li",
+    "note": "One of the commonest surnames, as in 李老师; plum is the character keyword."
+  },
+  {
+    "id": 1015,
+    "hanzi": "呢",
+    "pinyin": "ne",
+    "meaning": "what about…? (question particle)",
+    "sourcePinyin": "ne5",
+    "sourceSense": "(sentence-final particle) used in questions to link back to prior discourse or context (\"what about...?\", \"and...?\")",
+    "note": "Follow-up question particle: 我很好，你呢？ Not the ni2 wool-fabric reading."
+  },
+  {
+    "id": 1016,
+    "hanzi": "茶",
+    "pinyin": "chá",
+    "meaning": "tea",
+    "sourcePinyin": "cha2",
+    "sourceSense": "tea",
+    "note": "Reviewed primary sense and reading against the supplied dictionary entry."
+  },
+  {
+    "id": 1017,
+    "hanzi": "星期",
+    "pinyin": "xīngqī",
+    "meaning": "week",
+    "sourcePinyin": "xing1 qi1",
+    "sourceSense": "week",
+    "note": "Reviewed primary sense and reading against the supplied dictionary entry."
+  },
+  {
+    "id": 1018,
+    "hanzi": "上海",
+    "pinyin": "shànghǎi",
+    "meaning": "Shanghai",
+    "sourcePinyin": "Shang4 hai3",
+    "sourceSense": "Shanghai municipality (short name 滬|沪[Hu4])",
+    "note": "City name."
   }
 ]
