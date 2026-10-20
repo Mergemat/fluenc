@@ -1053,5 +1053,15 @@
     "note": "The 𠆢 roof covers a dot, with 乛 below.",
     "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
     "confidence": "verified"
+  },
+  {
+    "character": "后",
+    "components": ["𠂋", "口"],
+    "structure": "compound",
+    "decomposition": "⿸𠂋口",
+    "approximate": false,
+    "note": "The first three strokes form 𠂋 over 口; replaces the unknown upper operand in the upstream decomposition.",
+    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
+    "confidence": "verified"
   }
 ]

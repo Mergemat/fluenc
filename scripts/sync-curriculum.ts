@@ -178,7 +178,7 @@ const characters = [...stats.entries()]
   );
 
 const curriculum = {
-  version: "2026-10-19.1",
+  version: "2026-10-20.1",
   sources: {
     words: WORDS_URL,
     supplementaryWords: "src/data/words.supplement.json",
