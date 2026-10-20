@@ -9615,5 +9615,50 @@
     "sourcePinyin": "Shang4 hai3",
     "sourceSense": "Shanghai municipality (short name 滬|沪[Hu4])",
     "note": "City name."
+  },
+  {
+    "id": 1019,
+    "hanzi": "猫",
+    "pinyin": "māo",
+    "meaning": "cat",
+    "sourcePinyin": "mao1",
+    "sourceSense": "cat (CL:隻|只[zhi1])",
+    "note": "Domestic cat in the Lesson 5 age examples."
+  },
+  {
+    "id": 1020,
+    "hanzi": "热",
+    "pinyin": "rè",
+    "meaning": "hot",
+    "sourcePinyin": "re4",
+    "sourceSense": "hot (of weather)",
+    "note": "Weather temperature in 七月的天气太热了."
+  },
+  {
+    "id": 1021,
+    "hanzi": "块",
+    "pinyin": "kuài",
+    "meaning": "yuan (colloquial currency unit)",
+    "sourcePinyin": "kuai4",
+    "sourceSense": "(coll.) classifier for money and currency units",
+    "note": "Colloquial currency classifier in 一杯咖啡十块钱; chunk is the character keyword."
+  },
+  {
+    "id": 1022,
+    "hanzi": "后",
+    "pinyin": "hòu",
+    "meaning": "after",
+    "sourcePinyin": "hou4",
+    "sourceSense": "after",
+    "note": "Temporal use in 五分钟后见, from 後 simplified as 后."
+  },
+  {
+    "id": 1023,
+    "hanzi": "昨天",
+    "pinyin": "zuótiān",
+    "meaning": "yesterday",
+    "sourcePinyin": "zuo2 tian1",
+    "sourceSense": "yesterday",
+    "note": "Common time word in the Lesson 7 date question."
   }
 ]

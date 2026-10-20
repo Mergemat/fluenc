@@ -5958,5 +5958,45 @@
     "sourcePinyin": "yu3",
     "sourceSense": "language",
     "note": "Chosen for the language sense in 汉语."
+  },
+  {
+    "character": "猫",
+    "pinyin": "māo",
+    "keyword": "cat",
+    "sourcePinyin": "mao1",
+    "sourceSense": "cat (CL:隻|只[zhi1])",
+    "note": "Domestic cat, as in 我的猫六岁了; the mao2 reading occurs in 猫腰."
+  },
+  {
+    "character": "热",
+    "pinyin": "rè",
+    "keyword": "hot",
+    "sourcePinyin": "re4",
+    "sourceSense": "hot (of weather)",
+    "note": "Temperature sense, as in 七月的天气太热了."
+  },
+  {
+    "character": "块",
+    "pinyin": "kuài",
+    "keyword": "chunk",
+    "sourcePinyin": "kuai4",
+    "sourceSense": "lump; chunk; piece",
+    "note": "Concrete chunk keyword for the character; the word lesson teaches its colloquial currency classifier use."
+  },
+  {
+    "character": "后",
+    "pinyin": "hòu",
+    "keyword": "after",
+    "sourcePinyin": "hou4",
+    "sourceSense": "after",
+    "note": "Temporal after, as in 五分钟后见. Select 後 simplified as 后, rather than 后 meaning empress."
+  },
+  {
+    "character": "昨",
+    "pinyin": "zuó",
+    "keyword": "yesterday",
+    "sourcePinyin": "zuo2",
+    "sourceSense": "yesterday",
+    "note": "Time sense in 昨天."
   }
 ]
