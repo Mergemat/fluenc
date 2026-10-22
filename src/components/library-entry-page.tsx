@@ -208,7 +208,13 @@ function CharacterEntry({
           ))}
         </div>
         {item.componentNote ? (
-          <p className="dx-entry-note">{item.componentNote}</p>
+          <p
+            aria-label="How the parts fit"
+            className="dx-entry-note"
+            role="note"
+          >
+            {item.componentNote}
+          </p>
         ) : null}
       </section>
 

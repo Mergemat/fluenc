@@ -1,37 +1,69 @@
+import secondaryMeanings from "../data/secondary-meanings.reviewed.json";
+
 type MeaningItem = ({ keyword: string } | { meaning: string }) & {
   dictionaryMeanings: readonly string[];
+  hanzi: string;
+  pinyin: string;
 };
+
+const secondaryByReading = new Map(
+  secondaryMeanings.map((entry) => [`${entry.hanzi}:${entry.pinyin}`, entry])
+);
+
+// These whole entries describe the dictionary, spelling, pronunciation or classifiers
+// for a noun. A definition such as "classifier for books" is still a real sense of 本.
+// Inline labels stay intact: deleting parentheses can change a sense's meaning.
+const DICTIONARY_METADATA =
+  /^(?:CL:|(?:also|Taiwan|Beijing|colloquial) pr\. |also written |(?:(?:old|euphemistic) )?variant of |same as |opposite: |Kangxi radical )/i;
+const RADICAL_DESCRIPTION =
+  /radical in Chinese characters \(Kangxi radical \d+\)$/;
+const INFINITIVE = /^to\s+/;
+const TERMINAL_PUNCTUATION = /[.!?…]+$/;
+const WHITESPACE = /\s+/g;
+
+function meaningKey(meaning: string) {
+  return meaning
+    .trim()
+    .toLowerCase()
+    .replace(INFINITIVE, "")
+    .replace(TERMINAL_PUNCTUATION, "")
+    .replace(WHITESPACE, " ")
+    .trim();
+}
 
 export function getItemMeaning(item: MeaningItem) {
   const primary = "keyword" in item ? item.keyword : item.meaning;
-  const alternatives = item.dictionaryMeanings.filter(
-    (meaning) => meaning.toLocaleLowerCase() !== primary.toLocaleLowerCase()
-  );
+  const primaryKey = meaningKey(primary);
+  const seen = new Set([primaryKey]);
+  const alternatives = item.dictionaryMeanings.filter((meaning) => {
+    const key = meaningKey(meaning);
+    if (
+      !key ||
+      seen.has(key) ||
+      DICTIONARY_METADATA.test(meaning.trim()) ||
+      RADICAL_DESCRIPTION.test(meaning)
+    ) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+
+  // Short teaching cues are editorial decisions, not the first short dictionary
+  // fragment. Require both the reviewed reading and its exact evidence on this item;
+  // cross-references and another pronunciation cannot supply an alternate cue.
+  const reviewed = secondaryByReading.get(`${item.hanzi}:${item.pinyin}`);
+  const also =
+    reviewed &&
+    item.dictionaryMeanings.includes(reviewed.sourceSense) &&
+    meaningKey(reviewed.meaning) !== primaryKey
+      ? reviewed.meaning
+      : null;
+
   return {
     primary,
     alternatives,
-    also: shortAlternative(primary, alternatives),
-    summary: [primary, ...alternatives.slice(0, 1)].join("; "),
+    also,
+    summary: also ? `${primary}; ${also}` : primary,
   };
-}
-
-/**
- * One short extra sense for the "also" line: dictionary senses split at semicolons, with
- * labels like "(prefix)" removed, skipping repeats of the primary meaning and long glosses.
- */
-const SENSE_SEPARATOR = /;\s*/;
-const LABEL = /\([^)]*\)/g;
-const SPACES = /\s+/g;
-
-function shortAlternative(primary: string, alternatives: readonly string[]) {
-  const same = primary.toLocaleLowerCase();
-  for (const sense of alternatives) {
-    for (const part of sense.split(SENSE_SEPARATOR)) {
-      const clean = part.replace(LABEL, "").replace(SPACES, " ").trim();
-      if (clean && clean.toLocaleLowerCase() !== same && clean.length <= 32) {
-        return clean;
-      }
-    }
-  }
-  return null;
 }

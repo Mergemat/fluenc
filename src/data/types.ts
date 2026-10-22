@@ -7,6 +7,7 @@ export function isStudyItemType(
 }
 
 export interface Character {
+  /** Authored glyph assembly guidance, never source review or replacement history. */
   componentNote: string | null;
   componentStructure: "atomic" | "compound";
   components: string[];
@@ -39,6 +40,7 @@ export interface Curriculum {
     supplementaryWords: string;
     characters: string;
     decompositionReviews: string;
+    componentNotes: string;
     keywordReviews: string;
     dictionary: string;
     wordReviews: string;
