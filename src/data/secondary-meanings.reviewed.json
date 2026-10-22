@@ -1,0 +1,1880 @@
+[
+  {
+    "hanzi": "是",
+    "pinyin": "shì",
+    "meaning": "correct",
+    "sourceSense": "correct; right; true"
+  },
+  {
+    "hanzi": "好",
+    "pinyin": "hǎo",
+    "meaning": "appropriate",
+    "sourceSense": "appropriate; proper"
+  },
+  {
+    "hanzi": "就",
+    "pinyin": "jiù",
+    "meaning": "only",
+    "sourceSense": "only; as little as"
+  },
+  {
+    "hanzi": "有",
+    "pinyin": "yǒu",
+    "meaning": "there is",
+    "sourceSense": "to have; there is"
+  },
+  {
+    "hanzi": "要",
+    "pinyin": "yào",
+    "meaning": "to need",
+    "sourceSense": "to want; to need; to ask for"
+  },
+  {
+    "hanzi": "说",
+    "pinyin": "shuō",
+    "meaning": "to explain",
+    "sourceSense": "to explain; to comment"
+  },
+  {
+    "hanzi": "道",
+    "pinyin": "dào",
+    "meaning": "road",
+    "sourceSense": "road; path (CL:條|条[tiao2],股[gu3])"
+  },
+  {
+    "hanzi": "都",
+    "pinyin": "dōu",
+    "meaning": "already",
+    "sourceSense": "already"
+  },
+  {
+    "hanzi": "会",
+    "pinyin": "huì",
+    "meaning": "to meet",
+    "sourceSense": "to meet; to get together"
+  },
+  {
+    "hanzi": "去",
+    "pinyin": "qù",
+    "meaning": "to remove",
+    "sourceSense": "to remove"
+  },
+  {
+    "hanzi": "那",
+    "pinyin": "nà",
+    "meaning": "then (in that case)",
+    "sourceSense": "then (in that case)"
+  },
+  {
+    "hanzi": "想",
+    "pinyin": "xiǎng",
+    "meaning": "to miss someone",
+    "sourceSense": "to miss (feel wistful about the absence of)"
+  },
+  {
+    "hanzi": "做",
+    "pinyin": "zuò",
+    "meaning": "to make",
+    "sourceSense": "to make; to produce"
+  },
+  {
+    "hanzi": "一",
+    "pinyin": "yī",
+    "meaning": "as soon as",
+    "sourceSense": "as soon as"
+  },
+  {
+    "hanzi": "让",
+    "pinyin": "ràng",
+    "meaning": "to yield",
+    "sourceSense": "to yield"
+  },
+  {
+    "hanzi": "能",
+    "pinyin": "néng",
+    "meaning": "energy (physics)",
+    "sourceSense": "(physics) energy"
+  },
+  {
+    "hanzi": "还",
+    "pinyin": "hái",
+    "meaning": "in addition",
+    "sourceSense": "in addition"
+  },
+  {
+    "hanzi": "到",
+    "pinyin": "dào",
+    "meaning": "to leave for",
+    "sourceSense": "to leave for; to go to"
+  },
+  {
+    "hanzi": "走",
+    "pinyin": "zǒu",
+    "meaning": "to leave",
+    "sourceSense": "to leave"
+  },
+  {
+    "hanzi": "自",
+    "pinyin": "zì",
+    "meaning": "from",
+    "sourceSense": "from; since"
+  },
+  {
+    "hanzi": "看",
+    "pinyin": "kàn",
+    "meaning": "to read",
+    "sourceSense": "to read"
+  },
+  {
+    "hanzi": "为",
+    "pinyin": "wèi",
+    "meaning": "because of",
+    "sourceSense": "because of"
+  },
+  {
+    "hanzi": "真",
+    "pinyin": "zhēn",
+    "meaning": "really",
+    "sourceSense": "really"
+  },
+  {
+    "hanzi": "告",
+    "pinyin": "gào",
+    "meaning": "to announce",
+    "sourceSense": "to announce; to report"
+  },
+  {
+    "hanzi": "诉",
+    "pinyin": "sù",
+    "meaning": "to complain",
+    "sourceSense": "to complain"
+  },
+  {
+    "hanzi": "经",
+    "pinyin": "jīng",
+    "meaning": "classics",
+    "sourceSense": "classics"
+  },
+  {
+    "hanzi": "像",
+    "pinyin": "xiàng",
+    "meaning": "portrait",
+    "sourceSense": "portrait"
+  },
+  {
+    "hanzi": "可",
+    "pinyin": "kě",
+    "meaning": "to permit",
+    "sourceSense": "to approve; to permit"
+  },
+  {
+    "hanzi": "谢",
+    "pinyin": "xiè",
+    "meaning": "to apologize (in compounds)",
+    "sourceSense": "(bound form) to apologize"
+  },
+  {
+    "hanzi": "生",
+    "pinyin": "shēng",
+    "meaning": "raw",
+    "sourceSense": "raw; uncooked; unprocessed"
+  },
+  {
+    "hanzi": "先",
+    "pinyin": "xiān",
+    "meaning": "for now",
+    "sourceSense": "for the time being; for now"
+  },
+  {
+    "hanzi": "得",
+    "pinyin": "dé",
+    "meaning": "to allow",
+    "sourceSense": "to allow"
+  },
+  {
+    "hanzi": "觉",
+    "pinyin": "jué",
+    "meaning": "awake",
+    "sourceSense": "awake"
+  },
+  {
+    "hanzi": "找",
+    "pinyin": "zhǎo",
+    "meaning": "to give change",
+    "sourceSense": "to give change"
+  },
+  {
+    "hanzi": "快",
+    "pinyin": "kuài",
+    "meaning": "soon",
+    "sourceSense": "soon"
+  },
+  {
+    "hanzi": "喜",
+    "pinyin": "xǐ",
+    "meaning": "happiness",
+    "sourceSense": "happiness"
+  },
+  {
+    "hanzi": "听",
+    "pinyin": "tīng",
+    "meaning": "to heed",
+    "sourceSense": "to heed; to obey"
+  },
+  {
+    "hanzi": "又",
+    "pinyin": "yòu",
+    "meaning": "in addition",
+    "sourceSense": "also"
+  },
+  {
+    "hanzi": "叫",
+    "pinyin": "jiào",
+    "meaning": "to shout",
+    "sourceSense": "to shout"
+  },
+  {
+    "hanzi": "才",
+    "pinyin": "cái",
+    "meaning": "talent",
+    "sourceSense": "ability; talent"
+  },
+  {
+    "hanzi": "请",
+    "pinyin": "qǐng",
+    "meaning": "to invite",
+    "sourceSense": "to invite"
+  },
+  {
+    "hanzi": "起",
+    "pinyin": "qǐ",
+    "meaning": "to start",
+    "sourceSense": "to start"
+  },
+  {
+    "hanzi": "子",
+    "pinyin": "zǐ",
+    "meaning": "seed",
+    "sourceSense": "seed"
+  },
+  {
+    "hanzi": "题",
+    "pinyin": "tí",
+    "meaning": "topic",
+    "sourceSense": "topic"
+  },
+  {
+    "hanzi": "开",
+    "pinyin": "kāi",
+    "meaning": "to turn on",
+    "sourceSense": "to turn on; to put in operation; to operate; to run"
+  },
+  {
+    "hanzi": "作",
+    "pinyin": "zuò",
+    "meaning": "to pretend",
+    "sourceSense": "to pretend; to feign"
+  },
+  {
+    "hanzi": "工",
+    "pinyin": "gōng",
+    "meaning": "worker",
+    "sourceSense": "worker"
+  },
+  {
+    "hanzi": "帮",
+    "pinyin": "bāng",
+    "meaning": "group",
+    "sourceSense": "group"
+  },
+  {
+    "hanzi": "定",
+    "pinyin": "dìng",
+    "meaning": "to book tickets",
+    "sourceSense": "to subscribe to (a newspaper etc); to book (tickets etc); to order (goods etc)"
+  },
+  {
+    "hanzi": "望",
+    "pinyin": "wàng",
+    "meaning": "full moon",
+    "sourceSense": "full moon"
+  },
+  {
+    "hanzi": "方",
+    "pinyin": "fāng",
+    "meaning": "direction",
+    "sourceSense": "direction"
+  },
+  {
+    "hanzi": "拿",
+    "pinyin": "ná",
+    "meaning": "to take",
+    "sourceSense": "to take"
+  },
+  {
+    "hanzi": "当",
+    "pinyin": "dāng",
+    "meaning": "to act as",
+    "sourceSense": "to act as"
+  },
+  {
+    "hanzi": "天",
+    "pinyin": "tiān",
+    "meaning": "day",
+    "sourceSense": "day"
+  },
+  {
+    "hanzi": "回",
+    "pinyin": "huí",
+    "meaning": "to reply",
+    "sourceSense": "to reply; to answer"
+  },
+  {
+    "hanzi": "间",
+    "pinyin": "jiān",
+    "meaning": "room",
+    "sourceSense": "room"
+  },
+  {
+    "hanzi": "抱",
+    "pinyin": "bào",
+    "meaning": "to carry in one's arms",
+    "sourceSense": "to carry (in one's arms)"
+  },
+  {
+    "hanzi": "点",
+    "pinyin": "diǎn",
+    "meaning": "to order food",
+    "sourceSense": "to order (food etc); to select"
+  },
+  {
+    "hanzi": "情",
+    "pinyin": "qíng",
+    "meaning": "situation (in compounds)",
+    "sourceSense": "(bound form) situation; condition"
+  },
+  {
+    "hanzi": "发",
+    "pinyin": "fā",
+    "meaning": "to develop",
+    "sourceSense": "to develop"
+  },
+  {
+    "hanzi": "信",
+    "pinyin": "xìn",
+    "meaning": "letter",
+    "sourceSense": "letter"
+  },
+  {
+    "hanzi": "常",
+    "pinyin": "cháng",
+    "meaning": "common",
+    "sourceSense": "common"
+  },
+  {
+    "hanzi": "非",
+    "pinyin": "fēi",
+    "meaning": "wrong",
+    "sourceSense": "wrong; incorrect"
+  },
+  {
+    "hanzi": "明",
+    "pinyin": "míng",
+    "meaning": "clear in meaning",
+    "sourceSense": "(of meaning) clear"
+  },
+  {
+    "hanzi": "白",
+    "pinyin": "bái",
+    "meaning": "free of charge",
+    "sourceSense": "free of charge"
+  },
+  {
+    "hanzi": "许",
+    "pinyin": "xǔ",
+    "meaning": "to promise",
+    "sourceSense": "to promise"
+  },
+  {
+    "hanzi": "打",
+    "pinyin": "dǎ",
+    "meaning": "to fight",
+    "sourceSense": "to fight"
+  },
+  {
+    "hanzi": "带",
+    "pinyin": "dài",
+    "meaning": "belt",
+    "sourceSense": "belt"
+  },
+  {
+    "hanzi": "家",
+    "pinyin": "jiā",
+    "meaning": "family",
+    "sourceSense": "family"
+  },
+  {
+    "hanzi": "认",
+    "pinyin": "rèn",
+    "meaning": "to admit",
+    "sourceSense": "to admit"
+  },
+  {
+    "hanzi": "出",
+    "pinyin": "chū",
+    "meaning": "to produce",
+    "sourceSense": "to produce; to yield"
+  },
+  {
+    "hanzi": "种",
+    "pinyin": "zhǒng",
+    "meaning": "seed",
+    "sourceSense": "seed"
+  },
+  {
+    "hanzi": "见",
+    "pinyin": "jiàn",
+    "meaning": "to meet",
+    "sourceSense": "to meet"
+  },
+  {
+    "hanzi": "喂",
+    "pinyin": "wèi",
+    "meaning": "to feed",
+    "sourceSense": "to feed (an animal, baby, invalid etc)"
+  },
+  {
+    "hanzi": "错",
+    "pinyin": "cuò",
+    "meaning": "to miss",
+    "sourceSense": "to miss"
+  },
+  {
+    "hanzi": "女",
+    "pinyin": "nǚ",
+    "meaning": "daughter",
+    "sourceSense": "daughter"
+  },
+  {
+    "hanzi": "次",
+    "pinyin": "cì",
+    "meaning": "second in order",
+    "sourceSense": "second"
+  },
+  {
+    "hanzi": "任",
+    "pinyin": "rèn",
+    "meaning": "responsibility",
+    "sourceSense": "responsibility"
+  },
+  {
+    "hanzi": "现",
+    "pinyin": "xiàn",
+    "meaning": "to appear",
+    "sourceSense": "to appear"
+  },
+  {
+    "hanzi": "两",
+    "pinyin": "liǎng",
+    "meaning": "both",
+    "sourceSense": "both"
+  },
+  {
+    "hanzi": "活",
+    "pinyin": "huó",
+    "meaning": "work",
+    "sourceSense": "work"
+  },
+  {
+    "hanzi": "心",
+    "pinyin": "xīn",
+    "meaning": "mind",
+    "sourceSense": "mind"
+  },
+  {
+    "hanzi": "记",
+    "pinyin": "jì",
+    "meaning": "to record",
+    "sourceSense": "to record"
+  },
+  {
+    "hanzi": "行",
+    "pinyin": "xíng",
+    "meaning": "OK",
+    "sourceSense": "all right; OK!; will do"
+  },
+  {
+    "hanzi": "世",
+    "pinyin": "shì",
+    "meaning": "generation",
+    "sourceSense": "generation"
+  },
+  {
+    "hanzi": "名",
+    "pinyin": "míng",
+    "meaning": "famous",
+    "sourceSense": "famous"
+  },
+  {
+    "hanzi": "字",
+    "pinyin": "zì",
+    "meaning": "word",
+    "sourceSense": "word"
+  },
+  {
+    "hanzi": "小",
+    "pinyin": "xiǎo",
+    "meaning": "young",
+    "sourceSense": "young"
+  },
+  {
+    "hanzi": "亲",
+    "pinyin": "qīn",
+    "meaning": "to kiss",
+    "sourceSense": "to kiss"
+  },
+  {
+    "hanzi": "重",
+    "pinyin": "zhòng",
+    "meaning": "serious",
+    "sourceSense": "serious"
+  },
+  {
+    "hanzi": "医",
+    "pinyin": "yī",
+    "meaning": "doctor",
+    "sourceSense": "doctor"
+  },
+  {
+    "hanzi": "上",
+    "pinyin": "shàng",
+    "meaning": "to attend class",
+    "sourceSense": "to attend (class or university)"
+  },
+  {
+    "hanzi": "话",
+    "pinyin": "huà",
+    "meaning": "dialect",
+    "sourceSense": "dialect"
+  },
+  {
+    "hanzi": "电",
+    "pinyin": "diàn",
+    "meaning": "lightning",
+    "sourceSense": "lightning"
+  },
+  {
+    "hanzi": "完",
+    "pinyin": "wán",
+    "meaning": "to finish",
+    "sourceSense": "to finish"
+  },
+  {
+    "hanzi": "跑",
+    "pinyin": "pǎo",
+    "meaning": "to escape",
+    "sourceSense": "to escape"
+  },
+  {
+    "hanzi": "少",
+    "pinyin": "shǎo",
+    "meaning": "seldom",
+    "sourceSense": "seldom"
+  },
+  {
+    "hanzi": "警",
+    "pinyin": "jǐng",
+    "meaning": "police",
+    "sourceSense": "police"
+  },
+  {
+    "hanzi": "月",
+    "pinyin": "yuè",
+    "meaning": "moon",
+    "sourceSense": "moon"
+  },
+  {
+    "hanzi": "法",
+    "pinyin": "fǎ",
+    "meaning": "method",
+    "sourceSense": "method"
+  },
+  {
+    "hanzi": "放",
+    "pinyin": "fàng",
+    "meaning": "to release",
+    "sourceSense": "to release"
+  },
+  {
+    "hanzi": "成",
+    "pinyin": "chéng",
+    "meaning": "to succeed",
+    "sourceSense": "to succeed"
+  },
+  {
+    "hanzi": "玩",
+    "pinyin": "wán",
+    "meaning": "toy",
+    "sourceSense": "toy"
+  },
+  {
+    "hanzi": "送",
+    "pinyin": "sòng",
+    "meaning": "to give as a present",
+    "sourceSense": "to give (as a present)"
+  },
+  {
+    "hanzi": "结",
+    "pinyin": "jié",
+    "meaning": "to check out of a hotel",
+    "sourceSense": "to check out (of a hotel)"
+  },
+  {
+    "hanzi": "束",
+    "pinyin": "shù",
+    "meaning": "bundle",
+    "sourceSense": "bundle"
+  },
+  {
+    "hanzi": "解",
+    "pinyin": "jiě",
+    "meaning": "to solve",
+    "sourceSense": "to solve"
+  },
+  {
+    "hanzi": "机",
+    "pinyin": "jī",
+    "meaning": "opportunity (in compounds)",
+    "sourceSense": "(bound form) an opportunity"
+  },
+  {
+    "hanzi": "清",
+    "pinyin": "qīng",
+    "meaning": "to settle accounts",
+    "sourceSense": "to clear; to settle (accounts)"
+  },
+  {
+    "hanzi": "实",
+    "pinyin": "shí",
+    "meaning": "fruit",
+    "sourceSense": "fruit"
+  },
+  {
+    "hanzi": "混",
+    "pinyin": "hùn",
+    "meaning": "to muddle along",
+    "sourceSense": "to muddle along"
+  },
+  {
+    "hanzi": "本",
+    "pinyin": "běn",
+    "meaning": "book measure word",
+    "sourceSense": "classifier for books, periodicals, files etc"
+  },
+  {
+    "hanzi": "根",
+    "pinyin": "gēn",
+    "meaning": "basis",
+    "sourceSense": "basis"
+  },
+  {
+    "hanzi": "坐",
+    "pinyin": "zuò",
+    "meaning": "to take a bus or plane",
+    "sourceSense": "to take (a bus, airplane etc)"
+  },
+  {
+    "hanzi": "计",
+    "pinyin": "jì",
+    "meaning": "to plan",
+    "sourceSense": "to plan"
+  },
+  {
+    "hanzi": "划",
+    "pinyin": "huá",
+    "meaning": "profitable",
+    "sourceSense": "profitable"
+  },
+  {
+    "hanzi": "号",
+    "pinyin": "hào",
+    "meaning": "day of the month",
+    "sourceSense": "day of the month (e.g. 七號|七号[qi1 hao4] \"the 7th\")"
+  },
+  {
+    "hanzi": "站",
+    "pinyin": "zhàn",
+    "meaning": "to stand",
+    "sourceSense": "to stand"
+  },
+  {
+    "hanzi": "待",
+    "pinyin": "dài",
+    "meaning": "to treat someone",
+    "sourceSense": "to treat"
+  },
+  {
+    "hanzi": "房",
+    "pinyin": "fáng",
+    "meaning": "room",
+    "sourceSense": "room"
+  },
+  {
+    "hanzi": "正",
+    "pinyin": "zhèng",
+    "meaning": "exactly",
+    "sourceSense": "exactly"
+  },
+  {
+    "hanzi": "麻",
+    "pinyin": "má",
+    "meaning": "to feel numb",
+    "sourceSense": "to feel numb"
+  },
+  {
+    "hanzi": "关",
+    "pinyin": "guān",
+    "meaning": "mountain pass",
+    "sourceSense": "mountain pass"
+  },
+  {
+    "hanzi": "受",
+    "pinyin": "shòu",
+    "meaning": "to suffer",
+    "sourceSense": "to suffer"
+  },
+  {
+    "hanzi": "接",
+    "pinyin": "jiē",
+    "meaning": "to answer the phone",
+    "sourceSense": "to answer (the phone)"
+  },
+  {
+    "hanzi": "改",
+    "pinyin": "gǎi",
+    "meaning": "to correct",
+    "sourceSense": "to correct"
+  },
+  {
+    "hanzi": "怕",
+    "pinyin": "pà",
+    "meaning": "perhaps",
+    "sourceSense": "perhaps"
+  },
+  {
+    "hanzi": "因",
+    "pinyin": "yīn",
+    "meaning": "because",
+    "sourceSense": "because"
+  },
+  {
+    "hanzi": "怪",
+    "pinyin": "guài",
+    "meaning": "to blame",
+    "sourceSense": "to blame"
+  },
+  {
+    "hanzi": "几",
+    "pinyin": "jǐ",
+    "meaning": "several",
+    "sourceSense": "several; a few"
+  },
+  {
+    "hanzi": "对",
+    "pinyin": "duì",
+    "meaning": "towards",
+    "sourceSense": "towards; at; for"
+  },
+  {
+    "hanzi": "穿",
+    "pinyin": "chuān",
+    "meaning": "to go through",
+    "sourceSense": "to go through (e.g. a tunnel); to cross (e.g. a street)"
+  },
+  {
+    "hanzi": "挺",
+    "pinyin": "tǐng",
+    "meaning": "to support",
+    "sourceSense": "to support"
+  },
+  {
+    "hanzi": "保",
+    "pinyin": "bǎo",
+    "meaning": "to guarantee",
+    "sourceSense": "to guarantee; to ensure"
+  },
+  {
+    "hanzi": "位",
+    "pinyin": "wèi",
+    "meaning": "position",
+    "sourceSense": "position"
+  },
+  {
+    "hanzi": "果",
+    "pinyin": "guǒ",
+    "meaning": "result",
+    "sourceSense": "result"
+  },
+  {
+    "hanzi": "理",
+    "pinyin": "lǐ",
+    "meaning": "to manage",
+    "sourceSense": "to manage"
+  },
+  {
+    "hanzi": "服",
+    "pinyin": "fú",
+    "meaning": "to take medicine",
+    "sourceSense": "to take (medicine)"
+  },
+  {
+    "hanzi": "笑",
+    "pinyin": "xiào",
+    "meaning": "to laugh at",
+    "sourceSense": "to laugh at"
+  },
+  {
+    "hanzi": "照",
+    "pinyin": "zhào",
+    "meaning": "to take a photo",
+    "sourceSense": "to take (a photo)"
+  },
+  {
+    "hanzi": "片",
+    "pinyin": "piàn",
+    "meaning": "film",
+    "sourceSense": "film"
+  },
+  {
+    "hanzi": "证",
+    "pinyin": "zhèng",
+    "meaning": "proof",
+    "sourceSense": "proof"
+  },
+  {
+    "hanzi": "声",
+    "pinyin": "shēng",
+    "meaning": "reputation",
+    "sourceSense": "reputation"
+  },
+  {
+    "hanzi": "花",
+    "pinyin": "huā",
+    "meaning": "to spend money or time",
+    "sourceSense": "to spend (money, time)"
+  },
+  {
+    "hanzi": "讲",
+    "pinyin": "jiǎng",
+    "meaning": "to explain",
+    "sourceSense": "to explain"
+  },
+  {
+    "hanzi": "命",
+    "pinyin": "mìng",
+    "meaning": "fate",
+    "sourceSense": "fate"
+  },
+  {
+    "hanzi": "同",
+    "pinyin": "tóng",
+    "meaning": "together",
+    "sourceSense": "together"
+  },
+  {
+    "hanzi": "影",
+    "pinyin": "yǐng",
+    "meaning": "shadow",
+    "sourceSense": "shadow"
+  },
+  {
+    "hanzi": "拉",
+    "pinyin": "lā",
+    "meaning": "to play a bowed instrument",
+    "sourceSense": "to play (a bowed instrument)"
+  },
+  {
+    "hanzi": "调",
+    "pinyin": "diào",
+    "meaning": "to transfer",
+    "sourceSense": "to transfer"
+  },
+  {
+    "hanzi": "院",
+    "pinyin": "yuàn",
+    "meaning": "institution",
+    "sourceSense": "institution"
+  },
+  {
+    "hanzi": "眼",
+    "pinyin": "yǎn",
+    "meaning": "small hole",
+    "sourceSense": "small hole"
+  },
+  {
+    "hanzi": "比",
+    "pinyin": "bǐ",
+    "meaning": "ratio",
+    "sourceSense": "ratio"
+  },
+  {
+    "hanzi": "易",
+    "pinyin": "yì",
+    "meaning": "to change",
+    "sourceSense": "to change"
+  },
+  {
+    "hanzi": "容",
+    "pinyin": "róng",
+    "meaning": "appearance",
+    "sourceSense": "appearance"
+  },
+  {
+    "hanzi": "靠",
+    "pinyin": "kào",
+    "meaning": "to lean against",
+    "sourceSense": "to lean against or on"
+  },
+  {
+    "hanzi": "倒",
+    "pinyin": "dào",
+    "meaning": "to pour out",
+    "sourceSense": "to pour out"
+  },
+  {
+    "hanzi": "抓",
+    "pinyin": "zhuā",
+    "meaning": "to scratch",
+    "sourceSense": "to scratch"
+  },
+  {
+    "hanzi": "单",
+    "pinyin": "dān",
+    "meaning": "bill",
+    "sourceSense": "bill"
+  },
+  {
+    "hanzi": "表",
+    "pinyin": "biǎo",
+    "meaning": "a measuring instrument",
+    "sourceSense": "a meter (measuring sth)"
+  },
+  {
+    "hanzi": "代",
+    "pinyin": "dài",
+    "meaning": "generation",
+    "sourceSense": "generation; dynasty; age; period; (historical) era; (geological) eon"
+  },
+  {
+    "hanzi": "拍",
+    "pinyin": "pāi",
+    "meaning": "to take a photo",
+    "sourceSense": "to take (a photo)"
+  },
+  {
+    "hanzi": "留",
+    "pinyin": "liú",
+    "meaning": "to leave a message",
+    "sourceSense": "to leave (a message etc)"
+  },
+  {
+    "hanzi": "在",
+    "pinyin": "zài",
+    "meaning": "to exist",
+    "sourceSense": "to exist; to be alive"
+  },
+  {
+    "hanzi": "存",
+    "pinyin": "cún",
+    "meaning": "to deposit",
+    "sourceSense": "to deposit"
+  },
+  {
+    "hanzi": "释",
+    "pinyin": "shì",
+    "meaning": "to release",
+    "sourceSense": "to release"
+  },
+  {
+    "hanzi": "日",
+    "pinyin": "rì",
+    "meaning": "sun (in compounds)",
+    "sourceSense": "(bound form) sun"
+  },
+  {
+    "hanzi": "密",
+    "pinyin": "mì",
+    "meaning": "dense",
+    "sourceSense": "dense; close; thick"
+  },
+  {
+    "hanzi": "克",
+    "pinyin": "kè",
+    "meaning": "gram",
+    "sourceSense": "gram"
+  },
+  {
+    "hanzi": "派",
+    "pinyin": "pài",
+    "meaning": "to dispatch",
+    "sourceSense": "to send (a person or resource); to dispatch; to allocate (a resource or task); to appoint (sb)"
+  },
+  {
+    "hanzi": "部",
+    "pinyin": "bù",
+    "meaning": "ministry",
+    "sourceSense": "ministry"
+  },
+  {
+    "hanzi": "卖",
+    "pinyin": "mài",
+    "meaning": "to betray",
+    "sourceSense": "to betray"
+  },
+  {
+    "hanzi": "苦",
+    "pinyin": "kǔ",
+    "meaning": "hardship",
+    "sourceSense": "hardship"
+  },
+  {
+    "hanzi": "晚",
+    "pinyin": "wǎn",
+    "meaning": "late",
+    "sourceSense": "late"
+  },
+  {
+    "hanzi": "早",
+    "pinyin": "zǎo",
+    "meaning": "morning",
+    "sourceSense": "morning"
+  },
+  {
+    "hanzi": "责",
+    "pinyin": "zé",
+    "meaning": "to blame",
+    "sourceSense": "to blame"
+  },
+  {
+    "hanzi": "戏",
+    "pinyin": "xì",
+    "meaning": "trick",
+    "sourceSense": "trick"
+  },
+  {
+    "hanzi": "使",
+    "pinyin": "shǐ",
+    "meaning": "to cause",
+    "sourceSense": "to cause"
+  },
+  {
+    "hanzi": "战",
+    "pinyin": "zhàn",
+    "meaning": "to fight",
+    "sourceSense": "to fight"
+  },
+  {
+    "hanzi": "庭",
+    "pinyin": "tíng",
+    "meaning": "law court",
+    "sourceSense": "law court"
+  },
+  {
+    "hanzi": "棒",
+    "pinyin": "bàng",
+    "meaning": "stick",
+    "sourceSense": "stick"
+  },
+  {
+    "hanzi": "气",
+    "pinyin": "qì",
+    "meaning": "to get angry",
+    "sourceSense": "to make angry; to annoy; to get angry"
+  },
+  {
+    "hanzi": "停",
+    "pinyin": "tíng",
+    "meaning": "to park a car",
+    "sourceSense": "to park (a car)"
+  },
+  {
+    "hanzi": "试",
+    "pinyin": "shì",
+    "meaning": "examination",
+    "sourceSense": "examination"
+  },
+  {
+    "hanzi": "坏",
+    "pinyin": "huài",
+    "meaning": "broken",
+    "sourceSense": "broken"
+  },
+  {
+    "hanzi": "报",
+    "pinyin": "bào",
+    "meaning": "newspaper",
+    "sourceSense": "newspaper"
+  },
+  {
+    "hanzi": "紧",
+    "pinyin": "jǐn",
+    "meaning": "urgent",
+    "sourceSense": "urgent"
+  },
+  {
+    "hanzi": "约",
+    "pinyin": "yuē",
+    "meaning": "approximately",
+    "sourceSense": "approximately"
+  },
+  {
+    "hanzi": "交",
+    "pinyin": "jiāo",
+    "meaning": "to make friends",
+    "sourceSense": "to make friends"
+  },
+  {
+    "hanzi": "给",
+    "pinyin": "gěi",
+    "meaning": "for",
+    "sourceSense": "for"
+  },
+  {
+    "hanzi": "支",
+    "pinyin": "zhī",
+    "meaning": "branch",
+    "sourceSense": "branch"
+  },
+  {
+    "hanzi": "过",
+    "pinyin": "guò",
+    "meaning": "to celebrate a holiday",
+    "sourceSense": "to celebrate (a holiday)"
+  },
+  {
+    "hanzi": "食",
+    "pinyin": "shí",
+    "meaning": "to eat",
+    "sourceSense": "to eat"
+  },
+  {
+    "hanzi": "神",
+    "pinyin": "shén",
+    "meaning": "god",
+    "sourceSense": "god; deity"
+  },
+  {
+    "hanzi": "偷",
+    "pinyin": "tōu",
+    "meaning": "stealthily",
+    "sourceSense": "stealthily"
+  },
+  {
+    "hanzi": "排",
+    "pinyin": "pái",
+    "meaning": "to rehearse",
+    "sourceSense": "to rehearse"
+  },
+  {
+    "hanzi": "等",
+    "pinyin": "děng",
+    "meaning": "and so on",
+    "sourceSense": "and so on; etc.; et al."
+  },
+  {
+    "hanzi": "分",
+    "pinyin": "fēn",
+    "meaning": "minute",
+    "sourceSense": "minute (unit of time)"
+  },
+  {
+    "hanzi": "钟",
+    "pinyin": "zhōng",
+    "meaning": "bell",
+    "sourceSense": "a (large) bell (CL:架[jia4])"
+  },
+  {
+    "hanzi": "书",
+    "pinyin": "shū",
+    "meaning": "to write",
+    "sourceSense": "to write"
+  },
+  {
+    "hanzi": "跟",
+    "pinyin": "gēn",
+    "meaning": "with",
+    "sourceSense": "with"
+  },
+  {
+    "hanzi": "市",
+    "pinyin": "shì",
+    "meaning": "city",
+    "sourceSense": "city"
+  },
+  {
+    "hanzi": "提",
+    "pinyin": "tí",
+    "meaning": "to mention",
+    "sourceSense": "to mention"
+  },
+  {
+    "hanzi": "面",
+    "pinyin": "miàn",
+    "meaning": "surface",
+    "sourceSense": "surface"
+  },
+  {
+    "hanzi": "礼",
+    "pinyin": "lǐ",
+    "meaning": "gift",
+    "sourceSense": "gift"
+  },
+  {
+    "hanzi": "饭",
+    "pinyin": "fàn",
+    "meaning": "cooked rice",
+    "sourceSense": "cooked rice"
+  },
+  {
+    "hanzi": "利",
+    "pinyin": "lì",
+    "meaning": "sharp",
+    "sourceSense": "sharp"
+  },
+  {
+    "hanzi": "管",
+    "pinyin": "guǎn",
+    "meaning": "tube",
+    "sourceSense": "tube"
+  },
+  {
+    "hanzi": "味",
+    "pinyin": "wèi",
+    "meaning": "smell",
+    "sourceSense": "smell"
+  },
+  {
+    "hanzi": "连",
+    "pinyin": "lián",
+    "meaning": "continuously",
+    "sourceSense": "continuously"
+  },
+  {
+    "hanzi": "卡",
+    "pinyin": "kǎ",
+    "meaning": "to block",
+    "sourceSense": "to block"
+  },
+  {
+    "hanzi": "掉",
+    "pinyin": "diào",
+    "meaning": "to lose",
+    "sourceSense": "to lose"
+  },
+  {
+    "hanzi": "误",
+    "pinyin": "wù",
+    "meaning": "to delay",
+    "sourceSense": "to delay"
+  },
+  {
+    "hanzi": "运",
+    "pinyin": "yùn",
+    "meaning": "luck",
+    "sourceSense": "luck"
+  },
+  {
+    "hanzi": "奶",
+    "pinyin": "nǎi",
+    "meaning": "to breastfeed",
+    "sourceSense": "to breastfeed"
+  },
+  {
+    "hanzi": "刻",
+    "pinyin": "kè",
+    "meaning": "to carve",
+    "sourceSense": "to carve"
+  },
+  {
+    "hanzi": "立",
+    "pinyin": "lì",
+    "meaning": "immediately",
+    "sourceSense": "immediately"
+  },
+  {
+    "hanzi": "舞",
+    "pinyin": "wǔ",
+    "meaning": "to wield",
+    "sourceSense": "to wield"
+  },
+  {
+    "hanzi": "通",
+    "pinyin": "tōng",
+    "meaning": "to communicate",
+    "sourceSense": "to communicate"
+  },
+  {
+    "hanzi": "义",
+    "pinyin": "yì",
+    "meaning": "meaning",
+    "sourceSense": "meaning"
+  },
+  {
+    "hanzi": "闻",
+    "pinyin": "wén",
+    "meaning": "to hear",
+    "sourceSense": "to hear"
+  },
+  {
+    "hanzi": "吸",
+    "pinyin": "xī",
+    "meaning": "to absorb",
+    "sourceSense": "to absorb"
+  },
+  {
+    "hanzi": "挂",
+    "pinyin": "guà",
+    "meaning": "to hang up the phone",
+    "sourceSense": "to hang up (the phone)"
+  },
+  {
+    "hanzi": "欠",
+    "pinyin": "qiàn",
+    "meaning": "to lack",
+    "sourceSense": "to lack"
+  },
+  {
+    "hanzi": "图",
+    "pinyin": "tú",
+    "meaning": "to plan",
+    "sourceSense": "to plan"
+  },
+  {
+    "hanzi": "组",
+    "pinyin": "zǔ",
+    "meaning": "to organize",
+    "sourceSense": "to organize"
+  },
+  {
+    "hanzi": "治",
+    "pinyin": "zhì",
+    "meaning": "to treat a disease",
+    "sourceSense": "to treat (a disease)"
+  },
+  {
+    "hanzi": "装",
+    "pinyin": "zhuāng",
+    "meaning": "to install",
+    "sourceSense": "to install"
+  },
+  {
+    "hanzi": "文",
+    "pinyin": "wén",
+    "meaning": "culture",
+    "sourceSense": "culture"
+  },
+  {
+    "hanzi": "画",
+    "pinyin": "huà",
+    "meaning": "picture",
+    "sourceSense": "picture; painting (CL:幅[fu2],張|张[zhang1])"
+  },
+  {
+    "hanzi": "恨",
+    "pinyin": "hèn",
+    "meaning": "to regret",
+    "sourceSense": "to regret"
+  },
+  {
+    "hanzi": "金",
+    "pinyin": "jīn",
+    "meaning": "money",
+    "sourceSense": "money"
+  },
+  {
+    "hanzi": "追",
+    "pinyin": "zhuī",
+    "meaning": "to investigate",
+    "sourceSense": "to investigate"
+  },
+  {
+    "hanzi": "近",
+    "pinyin": "jìn",
+    "meaning": "approximately",
+    "sourceSense": "approximately"
+  },
+  {
+    "hanzi": "越",
+    "pinyin": "yuè",
+    "meaning": "to climb over",
+    "sourceSense": "to climb over"
+  },
+  {
+    "hanzi": "班",
+    "pinyin": "bān",
+    "meaning": "work shift",
+    "sourceSense": "work shift"
+  },
+  {
+    "hanzi": "菜",
+    "pinyin": "cài",
+    "meaning": "vegetables",
+    "sourceSense": "vegetable; greens (CL:棵[ke1])"
+  },
+  {
+    "hanzi": "热",
+    "pinyin": "rè",
+    "meaning": "to heat up",
+    "sourceSense": "to heat up"
+  },
+  {
+    "hanzi": "什么",
+    "pinyin": "shénme",
+    "meaning": "something",
+    "sourceSense": "something; anything"
+  },
+  {
+    "hanzi": "怎么",
+    "pinyin": "zěnme",
+    "meaning": "why",
+    "sourceSense": "why?"
+  },
+  {
+    "hanzi": "就是",
+    "pinyin": "jiùshì",
+    "meaning": "only",
+    "sourceSense": "only; simply; just"
+  },
+  {
+    "hanzi": "不会",
+    "pinyin": "bùhuì",
+    "meaning": "unlikely",
+    "sourceSense": "improbable"
+  },
+  {
+    "hanzi": "不能",
+    "pinyin": "bùnéng",
+    "meaning": "must not",
+    "sourceSense": "must not"
+  },
+  {
+    "hanzi": "可能",
+    "pinyin": "kěnéng",
+    "meaning": "possible",
+    "sourceSense": "possible"
+  },
+  {
+    "hanzi": "先生",
+    "pinyin": "xiānsheng",
+    "meaning": "husband",
+    "sourceSense": "husband"
+  },
+  {
+    "hanzi": "那么",
+    "pinyin": "nàme",
+    "meaning": "then (in that case)",
+    "sourceSense": "then; in that case"
+  },
+  {
+    "hanzi": "问题",
+    "pinyin": "wèntí",
+    "meaning": "question",
+    "sourceSense": "question"
+  },
+  {
+    "hanzi": "工作",
+    "pinyin": "gōngzuò",
+    "meaning": "job",
+    "sourceSense": "job"
+  },
+  {
+    "hanzi": "一直",
+    "pinyin": "yīzhí",
+    "meaning": "in a straight line",
+    "sourceSense": "straight (in a straight line)"
+  },
+  {
+    "hanzi": "没事",
+    "pinyin": "méishì",
+    "meaning": "to have nothing to do",
+    "sourceSense": "to have nothing to do"
+  },
+  {
+    "hanzi": "非常",
+    "pinyin": "fēicháng",
+    "meaning": "unusual",
+    "sourceSense": "unusual; extraordinary"
+  },
+  {
+    "hanzi": "明白",
+    "pinyin": "míngbai",
+    "meaning": "clear",
+    "sourceSense": "clear; obvious; unequivocal"
+  },
+  {
+    "hanzi": "准备",
+    "pinyin": "zhǔnbèi",
+    "meaning": "to intend",
+    "sourceSense": "to intend"
+  },
+  {
+    "hanzi": "生活",
+    "pinyin": "shēnghuó",
+    "meaning": "livelihood",
+    "sourceSense": "livelihood"
+  },
+  {
+    "hanzi": "最好",
+    "pinyin": "zuìhǎo",
+    "meaning": "had better",
+    "sourceSense": "had better ...; it would be best to ..."
+  },
+  {
+    "hanzi": "不错",
+    "pinyin": "bùcuò",
+    "meaning": "correct",
+    "sourceSense": "correct"
+  },
+  {
+    "hanzi": "电话",
+    "pinyin": "diànhuà",
+    "meaning": "phone call",
+    "sourceSense": "phone call"
+  },
+  {
+    "hanzi": "其他",
+    "pinyin": "qítā",
+    "meaning": "the rest",
+    "sourceSense": "the rest"
+  },
+  {
+    "hanzi": "不到",
+    "pinyin": "bùdào",
+    "meaning": "not to arrive",
+    "sourceSense": "not to arrive"
+  },
+  {
+    "hanzi": "了解",
+    "pinyin": "liǎojiě",
+    "meaning": "to find out",
+    "sourceSense": "to learn about; to find out"
+  },
+  {
+    "hanzi": "还好",
+    "pinyin": "háihǎo",
+    "meaning": "fortunately",
+    "sourceSense": "fortunately; luckily"
+  },
+  {
+    "hanzi": "清楚",
+    "pinyin": "qīngchu",
+    "meaning": "to understand thoroughly",
+    "sourceSense": "to understand thoroughly"
+  },
+  {
+    "hanzi": "根本",
+    "pinyin": "gēnběn",
+    "meaning": "fundamental",
+    "sourceSense": "fundamental"
+  },
+  {
+    "hanzi": "有些",
+    "pinyin": "yǒuxiē",
+    "meaning": "somewhat",
+    "sourceSense": "somewhat; rather; a bit"
+  },
+  {
+    "hanzi": "宝贝",
+    "pinyin": "bǎobèi",
+    "meaning": "treasure",
+    "sourceSense": "treasured object"
+  },
+  {
+    "hanzi": "关系",
+    "pinyin": "guānxi",
+    "meaning": "to affect",
+    "sourceSense": "to affect"
+  },
+  {
+    "hanzi": "选择",
+    "pinyin": "xuǎnzé",
+    "meaning": "choice",
+    "sourceSense": "choice; option; alternative"
+  },
+  {
+    "hanzi": "特别",
+    "pinyin": "tèbié",
+    "meaning": "special",
+    "sourceSense": "unusual; special"
+  },
+  {
+    "hanzi": "长",
+    "pinyin": "zhǎng",
+    "meaning": "chief",
+    "sourceSense": "chief"
+  },
+  {
+    "hanzi": "结果",
+    "pinyin": "jiéguǒ",
+    "meaning": "as a result",
+    "sourceSense": "in the end; as a result"
+  },
+  {
+    "hanzi": "处理",
+    "pinyin": "chǔlǐ",
+    "meaning": "to punish",
+    "sourceSense": "to punish"
+  },
+  {
+    "hanzi": "从来",
+    "pinyin": "cónglái",
+    "meaning": "never (with a negative)",
+    "sourceSense": "never (if used in negative sentence)"
+  },
+  {
+    "hanzi": "所有人",
+    "pinyin": "suǒyǒurén",
+    "meaning": "owner",
+    "sourceSense": "owner"
+  },
+  {
+    "hanzi": "不好意思",
+    "pinyin": "bùhǎoyìsi",
+    "meaning": "to feel embarrassed",
+    "sourceSense": "to feel embarrassed"
+  },
+  {
+    "hanzi": "身体",
+    "pinyin": "shēntǐ",
+    "meaning": "one's health",
+    "sourceSense": "one's health"
+  },
+  {
+    "hanzi": "容易",
+    "pinyin": "róngyì",
+    "meaning": "likely",
+    "sourceSense": "likely; liable to; apt to"
+  },
+  {
+    "hanzi": "消息",
+    "pinyin": "xiāoxi",
+    "meaning": "message",
+    "sourceSense": "message"
+  },
+  {
+    "hanzi": "证明",
+    "pinyin": "zhèngmíng",
+    "meaning": "certificate",
+    "sourceSense": "certificate"
+  },
+  {
+    "hanzi": "代表",
+    "pinyin": "dàibiǎo",
+    "meaning": "representative",
+    "sourceSense": "representative"
+  },
+  {
+    "hanzi": "留下",
+    "pinyin": "liúxià",
+    "meaning": "to stay behind",
+    "sourceSense": "to stay behind"
+  },
+  {
+    "hanzi": "大概",
+    "pinyin": "dàgài",
+    "meaning": "roughly",
+    "sourceSense": "roughly"
+  },
+  {
+    "hanzi": "那天",
+    "pinyin": "nàtiān",
+    "meaning": "the other day",
+    "sourceSense": "the other day"
+  },
+  {
+    "hanzi": "加油",
+    "pinyin": "jiāyóu",
+    "meaning": "to refuel",
+    "sourceSense": "to add oil; to top up with gas; to refuel"
+  },
+  {
+    "hanzi": "个人",
+    "pinyin": "gèrén",
+    "meaning": "an individual",
+    "sourceSense": "an individual; oneself; (attributive) personal; one's own"
+  },
+  {
+    "hanzi": "原来",
+    "pinyin": "yuánlái",
+    "meaning": "originally",
+    "sourceSense": "originally; formerly; at first"
+  },
+  {
+    "hanzi": "放下",
+    "pinyin": "fàngxià",
+    "meaning": "to let go of",
+    "sourceSense": "to let go of; to relinquish; to set aside"
+  },
+  {
+    "hanzi": "跟着",
+    "pinyin": "gēnzhe",
+    "meaning": "immediately afterwards",
+    "sourceSense": "immediately afterwards"
+  },
+  {
+    "hanzi": "吃饭",
+    "pinyin": "chīfàn",
+    "meaning": "to make a living",
+    "sourceSense": "to make a living"
+  },
+  {
+    "hanzi": "不必",
+    "pinyin": "bùbì",
+    "meaning": "not necessarily",
+    "sourceSense": "not necessarily"
+  },
+  {
+    "hanzi": "有事",
+    "pinyin": "yǒushì",
+    "meaning": "something is wrong",
+    "sourceSense": "there is something the matter"
+  },
+  {
+    "hanzi": "一会儿",
+    "pinyin": "yīhuìr",
+    "meaning": "in a moment",
+    "sourceSense": "in a moment"
+  },
+  {
+    "hanzi": "意外",
+    "pinyin": "yìwài",
+    "meaning": "unexpected",
+    "sourceSense": "unexpected"
+  },
+  {
+    "hanzi": "开门",
+    "pinyin": "kāimén",
+    "meaning": "to open for business",
+    "sourceSense": "to open for business"
+  },
+  {
+    "hanzi": "黑体",
+    "pinyin": "hēitǐ",
+    "meaning": "black body (physics)",
+    "sourceSense": "(physics) black body"
+  },
+  {
+    "hanzi": "第一",
+    "pinyin": "dìyī",
+    "meaning": "most important",
+    "sourceSense": "most important; primary; foremost"
+  },
+  {
+    "hanzi": "好多",
+    "pinyin": "hǎoduō",
+    "meaning": "much better",
+    "sourceSense": "much better"
+  },
+  {
+    "hanzi": "救命",
+    "pinyin": "jiùmìng",
+    "meaning": "to save someone's life",
+    "sourceSense": "to save sb's life"
+  },
+  {
+    "hanzi": "组织",
+    "pinyin": "zǔzhī",
+    "meaning": "tissue (biology)",
+    "sourceSense": "(biology) tissue"
+  },
+  {
+    "hanzi": "一般",
+    "pinyin": "yībān",
+    "meaning": "generally",
+    "sourceSense": "generally"
+  },
+  {
+    "hanzi": "感情",
+    "pinyin": "gǎnqíng",
+    "meaning": "affection",
+    "sourceSense": "affection; feelings between two persons"
+  },
+  {
+    "hanzi": "难过",
+    "pinyin": "nánguò",
+    "meaning": "to feel unwell",
+    "sourceSense": "to feel unwell"
+  },
+  {
+    "hanzi": "借",
+    "pinyin": "jiè",
+    "meaning": "to lend (with 给 or 出)",
+    "sourceSense": "(used in combination with 給|给[gei3] or 出[chu1] etc) to lend"
+  },
+  {
+    "hanzi": "說",
+    "pinyin": "shuō",
+    "meaning": "to explain",
+    "sourceSense": "to explain; to comment"
+  },
+  {
+    "hanzi": "會",
+    "pinyin": "huì",
+    "meaning": "to meet",
+    "sourceSense": "to meet; to get together"
+  },
+  {
+    "hanzi": "讓",
+    "pinyin": "ràng",
+    "meaning": "to yield",
+    "sourceSense": "to yield"
+  },
+  {
+    "hanzi": "還",
+    "pinyin": "hái",
+    "meaning": "in addition",
+    "sourceSense": "in addition"
+  },
+  {
+    "hanzi": "見",
+    "pinyin": "jiàn",
+    "meaning": "to meet",
+    "sourceSense": "to meet"
+  },
+  {
+    "hanzi": "謝",
+    "pinyin": "xiè",
+    "meaning": "to apologize (in compounds)",
+    "sourceSense": "(bound form) to apologize"
+  },
+  {
+    "hanzi": "聽",
+    "pinyin": "tīng",
+    "meaning": "to heed",
+    "sourceSense": "to heed; to obey"
+  },
+  {
+    "hanzi": "幫",
+    "pinyin": "bāng",
+    "meaning": "group",
+    "sourceSense": "group"
+  },
+  {
+    "hanzi": "話",
+    "pinyin": "huà",
+    "meaning": "dialect",
+    "sourceSense": "dialect"
+  },
+  {
+    "hanzi": "訴",
+    "pinyin": "sù",
+    "meaning": "to complain",
+    "sourceSense": "to complain"
+  },
+  {
+    "hanzi": "干嘛",
+    "pinyin": "gànmá",
+    "meaning": "what are you doing?",
+    "sourceSense": "what are you doing?"
+  }
+]

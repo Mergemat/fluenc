@@ -1,0 +1,37 @@
+[
+  {
+    "character": "马",
+    "components": ["㇕", "㇉", "一"],
+    "note": "The two bent strokes interlock. The horizontal 一 crosses the lower part."
+  },
+  {
+    "character": "永",
+    "components": ["丶", "水"],
+    "note": "The dot sits above a modified 水 shape. Its central stroke joins the top of the character."
+  },
+  {
+    "character": "飞",
+    "components": ["㇤", "冫"],
+    "note": "Mirror 冫 so its two short strokes sit on the right of the bent hook ㇤."
+  },
+  {
+    "character": "尸",
+    "components": ["㇕", "一", "丿"],
+    "note": "㇕ forms the top and right edge. 一 crosses the middle, and 丿 falls down the left."
+  },
+  {
+    "character": "之",
+    "components": ["丶", "㇇", "㇝"],
+    "note": "Start with the dot 丶, then the bent falling stroke ㇇, then the long final stroke ㇝."
+  },
+  {
+    "character": "黑",
+    "components": ["囗", "丷", "土", "灬"],
+    "note": "The vertical of 土 extends into the upper enclosure. It is one stroke, included in 土 rather than counted again as 丨."
+  },
+  {
+    "character": "五",
+    "components": ["一", "丨", "㇕", "一"],
+    "note": "The first 一 runs across the top. 丨 slants down, ㇕ goes across and down, and the second 一 forms the base."
+  }
+]

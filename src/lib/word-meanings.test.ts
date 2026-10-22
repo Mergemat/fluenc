@@ -30,6 +30,8 @@ test("dictionary ordering cannot choose or truncate a teaching meaning", () => {
   ).toBeTrue();
   expect(
     getItemMeaning({
+      hanzi: "越",
+      pinyin: "yuè",
       meaning: "the more..., the more...",
       dictionaryMeanings: [],
     }).primary

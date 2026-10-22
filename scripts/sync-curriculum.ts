@@ -1,11 +1,13 @@
 import { parse } from "csv-parse/sync";
 import keywordReviews from "../src/data/character-keywords.reviewed.json";
+import componentNotes from "../src/data/component-notes.authored.json";
 
 import dictionarySource from "../src/data/dictionary.source.json";
 import reviewedJson from "../src/data/reviewed-compositions.json";
 import wordReviews from "../src/data/word-meanings.reviewed.json";
 import supplement from "../src/data/words.supplement.json";
 import { characterWordEquivalences } from "../src/lib/character-word-equivalence";
+import { resolveComponentNotes } from "../src/lib/component-notes";
 import { resolveCharacterKeywords } from "../src/lib/curriculum-readings";
 import {
   findHanziComposition,
@@ -146,6 +148,7 @@ const keywords = resolveCharacterKeywords(
   keywordReviews,
   dictionarySource.entries
 );
+const learnerNotes = resolveComponentNotes(compositions, componentNotes);
 
 const characters = [...stats.entries()]
   .map(([hanzi, characterStats]) => {
@@ -161,11 +164,7 @@ const characters = [...stats.entries()]
       ...keyword,
       components: composition.components,
       componentStructure: composition.structure,
-      componentNote:
-        composition.glyphVariation ||
-        reviewed.get(hanzi)?.confidence === "editorial"
-          ? composition.note
-          : null,
+      componentNote: learnerNotes.get(hanzi) ?? null,
       frequencyRank: characterStats.rank,
       unlocks: characterStats.unlocks,
     };
@@ -178,12 +177,13 @@ const characters = [...stats.entries()]
   );
 
 const curriculum = {
-  version: "2026-10-20.1",
+  version: "2026-10-23.1",
   sources: {
     words: WORDS_URL,
     supplementaryWords: "src/data/words.supplement.json",
     characters: CHARACTERS_URL,
     decompositionReviews: "src/data/reviewed-compositions.json",
+    componentNotes: "src/data/component-notes.authored.json",
     keywordReviews: "src/data/character-keywords.reviewed.json",
     dictionary: dictionarySource.url,
     wordReviews: "src/data/word-meanings.reviewed.json",

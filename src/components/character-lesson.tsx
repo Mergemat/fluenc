@@ -556,11 +556,12 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
           {item.movie.componentNote ? (
             <button
               aria-expanded={noteOpen}
+              aria-label="How the parts fit"
               className="dx-note-toggle"
               onClick={toggleNote}
               type="button"
             >
-              <Info size={12} /> note
+              <Info size={12} /> shape
             </button>
           ) : null}
           <span data-tone={missing.length ? "todo" : "done"}>
@@ -576,9 +577,17 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
           <div className="dx-rows-props">{props.map(row)}</div>
         </div>
         {noteOpen && item.movie.componentNote ? (
-          <div className="dx-popover" role="note">
+          <div
+            aria-label="How the parts fit"
+            className="dx-popover"
+            role="note"
+          >
             <p>{item.movie.componentNote}</p>
-            <button aria-label="Close note" onClick={closeNote} type="button">
+            <button
+              aria-label="Close shape note"
+              onClick={closeNote}
+              type="button"
+            >
               <X size={14} />
             </button>
           </div>

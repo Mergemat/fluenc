@@ -1062,6 +1062,7 @@
   transition: text-shadow 160ms;
 }
 .dx-code.font-hanzi-props {
+  font-family: var(--font-hanzi-props);
   font-size: 30px;
   font-weight: 400;
 }
@@ -1917,6 +1918,7 @@
   color: var(--k);
 }
 .dx-scene-chips b.font-hanzi-props {
+  font-family: var(--font-hanzi-props);
   font-size: 18px;
   font-weight: 400;
 }
@@ -2650,6 +2652,7 @@ a.dx-pal-row:hover {
   white-space: nowrap;
 }
 .dx-pal-code.font-hanzi-props {
+  font-family: var(--font-hanzi-props);
   font-size: 28px;
   font-weight: 400;
 }
@@ -2739,6 +2742,7 @@ a.dx-pal-row:hover {
   border-radius: 18px;
 }
 .dx-clue-code.font-hanzi-props {
+  font-family: var(--font-hanzi-props);
   font-size: 60px;
   font-weight: 400;
 }
