@@ -2060,25 +2060,6 @@
 .dx-shadow-pips > i[data-done="true"] {
   background: var(--dx-green);
 }
-/* Listen: the whole line stays visible; the cue flips between hearing and saying. */
-.dx-listen .dx-sentence-prompt {
-  gap: var(--dx-space-tight);
-}
-.dx-listen-meaning {
-  max-width: 32ch;
-  margin: 0;
-  font: var(--dx-type-body);
-  color: var(--dx-muted);
-}
-.dx-listen[data-phase="repeat"] .dx-sentence-cue {
-  color: var(--dx-green);
-}
-.dx-listen-count {
-  margin: 0;
-  font: var(--dx-type-label);
-  font-variant-numeric: tabular-nums;
-  color: var(--dx-faint);
-}
 .dx-ratings {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

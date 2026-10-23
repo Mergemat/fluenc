@@ -176,7 +176,4 @@ test("a focus sentence is read before sentences for a newer word", () => {
 
   const read = learn(known, "sentence", sentence);
   expect(reading(read)).not.toContain(sentence);
-  expect(
-    deriveDashboard(read, now).listenQueue.map((item) => item.hanzi)
-  ).toContain(sentence);
 });

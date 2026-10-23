@@ -122,7 +122,6 @@ async function show(
     scheduledQueue: [],
     nextReviewAt: null,
     getQueue: [],
-    listenQueue: [],
     lockedWords,
     buildQueue,
   };
