@@ -62,7 +62,7 @@ export function LibraryEntryPage({
                 {back}
               </button>
             ) : (
-              <Link to={from === "palace" ? "/palace" : "/library"}>
+              <Link to={from === "palace" ? "/profile/palace" : "/library"}>
                 <ArrowLeft size={14} />
                 {back}
               </Link>

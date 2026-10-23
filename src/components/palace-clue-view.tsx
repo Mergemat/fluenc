@@ -75,7 +75,7 @@ function ClueHeader({
               palace
             </button>
           ) : (
-            <Link search={{ tab: kind }} to="/palace">
+            <Link search={{ tab: kind }} to="/profile/palace">
               <ArrowLeft size={14} />
               palace
             </Link>
@@ -137,7 +137,7 @@ export function PalaceClueView({
       <Page>
         <Status
           action={
-            <Link className="dx-chip" to="/palace">
+            <Link className="dx-chip" to="/profile/palace">
               back to palace
             </Link>
           }
