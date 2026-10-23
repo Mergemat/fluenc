@@ -560,7 +560,7 @@ function LibraryResults({
   );
 }
 
-/** One section: a pixel label, a count (with how much is learned, by sound) and its tiles. */
+/** One section: a label, a count (with how much is learned, by sound) and its tiles. */
 function LibrarySectionBlock({
   section,
   entries,
@@ -575,7 +575,7 @@ function LibrarySectionBlock({
   return (
     <section aria-labelledby={`${id}-title`} className="dx-lib-section" id={id}>
       <header className="dx-head">
-        <h2 className="dx-head-title" id={`${id}-title`}>
+        <h2 className="dx-lib-section-title" id={`${id}-title`}>
           {section.label}
         </h2>
         {progress ? (
