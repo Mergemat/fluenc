@@ -2944,6 +2944,11 @@ a.dx-pal-row:hover {
   overflow: hidden;
   border-radius: 2px;
 }
+.dx-activity-fill {
+  position: absolute;
+  inset: auto 0 0;
+  overflow: hidden;
+}
 .dx-activity-week > i[data-future="true"] {
   visibility: hidden;
 }

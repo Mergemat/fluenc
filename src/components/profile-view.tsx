@@ -8,6 +8,7 @@ import { ChevronRight } from "lucide-react";
 import {
   type ActivityDay,
   activityCalendar,
+  activityFill,
   activityStreaks,
   countThisWeek,
 } from "../lib/activity";
@@ -19,36 +20,25 @@ import { Page, PageHeader, Status } from "./ui/layout";
 
 const WEEKS = 52;
 const monthFormat = new Intl.DateTimeFormat("en-GB", { month: "short" });
-const levelOpacity = [0.22, 0.45, 0.65, 0.85, 1];
-const levels = [0, 1, 2, 3, 4];
+const keyFills = [0, 0.25, 0.5, 0.75, 1];
 
-/** GitHub-style shade: nothing, 1–2, 3–5, 6–8, more. */
-function levelOf(count: number) {
-  if (count === 0) {
-    return 0;
-  }
-  if (count <= 2) {
-    return 1;
-  }
-  if (count <= 5) {
-    return 2;
-  }
-  return count <= 8 ? 3 : 4;
-}
-
-function Cell({ level }: { level: number }) {
+/** A day's square: a faint grey base, and green dither rising as high as the day was busy. */
+function Cell({ fill }: { fill: number }) {
   return (
-    <DitherGradient
-      cell={1}
-      direction="up"
-      from={level ? "green" : "grey"}
-      opacity={levelOpacity[level]}
-    />
+    <>
+      <DitherGradient cell={1} direction="up" from="grey" opacity={0.22} />
+      {fill ? (
+        <span className="dx-activity-fill" style={{ height: `${fill * 100}%` }}>
+          <DitherGradient cell={1} direction="up" from="green" />
+        </span>
+      ) : null}
+    </>
   );
 }
 
 /** One column per week, newest on the right; on a phone it scrolls, opening at this week. */
 function ActivityGraph({ weeks }: { weeks: ActivityDay[][] }) {
+  const busiest = Math.max(...weeks.flat().map((day) => day.count));
   return (
     <div className="dx-activity">
       <div className="dx-activity-grid">
@@ -75,7 +65,9 @@ function ActivityGraph({ weeks }: { weeks: ActivityDay[][] }) {
                   key={day.key}
                   title={`${day.key} · ${day.count} new`}
                 >
-                  {day.future ? null : <Cell level={levelOf(day.count)} />}
+                  {day.future ? null : (
+                    <Cell fill={activityFill(day.count, busiest)} />
+                  )}
                 </i>
               ))}
             </div>
@@ -126,9 +118,9 @@ export function ProfileView() {
         <Rule />
         <span aria-hidden="true" className="dx-activity-key">
           less
-          {levels.map((level) => (
-            <i key={level}>
-              <Cell level={level} />
+          {keyFills.map((fill) => (
+            <i key={fill}>
+              <Cell fill={fill} />
             </i>
           ))}
           more
