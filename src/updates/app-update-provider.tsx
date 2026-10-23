@@ -1,4 +1,5 @@
 import { useIsMutating } from "@tanstack/react-query";
+import { useLocation } from "@tanstack/react-router";
 import {
   createContext,
   type ReactNode,
@@ -11,60 +12,66 @@ import {
 } from "react";
 import type { Workbox } from "workbox-window";
 
-import { AppUpdateToast } from "./app-update-toast";
+import { useToast } from "../components/ui/toast";
 
 export type UpdateStatus =
   | "checking"
   | "current"
+  /** A new version is installed and waiting for a good moment. */
+  | "ready"
   | "applying"
   | "error"
   | "unsupported"
   | "development";
 interface AppUpdate {
+  /** Switch to the waiting version now. */
   apply: () => void;
-  available: boolean;
-  check: () => Promise<void>;
   status: UpdateStatus;
 }
 
 const AppUpdateContext = createContext<AppUpdate | null>(null);
+// Set just before the reload that applies an update, so the new version can say it arrived.
+const UPDATED_KEY = "fluenc-updated";
 
-interface WorkerEvents {
-  onActivated: (isUpdate: boolean) => void;
-  onRedundant: () => void;
-}
-
-/** Listen to the app's service worker and check for a new version whenever the app is in use. */
-function watchWorker(worker: Workbox, events: WorkerEvents) {
-  const activated = (event: { isUpdate?: boolean }) =>
-    events.onActivated(Boolean(event.isUpdate));
-  worker.addEventListener("activated", activated);
-  worker.addEventListener("redundant", events.onRedundant);
-  const checkInBackground = () => {
+/** Check for a new version whenever the app is in use. */
+function watchForUpdates(worker: Workbox) {
+  const check = () => {
     if (document.visibilityState === "visible" && navigator.onLine) {
       worker.update().catch(() => undefined);
     }
   };
-  document.addEventListener("visibilitychange", checkInBackground);
-  window.addEventListener("online", checkInBackground);
-  const interval = window.setInterval(checkInBackground, 60 * 60 * 1000);
+  document.addEventListener("visibilitychange", check);
+  window.addEventListener("online", check);
+  const interval = window.setInterval(check, 60 * 60 * 1000);
   return () => {
-    worker.removeEventListener("activated", activated);
-    worker.removeEventListener("redundant", events.onRedundant);
-    document.removeEventListener("visibilitychange", checkInBackground);
-    window.removeEventListener("online", checkInBackground);
+    document.removeEventListener("visibilitychange", check);
+    window.removeEventListener("online", check);
     window.clearInterval(interval);
   };
 }
 
+/**
+ * New versions install in the background and wait. One takes over the next time fluenc is out of
+ * sight, outside a lesson, so it never reloads under the learner's hands; settings can apply it
+ * straight away.
+ * Progress is on the device, so a reload loses nothing once saves have finished.
+ */
 export function AppUpdateProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<UpdateStatus>("checking");
-  const [available, setAvailable] = useState(false);
-  const [toastOpen, setToastOpen] = useState(false);
   const workbox = useRef<Workbox | null>(null);
-  const registration = useRef<ServiceWorkerRegistration | null>(null);
-  const register = useRef<() => void>(() => undefined);
   const saving = useIsMutating() > 0;
+  // A lesson can hold a half-written Hanzi Movie; it is not saved until the lesson is done.
+  const drafting = useLocation({
+    select: (location) => location.pathname.startsWith("/lessons"),
+  });
+  const toast = useToast();
+
+  useEffect(() => {
+    if (sessionStorage.getItem(UPDATED_KEY)) {
+      sessionStorage.removeItem(UPDATED_KEY);
+      toast("fluenc updated");
+    }
+  }, [toast]);
 
   useEffect(() => {
     if (!import.meta.env.PROD) {
@@ -75,26 +82,8 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
       setStatus("unsupported");
       return;
     }
-
     let active = true;
     let unwatch: () => void = () => undefined;
-    const events: WorkerEvents = {
-      onActivated: (isUpdate) => {
-        if (!active) {
-          return;
-        }
-        if (isUpdate) {
-          setAvailable(true);
-          setToastOpen(true);
-        }
-        setStatus("current");
-      },
-      onRedundant: () => {
-        if (active) {
-          setStatus("error");
-        }
-      },
-    };
     const prepare = async () => {
       const { Workbox: WorkboxClient } = await import("workbox-window");
       if (!active) {
@@ -105,80 +94,71 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
         updateViaCache: "none",
       });
       workbox.current = worker;
-      unwatch = watchWorker(worker, events);
-      const result = await worker.register({ immediate: true });
-      if (!active) {
-        return;
-      }
-      if (!result) {
-        throw new Error("App registration failed");
-      }
-      registration.current = result;
-      // Only an install that replaces a running version is an update; the first one is this version.
-      if (!(result.installing && navigator.serviceWorker.controller)) {
-        setStatus("current");
-      }
-    };
-    register.current = () => {
-      unwatch();
-      prepare().catch(() => {
+      worker.addEventListener("waiting", () => {
+        if (active) {
+          setStatus("ready");
+        }
+      });
+      worker.addEventListener("controlling", (event) => {
+        // Only a version replacing this one reloads; the first install already runs this code.
+        if (event.isUpdate) {
+          sessionStorage.setItem(UPDATED_KEY, "1");
+          window.location.reload();
+        }
+      });
+      worker.addEventListener("redundant", () => {
         if (active) {
           setStatus("error");
         }
       });
+      unwatch = watchForUpdates(worker);
+      const registration = await worker.register({ immediate: true });
+      if (!registration) {
+        throw new Error("App registration failed");
+      }
+      if (active && !registration.waiting) {
+        setStatus((current) => (current === "checking" ? "current" : current));
+      }
     };
-    register.current();
+    prepare().catch(() => {
+      if (active) {
+        setStatus("error");
+      }
+    });
     return () => {
       active = false;
       unwatch();
       workbox.current = null;
-      registration.current = null;
     };
   }, []);
 
-  const check = useCallback(async () => {
-    if (available) {
-      setToastOpen(true);
-      return;
-    }
-    setStatus("checking");
-    if (!(workbox.current && registration.current)) {
-      register.current();
-      return;
-    }
-    try {
-      await workbox.current.update();
-      if (!(registration.current.installing || registration.current.waiting)) {
-        setStatus("current");
-      }
-    } catch {
-      setStatus("error");
-    }
-  }, [available]);
   const apply = useCallback(() => {
-    if (saving || !available || status === "applying") {
+    if (saving || status !== "ready" || !workbox.current) {
       return;
     }
     setStatus("applying");
-    window.location.reload();
-  }, [available, saving, status]);
-  const dismiss = useCallback(() => setToastOpen(false), []);
-  const update = useMemo(
-    () => ({ status, available, check, apply }),
-    [status, available, check, apply]
-  );
+    workbox.current.messageSkipWaiting();
+  }, [saving, status]);
 
+  // Leaving fluenc is the moment: the reload happens out of sight.
+  useEffect(() => {
+    if (status !== "ready" || saving || drafting) {
+      return;
+    }
+    const applyWhenHidden = () => {
+      if (document.visibilityState === "hidden") {
+        apply();
+      }
+    };
+    document.addEventListener("visibilitychange", applyWhenHidden);
+    return () =>
+      document.removeEventListener("visibilitychange", applyWhenHidden);
+  }, [apply, drafting, saving, status]);
+
+  const update = useMemo(() => ({ status, apply }), [status, apply]);
   return (
     <AppUpdateContext.Provider value={update}>
       {children}
-      {toastOpen && available ? (
-        <AppUpdateToast
-          onDismiss={dismiss}
-          onRefresh={apply}
-          saving={saving}
-          updating={status === "applying"}
-        />
-      ) : null}
     </AppUpdateContext.Provider>
   );
 }

@@ -6,7 +6,7 @@ import {
   applyOperation,
   emptyLearnerState,
   type LearnerState,
-  type ProgressOperation,
+  type ProgressChange,
 } from "./learner-state";
 import { deriveDashboard, deriveLibrary, derivePalace } from "./learner-views";
 
@@ -14,7 +14,7 @@ const enroll = (
   itemType: "character" | "word" | "sentence",
   itemId: string,
   enrolledAt: string
-): ProgressOperation => ({
+): ProgressChange => ({
   kind: "enroll",
   data: { itemType, itemId, enrolledAt },
 });
@@ -56,7 +56,7 @@ test("saved names reach the palace, the library and every lesson that uses them"
     },
     { kind: "livingLink", data: { wordId: "5", story: "we stand together" } },
   ].reduce(
-    (next, operation) => applyOperation(next, operation as ProgressOperation),
+    (next, operation) => applyOperation(next, operation as ProgressChange),
     emptyLearnerState
   );
 
@@ -100,7 +100,6 @@ test("enrolling twice or reviewing an unknown card leaves the state unchanged, l
     applyOperation(once, {
       kind: "review",
       data: {
-        eventId: crypto.randomUUID(),
         itemType: "sentence",
         itemId: "s02",
         rating: 3,
@@ -119,7 +118,6 @@ test("a reviewed card keeps the moment it was introduced", () => {
   const reviewed = applyOperation(enrolled, {
     kind: "review",
     data: {
-      eventId: crypto.randomUUID(),
       itemType: "sentence",
       itemId: "s01",
       rating: 3,

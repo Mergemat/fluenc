@@ -9,13 +9,21 @@ import {
 } from "drizzle-orm/sqlite-core";
 
 import { studyItemTypes } from "../data/types";
+import { account, session, user, verification } from "./auth-schema";
 
+/** One per account; its id is the user's id. Every row of progress below belongs to one. */
 export const learners = sqliteTable("learners", {
   id: text("id").primaryKey(),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .default(sql`(unixepoch() * 1000)`),
 });
+
+/**
+ * The `seq` of the last change written to a row. A device sends the highest `seq` it has seen and
+ * gets back only the rows changed since.
+ */
+const version = () => integer("version").notNull().default(0);
 
 export const learnerItems = sqliteTable(
   "learner_items",
@@ -40,6 +48,7 @@ export const learnerItems = sqliteTable(
     introducedAt: integer("introduced_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
+    version: version(),
   },
   (table) => [
     primaryKey({ columns: [table.learnerId, table.itemType, table.itemId] }),
@@ -47,37 +56,28 @@ export const learnerItems = sqliteTable(
   ]
 );
 
-export const reviewLogs = sqliteTable(
-  "review_logs",
+/**
+ * Every change a device or script made, in the order the server received it. Its `id` is chosen by
+ * the device, so a change sent twice is applied once. Reviews here are the learner's review log.
+ */
+export const events = sqliteTable(
+  "events",
   {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    seq: integer("seq").primaryKey({ autoIncrement: true }),
+    id: text("id").notNull().unique(),
     learnerId: text("learner_id")
       .notNull()
       .references(() => learners.id, { onDelete: "cascade" }),
-    itemType: text("item_type", {
-      enum: studyItemTypes,
-    }).notNull(),
-    itemId: text("item_id").notNull(),
-    rating: integer("rating").notNull(),
-    durationMs: integer("duration_ms").notNull().default(0),
-    reviewedAt: integer("reviewed_at", { mode: "timestamp_ms" })
+    kind: text("kind").notNull(),
+    data: text("data", { mode: "json" }).notNull(),
+    /** When the change was made, by the device's clock. */
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+    receivedAt: integer("received_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (table) => [
-    index("review_logs_learner_date_idx").on(table.learnerId, table.reviewedAt),
-  ]
+  (table) => [index("events_learner_seq_idx").on(table.learnerId, table.seq)]
 );
-
-export const syncEvents = sqliteTable("sync_events", {
-  id: text("id").primaryKey(),
-  learnerId: text("learner_id")
-    .notNull()
-    .references(() => learners.id, { onDelete: "cascade" }),
-  appliedAt: integer("applied_at", { mode: "timestamp_ms" })
-    .notNull()
-    .default(sql`(unixepoch() * 1000)`),
-});
 
 export const palaceActors = sqliteTable(
   "palace_actors",
@@ -87,6 +87,7 @@ export const palaceActors = sqliteTable(
       .references(() => learners.id, { onDelete: "cascade" }),
     actorKey: text("actor_key").notNull(),
     actorName: text("actor_name").notNull(),
+    version: version(),
   },
   (table) => [primaryKey({ columns: [table.learnerId, table.actorKey] })]
 );
@@ -99,6 +100,7 @@ export const palaceSets = sqliteTable(
       .references(() => learners.id, { onDelete: "cascade" }),
     finalKey: text("final_key").notNull(),
     setName: text("set_name").notNull(),
+    version: version(),
   },
   (table) => [primaryKey({ columns: [table.learnerId, table.finalKey] })]
 );
@@ -111,6 +113,7 @@ export const toneRooms = sqliteTable(
       .references(() => learners.id, { onDelete: "cascade" }),
     tone: integer("tone").notNull(),
     roomName: text("room_name").notNull(),
+    version: version(),
   },
   (table) => [primaryKey({ columns: [table.learnerId, table.tone] })]
 );
@@ -123,6 +126,7 @@ export const componentProps = sqliteTable(
       .references(() => learners.id, { onDelete: "cascade" }),
     component: text("component").notNull(),
     propName: text("prop_name").notNull(),
+    version: version(),
   },
   (table) => [primaryKey({ columns: [table.learnerId, table.component] })]
 );
@@ -139,6 +143,7 @@ export const mnemonics = sqliteTable(
     updatedAt: integer("updated_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
+    version: version(),
   },
   (table) => [
     primaryKey({ columns: [table.learnerId, table.itemType, table.itemId] }),
@@ -158,6 +163,9 @@ export const focusEntries = sqliteTable(
     meaning: text("meaning").notNull(),
     label: text("label").notNull(),
     addedAt: integer("added_at", { mode: "timestamp_ms" }).notNull(),
+    /** Set when the entry is removed, so devices that have it learn it is gone. */
+    removedAt: integer("removed_at", { mode: "timestamp_ms" }),
+    version: version(),
   },
   (table) => [
     primaryKey({ columns: [table.learnerId, table.kind, table.hanzi] }),
@@ -176,10 +184,13 @@ export const pushSubscriptions = sqliteTable("push_subscriptions", {
 
 /** Every table, for drizzle's typed client. */
 export const schema = {
+  user,
+  session,
+  account,
+  verification,
   learners,
   learnerItems,
-  reviewLogs,
-  syncEvents,
+  events,
   palaceActors,
   palaceSets,
   toneRooms,

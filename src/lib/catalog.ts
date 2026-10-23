@@ -3,7 +3,6 @@ import { sentences as courseSentences, type Sentence } from "../data/sentences";
 import type { Character, Curriculum, FocusEntry, Word } from "../data/types";
 import { characterIsWord } from "./character-words";
 import { segmentSentence } from "./sentence-words";
-import { wordSyllables } from "./word-syllables";
 
 const HAN = /\p{Script=Han}/u;
 const hanOnly = (value: string) =>
@@ -50,7 +49,7 @@ function resolveFocusWords(
           meaning: entry.meaning,
           dictionaryMeanings: [],
           characterIds: Array.from(entry.hanzi),
-          syllables: wordSyllables(entry.hanzi, entry.pinyin),
+          syllables: entry.syllables ?? null,
         });
       }
     }

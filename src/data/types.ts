@@ -63,4 +63,9 @@ export interface FocusEntry {
   label: string;
   meaning: string;
   pinyin: string;
+  /**
+   * A word's pinyin split per character, worked out by the server so devices need no pinyin
+   * dictionary. Absent or null when it does not split cleanly.
+   */
+  syllables?: string[] | null;
 }

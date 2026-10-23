@@ -29,6 +29,20 @@
       "when": 1791984149382,
       "tag": "0003_focus_entries",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1792716083598,
+      "tag": "0004_local_first_sync",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1792716084328,
+      "tag": "0005_drop_review_logs",
+      "breakpoints": true
     }
   ]
 }

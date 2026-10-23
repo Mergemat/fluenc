@@ -1,5 +1,5 @@
 import type { RefresherCustomEvent } from "@ionic/core";
-import { useIsMutating, useQueryClient } from "@tanstack/react-query";
+import { useIsMutating } from "@tanstack/react-query";
 import {
   type ReactNode,
   type TouchEvent,
@@ -9,6 +9,8 @@ import {
   useSyncExternalStore,
 } from "react";
 
+import { syncNow } from "../offline/sync";
+import { useAppUpdate } from "../updates/app-update-provider";
 import {
   IonContent,
   IonRefresher,
@@ -27,7 +29,7 @@ const subscribeToDisplayMode = (onChange: () => void) => {
 };
 
 interface PullGesture {
-  reload: boolean;
+  refresh: boolean;
   touching: boolean;
 }
 
@@ -38,13 +40,13 @@ export function AppScroll({
   children: ReactNode;
   pathname: string;
 }) {
-  const queryClient = useQueryClient();
   const pending = useIsMutating() > 0;
+  const update = useAppUpdate();
   const content = useRef<HTMLIonContentElement>(null);
   const refresher = useRef<HTMLIonRefresherElement>(null);
-  // The pull gesture: whether a finger is down, and whether releasing it should reload.
-  const pull = useRef<PullGesture>({ touching: false, reload: false });
-  const reloadTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+  // The pull gesture: whether a finger is down, and whether releasing it should refresh.
+  const pull = useRef<PullGesture>({ touching: false, refresh: false });
+  const refreshTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined
   );
   const shownPath = useRef(pathname);
@@ -58,7 +60,7 @@ export function AppScroll({
   // Initialize after hydration: Ionic adds platform classes to the document.
   useEffect(() => {
     initializeScroll();
-    return () => clearTimeout(reloadTimer.current);
+    return () => clearTimeout(refreshTimer.current);
   }, []);
 
   // A new page starts at the top.
@@ -69,55 +71,57 @@ export function AppScroll({
     }
   }, [ready, pathname]);
 
-  const scheduleReload = useCallback(() => {
-    clearTimeout(reloadTimer.current);
-    if (!pull.current.reload) {
+  // Pulling syncs, or switches to a new version waiting to take over.
+  const scheduleRefresh = useCallback(() => {
+    clearTimeout(refreshTimer.current);
+    if (!pull.current.refresh) {
       return;
     }
-    // Give the released spinner time to settle before replacing the document.
-    reloadTimer.current = setTimeout(() => {
-      pull.current.reload = false;
-      if (queryClient.isMutating()) {
-        refresher.current?.complete();
-      } else {
-        window.location.reload();
+    // Give the released spinner time to settle before it reports back.
+    refreshTimer.current = setTimeout(() => {
+      pull.current.refresh = false;
+      if (update.status === "ready") {
+        update.apply();
+        return;
       }
+      syncNow()
+        .catch(() => undefined)
+        .finally(() => refresher.current?.complete());
     }, 450);
-  }, [queryClient]);
+  }, [update]);
   const refresh = useCallback(
     (event: RefresherCustomEvent) => {
-      if (queryClient.isMutating()) {
+      if (pending) {
         event.detail.complete();
         return;
       }
-      // Native iOS reaches this state before release. Keep it refreshing until
-      // navigation: complete() would play the shrinking/reversing exit animation.
-      pull.current.reload = true;
+      // Native iOS reaches this state before release; refresh once the finger lifts.
+      pull.current.refresh = true;
       if (!pull.current.touching) {
-        scheduleReload();
+        scheduleRefresh();
       }
     },
-    [queryClient, scheduleReload]
+    [pending, scheduleRefresh]
   );
   const startTouch = useCallback(() => {
     pull.current.touching = true;
-    clearTimeout(reloadTimer.current);
+    clearTimeout(refreshTimer.current);
   }, []);
   const finishTouch = useCallback(
     (event: TouchEvent) => {
       pull.current.touching = event.touches.length > 0;
       if (!pull.current.touching) {
-        scheduleReload();
+        scheduleRefresh();
       }
     },
-    [scheduleReload]
+    [scheduleRefresh]
   );
   const cancelTouch = useCallback(() => {
-    clearTimeout(reloadTimer.current);
-    if (pull.current.reload) {
+    clearTimeout(refreshTimer.current);
+    if (pull.current.refresh) {
       refresher.current?.complete();
     }
-    pull.current = { touching: false, reload: false };
+    pull.current = { touching: false, refresh: false };
   }, []);
 
   if (!ready) {

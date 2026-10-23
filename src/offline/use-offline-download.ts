@@ -9,7 +9,6 @@ import {
   type OfflineFile,
   type OfflineFiles,
 } from "./files";
-import { getCachedLearner } from "./progress";
 
 export interface DownloadProgress {
   completed: number;
@@ -155,9 +154,6 @@ async function downloadOfflineFiles(
 
   // The app shell and course install in the service worker; progress comes from the saved learner state.
   await withTimeout(navigator.serviceWorker.ready);
-  if (!(await getCachedLearner())) {
-    throw new Error("Lessons are not saved yet");
-  }
   navigator.storage?.persist?.().catch(() => undefined);
   return "ready";
 }

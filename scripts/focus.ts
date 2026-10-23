@@ -4,6 +4,9 @@
 //   bun run focus list
 //   bun run focus remove 中国 学生
 //
+// Works on the account in FLUENC_EMAIL (.env), or the one passed as --email. Devices pick the
+// change up on their next sync.
+//
 // lesson.json: { "label": "HSK 1 · L3", "words": [{ "hanzi", "pinyin", "meaning" }],
 // "sentences": [{ "hanzi", "pinyin", "meaning" }] }. Words take dictionary pinyin (不 is bù);
 // sentences keep theirs as written.
@@ -15,11 +18,8 @@ import { catalogFor } from "../src/lib/catalog";
 import { cardKey, type LearnerState } from "../src/lib/learner-state";
 import { deriveDashboard } from "../src/lib/learner-views";
 import { wordSyllables } from "../src/lib/word-syllables";
-import {
-  addFocusHandler,
-  getLearnerStateHandler,
-  removeFocusHandler,
-} from "../src/server/curriculum.handlers.server";
+import { readLearnerState, writeOperations } from "../src/server/sync.server";
+import { resolveLearner } from "./learner";
 
 const item = z.object({
   hanzi: z.string().trim().min(1),
@@ -78,7 +78,17 @@ function status(entry: FocusEntry, state: LearnerState) {
   };
 }
 
-async function add(file: string, dryRun: boolean) {
+function writeFocus(
+  learnerId: string,
+  data: { add: FocusEntry[] } | { remove: string[] }
+) {
+  const at = new Date().toISOString();
+  return writeOperations(learnerId, [
+    { id: crypto.randomUUID(), at, kind: "focus", data },
+  ]);
+}
+
+async function add(learnerId: string, file: string, dryRun: boolean) {
   const input = lesson.parse(JSON.parse(await readFile(file, "utf8")));
   const start = Date.now();
   const entries: FocusEntry[] = [
@@ -98,7 +108,7 @@ async function add(file: string, dryRun: boolean) {
     addedAt: new Date(start + index).toISOString(),
   }));
 
-  const state = await getLearnerStateHandler();
+  const state = await readLearnerState(learnerId);
   console.log(`${input.label}: ${entries.length} entries`);
   const accepted = entries.filter((entry) => {
     const result = status(entry, state);
@@ -112,8 +122,8 @@ async function add(file: string, dryRun: boolean) {
     console.log("\nDry run: nothing saved.");
     return;
   }
-  await addFocusHandler(accepted);
-  const saved = await getLearnerStateHandler();
+  await writeFocus(learnerId, { add: accepted });
+  const saved = await readLearnerState(learnerId);
   const dashboard = deriveDashboard(saved, new Date());
   console.log(
     `\nSaved ${accepted.length}. Next in Build: ${dashboard.buildQueue
@@ -123,8 +133,8 @@ async function add(file: string, dryRun: boolean) {
   );
 }
 
-async function list() {
-  const state = await getLearnerStateHandler();
+async function list(learnerId: string) {
+  const state = await readLearnerState(learnerId);
   let label = "";
   for (const entry of state.focus) {
     if (entry.label !== label) {
@@ -140,16 +150,30 @@ async function list() {
   }
 }
 
-const [command, ...args] = process.argv.slice(2);
-if (command === "add" && args[0]) {
-  await add(args[0], args.includes("--dry-run"));
+async function remove(learnerId: string, hanzi: string[]) {
+  const before = await readLearnerState(learnerId);
+  await writeFocus(learnerId, { remove: hanzi });
+  const after = await readLearnerState(learnerId);
+  console.log(`Removed ${before.focus.length - after.focus.length}.`);
+}
+
+const [command, ...rest] = process.argv.slice(2);
+const usage =
+  "Usage: bun run focus add <lesson.json> [--dry-run] | list | remove <hanzi…> [--email <address>]";
+if (!(command === "add" || command === "list" || command === "remove")) {
+  console.error(usage);
+  process.exit(1);
+}
+const target = await resolveLearner(rest);
+const [lessonFile] = target.args;
+console.log(`Focus for ${target.email}`);
+if (command === "add" && lessonFile) {
+  await add(target.learnerId, lessonFile, target.args.includes("--dry-run"));
 } else if (command === "list") {
-  await list();
-} else if (command === "remove" && args.length) {
-  console.log(`Removed ${await removeFocusHandler(args)}.`);
+  await list(target.learnerId);
+} else if (command === "remove" && target.args.length) {
+  await remove(target.learnerId, target.args);
 } else {
-  console.error(
-    "Usage: bun run focus add <lesson.json> [--dry-run] | list | remove <hanzi…>"
-  );
+  console.error(usage);
   process.exit(1);
 }

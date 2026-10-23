@@ -1,7 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 
-import { hasPendingProgress } from "../offline/progress";
 import type {
   DownloadStatus,
   OfflineDownload,
@@ -10,6 +8,7 @@ import {
   type UpdateStatus,
   useAppUpdate,
 } from "../updates/app-update-provider";
+import { AccountSettings } from "./account-settings";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import { NotificationSettings } from "./notification-settings";
@@ -36,6 +35,8 @@ const updateStates: Record<UpdateStatus, RowState> = {
   unsupported: ["idle", "published app only"],
   checking: ["busy", "checking…"],
   current: ["ok", "up to date"],
+  // Installed alongside this version; it takes over the next time fluenc is out of sight.
+  ready: ["warn", "new version ready · applies when you leave fluenc"],
 };
 
 function offlineState(
@@ -51,39 +52,28 @@ function offlineState(
   return offlineStates[status];
 }
 
-function syncState(pending: boolean | undefined, checking: boolean): RowState {
-  if (pending) {
-    return ["busy", "changes waiting to sync"];
-  }
-  return checking ? ["busy", "checking…"] : ["ok", "all progress synced"];
-}
-
 /**
- * Reminders are the only real choice. Everything else — offline download, progress sync,
+ * The account and reminders are the real choices. Everything else — offline download, sync,
  * app updates — runs by itself, so this page only reports how the device is doing.
  */
 export function SettingsView({ offline }: { offline: OfflineDownload }) {
   const update = useAppUpdate();
-  const pending = useQuery({
-    queryKey: ["pending-progress"],
-    queryFn: hasPendingProgress,
-    refetchInterval: 3000,
-    networkMode: "always",
-  });
   const percentage = offline.progress?.total
     ? Math.floor((offline.progress.completed / offline.progress.total) * 100)
     : null;
 
   const [offlineTone, offlineText] = offlineState(offline.status, percentage);
-  const [syncTone, syncText] = syncState(pending.data, pending.isPending);
-  const [updateTone, updateText] = update.available
-    ? (["warn", "new version ready"] satisfies RowState)
-    : updateStates[update.status];
+  const [updateTone, updateText] = updateStates[update.status];
 
   return (
     <Page>
       <PageHeader title="settings" />
       <div className="dx-set">
+        <h2 className="dx-label dx-set-group">
+          <span>account</span>
+          <Rule />
+        </h2>
+        <AccountSettings />
         <h2 className="dx-label dx-set-group">
           <span>reminders</span>
           <Rule />
@@ -118,20 +108,13 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
           ) : null}
         </SettingRow>
         <SettingRow
-          id="sync-heading"
-          note="saved here first, synced in the background"
-          status={syncText}
-          title="progress"
-          tone={syncTone}
-        />
-        <SettingRow
           id="update-heading"
-          note="checked each time you open fluenc"
+          note="updates install in the background"
           status={updateText}
           title="version"
           tone={updateTone}
         >
-          {update.available ? (
+          {update.status === "ready" || update.status === "applying" ? (
             <DitherButton
               className="dx-tool"
               color="blue"
@@ -140,7 +123,7 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
               variant="gradient"
             >
               <RefreshCw size={13} />
-              refresh
+              update now
             </DitherButton>
           ) : null}
         </SettingRow>

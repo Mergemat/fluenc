@@ -20,8 +20,24 @@ declare const self: ServiceWorkerGlobalScope & {
 const STROKES_PATH = /^\/hanzi\/[^/]+\.json$/;
 const AUDIO_PATH = /^\/audio\/pinyin\/[^/]+\.mp3$/;
 
+// A new version waits until the page says it is a good moment (see app-update-provider), so a
+// running page never loses the files it was built with. Workers from before that handshake
+// would never send the message; replacing one of them takes over at once, as they did.
+const HANDSHAKE_CACHE = "fluenc-update-handshake";
 self.addEventListener("install", (event) => {
-  event.waitUntil(self.skipWaiting());
+  event.waitUntil(
+    caches
+      .has(HANDSHAKE_CACHE)
+      .then((ready) => (ready ? undefined : self.skipWaiting()))
+  );
+});
+self.addEventListener("activate", (event) => {
+  event.waitUntil(caches.open(HANDSHAKE_CACHE));
+});
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 clientsClaim();
 precacheAndRoute(self.__WB_MANIFEST);
@@ -39,7 +55,7 @@ self.addEventListener("notificationclick", (event) => {
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL("/offline.html"), {
     allowlist: [
-      /^\/(?:review|lessons|reading|library|palace|settings)?\/?(?:\?.*)?$/,
+      /^\/(?:review|lessons|reading|listen|library|palace|settings|account)?\/?(?:\?.*)?$/,
       /^\/library\/(?:characters|words)\/[^/?]+\/?(?:\?.*)?$/,
       /^\/palace\/(?:cast|sets|areas|props)\/[^/?]+\/?(?:\?.*)?$/,
     ],

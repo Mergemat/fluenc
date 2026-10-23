@@ -9,11 +9,7 @@ import {
   type LibraryData,
   type PalaceData,
 } from "../lib/learner-views";
-import {
-  getCachedLearner,
-  getOfflineLearner,
-  type LearnerSnapshot,
-} from "./progress";
+import { type LearnerSnapshot, readLearner } from "./progress";
 
 // Each view is derived once per snapshot, however many components read it. The library and palace
 // only depend on the state, which structural sharing keeps when a refetch changes nothing.
@@ -44,10 +40,12 @@ export const selectLibrary = (data: LearnerSnapshot) =>
 export const selectPalace = (data: LearnerSnapshot) =>
   memoize(palaces, data.state, () => derivePalace(data.state));
 
+// Progress is read from the device, never the network; sync writes new snapshots into the query.
 export const learnerQueryOptions = queryOptions({
   queryKey: ["learner"],
-  queryFn: ({ signal }) => getOfflineLearner(signal),
+  queryFn: readLearner,
   networkMode: "always",
+  staleTime: Number.POSITIVE_INFINITY,
   // Re-read when the next card falls due so it moves into review.
   refetchInterval: (query) => {
     const nextReviewAt =
@@ -75,17 +73,6 @@ export const palaceQueryOptions = queryOptions({
   select: selectPalace,
 });
 
-export async function loadLearner(queryClient: QueryClient) {
-  if (!queryClient.getQueryData(learnerQueryOptions.queryKey)) {
-    const cached = await getCachedLearner();
-    if (cached) {
-      queryClient.setQueryData(learnerQueryOptions.queryKey, cached, {
-        updatedAt: 0,
-      });
-    }
-  }
-  return queryClient.ensureQueryData({
-    ...learnerQueryOptions,
-    revalidateIfStale: true,
-  });
+export function loadLearner(queryClient: QueryClient) {
+  return queryClient.ensureQueryData(learnerQueryOptions);
 }

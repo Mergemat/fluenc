@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { type LearnerSnapshot, seedLearner } from "./progress";
+import type { LearnerSnapshot } from "./progress";
 import { learnerQueryOptions } from "./queries";
 
+/** Save progress on the device. It shows at once; sync sends it when it can. */
 export function useProgressMutation<T>(
   save: (input: T) => Promise<LearnerSnapshot>
 ) {
@@ -12,13 +13,6 @@ export function useProgressMutation<T>(
     scope: { id: "progress" },
     networkMode: "always",
     mutationFn: save,
-    onMutate: async () => {
-      await queryClient.cancelQueries(learnerQueryOptions);
-      const learner = queryClient.getQueryData(learnerQueryOptions.queryKey);
-      if (learner) {
-        await seedLearner(learner);
-      }
-    },
     onSuccess: (snapshot) => {
       queryClient.setQueryData(learnerQueryOptions.queryKey, snapshot);
     },
