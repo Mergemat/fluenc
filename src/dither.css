@@ -1206,9 +1206,15 @@
   box-shadow: none;
   opacity: 0.35;
 }
+/* A highlighted row is rounded like every other surface, and the lines touching it give way. */
 .dx-row:focus-within,
 .dx-row[data-lit="true"] {
   background: color-mix(in srgb, var(--k) 9%, transparent);
+  border-radius: var(--dx-radius);
+  box-shadow: none;
+}
+.dx-row:has(+ .dx-row:is(:focus-within, [data-lit="true"])) {
+  box-shadow: none;
 }
 .dx-row:focus-within .dx-code,
 .dx-row[data-lit="true"] .dx-code {
@@ -2813,6 +2819,11 @@
 }
 a.dx-pal-row:hover {
   background: var(--dx-raised);
+  border-radius: var(--dx-radius);
+  box-shadow: none;
+}
+.dx-pal-group:has(a.dx-pal-row:hover) + .dx-pal-group .dx-pal-row {
+  box-shadow: none;
 }
 .dx-pal-row[data-kind="cast"] {
   --k: var(--dx-blue);
@@ -3249,6 +3260,10 @@ a.dx-pal-row:hover {
 }
 .dx-later-row:hover {
   background: var(--dx-surface);
+}
+.dx-later-list > :where(li):has(> .dx-later-row:hover),
+.dx-later-list > :where(li):has(> .dx-later-row:hover) + :where(li) {
+  box-shadow: none;
 }
 .dx-later-lead {
   font-size: 28px;
