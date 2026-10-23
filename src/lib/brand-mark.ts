@@ -1,5 +1,5 @@
 // The fluenc mark: the four Mandarin tone contours — high level, rising, dipping, falling — drawn
-// as pixel strokes on a 2×2 grid. docs/design/brand/icon-generator.html uses the same geometry.
+// as pixel strokes on a 2×2 grid.
 export const brandTones = [
   {
     color: "green",

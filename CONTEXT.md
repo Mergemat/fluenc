@@ -1,6 +1,6 @@
 # Fluenc learning context
 
-Fluenc presents Mandarin Blueprint-style learning as separate, self-paced activities. Review, new lessons, and comprehensible reading never force the learner into one timed session.
+Fluenc presents Hanzi Movie Method learning as separate, self-paced activities. Review, new lessons, and comprehensible reading never force the learner into one timed session.
 
 ## Learning activities
 

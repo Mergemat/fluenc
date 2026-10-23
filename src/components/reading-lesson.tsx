@@ -13,7 +13,7 @@ import { ErrorNote } from "./ui/layout";
 
 type ReadingItem = DashboardData["getQueue"][number];
 
-// Mandarin Blueprint shadows each sentence 3–10 times, about 5 being the sweet spot.
+// Shadow each sentence 3–10 times; about 5 is the sweet spot.
 export const SHADOW_TARGET = 5;
 export const SHADOW_MINIMUM = 3;
 

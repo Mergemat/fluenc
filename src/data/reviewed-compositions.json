@@ -6,7 +6,10 @@
     "decomposition": "⿰丿㇏",
     "approximate": false,
     "note": "Mnemonic props: left-falling stroke and right-falling stroke.",
-    "sources": ["https://babelstone.co.uk/CJK/IDS.TXT"],
+    "sources": [
+      "https://babelstone.co.uk/CJK/IDS.TXT",
+      "https://github.com/skishore/makemeahanzi/blob/master/graphics.txt"
+    ],
     "confidence": "verified"
   },
   {

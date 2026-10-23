@@ -365,8 +365,8 @@ export function deriveDashboard(
       };
     })
     .filter((sentence) => sentence.coverage >= 0.9)
-    // Focus sentences first. Then, as Mandarin Blueprint pairs Build with Get, a new word comes
-    // with sentences that use it. Fully known sentences come before ones with an unknown left.
+    // Focus sentences first. Then, pairing Build with Get, a new word comes with sentences that
+    // use it. Fully known sentences come before ones with an unknown left.
     .sort(
       (left, right) =>
         focusPlace(cardKey("sentence", left.id)) -
