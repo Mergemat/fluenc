@@ -89,12 +89,14 @@ export function countThisWeek(dates: readonly string[], today: Date) {
 }
 
 /**
- * How full a day's square is, from 0 to 1: a log scale against the busiest day shown, so a light
- * day still reads next to a heavy one. Any activity fills at least a fifth.
+ * How dense a day's square is, from 0 to 1: a log scale against the busiest day shown, so a light
+ * day still reads next to a heavy one, and any activity shows.
  */
-export function activityFill(count: number, busiest: number) {
+export function activityDensity(count: number, busiest: number) {
   if (count <= 0) {
     return 0;
   }
-  return 0.2 + 0.8 * (Math.log1p(count) / Math.log1p(Math.max(busiest, count)));
+  return (
+    0.08 + 0.92 * (Math.log1p(count) / Math.log1p(Math.max(busiest, count)))
+  );
 }

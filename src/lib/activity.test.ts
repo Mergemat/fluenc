@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 
 import {
   activityCalendar,
-  activityFill,
+  activityDensity,
   activityStreaks,
   countThisWeek,
   dayKey,
@@ -60,10 +60,10 @@ test("this week is the last seven days, today included", () => {
   expect(dayKey(new Date(2026, 0, 2))).toBe("2026-01-02");
 });
 
-test("a light day still shows next to the busiest one, and fuller days fill higher", () => {
-  expect(activityFill(0, 20)).toBe(0);
-  expect(activityFill(20, 20)).toBe(1);
-  // A log scale: one item out of twenty fills far more than a twentieth.
-  expect(activityFill(1, 20)).toBeGreaterThan(0.3);
-  expect(activityFill(5, 20)).toBeGreaterThan(activityFill(2, 20));
+test("a light day still shows next to the busiest one, and busier days are denser", () => {
+  expect(activityDensity(0, 20)).toBe(0);
+  expect(activityDensity(20, 20)).toBe(1);
+  // A log scale: one item out of twenty is far denser than a twentieth.
+  expect(activityDensity(1, 20)).toBeGreaterThan(0.25);
+  expect(activityDensity(5, 20)).toBeGreaterThan(activityDensity(2, 20));
 });
