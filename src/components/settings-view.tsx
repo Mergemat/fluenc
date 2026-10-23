@@ -12,8 +12,7 @@ import { AccountSettings } from "./account-settings";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import { NotificationSettings } from "./notification-settings";
-import { Rule } from "./ui/dither";
-import { Page, PageHeader } from "./ui/layout";
+import { Page, PageHeader, SectionHead } from "./ui/layout";
 import { SettingRow, type Tone } from "./ui/setting-row";
 
 type RowState = [Tone, string];
@@ -69,20 +68,11 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
     <Page>
       <PageHeader title="settings" />
       <div className="dx-set">
-        <h2 className="dx-label dx-set-group">
-          <span>account</span>
-          <Rule />
-        </h2>
+        <SectionHead className="dx-set-group" label="account" />
         <AccountSettings />
-        <h2 className="dx-label dx-set-group">
-          <span>reminders</span>
-          <Rule />
-        </h2>
+        <SectionHead className="dx-set-group" label="reminders" />
         <NotificationSettings />
-        <h2 className="dx-label dx-set-group">
-          <span>this device</span>
-          <Rule />
-        </h2>
+        <SectionHead className="dx-set-group" label="this device" />
         <SettingRow
           id="offline-heading"
           note="lessons, strokes and character audio"

@@ -35,6 +35,37 @@ export function PageHeader({
   );
 }
 
+/**
+ * Names a group of content: a mono label with its meta beside it. Space does the grouping, so
+ * there is no rule or box; the page header keeps the only rule. `tone` colours the meta for a
+ * state (to do, done); `children` sit at the far end, like a legend or a toggle.
+ */
+export function SectionHead({
+  label,
+  meta,
+  tone,
+  className = "",
+  children,
+}: {
+  label: ReactNode;
+  meta?: ReactNode;
+  tone?: "todo" | "done";
+  className?: string;
+  children?: ReactNode;
+}) {
+  return (
+    <h2 className={`dx-label dx-section-head ${className}`.trim()}>
+      <span>{label}</span>
+      {meta === undefined || meta === null ? null : (
+        <span className="dx-section-meta" data-tone={tone}>
+          {meta}
+        </span>
+      )}
+      {children ? <span className="dx-section-end">{children}</span> : null}
+    </h2>
+  );
+}
+
 /** A dithered tile with a character in it, over a title and a line of detail. */
 export function Empty({
   title,

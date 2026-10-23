@@ -19,7 +19,7 @@ import { DitherGradient } from "./dither-kit/gradient";
 import { type ClueRow, clueRows } from "./palace-rows";
 import { Chip } from "./ui/chip";
 
-import { Page, PageHeader, Status } from "./ui/layout";
+import { Page, PageHeader, SectionHead, Status } from "./ui/layout";
 
 const route = getRouteApi("/_app/profile_/palace");
 const tabs: { id: ClueKind; label: string }[] = [
@@ -139,7 +139,7 @@ export function PalaceView() {
         {shown.map((row, index) => (
           <div className="dx-pal-group" key={`${row.kind}:${row.key}`}>
             {row.group && row.group !== shown[index - 1]?.group ? (
-              <h3>{row.group}</h3>
+              <SectionHead label={row.group} />
             ) : null}
             <ClueLink row={row} />
           </div>

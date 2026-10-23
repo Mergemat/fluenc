@@ -19,8 +19,7 @@ import type { ProfileData } from "../lib/profile";
 import { profileQueryOptions } from "../offline/queries";
 import { useSyncStatus } from "../offline/sync";
 import { DitherGradient } from "./dither-kit/gradient";
-import { Rule } from "./ui/dither";
-import { Page, PageHeader, Status } from "./ui/layout";
+import { Page, PageHeader, SectionHead, Status } from "./ui/layout";
 
 const WEEKS = 52;
 const monthFormat = new Intl.DateTimeFormat("en-GB", { month: "short" });
@@ -135,9 +134,7 @@ function Profile({ data }: { data: ProfileData }) {
           );
         })}
       </div>
-      <h2 className="dx-label dx-pro-group">
-        <span>activity</span>
-        <Rule />
+      <SectionHead className="dx-pro-group" label="activity">
         <span aria-hidden="true" className="dx-activity-key">
           less
           {keyDensities.map((density) => (
@@ -147,7 +144,7 @@ function Profile({ data }: { data: ProfileData }) {
           ))}
           more
         </span>
-      </h2>
+      </SectionHead>
       <ActivityGraph weeks={weeks} />
       <p className="dx-pro-facts">
         <span>

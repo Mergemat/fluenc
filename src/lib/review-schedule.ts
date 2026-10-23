@@ -1,4 +1,4 @@
-import { type Card, fsrs, type Grade, State } from "ts-fsrs";
+import { type Card, fsrs, type Grade, Rating, State } from "ts-fsrs";
 
 export const REVIEW_TIME_ZONE = "Asia/Shanghai";
 
@@ -53,4 +53,36 @@ export function scheduleReview(
 ): Card {
   const next = scheduler.next(card, reviewedAt, rating).card;
   return { ...next, due: reviewDueAt(next.due, next.state) };
+}
+
+const grades: Grade[] = [Rating.Again, Rating.Hard, Rating.Good, Rating.Easy];
+
+/** When the card would come back after each grade, if it were graded at `at`. */
+export function previewDue(card: Card, at: Date) {
+  const preview = scheduler.repeat(card, at);
+  return new Map(
+    grades.map((grade) => {
+      const next = preview[grade].card;
+      return [grade, reviewDueAt(next.due, next.state)] as const;
+    })
+  );
+}
+
+/** How long until `due`, short: "10 min", "5 h", "1 day", "12 days", "3 mo", "2 yr". */
+export function waitLabel(from: Date, due: Date) {
+  const minutes = Math.round((due.getTime() - from.getTime()) / 60_000);
+  if (minutes < 60) {
+    return `${Math.max(1, minutes)} min`;
+  }
+  // Long-term cards are due on a Shanghai calendar day, so count days by the calendar.
+  const days = reviewDay(due) - reviewDay(from);
+  if (days < 1) {
+    return `${Math.round(minutes / 60)} h`;
+  }
+  if (days < 45) {
+    return days === 1 ? "1 day" : `${days} days`;
+  }
+  return days < 365
+    ? `${Math.round(days / 30)} mo`
+    : `${Math.round(days / 365)} yr`;
 }

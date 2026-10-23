@@ -30,7 +30,6 @@ import {
 } from "../offline/queries";
 import { DitherGradient } from "./dither-kit/gradient";
 import { Chip } from "./ui/chip";
-import { Rule } from "./ui/dither";
 import { Page, PageHeader, Status } from "./ui/layout";
 
 const route = getRouteApi("/_app/library");
@@ -600,9 +599,7 @@ function LibrarySectionBlock({
               <DitherGradient cell={2} direction="left" from="green" />
             </span>
           </div>
-        ) : (
-          <Rule />
-        )}
+        ) : null}
         <div className="dx-head-meta">
           {progress ? (
             <>

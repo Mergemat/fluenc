@@ -16,9 +16,8 @@ import { saveEnrollment, saveLivingLinkOffline } from "../offline/progress";
 import { useProgressMutation } from "../offline/use-progress-mutation";
 import { DitherButton } from "./dither-kit/button";
 import { WordGloss } from "./review-card";
-import { Rule } from "./ui/dither";
 import { AudioButton } from "./ui/hanzi";
-import { PageHeader } from "./ui/layout";
+import { PageHeader, SectionHead } from "./ui/layout";
 import { useToast } from "./ui/toast";
 
 type WordItem = Extract<BuildItem, { type: "word" }>;
@@ -161,11 +160,7 @@ export function WordLesson({ item }: { item: WordItem }) {
       </section>
 
       <section aria-label="Memory link" className="dx-clues">
-        <div className="dx-label">
-          <span>memory link</span>
-          <Rule />
-          <span>optional</span>
-        </div>
+        <SectionHead label="memory link" meta="optional" />
         <div className="dx-rows">
           <label className="dx-row" data-empty={!trimmed} data-kind="link">
             <span className="dx-code">

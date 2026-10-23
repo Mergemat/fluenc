@@ -1,13 +1,24 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useEffectEvent, useState } from "react";
-
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useState,
+} from "react";
+import { Rating } from "ts-fsrs";
 import { directCharacters } from "../lib/character-props";
 import type { DashboardData } from "../lib/learner-views";
-import { isLearning, REVIEW_TIME_ZONE } from "../lib/review-schedule";
+import {
+  isLearning,
+  REVIEW_TIME_ZONE,
+  reviewDay as shanghaiDay,
+  waitLabel,
+} from "../lib/review-schedule";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
-import { ReviewCard } from "./review-card";
-import { Empty, PageHeader } from "./ui/layout";
+import { type Graded, ReviewCard } from "./review-card";
+import { Empty, PageHeader, SectionHead } from "./ui/layout";
 
 type DoneState = "waiting" | "finished" | "empty";
 
@@ -44,7 +55,7 @@ function doneDetail(state: DoneState, learning: number) {
     : "learn a character or word first — reviews keep what you already understand";
 }
 
-/** The one thing worth knowing once the queue is empty: when cards come back. */
+/** The one thing worth knowing once the queue is empty: when cards come back, and how many. */
 function doneNext(
   data: DashboardData,
   waitingUntil: string | null,
@@ -53,9 +64,25 @@ function doneNext(
   if (waitingUntil) {
     return ["back in", countdown(Date.parse(waitingUntil) - now)];
   }
-  return data.nextReviewAt
-    ? ["next reviews", reviewDay(data.nextReviewAt, now)]
-    : null;
+  const next = nextReviews(data, now);
+  return next ? ["next reviews", next] : null;
+}
+
+/** When reviews come back and how many that day: "tomorrow · 14", or "in 8 min · 2" today. */
+export function nextReviews(data: DashboardData, now: number) {
+  if (!data.nextReviewAt) {
+    return null;
+  }
+  const at = new Date(data.nextReviewAt);
+  const day = shanghaiDay(at);
+  const count = data.scheduledQueue.filter(
+    (item) => shanghaiDay(new Date(item.card.due)) === day
+  ).length;
+  const when =
+    day === shanghaiDay(new Date(now))
+      ? `in ${waitLabel(new Date(now), at)}`
+      : reviewDay(data.nextReviewAt, now);
+  return `${when} · ${count}`;
 }
 
 export function ReviewView({ data }: { data: DashboardData }) {
@@ -89,6 +116,15 @@ export function ReviewView({ data }: { data: DashboardData }) {
     null
   );
   const hasCards = data.reviewQueue.length + data.scheduledQueue.length > 0;
+  // This visit's grades, latest per card, for the summary once the queue is empty.
+  const [graded, setGraded] = useState<ReadonlyMap<string, Graded>>(
+    () => new Map()
+  );
+  const onGraded = useCallback(
+    (entry: Graded) =>
+      setGraded((previous) => new Map(previous).set(entry.key, entry)),
+    []
+  );
   const done = sessionSize - data.reviewQueue.length;
 
   let state: DoneState = "empty";
@@ -149,10 +185,12 @@ export function ReviewView({ data }: { data: DashboardData }) {
         <ReviewCard
           item={active}
           key={`${active.type}:${active.id}:${active.reps}`}
+          onGraded={onGraded}
         />
       ) : (
         <ReviewDone
           data={data}
+          graded={[...graded.values()]}
           learning={learning.length}
           nextLearningAt={nextLearningAt}
           state={state}
@@ -166,11 +204,13 @@ export function ReviewView({ data }: { data: DashboardData }) {
 function ReviewDone({
   state,
   data,
+  graded,
   learning,
   nextLearningAt,
 }: {
   state: "waiting" | "finished" | "empty";
   data: DashboardData;
+  graded: Graded[];
   learning: number;
   nextLearningAt: string | null;
 }) {
@@ -208,6 +248,24 @@ function ReviewDone({
 
   const copy = doneCopy[state];
   const nextUp = doneNext(data, waiting ? nextLearningAt : null, now);
+  const nextLine = nextUp ? (
+    <p className="dx-done-next">
+      {nextUp[0]} <b>{nextUp[1]}</b>
+    </p>
+  ) : null;
+  const [lesson] = data.buildQueue;
+  const action =
+    state === "finished" && lesson ? (
+      <>
+        learn{" "}
+        <b className="font-hanzi" lang="zh-CN">
+          {lesson.hanzi}
+        </b>{" "}
+        next
+      </>
+    ) : (
+      copy.action
+    );
 
   return (
     <div
@@ -215,18 +273,18 @@ function ReviewDone({
       data-state={state}
       role={state === "waiting" ? "status" : undefined}
     >
-      <Empty
-        detail={doneDetail(state, learning)}
-        mark={copy.mark}
-        title={copy.title}
-        tone={state === "waiting" ? "orange" : "green"}
-      >
-        {nextUp ? (
-          <p className="dx-done-next">
-            {nextUp[0]} <b>{nextUp[1]}</b>
-          </p>
-        ) : null}
-      </Empty>
+      {graded.length ? (
+        <Recap graded={graded}>{nextLine}</Recap>
+      ) : (
+        <Empty
+          detail={doneDetail(state, learning)}
+          mark={copy.mark}
+          title={copy.title}
+          tone={state === "waiting" ? "orange" : "green"}
+        >
+          {nextLine}
+        </Empty>
+      )}
       {state === "waiting" ? null : (
         <footer className="dx-done-actions">
           <DitherButton
@@ -235,7 +293,7 @@ function ReviewDone({
             onClick={next}
             variant="gradient"
           >
-            <span>{copy.action}</span>
+            <span>{action}</span>
             <kbd>↵</kbd>
           </DitherButton>
           {state === "finished" && data.getQueue.length ? (
@@ -245,6 +303,47 @@ function ReviewDone({
           ) : null}
         </footer>
       )}
+    </div>
+  );
+}
+
+/** What this visit reviewed: a count, the cards that slipped and when they return. */
+function Recap({
+  graded,
+  children,
+}: {
+  graded: Graded[];
+  children: ReactNode;
+}) {
+  const slipped = graded.filter(
+    (entry) => entry.rating === Rating.Again || entry.rating === Rating.Hard
+  );
+  return (
+    <div className="dx-recap">
+      <h2>{graded.length} reviewed</h2>
+      {slipped.length ? (
+        <>
+          <SectionHead label="look at these again" meta={slipped.length} />
+          <ul className="dx-recap-slipped">
+            {slipped.map((entry) => (
+              <li key={entry.key}>
+                <span className="font-hanzi" lang="zh-CN">
+                  {entry.hanzi}
+                  <i className="dx-recap-bar">
+                    <DitherGradient
+                      cell={2}
+                      direction="right"
+                      from={entry.rating === Rating.Again ? "red" : "orange"}
+                    />
+                  </i>
+                </span>
+                <small>{entry.after}</small>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+      {children}
     </div>
   );
 }
