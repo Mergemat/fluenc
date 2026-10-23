@@ -5,6 +5,7 @@ import {
   type ChangeEvent,
   type CompositionEvent,
   type MouseEvent,
+  type ReactNode,
   useCallback,
   useDeferredValue,
   useEffect,
@@ -100,6 +101,82 @@ function usePagedResults(filters: string) {
 const sectionId = (key: string) => `library-${key}`;
 
 /**
+ * The search field owns its text: echoing it through the URL lands a render late, and resetting
+ * the value mid-composition breaks IME input (iOS pinyin). The URL follows once a word is
+ * committed. "/" focuses the field from anywhere on the page.
+ */
+function useSearchField(q: string, commit: (value: string) => void) {
+  // `sent` is what the field has sent to the URL and not yet seen land; navigations can skip
+  // values. `q` is the URL value the field last saw.
+  const [field, setField] = useState({ q, draft: q, sent: [] as string[] });
+  if (field.q !== q) {
+    const echo = field.sent.indexOf(q);
+    // Changed from outside the field (the sidebar link, clearing): adopt it.
+    setField(
+      echo === -1
+        ? { q, draft: q, sent: [] }
+        : { q, draft: field.draft, sent: field.sent.slice(echo + 1) }
+    );
+  }
+  const composing = useRef<boolean>(false);
+  const input = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+      if (
+        event.target instanceof Element &&
+        event.target.closest("input, textarea")
+      ) {
+        return;
+      }
+      event.preventDefault();
+      input.current?.focus();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const type = useCallback(
+    (value: string, send: boolean) => {
+      setField((previous) => ({
+        ...previous,
+        draft: value,
+        sent: send ? [...previous.sent, value] : previous.sent,
+      }));
+      if (send) {
+        commit(value);
+      }
+    },
+    [commit]
+  );
+  const onChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      type(event.target.value, !composing.current);
+    },
+    [type]
+  );
+  const onCompositionStart = useCallback(() => {
+    composing.current = true;
+  }, []);
+  const onCompositionEnd = useCallback(
+    (event: CompositionEvent<HTMLInputElement>) => {
+      composing.current = false;
+      type(event.currentTarget.value, true);
+    },
+    [type]
+  );
+  return {
+    draft: field.draft,
+    input,
+    handlers: { onChange, onCompositionStart, onCompositionEnd },
+  };
+}
+
+type Section = LibrarySection & { shown: LibraryEntry[] };
+
+/**
  * A lookup: search reaches every character and word; without a query the course is browsed in
  * sections, in learning order or by sound, with a strip to jump between them.
  */
@@ -143,29 +220,11 @@ export function LibraryView() {
       ),
     [dashboard.data]
   );
-  // The field owns its text: echoing it through the URL lands a render late, and resetting the
-  // value mid-composition breaks IME input (iOS pinyin). The URL follows once a word is committed.
-  const [draft, setDraft] = useState(q);
-  const composing = useRef<boolean>(false);
-  // What the field has sent to the URL and not yet seen land; navigations can skip values.
-  const sent = useRef<string[]>([]);
-  useEffect(() => {
-    const echo = sent.current.indexOf(q);
-    if (echo === -1) {
-      // Changed from outside the field (the sidebar link, clearing): adopt it.
-      sent.current = [];
-      setDraft(q);
-    } else {
-      sent.current = sent.current.slice(echo + 1);
-    }
-  }, [q]);
   const commitQuery = useCallback(
-    (value: string) => {
-      sent.current.push(value);
-      update({ q: value });
-    },
+    (value: string) => update({ q: value }),
     [update]
   );
+  const { draft, input, handlers } = useSearchField(q, commitQuery);
   const query = useDeferredValue(draft);
   const searching = query.trim() !== "";
   const search = useMemo(
@@ -196,53 +255,155 @@ export function LibraryView() {
   const items = searching
     ? pool.filter((item) => status === "all" || item.status === status)
     : sections.flatMap((section) => section.shown);
-  const { shown, showAtLeast, observeSentinel } = usePagedResults(
-    `${query}\n${kind}\n${group}\n${status}`
-  );
-  const input = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) {
-        return;
-      }
-      if (
-        event.target instanceof Element &&
-        event.target.closest("input, textarea")
-      ) {
-        return;
-      }
-      event.preventDefault();
-      input.current?.focus();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
-  const typeQuery = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      setDraft(event.target.value);
-      if (!composing.current) {
-        commitQuery(event.target.value);
-      }
-    },
-    [commitQuery]
-  );
-  const startComposing = useCallback(() => {
-    composing.current = true;
-  }, []);
-  const endComposing = useCallback(
-    (event: CompositionEvent<HTMLInputElement>) => {
-      composing.current = false;
-      setDraft(event.currentTarget.value);
-      commitQuery(event.currentTarget.value);
-    },
-    [commitQuery]
-  );
   const clearQuery = useCallback(() => {
     update({ q: "" });
     input.current?.focus();
-  }, [update]);
+  }, [update, input]);
+  const clearAll = useCallback(
+    () => update({ q: "", status: "all" }),
+    [update]
+  );
+  const { refetch } = library;
+  const retry = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  const learned = library.data
+    ? library.data.characters.filter((item) => item.status === "review")
+        .length +
+      library.data.words.filter((item) => item.status === "review").length
+    : 0;
+  const total = library.data
+    ? library.data.characters.length + library.data.words.length
+    : 0;
+
+  let results: ReactNode;
+  if (library.isError) {
+    results = (
+      <Status
+        action={
+          <button className="dx-chip" onClick={retry} type="button">
+            retry
+          </button>
+        }
+        title="the library isn’t available offline yet"
+      />
+    );
+  } else if (!library.data) {
+    results = (
+      <div aria-busy="true" className="dx-wall">
+        {skeletonTiles.map((id) => (
+          <span className="dx-tile dx-tile-skeleton" key={id}>
+            <DitherGradient cell={2} direction="up" from="grey" opacity={0.5} />
+          </span>
+        ))}
+      </div>
+    );
+  } else if (items.length) {
+    results = (
+      <LibraryResults
+        filters={`${query}\n${kind}\n${group}\n${status}`}
+        items={items}
+        pending={draft !== query}
+        progress={group === "sound"}
+        searching={searching}
+        sections={sections}
+      />
+    );
+  } else {
+    results = (
+      <Status
+        action={
+          <button className="dx-chip" onClick={clearAll} type="button">
+            clear search &amp; filters
+          </button>
+        }
+        title={`nothing matches${query ? ` “${query}”` : ""}`}
+      />
+    );
+  }
+
+  return (
+    <Page>
+      <PageHeader
+        meta={library.data ? `${learned} learned · ${total}` : undefined}
+        title="library"
+      />
+      <div className="dx-lib-controls">
+        <label className="dx-search">
+          <Search aria-hidden="true" size={16} />
+          <input
+            aria-label="Search the library"
+            autoComplete="off"
+            placeholder="hanzi, pinyin, meaning, or your clues"
+            ref={input}
+            spellCheck={false}
+            type="search"
+            value={draft}
+            {...handlers}
+          />
+          {draft ? (
+            <button
+              aria-label="Clear search"
+              onClick={clearQuery}
+              type="button"
+            >
+              <X size={15} />
+            </button>
+          ) : (
+            <kbd>/</kbd>
+          )}
+        </label>
+        <LibraryFilters
+          group={group}
+          kind={kind}
+          matches={matches}
+          pool={pool}
+          searching={searching}
+          status={status}
+          update={update}
+        />
+      </div>
+
+      {results}
+
+      <p className="dx-lib-credit">
+        definitions adapted from{" "}
+        <a href="https://www.mdbg.net/chinese/dictionary?page=cedict">
+          CC-CEDICT
+        </a>{" "}
+        ·{" "}
+        <a href="https://creativecommons.org/licenses/by-sa/4.0/">
+          CC BY-SA 4.0
+        </a>
+      </p>
+    </Page>
+  );
+}
+
+/** Kind and grouping while browsing, and status always, each chip with its count. */
+function LibraryFilters({
+  kind,
+  group,
+  status,
+  searching,
+  matches,
+  pool,
+  update,
+}: {
+  kind: Kind;
+  group: LibraryGroup;
+  status: StatusId | "all";
+  searching: boolean;
+  matches: LibraryEntry[];
+  pool: LibraryEntry[];
+  update: (next: {
+    kind?: Kind;
+    group?: LibraryGroup;
+    status?: StatusId | "all";
+  }) => void;
+}) {
   const selectKind = useCallback(
     (next: Kind) => update({ kind: next }),
     [update]
@@ -255,13 +416,80 @@ export function LibraryView() {
     (next: StatusId) => update({ status: status === next ? "all" : next }),
     [status, update]
   );
-  const clearAll = useCallback(
-    () => update({ q: "", status: "all" }),
-    [update]
+  return (
+    <div className="dx-lib-filters">
+      {searching ? null : (
+        <div>
+          <fieldset aria-label="Kind" className="dx-group">
+            {kinds.map((entry) => (
+              <Chip
+                key={entry.id}
+                onSelect={selectKind}
+                pressed={kind === entry.id}
+                value={entry.id}
+              >
+                {entry.label}
+                <small>
+                  {matches.filter((item) => item.kind === entry.id).length}
+                </small>
+              </Chip>
+            ))}
+          </fieldset>
+          <fieldset aria-label="Browse by" className="dx-group">
+            {groups.map((entry) => (
+              <Chip
+                key={entry.id}
+                onSelect={selectGroup}
+                pressed={group === entry.id}
+                value={entry.id}
+              >
+                {entry.label}
+              </Chip>
+            ))}
+          </fieldset>
+        </div>
+      )}
+      <fieldset aria-label="Status" className="dx-group">
+        {statuses.map((entry) => (
+          <Chip
+            data-status={entry.id}
+            key={entry.id}
+            onSelect={toggleStatus}
+            pressed={status === entry.id}
+            value={entry.id}
+          >
+            <i aria-hidden="true" />
+            {entry.label}
+            <small>
+              {pool.filter((item) => item.status === entry.id).length}
+            </small>
+          </Chip>
+        ))}
+      </fieldset>
+    </div>
   );
-  const retry = useCallback(() => {
-    library.refetch();
-  }, [library]);
+}
+
+/** Matching tiles a page at a time: one wall when searching, sections with a jump strip otherwise. */
+function LibraryResults({
+  items,
+  sections,
+  searching,
+  pending,
+  progress,
+  filters,
+}: {
+  items: LibraryEntry[];
+  sections: Section[];
+  searching: boolean;
+  /** The typed query hasn't been applied yet. */
+  pending: boolean;
+  /** Sections show how much of them is learned (browsing by sound). */
+  progress: boolean;
+  /** Changes whenever the search or filters do, so paging starts over. */
+  filters: string;
+}) {
+  const { shown, showAtLeast, observeSentinel } = usePagedResults(filters);
   // Render every section up to the target, then bring it under the strip.
   const jumpTo = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -280,207 +508,55 @@ export function LibraryView() {
     },
     [sections, showAtLeast]
   );
-
-  const learned = library.data
-    ? library.data.characters.filter((item) => item.status === "review")
-        .length +
-      library.data.words.filter((item) => item.status === "review").length
-    : 0;
-  const total = library.data
-    ? library.data.characters.length + library.data.words.length
-    : 0;
-
-  const results = () => {
-    if (library.isError) {
-      return (
-        <Status
-          action={
-            <button className="dx-chip" onClick={retry} type="button">
-              retry
-            </button>
-          }
-          title="the library isn’t available offline yet"
-        />
-      );
-    }
-    if (!library.data) {
-      return (
-        <div aria-busy="true" className="dx-wall">
-          {skeletonTiles.map((id) => (
-            <span className="dx-tile dx-tile-skeleton" key={id}>
-              <DitherGradient
-                cell={2}
-                direction="up"
-                from="grey"
-                opacity={0.5}
-              />
-            </span>
-          ))}
-        </div>
-      );
-    }
-    if (!items.length) {
-      return (
-        <Status
-          action={
-            <button className="dx-chip" onClick={clearAll} type="button">
-              clear search &amp; filters
-            </button>
-          }
-          title={`nothing matches${query ? ` “${query}”` : ""}`}
-        />
-      );
-    }
-    const more =
-      items.length > shown ? (
-        <div className="dx-lib-sentinel" ref={observeSentinel} />
-      ) : null;
-    if (searching) {
-      return (
-        <>
-          <div aria-busy={draft !== query} className="dx-wall">
-            {items.slice(0, shown).map((item) => (
-              <Tile item={item} key={`${item.kind}:${item.id}`} />
-            ))}
-          </div>
-          {more}
-        </>
-      );
-    }
-    let budget = shown;
+  const more =
+    items.length > shown ? (
+      <div className="dx-lib-sentinel" ref={observeSentinel} />
+    ) : null;
+  if (searching) {
     return (
       <>
-        <nav aria-label="Jump to section" className="dx-lib-index">
-          {sections.map((section) => (
-            <button
-              data-learned={section.learned > 0}
-              key={section.key}
-              onClick={jumpTo}
-              type="button"
-              value={section.key}
-            >
-              {section.label}
-            </button>
+        <div aria-busy={pending} className="dx-wall">
+          {items.slice(0, shown).map((item) => (
+            <Tile item={item} key={`${item.kind}:${item.id}`} />
           ))}
-        </nav>
-        {sections.map((section) => {
-          if (budget <= 0) {
-            return null;
-          }
-          const tiles = section.shown.slice(0, budget);
-          budget -= tiles.length;
-          return (
-            <LibrarySectionBlock
-              entries={tiles}
-              key={section.key}
-              progress={group === "sound"}
-              section={section}
-            />
-          );
-        })}
+        </div>
         {more}
       </>
     );
-  };
-
+  }
+  let budget = shown;
   return (
-    <Page>
-      <PageHeader
-        meta={library.data ? `${learned} learned · ${total}` : undefined}
-        title="library"
-      />
-      <div className="dx-lib-controls">
-        <label className="dx-search">
-          <Search aria-hidden="true" size={16} />
-          <input
-            aria-label="Search the library"
-            autoComplete="off"
-            onChange={typeQuery}
-            onCompositionEnd={endComposing}
-            onCompositionStart={startComposing}
-            placeholder="hanzi, pinyin, meaning, or your clues"
-            ref={input}
-            spellCheck={false}
-            type="search"
-            value={draft}
+    <>
+      <nav aria-label="Jump to section" className="dx-lib-index">
+        {sections.map((section) => (
+          <button
+            data-learned={section.learned > 0}
+            key={section.key}
+            onClick={jumpTo}
+            type="button"
+            value={section.key}
+          >
+            {section.label}
+          </button>
+        ))}
+      </nav>
+      {sections.map((section) => {
+        if (budget <= 0) {
+          return null;
+        }
+        const tiles = section.shown.slice(0, budget);
+        budget -= tiles.length;
+        return (
+          <LibrarySectionBlock
+            entries={tiles}
+            key={section.key}
+            progress={progress}
+            section={section}
           />
-          {draft ? (
-            <button
-              aria-label="Clear search"
-              onClick={clearQuery}
-              type="button"
-            >
-              <X size={15} />
-            </button>
-          ) : (
-            <kbd>/</kbd>
-          )}
-        </label>
-        <div className="dx-lib-filters">
-          {searching ? null : (
-            <div>
-              <fieldset aria-label="Kind" className="dx-group">
-                {kinds.map((entry) => (
-                  <Chip
-                    key={entry.id}
-                    onSelect={selectKind}
-                    pressed={kind === entry.id}
-                    value={entry.id}
-                  >
-                    {entry.label}
-                    <small>
-                      {matches.filter((item) => item.kind === entry.id).length}
-                    </small>
-                  </Chip>
-                ))}
-              </fieldset>
-              <fieldset aria-label="Browse by" className="dx-group">
-                {groups.map((entry) => (
-                  <Chip
-                    key={entry.id}
-                    onSelect={selectGroup}
-                    pressed={group === entry.id}
-                    value={entry.id}
-                  >
-                    {entry.label}
-                  </Chip>
-                ))}
-              </fieldset>
-            </div>
-          )}
-          <fieldset aria-label="Status" className="dx-group">
-            {statuses.map((entry) => (
-              <Chip
-                data-status={entry.id}
-                key={entry.id}
-                onSelect={toggleStatus}
-                pressed={status === entry.id}
-                value={entry.id}
-              >
-                <i aria-hidden="true" />
-                {entry.label}
-                <small>
-                  {pool.filter((item) => item.status === entry.id).length}
-                </small>
-              </Chip>
-            ))}
-          </fieldset>
-        </div>
-      </div>
-
-      {results()}
-
-      <p className="dx-lib-credit">
-        definitions adapted from{" "}
-        <a href="https://www.mdbg.net/chinese/dictionary?page=cedict">
-          CC-CEDICT
-        </a>{" "}
-        ·{" "}
-        <a href="https://creativecommons.org/licenses/by-sa/4.0/">
-          CC BY-SA 4.0
-        </a>
-      </p>
-    </Page>
+        );
+      })}
+      {more}
+    </>
   );
 }
 
