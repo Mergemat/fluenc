@@ -509,13 +509,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
     >
       <PageHeader
         heading={false}
-        meta={
-          <>
-            {direct ? "new prop" : "new character"}
-            {item.focus ? <b className="dx-head-source">{item.focus}</b> : null}
-            <UsageWords hanzi={item.hanzi} usage={usage} />
-          </>
-        }
+        meta={<UsageWords hanzi={item.hanzi} usage={usage} />}
         title="learn"
       />
       <section aria-label="Character" className="dx-read dx-read-character">

@@ -258,7 +258,9 @@ test("a card graded hard is listed at the end with the wait its button showed", 
       candidate.textContent?.includes("with effort")
     )
   );
-  const wait = expectDefined(hard.querySelector("em")?.textContent);
+  const wait = expectDefined(
+    hard.closest(".dx-rate-slot")?.querySelector("em")?.textContent
+  );
   await act(() => hard.click());
   data = rate(data, "s0", Rating.Hard);
   await show(data, "recap");

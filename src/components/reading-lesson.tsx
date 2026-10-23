@@ -7,7 +7,7 @@ import type { DashboardData } from "../lib/learner-views";
 import { saveEnrollment } from "../offline/progress";
 import { useProgressMutation } from "../offline/use-progress-mutation";
 import { DitherButton } from "./dither-kit/button";
-import { AnswerGhost } from "./review-card";
+import { AnswerMask } from "./review-card";
 import { AudioButton } from "./ui/hanzi";
 import { ErrorNote } from "./ui/layout";
 
@@ -91,16 +91,11 @@ export function ReadingLesson({ item }: { item: ReadingItem }) {
           <AudioButton label="listen" pinyin={item.pinyin} text={item.hanzi} />
         </div>
         <div className="dx-answer">
-          <AnswerGhost labels={["sound", "meaning"]} />
-          <div
-            aria-hidden={!revealed}
-            className="dx-answer-real"
-            inert={!revealed}
-          >
+          <AnswerMask revealed={revealed}>
             <p className="dx-word-reading">{item.pinyin}</p>
             <h2 className="dx-meaning">{item.meaning}</h2>
             <ShadowPips reps={reps} />
-          </div>
+          </AnswerMask>
         </div>
       </div>
       <footer className="dx-card-actions dx-shadow-actions">

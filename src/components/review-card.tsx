@@ -1,7 +1,9 @@
-// Prompt and answer share one fixed footprint (the answer replaces placeholder bars of the same
-// height), and the reveal button and ratings share one slot, so revealing never moves anything.
+// Prompt and answer share one footprint: before the reveal, the answer is laid out in place with
+// each piece of text under a dithered bar of its own size, so the bars show exactly what will
+// appear and where. The reveal button and ratings share one slot, so revealing never moves anything.
 import {
   type CSSProperties,
+  type ReactNode,
   useCallback,
   useEffect,
   useEffectEvent,
@@ -36,12 +38,6 @@ const ratings: {
 ];
 
 const RATING_KEY = /^[1-4]$/;
-
-const ghostLabels: Record<ReviewItem["type"], string[]> = {
-  character: ["meaning", "sound", "scene"],
-  word: ["meaning", "use"],
-  sentence: ["hanzi", "sound"],
-};
 
 type CharacterReview = Extract<ReviewItem, { type: "character" }>;
 type WordReview = Extract<ReviewItem, { type: "word" }>;
@@ -82,42 +78,47 @@ function RatingButton({
   onRate: (rating: number) => void;
 }) {
   const rate = useCallback(() => onRate(rating.value), [onRate, rating.value]);
+  // The wait sits above its button, so it reads as when the card returns, not as part of the name.
   return (
-    <DitherButton
-      bloom={picked ? "high" : "off"}
-      className="dx-rate"
-      color={rating.color}
-      data-picked={picked}
-      disabled={pending && !picked}
-      onClick={rate}
-      variant={picked ? "solid" : "dotted"}
-    >
-      <span>{rating.label}</span>
-      <small>{rating.note}</small>
+    <div className="dx-rate-slot">
       <em>{after}</em>
-      <kbd>{rating.value}</kbd>
-    </DitherButton>
+      <DitherButton
+        bloom={picked ? "high" : "off"}
+        className="dx-rate"
+        color={rating.color}
+        data-picked={picked}
+        disabled={pending && !picked}
+        onClick={rate}
+        variant={picked ? "solid" : "dotted"}
+      >
+        <span>{rating.label}</span>
+        <small>{rating.note}</small>
+        <kbd>{rating.value}</kbd>
+      </DitherButton>
+    </div>
   );
 }
 
-/** Placeholder bars, one per part of the answer, holding its place until it shows. */
-export function AnswerGhost({ labels }: { labels: string[] }) {
+/** The answer, laid out where it will show so the reveal moves nothing; until then it is unseen
+ * under a dither haze rising from the bottom. */
+export function AnswerMask({
+  revealed,
+  children,
+}: {
+  revealed: boolean;
+  children: ReactNode;
+}) {
   return (
-    <div aria-hidden="true" className="dx-answer-ghost">
-      {labels.map((label) => (
-        <div key={label}>
-          <span>{label}</span>
-          <i>
-            <DitherGradient
-              cell={2}
-              direction="right"
-              from="grey"
-              opacity={0.7}
-            />
-          </i>
+    <>
+      <div aria-hidden={!revealed} className="dx-answer-real" inert={!revealed}>
+        {children}
+      </div>
+      {revealed ? null : (
+        <div aria-hidden="true" className="dx-answer-veil">
+          <DitherGradient cell={3} direction="up" from="grey" opacity={0.5} />
         </div>
-      ))}
-    </div>
+      )}
+    </>
   );
 }
 
@@ -402,14 +403,9 @@ export function ReviewCard({
         />
 
         <div className="dx-answer">
-          <AnswerGhost labels={ghostLabels[item.type]} />
-          <div
-            aria-hidden={!revealed}
-            className="dx-answer-real"
-            inert={!revealed}
-          >
+          <AnswerMask revealed={revealed}>
             <ReviewAnswer clues={clues} item={item} parts={parts} />
-          </div>
+          </AnswerMask>
         </div>
       </div>
 
