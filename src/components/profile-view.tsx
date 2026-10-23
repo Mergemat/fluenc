@@ -4,6 +4,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
+import { useMemo } from "react";
 
 import {
   type ActivityDay,
@@ -11,7 +12,10 @@ import {
   activityDensity,
   activityStreaks,
   countThisWeek,
+  dateOfKey,
+  dayKey,
 } from "../lib/activity";
+import type { ProfileData } from "../lib/profile";
 import { profileQueryOptions } from "../offline/queries";
 import { useSyncStatus } from "../offline/sync";
 import { DitherGradient } from "./dither-kit/gradient";
@@ -95,22 +99,37 @@ export function ProfileView() {
       </Page>
     );
   }
-  const { tracks, introductions, palace } = profile.data;
-  const today = new Date();
-  const weeks = activityCalendar(introductions, today, WEEKS);
-  const streaks = activityStreaks(introductions, today);
   return (
     <Page>
       <PageHeader meta={<Link to="/settings">{who}</Link>} title="profile" />
+      <Profile data={profile.data} />
+    </Page>
+  );
+}
+
+function Profile({ data }: { data: ProfileData }) {
+  const { tracks, introductions, palace } = data;
+  // Worked out once per day and per change in progress, not on every render.
+  const today = dayKey(new Date());
+  const { weeks, streaks, added } = useMemo(() => {
+    const now = dateOfKey(today);
+    return {
+      weeks: activityCalendar(introductions, now, WEEKS),
+      streaks: activityStreaks(introductions, now),
+      added: tracks.map((track) => countThisWeek(track.introducedAt, now)),
+    };
+  }, [introductions, tracks, today]);
+  return (
+    <>
       <div className="dx-scores">
-        {tracks.map((track) => {
-          const added = countThisWeek(track.introducedAt, today);
+        {tracks.map((track, index) => {
+          const count = added[index] ?? 0;
           return (
             <p key={track.id}>
               <b className="dx-score">{track.learned + track.learning}</b>
               <span>{track.label}</span>
-              <small data-added={added > 0}>
-                {added ? `+${added} this week` : "none this week"}
+              <small data-added={count > 0}>
+                {count ? `+${count} this week` : "none this week"}
               </small>
             </p>
           );
@@ -148,6 +167,6 @@ export function ProfileView() {
           <ChevronRight aria-hidden="true" size={15} />
         </span>
       </Link>
-    </Page>
+    </>
   );
 }

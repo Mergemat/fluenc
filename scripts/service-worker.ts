@@ -58,6 +58,8 @@ registerRoute(
       /^\/(?:review|lessons|reading|listen|library|profile|settings|account)?\/?(?:\?.*)?$/,
       /^\/library\/(?:characters|words)\/[^/?]+\/?(?:\?.*)?$/,
       /^\/profile\/palace\/?(?:\?.*)?$/,
+      // The palace's old address, which redirects to the profile.
+      /^\/palace(?:\/[^?]*)?(?:\?.*)?$/,
       /^\/profile\/palace\/(?:cast|sets|areas|props)\/[^/?]+\/?(?:\?.*)?$/,
     ],
   })
