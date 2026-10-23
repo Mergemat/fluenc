@@ -88,7 +88,7 @@ function excluded<T extends SQLiteTable>(
   return Object.fromEntries(
     columns.map((column) => {
       const { name } = table[column as keyof T] as unknown as SQLiteColumn;
-      return [column, sql.raw(`excluded.${name}`)];
+      return [column, sql`excluded.${sql.identifier(name)}`];
     })
   ) as Record<keyof T["$inferInsert"], SQL>;
 }
@@ -492,11 +492,11 @@ async function writeChanges(
       }
     }
   }
-  // Drizzle queries run when awaited; await them in order on the transaction.
-  for (const write of writes) {
-    // biome-ignore lint/performance/noAwaitInLoops: a transaction takes one statement at a time.
-    await write;
-  }
+  // Drizzle queries run when awaited, and a transaction takes one statement at a time: chain them.
+  await writes.reduce<Promise<unknown>>(
+    (previous, write) => previous.then(() => write),
+    Promise.resolve()
+  );
 }
 
 /**

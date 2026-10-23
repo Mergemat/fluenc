@@ -9,7 +9,7 @@ interface PalaceSearch {
   tab?: "cast" | "sets" | "areas" | "props";
 }
 
-export const Route = createFileRoute("/_app/palace")({
+export const Route = createFileRoute("/_app/profile_/palace")({
   validateSearch: (search: Record<string, unknown>): PalaceSearch => ({
     tab: oneOf(search.tab, ["cast", "sets", "areas", "props"]),
     q: optionalString(search.q),

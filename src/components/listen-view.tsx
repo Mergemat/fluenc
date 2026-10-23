@@ -17,7 +17,7 @@ import { Empty, ErrorNote, Page, PageHeader } from "./ui/layout";
 type ListenItem = DashboardData["listenQueue"][number];
 
 /** The pause after each line: as long as the line took, a little more, never under a second. */
-export const repeatPause = (spokenMs: number) => Math.max(1200, spokenMs * 1.2);
+const repeatPause = (spokenMs: number) => Math.max(1200, spokenMs * 1.2);
 
 function shuffle<T>(items: T[]) {
   const copy = [...items];
