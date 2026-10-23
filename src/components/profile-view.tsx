@@ -8,7 +8,7 @@ import { ChevronRight } from "lucide-react";
 import {
   type ActivityDay,
   activityCalendar,
-  activityFill,
+  activityDensity,
   activityStreaks,
   countThisWeek,
 } from "../lib/activity";
@@ -20,17 +20,20 @@ import { Page, PageHeader, Status } from "./ui/layout";
 
 const WEEKS = 52;
 const monthFormat = new Intl.DateTimeFormat("en-GB", { month: "short" });
-const keyFills = [0, 0.25, 0.5, 0.75, 1];
+const keyDensities = [0, 0.25, 0.5, 0.75, 1];
 
-/** A day's square: a faint grey base, and green dither rising as high as the day was busy. */
-function Cell({ fill }: { fill: number }) {
+/** A day's square: a faint grey base, and green dither as dense and bright as the day was busy. */
+function Cell({ density }: { density: number }) {
   return (
     <>
       <DitherGradient cell={1} direction="up" from="grey" opacity={0.22} />
-      {fill ? (
-        <span className="dx-activity-fill" style={{ height: `${fill * 100}%` }}>
-          <DitherGradient cell={1} direction="up" from="green" />
-        </span>
+      {density ? (
+        <DitherGradient
+          cell={1}
+          density={density}
+          from="green"
+          opacity={0.55 + 0.45 * density}
+        />
       ) : null}
     </>
   );
@@ -66,7 +69,7 @@ function ActivityGraph({ weeks }: { weeks: ActivityDay[][] }) {
                   title={`${day.key} · ${day.count} new`}
                 >
                   {day.future ? null : (
-                    <Cell fill={activityFill(day.count, busiest)} />
+                    <Cell density={activityDensity(day.count, busiest)} />
                   )}
                 </i>
               ))}
@@ -118,9 +121,9 @@ export function ProfileView() {
         <Rule />
         <span aria-hidden="true" className="dx-activity-key">
           less
-          {keyFills.map((fill) => (
-            <i key={fill}>
-              <Cell fill={fill} />
+          {keyDensities.map((density) => (
+            <i key={density}>
+              <Cell density={density} />
             </i>
           ))}
           more

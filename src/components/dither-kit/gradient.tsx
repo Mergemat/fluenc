@@ -23,6 +23,9 @@ export interface DitherGradientProps {
   /** CSS px per dither cell — bigger is chunkier. */
   cell?: number;
   className?: string;
+  /** Flat density (0–1) in place of the ramp: every cell is lit against the same
+   * level, like the button's flat textures. Higher lights more cells, brighter. */
+  density?: number;
   /** Where `to` ends up — "up" reads as a glow rising from the bottom edge. */
   direction?: GradientDirection;
   /** The colour the gradient starts solid as — a palette name or a hue. */
@@ -36,6 +39,7 @@ export interface DitherGradientProps {
 
 interface PaintSpec {
   cell: number;
+  density: number | undefined;
   direction: GradientDirection;
   from: PixelColor;
   opacity: number;
@@ -98,7 +102,7 @@ function paintGradient(
 
   for (let y = 0; y < rows; y += 1) {
     for (let x = 0; x < cols; x += 1) {
-      const density = 1 - ramp(x, y, cols, rows);
+      const density = spec.density ?? 1 - ramp(x, y, cols, rows);
       const lit = density > BAYER4[y % 4][x % 4];
       const paint = cellPaint(lit, density, fromFill, toFill, spec.opacity);
       if (paint) {
@@ -127,6 +131,7 @@ export function DitherGradient({
   to = "transparent",
   direction = "up",
   cell = 3,
+  density,
   opacity = 1,
   bloom = "off",
   className,
@@ -150,6 +155,7 @@ export function DitherGradient({
         to,
         direction,
         cell,
+        density,
         opacity,
       });
     };
@@ -160,7 +166,7 @@ export function DitherGradient({
     const ro = new ResizeObserver(paint);
     ro.observe(wrap);
     return () => ro.disconnect();
-  }, [from, to, direction, cell, opacity, bloom]);
+  }, [from, to, direction, cell, density, opacity, bloom]);
 
   const bloomStyle = pixelBloomStyle(bloom);
 
