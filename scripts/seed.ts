@@ -16,7 +16,6 @@ import {
   type ProgressOperation,
 } from "../src/lib/learner-state";
 import { deriveDashboard } from "../src/lib/learner-views";
-import { auth } from "../src/server/auth.server";
 import { writeOperations } from "../src/server/sync.server";
 import { requireLocalDatabase } from "./local-db";
 
@@ -105,6 +104,9 @@ const props = [
 ];
 
 requireLocalDatabase("seed demo data");
+// Sign-up runs outside a request here, so it needs an origin of its own.
+process.env.BETTER_AUTH_URL ||= "http://localhost:3000";
+const { auth } = await import("../src/server/auth.server");
 
 const [existing] = await db
   .select({ id: user.id })

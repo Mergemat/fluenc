@@ -23,45 +23,36 @@ You need [Bun](https://bun.sh) 1.3 or later.
 
 ```sh
 bun install
-cp .env.example .env
-```
-
-In `.env`, set at least:
-
-```sh
-TURSO_DATABASE_URL=file:local.db
-TURSO_AUTH_TOKEN=local                       # any value works for a local file
-BETTER_AUTH_SECRET=$(openssl rand -base64 32) # paste the output
-BETTER_AUTH_URL=http://localhost:3000
-```
-
-Then create the tables and start the app:
-
-```sh
-bun run db:migrate
+bun run setup
 bun run dev
 ```
 
-Open http://localhost:3000 and sign up.
+Open http://localhost:3000. `bun run setup` writes `.env` with a local SQLite database and a generated auth secret, applies the migrations, and lists which optional features are on. It never changes a value you already set, so it's safe to run again after pulling.
 
-The other variables in `.env.example` are optional:
+To see the app with real-looking progress, run `bun run db:seed` and sign in as `demo@example.com` / `demo-password`. The account has two weeks of lessons, reviews due and sentences to read. `bun run db:reset` deletes the local database and starts over. Both refuse to run against a remote database.
 
-- `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` turn on spoken audio for words and sentences. Single characters always play from the recordings in `public/audio/pinyin`. Only signed-in users can request generated audio.
-- `BLOB_READ_WRITE_TOKEN` stores generated audio in Vercel Blob, so each text is generated once. On Vercel the token is injected for you.
-- `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` and `CRON_SECRET` turn on daily reminders. See [Reminders](#reminders).
-- `FLUENC_EMAIL` sets the account that `bun run focus` and `bun run claim` use.
+Everything else in `.env` is optional, and `.env.example` explains each variable:
+
+- **Spoken audio.** `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` turn on audio for words and sentences. Single characters always play from the bundled recordings. Only signed-in users can request generated audio.
+- **Audio cache.** `BLOB_READ_WRITE_TOKEN` stores generated audio in Vercel Blob, so each text is generated once. Vercel sets it in production.
+- **Reminders.** `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` and `CRON_SECRET` turn on daily review reminders. See [Reminders](#reminders).
+- **Scripts.** `FLUENC_EMAIL` sets the account that `bun run focus` and `bun run claim` use.
+
+VS Code suggests the Biome and Tailwind extensions and formats on save.
 
 ## Scripts
 
 | Command | What it does |
 | --- | --- |
+| `bun run setup` | Write `.env`, create or update the database, list optional features |
 | `bun run dev` | Start the dev server |
-| `bun run build` | Build the app and its service worker |
-| `bun run preview` | Serve the production build |
+| `bun run verify` | Lint, type-check, test and build, the same as CI |
+| `bun run check` / `bun run fix` | Lint, or lint and fix, with Ultracite (Biome) |
+| `bun run typecheck` | Type-check |
 | `bun test` | Run the tests |
-| `bun run check` / `bun run fix` | Lint and format with Ultracite (Biome) |
-| `bun run typecheck` | Type-check. Run a build or `dev` first, since it generates the route tree |
-| `bun run db:generate` / `db:migrate` | Create and apply Drizzle migrations |
+| `bun run build` / `bun run preview` | Build the app and its service worker, then serve that build |
+| `bun run db:seed` / `db:reset` | Add the demo account, or start the local database over |
+| `bun run db:generate` / `db:migrate` | Create a migration after changing `src/db/schema.ts`, or apply migrations |
 | `bun run focus` | Add, list or remove focus words and sentences for an account |
 | `bun run claim` | Move progress saved before accounts existed onto an account |
 | `bun run data:sync` | Rebuild the curriculum from the reviewed data in `src/data` |
@@ -90,7 +81,7 @@ The app deploys to Vercel as is. `vercel.json` sets the region and the reminder 
 
 1. Create a Turso database and set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`.
 2. Set `BETTER_AUTH_SECRET` and set `BETTER_AUTH_URL` to your public URL.
-3. Run `bun run db:migrate` against that database.
+3. Apply the migrations to that database: `TURSO_DATABASE_URL=… TURSO_AUTH_TOKEN=… bun run db:migrate`. Run this again whenever a deploy adds a migration in `drizzle/`.
 4. Deploy with `bunx vercel deploy --prod`.
 
 ### Reminders
