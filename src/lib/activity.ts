@@ -1,8 +1,17 @@
 // Days the learner met something new, by the device's own calendar: the GitHub-style graph, the
 // streak and what this week added. Only introductions are dated, so review-only days stay empty.
 
-/** A local calendar day as YYYY-MM-DD. */
-export const dayKey = (date: Date) => date.toLocaleDateString("en-CA");
+/** A local calendar day as YYYY-MM-DD. Built by hand: locale formatting is slow in Safari. */
+export const dayKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+    date.getDate()
+  ).padStart(2, "0")}`;
+
+/** Midday on the day a `dayKey` names, clear of any daylight-saving shift. */
+export function dateOfKey(key: string) {
+  const [year, month, day] = key.split("-").map(Number);
+  return new Date(year ?? 0, (month ?? 1) - 1, day ?? 1, 12);
+}
 
 const addDays = (date: Date, days: number) => {
   const next = new Date(date);
@@ -64,8 +73,7 @@ export function activityStreaks(dates: readonly string[], today: Date) {
   let longest = 0;
   for (const key of active) {
     // Count only from the first day of each run.
-    const [year, month, day] = key.split("-").map(Number);
-    const date = new Date(year ?? 0, (month ?? 1) - 1, day ?? 1, 12);
+    const date = dateOfKey(key);
     if (active.has(dayKey(addDays(date, -1)))) {
       continue;
     }
