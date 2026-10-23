@@ -79,3 +79,7 @@ SELECT 'review-log-' || `id`, `learner_id`, 'review',
     'reviewedAt', strftime('%Y-%m-%dT%H:%M:%fZ', `reviewed_at` / 1000.0, 'unixepoch')),
   `reviewed_at`, `reviewed_at`
 FROM `review_logs` ORDER BY `reviewed_at`, `id`;
+--> statement-breakpoint
+-- Saves devices already sent keep their ids, so one sent again from an old queue is skipped.
+INSERT OR IGNORE INTO `events` (`id`, `learner_id`, `kind`, `data`, `created_at`, `received_at`)
+SELECT `id`, `learner_id`, 'sent', '{}', `applied_at`, `applied_at` FROM `sync_events`;
