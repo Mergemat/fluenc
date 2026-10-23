@@ -177,6 +177,17 @@ export function deriveProfile(
     },
   ];
 
+  // Met characters first, in the order they were met (undated ones before any dated one), then
+  // the rest in course order. Each milestone is then one stretch of the wall.
+  const metAt = (id: string) =>
+    introducedAt.get(cardKey("character", id)) ?? "";
+  const wall = [
+    ...startedCharacters.toSorted((left, right) =>
+      metAt(left.id).localeCompare(metAt(right.id))
+    ),
+    ...library.characters.filter((item) => item.status === "new"),
+  ].map(({ id, hanzi, keyword, status }) => ({ id, hanzi, keyword, status }));
+
   const clues = [
     ...board.actors,
     ...board.sets,
@@ -185,6 +196,8 @@ export function deriveProfile(
   ];
   return {
     tracks,
+    /** Every course character, met ones first, for the character wall. */
+    wall,
     /** When the learner met their first item, if it was recorded. */
     since: [...introducedAt.values()].toSorted()[0] ?? null,
     /** Clues with a learner's name, counted like the palace page. */
