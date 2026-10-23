@@ -8,12 +8,20 @@ import { ChevronRight } from "lucide-react";
 import type { Milestone, ProfileData } from "../lib/profile";
 import { profileQueryOptions } from "../offline/queries";
 import { useSyncStatus } from "../offline/sync";
+import { DitherGradient } from "./dither-kit/gradient";
+import type { PixelColor } from "./dither-kit/pixel";
 import { Page, PageHeader, Status } from "./ui/layout";
 
 const dayFormat = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
 });
+
+const cellColor: Record<ProfileData["wall"][number]["status"], PixelColor> = {
+  review: "green",
+  learning: "orange",
+  new: "grey",
+};
 
 function Block({
   milestone,
@@ -40,7 +48,14 @@ function Block({
             data-status={cell.status}
             key={cell.id}
             title={`${cell.hanzi} ${cell.keyword}`}
-          />
+          >
+            <DitherGradient
+              cell={1}
+              direction="up"
+              from={cellColor[cell.status]}
+              opacity={cell.status === "new" ? 0.45 : 1}
+            />
+          </i>
         ))}
       </span>
     </div>
