@@ -31,19 +31,27 @@ const change = (
   counter += 1;
   return { ...operation, id: `op-${counter}`, at } as ProgressOperation;
 };
+/** The same change made again under a new id, as if by another learner. */
+const copy = (operation: ProgressOperation) => {
+  counter += 1;
+  return { ...operation, id: `op-${counter}` };
+};
 const enroll = (itemId: string, enrolledAt = "2026-10-20T08:00:00.000Z") =>
-  change({
-    kind: "enroll",
-    data: { itemType: "sentence", itemId, enrolledAt },
-  });
-const review = (itemId: string, reviewedAt: string) =>
+  change(
+    {
+      kind: "enroll",
+      data: { itemType: "sentence", itemId, enrolledAt },
+    },
+    enrolledAt
+  );
+const review = (itemId: string, reviewedAt: string, rating = 3) =>
   change(
     {
       kind: "review",
       data: {
         itemType: "sentence",
         itemId,
-        rating: 3,
+        rating,
         durationMs: 0,
         reviewedAt,
       },
@@ -77,6 +85,58 @@ test("a change sent twice is applied once", async () => {
   await writeOperations(learner, [enrolled, reviewed]);
   const state = await readLearnerState(learner);
   expect(state.cards["sentence:s01"]?.reps).toBe(1);
+});
+
+test("a review that arrives late is scheduled as if it had arrived in order", async () => {
+  const enrolled = enroll("s01", "2026-10-01T08:00:00.000Z");
+  const first = review("s01", "2026-10-02T08:00:00.000Z");
+  const forgot = review("s01", "2026-10-06T08:00:00.000Z", 1);
+  const remembered = review("s01", "2026-10-11T08:00:00.000Z");
+
+  await writeOperations("learner-in-order", [enrolled, first, forgot]);
+  await writeOperations("learner-in-order", [remembered]);
+
+  // The phone forgot it offline; the laptop's later review reached the server first.
+  await writeOperations("learner-late", [enrolled, first].map(copy));
+  await writeOperations("learner-late", [copy(remembered)]);
+  const before = await readPatch("learner-late", null);
+  await writeOperations("learner-late", [copy(forgot)]);
+
+  const inOrder = await readLearnerState("learner-in-order");
+  const late = await readLearnerState("learner-late");
+  expect(late.cards).toEqual(inOrder.cards);
+  // Devices that already synced hear about the corrected card.
+  const next = await readPatch("learner-late", before.cursor);
+  expect(next.patch.cards["sentence:s01"]).toEqual(
+    inOrder.cards["sentence:s01"]
+  );
+});
+
+test("an earlier enroll that arrives late sets when the card was introduced", async () => {
+  const learner = "learner-enrolled-late";
+  await writeOperations(learner, [enroll("s01", "2026-10-22T08:00:00.000Z")]);
+  await writeOperations(learner, [enroll("s01", "2026-10-20T08:00:00.000Z")]);
+  expect(
+    (await readLearnerState(learner)).cards["sentence:s01"]?.introducedAt
+  ).toBe("2026-10-20T08:00:00.000Z");
+});
+
+test("a device clock running ahead cannot push a card's reviews into the future", async () => {
+  const learner = "learner-fast-clock";
+  const now = new Date("2026-10-21T09:00:00.000Z");
+  await writeOperations(learner, [enroll("s01")], now);
+  await writeOperations(
+    learner,
+    [review("s01", "2027-01-01T00:00:00.000Z")],
+    now
+  );
+  const ahead = (await readLearnerState(learner)).cards["sentence:s01"];
+  expect(ahead?.lastReview).toBe(now.toISOString());
+
+  // A device with the right clock reviews it an hour later, at the time it says.
+  await writeOperations(learner, [review("s01", "2026-10-21T10:00:00.000Z")]);
+  const next = (await readLearnerState(learner)).cards["sentence:s01"];
+  expect(next?.lastReview).toBe("2026-10-21T10:00:00.000Z");
 });
 
 test("changes the course does not have are recorded but change nothing", async () => {
@@ -143,6 +203,49 @@ test("names, stories and focus sync, and a removed focus entry reaches devices",
   expect((await readLearnerState(learner)).focus).toEqual([]);
   // A device syncing for the first time never hears about it.
   expect((await readPatch(learner, null)).patch.removedFocus).toEqual([]);
+});
+
+test("an older name or story that arrives late does not replace a newer one", async () => {
+  const learner = "learner-renamed";
+  const movie = (actorName: string, at: string) =>
+    change(
+      {
+        kind: "movie",
+        data: {
+          characterId: "马",
+          actorKey: "m",
+          actorName,
+          finalKey: "a",
+          setName: `${actorName}'s garden`,
+          tone: 3,
+          roomName: `${actorName}'s kitchen`,
+          props: [{ component: "马", propName: `${actorName}'s horse` }],
+        },
+      },
+      at
+    );
+  const story = (text: string, at: string) =>
+    change({ kind: "livingLink", data: { wordId: "5", story: text } }, at);
+
+  await writeOperations(learner, [
+    movie("Mia", "2026-10-22T08:00:00.000Z"),
+    story("we stand together", "2026-10-22T08:00:00.000Z"),
+  ]);
+  // Renamed on a phone two days earlier, offline until now.
+  await writeOperations(learner, [
+    movie("Max", "2026-10-20T08:00:00.000Z"),
+    story("an old story", "2026-10-20T08:00:00.000Z"),
+  ]);
+  expect(await readLearnerState(learner)).toMatchObject({
+    actors: { m: "Mia" },
+    sets: { a: "Mia's garden" },
+    rooms: { 3: "Mia's kitchen" },
+    props: { 马: "Mia's horse" },
+    livingLinks: { 5: "we stand together" },
+  });
+
+  await writeOperations(learner, [movie("Ana", "2026-10-23T08:00:00.000Z")]);
+  expect((await readLearnerState(learner)).actors).toEqual({ m: "Ana" });
 });
 
 test("one learner never sees another's progress", async () => {

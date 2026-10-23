@@ -25,6 +25,13 @@ export const learners = sqliteTable("learners", {
  */
 const version = () => integer("version").notNull().default(0);
 
+/**
+ * When the row's value was chosen, by the device's clock. An older change that arrives late does
+ * not replace it.
+ */
+const changedAt = () =>
+  integer("changed_at", { mode: "timestamp_ms" }).notNull().default(sql`0`);
+
 export const learnerItems = sqliteTable(
   "learner_items",
   {
@@ -87,6 +94,7 @@ export const palaceActors = sqliteTable(
       .references(() => learners.id, { onDelete: "cascade" }),
     actorKey: text("actor_key").notNull(),
     actorName: text("actor_name").notNull(),
+    changedAt: changedAt(),
     version: version(),
   },
   (table) => [primaryKey({ columns: [table.learnerId, table.actorKey] })]
@@ -100,6 +108,7 @@ export const palaceSets = sqliteTable(
       .references(() => learners.id, { onDelete: "cascade" }),
     finalKey: text("final_key").notNull(),
     setName: text("set_name").notNull(),
+    changedAt: changedAt(),
     version: version(),
   },
   (table) => [primaryKey({ columns: [table.learnerId, table.finalKey] })]
@@ -113,6 +122,7 @@ export const toneRooms = sqliteTable(
       .references(() => learners.id, { onDelete: "cascade" }),
     tone: integer("tone").notNull(),
     roomName: text("room_name").notNull(),
+    changedAt: changedAt(),
     version: version(),
   },
   (table) => [primaryKey({ columns: [table.learnerId, table.tone] })]
@@ -126,6 +136,7 @@ export const componentProps = sqliteTable(
       .references(() => learners.id, { onDelete: "cascade" }),
     component: text("component").notNull(),
     propName: text("prop_name").notNull(),
+    changedAt: changedAt(),
     version: version(),
   },
   (table) => [primaryKey({ columns: [table.learnerId, table.component] })]
@@ -140,6 +151,7 @@ export const mnemonics = sqliteTable(
     itemType: text("item_type", { enum: ["word"] }).notNull(),
     itemId: text("item_id").notNull(),
     story: text("story").notNull(),
+    /** When the story was written, by the device's clock; see `changedAt`. */
     updatedAt: integer("updated_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(unixepoch() * 1000)`),

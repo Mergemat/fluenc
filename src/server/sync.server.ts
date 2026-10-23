@@ -10,7 +10,7 @@ import {
   sql,
 } from "drizzle-orm";
 import type { SQLiteColumn, SQLiteTable } from "drizzle-orm/sqlite-core";
-
+import wordCharacters from "../data/character-words.generated.json";
 import type { FocusEntry } from "../data/types";
 import { db } from "../db";
 import {
@@ -267,6 +267,158 @@ async function readTargets(
   };
 }
 
+/** Word ids studied as each character, so a character's events can be found by item id. */
+const wordsByCharacter: Record<string, string[]> = {};
+for (const [wordId, characterId] of Object.entries(
+  wordCharacters as Record<string, string>
+)) {
+  wordsByCharacter[characterId] = [
+    ...(wordsByCharacter[characterId] ?? []),
+    wordId,
+  ];
+}
+
+/**
+ * Cards a change arrived for after a later one: a review older than the card's last, or an enroll
+ * older than its introduction. Applied now, it would land out of order.
+ */
+function lateCards(state: LearnerState, operations: ProgressOperation[]) {
+  const late = new Set<string>();
+  for (const operation of operations) {
+    const key = targetCardKey(operation);
+    const card = key ? state.cards[key] : undefined;
+    if (!(key && card)) {
+      continue;
+    }
+    const reviewedEarlier =
+      operation.kind === "review" &&
+      card.lastReview !== null &&
+      operation.data.reviewedAt < card.lastReview;
+    const enrolledEarlier =
+      operation.kind === "enroll" &&
+      card.introducedAt !== undefined &&
+      operation.data.enrolledAt < card.introducedAt;
+    if (reviewedEarlier || enrolledEarlier) {
+      late.add(key);
+    }
+  }
+  return late;
+}
+
+/** A change's times, no later than `now`: a device whose clock runs ahead cannot date the future. */
+function notAfter(operation: ProgressOperation, now: Date): ProgressOperation {
+  const latest = now.toISOString();
+  const clamp = (time: string) =>
+    new Date(time) > now ? latest : new Date(time).toISOString();
+  const at = clamp(operation.at);
+  if (operation.kind === "review") {
+    return {
+      ...operation,
+      at,
+      data: { ...operation.data, reviewedAt: clamp(operation.data.reviewedAt) },
+    };
+  }
+  if (operation.kind === "enroll") {
+    return {
+      ...operation,
+      at,
+      data: { ...operation.data, enrolledAt: clamp(operation.data.enrolledAt) },
+    };
+  }
+  return { ...operation, at };
+}
+
+/** When each name and story in a set of changes was chosen; the last change to a name wins. */
+interface NameTimes {
+  actors: Record<string, Date>;
+  livingLinks: Record<string, Date>;
+  props: Record<string, Date>;
+  rooms: Record<string, Date>;
+  sets: Record<string, Date>;
+}
+
+function nameTimes(operations: ProgressOperation[]): NameTimes {
+  const times: NameTimes = {
+    actors: {},
+    sets: {},
+    rooms: {},
+    props: {},
+    livingLinks: {},
+  };
+  for (const operation of operations) {
+    const at = new Date(operation.at);
+    if (operation.kind === "livingLink") {
+      times.livingLinks[operation.data.wordId] = at;
+    }
+    if (operation.kind === "movie") {
+      const { actorKey, finalKey, tone, props } = operation.data;
+      times.actors[actorKey] = at;
+      times.sets[finalKey] = at;
+      times.rooms[tone] = at;
+      for (const prop of props) {
+        times.props[prop.component] = at;
+      }
+    }
+  }
+  return times;
+}
+
+/** An upsert condition: replace the stored row only with a change made at or after it. */
+const isNewer = (column: SQLiteColumn) =>
+  sql`excluded.${sql.identifier(column.name)} >= ${column}`;
+
+/**
+ * Rebuild cards from every enroll and review stored for them, in the order they were made. An
+ * enroll comes first even if its device's clock says otherwise, so no review is dropped.
+ */
+async function replayCards(
+  transaction: Transaction,
+  learnerId: string,
+  keys: Set<string>,
+  state: LearnerState
+): Promise<LearnerState> {
+  const itemIds = [...keys].flatMap((key) => {
+    const target = parseCardKey(key);
+    if (!target) {
+      return [];
+    }
+    return target.type === "character"
+      ? [target.id, ...(wordsByCharacter[target.id] ?? [])]
+      : [target.id];
+  });
+  const rows = await transaction
+    .select()
+    .from(events)
+    .where(
+      and(
+        eq(events.learnerId, learnerId),
+        inArray(events.kind, ["enroll", "review"]),
+        inArray(sql`json_extract(${events.data}, '$.itemId')`, itemIds)
+      )
+    )
+    .orderBy(asc(events.createdAt), asc(events.seq));
+  const stored = rows
+    .map(
+      (row) =>
+        ({
+          id: row.id,
+          at: row.createdAt.toISOString(),
+          kind: row.kind,
+          data: row.data,
+        }) as ProgressOperation
+    )
+    .filter((operation) => keys.has(targetCardKey(operation) ?? ""));
+  const enrolls = stored.filter((operation) => operation.kind === "enroll");
+  const reviews = stored.filter((operation) => operation.kind === "review");
+  const cards = Object.fromEntries(
+    Object.entries(state.cards).filter(([key]) => !keys.has(key))
+  );
+  return [...enrolls, ...reviews].reduce(
+    (next, operation) => applyOperation(next, operation),
+    { ...state, cards }
+  );
+}
+
 const changedEntries = <T>(
   after: Record<string, T>,
   before: Record<string, T>
@@ -278,6 +430,7 @@ async function writeChanges(
   learnerId: string,
   before: LearnerState,
   after: LearnerState,
+  changed: NameTimes,
   version: number
 ) {
   const writes: PromiseLike<unknown>[] = [];
@@ -327,6 +480,7 @@ async function writeChanges(
             "lapses",
             "state",
             "lastReview",
+            "introducedAt",
             "version",
           ]),
         })
@@ -343,12 +497,14 @@ async function writeChanges(
             learnerId,
             actorKey,
             actorName,
+            changedAt: changed.actors[actorKey],
             version,
           }))
         )
         .onConflictDoUpdate({
           target: [palaceActors.learnerId, palaceActors.actorKey],
-          set: excluded(palaceActors, ["actorName", "version"]),
+          set: excluded(palaceActors, ["actorName", "changedAt", "version"]),
+          setWhere: isNewer(palaceActors.changedAt),
         })
     );
   }
@@ -362,12 +518,14 @@ async function writeChanges(
             learnerId,
             finalKey,
             setName,
+            changedAt: changed.sets[finalKey],
             version,
           }))
         )
         .onConflictDoUpdate({
           target: [palaceSets.learnerId, palaceSets.finalKey],
-          set: excluded(palaceSets, ["setName", "version"]),
+          set: excluded(palaceSets, ["setName", "changedAt", "version"]),
+          setWhere: isNewer(palaceSets.changedAt),
         })
     );
   }
@@ -381,12 +539,14 @@ async function writeChanges(
             learnerId,
             tone: Number(tone),
             roomName,
+            changedAt: changed.rooms[tone],
             version,
           }))
         )
         .onConflictDoUpdate({
           target: [toneRooms.learnerId, toneRooms.tone],
-          set: excluded(toneRooms, ["roomName", "version"]),
+          set: excluded(toneRooms, ["roomName", "changedAt", "version"]),
+          setWhere: isNewer(toneRooms.changedAt),
         })
     );
   }
@@ -400,18 +560,19 @@ async function writeChanges(
             learnerId,
             component,
             propName,
+            changedAt: changed.props[component],
             version,
           }))
         )
         .onConflictDoUpdate({
           target: [componentProps.learnerId, componentProps.component],
-          set: excluded(componentProps, ["propName", "version"]),
+          set: excluded(componentProps, ["propName", "changedAt", "version"]),
+          setWhere: isNewer(componentProps.changedAt),
         })
     );
   }
   const links = changedEntries(after.livingLinks, before.livingLinks);
   if (links.length) {
-    const updatedAt = new Date();
     writes.push(
       transaction
         .insert(mnemonics)
@@ -421,13 +582,14 @@ async function writeChanges(
             itemType: "word" as const,
             itemId,
             story,
-            updatedAt,
+            updatedAt: changed.livingLinks[itemId],
             version,
           }))
         )
         .onConflictDoUpdate({
           target: [mnemonics.learnerId, mnemonics.itemType, mnemonics.itemId],
           set: excluded(mnemonics, ["story", "updatedAt", "version"]),
+          setWhere: isNewer(mnemonics.updatedAt),
         })
     );
   }
@@ -501,15 +663,18 @@ async function writeChanges(
 
 /**
  * Record changes, in order, each once: a change whose id is already stored is skipped. Applied
- * with the same `applyOperation` devices use, to just the rows they touch.
+ * with the same `applyOperation` devices use, to just the rows they touch. A change that arrives
+ * after a later one is placed by when it was made, not when it arrived.
  */
 export async function writeOperations(
   learnerId: string,
-  operations: ProgressOperation[]
+  received: ProgressOperation[],
+  now = new Date()
 ) {
-  if (!operations.length) {
+  if (!received.length) {
     return;
   }
+  const operations = received.map((operation) => notAfter(operation, now));
   await db.transaction(async (transaction) => {
     await transaction
       .insert(learners)
@@ -534,11 +699,22 @@ export async function writeOperations(
     const fresh = new Set(inserted.map((row) => row.id));
     const applied = operations.filter((operation) => fresh.has(operation.id));
     const before = await readTargets(transaction, learnerId, applied);
-    const after = applied.reduce(
-      (state, operation) => applyOperation(state, operation),
-      before
-    );
+    // A late card is rebuilt from its stored events, which now include this batch's.
+    const late = lateCards(before, applied);
+    const start = late.size
+      ? await replayCards(transaction, learnerId, late, before)
+      : before;
+    const after = applied
+      .filter((operation) => !late.has(targetCardKey(operation) ?? ""))
+      .reduce((state, operation) => applyOperation(state, operation), start);
     const version = Math.max(...inserted.map((row) => row.seq));
-    await writeChanges(transaction, learnerId, before, after, version);
+    await writeChanges(
+      transaction,
+      learnerId,
+      before,
+      after,
+      nameTimes(applied),
+      version
+    );
   });
 }
