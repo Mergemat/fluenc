@@ -7,7 +7,6 @@ import {
   useState,
 } from "react";
 import { Rating } from "ts-fsrs";
-import { directCharacters } from "../lib/character-props";
 import type { DashboardData } from "../lib/learner-views";
 import {
   isLearning,
@@ -141,10 +140,7 @@ export function ReviewView({ data }: { data: DashboardData }) {
           active ? (
             <>
               <b>{data.reviewQueue.length}</b> ready
-              {learning.length ? ` · ${learning.length} learning` : ""} ·{" "}
-              {active.type === "character" && directCharacters.has(active.hanzi)
-                ? "prop"
-                : active.type}
+              {learning.length ? ` · ${learning.length} learning` : ""}
             </>
           ) : (
             doneCopy[state].crumb

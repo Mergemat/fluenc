@@ -67,6 +67,10 @@
   --dx-space-group: 24px;
   --dx-space-section: 48px;
   --dx-space-page: 64px;
+  /* The character in a lesson and in review is one size at any screen: the room the tighter of
+     the two layouts has there (a lesson's clue list on phones, its two columns on small desktops,
+     review's height on large ones). */
+  --dx-glyph: min(52vw, calc(40dvh - 131px), 360px);
   /* Page header to the first content. */
   --dx-section: var(--dx-space-group);
 }
@@ -444,10 +448,6 @@
   }
 }
 @media (max-width: 767px) {
-  /* The top bar's edge already sits right above the page title; a second rule would stack on it. */
-  .dx-head > .dx-rule {
-    display: none;
-  }
   .dx-head-meta {
     margin-left: auto;
   }
@@ -535,6 +535,10 @@
   padding: var(--dx-page-top) var(--dx-gutter) var(--dx-space-section);
   margin: 0 auto;
 }
+/* The line beside a page title never shrinks to a stub; long meta gives way first. */
+.dx-head > .dx-rule {
+  min-width: 40px;
+}
 .dx-head {
   display: flex;
   flex-shrink: 0;
@@ -608,7 +612,6 @@
   justify-content: center;
   padding: var(--dx-space-page) 0;
   text-align: center;
-  animation: dx-enter 0.2s ease-out;
 }
 .dx-empty-mark {
   position: relative;
@@ -789,6 +792,20 @@
 }
 
 /* ── Glyph ───────────────────────────────────────── */
+@media (min-width: 960px) {
+  :root {
+    --dx-glyph: min(44dvh, 360px, 21.5vw);
+  }
+}
+@media (min-width: 1280px) {
+  :root {
+    --dx-glyph: min(44dvh, 360px);
+  }
+}
+.dx-studio,
+.dx-review {
+  --glyph-max: var(--dx-glyph);
+}
 .dx-glyph-box {
   display: grid;
   flex: 1;
@@ -814,7 +831,6 @@
   line-height: 1;
   color: var(--dx-fg);
   user-select: none;
-  transition: opacity 200ms;
 }
 .dx-glyph[data-state="loading"] .dx-glyph-ghost {
   color: var(--dx-faint);
@@ -827,7 +843,6 @@
   width: 100%;
   height: 100%;
   overflow: visible;
-  animation: dx-enter 0.25s ease-out;
 }
 /* A lit part: dither-kit gradient clipped to the part's strokes, drawn over the glyph. */
 .dx-part-fill {
@@ -975,22 +990,19 @@
 
 /* ── Studio ──────────────────────────────────────── */
 .dx-studio {
+  --study-gap: var(--dx-space-item);
   position: relative;
   box-sizing: border-box;
   display: grid;
   grid-template-areas: "head" "read" "clues" "actions";
   grid-template-rows: auto minmax(0, 1fr) auto auto;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--dx-space-item);
+  gap: var(--study-gap);
   width: 100%;
   max-width: calc(var(--dx-page) + 2 * var(--dx-gutter));
   height: 100%;
-  padding: var(--dx-page-top) var(--dx-gutter) 12px;
+  padding: var(--dx-page-top) var(--dx-gutter) var(--dx-space-group);
   margin: 0 auto;
-}
-/* A new lesson fades in under a header that stays put, as a review card does. */
-.dx-studio > :not(.dx-head) {
-  animation: dx-enter 0.24s ease-out;
 }
 @keyframes dx-enter {
   from {
@@ -1001,10 +1013,11 @@
 .dx-studio h1 {
   margin: 0;
 }
+/* Title row to content is the same on every page; here the container's gap is part of it. */
 .dx-studio > .dx-head,
 .dx-review > .dx-head {
   grid-area: head;
-  margin-bottom: 0;
+  margin-bottom: calc(var(--dx-section) - var(--study-gap));
 }
 .dx-read {
   display: flex;
@@ -1344,10 +1357,14 @@
   border-radius: 2px;
   animation: dx-pulse 1.1s ease-in-out infinite;
 }
+/* Learn, review and read end in the same action row: as wide as review's column, centred. */
 .dx-actions {
   display: flex;
   grid-area: actions;
-  gap: 8px;
+  gap: var(--dx-space-tight);
+  justify-self: center;
+  width: 100%;
+  max-width: 760px;
 }
 .dx-actions > .dx-action {
   flex: 1;
@@ -1396,15 +1413,14 @@
 
 @media (min-width: 960px) {
   .dx-studio {
-    grid-template-areas: "head head" "read ." "read clues" "read actions" "read .";
-    grid-template-rows: auto minmax(0, 1fr) auto auto minmax(0, 1fr);
+    --study-gap: var(--dx-space-item);
+    grid-template-areas: "head head" "read ." "read clues" "read ." "actions actions";
+    grid-template-rows: auto minmax(0, 1fr) auto minmax(0, 1fr) auto;
     grid-template-columns: minmax(0, 1fr) minmax(400px, 460px);
-    row-gap: var(--dx-space-item);
+    row-gap: var(--study-gap);
     column-gap: 48px;
-    padding-bottom: 24px;
   }
   .dx-read {
-    --glyph-max: 440px;
     gap: var(--dx-space-item);
     justify-content: center;
   }
@@ -1420,16 +1436,13 @@
   .dx-py {
     font-size: var(--dx-text-3xl);
   }
-  .dx-actions {
-    justify-self: stretch;
-  }
 }
 /* Phones: the character comes first. Meaning and pinyin sit beside it so the glyph gets the
    height, and each clue is one line: code · name · category or meaning. */
 @media (max-width: 959px) {
   .dx-studio {
-    gap: var(--dx-space-tight);
-    padding-top: var(--dx-space-tight);
+    --study-gap: var(--dx-space-tight);
+    gap: var(--study-gap);
   }
   .dx-meaning {
     font-size: 28px;
@@ -1483,7 +1496,8 @@
 }
 @media (max-height: 680px) and (max-width: 959px) {
   .dx-studio {
-    gap: var(--dx-space-tight);
+    --study-gap: var(--dx-space-tight);
+    gap: var(--study-gap);
   }
   .dx-alt {
     display: none;
@@ -1742,14 +1756,15 @@
 
 /* ── Review ──────────────────────────────────────── */
 .dx-review {
+  --study-gap: var(--dx-space-item);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: var(--dx-space-item);
+  gap: var(--study-gap);
   width: 100%;
   max-width: calc(var(--dx-page) + 2 * var(--dx-gutter));
   height: 100%;
-  padding: var(--dx-page-top) var(--dx-gutter) 12px;
+  padding: var(--dx-page-top) var(--dx-gutter) var(--dx-space-group);
   margin: 0 auto;
 }
 .dx-review > :not(.dx-head) {
@@ -1781,18 +1796,19 @@
   grid-template-rows: minmax(0, 1fr) auto;
   gap: 16px;
   min-height: 0;
-  animation: dx-enter 0.2s ease-out;
 }
+/* Every study card has the same two places: the prompt, the character's size, and the answer,
+   everything below it. A character, a word or a sentence centres in the first, so review and read
+   line up top to top and bottom to bottom. A prompt or answer that needs more takes it. */
 .dx-card-stage {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: minmax(min-content, var(--dx-glyph)) minmax(min-content, 1fr);
   gap: var(--dx-space-item);
   align-items: center;
-  justify-content: center;
   min-height: 0;
 }
-.dx-card-stage > .dx-glyph-box {
-  flex: 0 1 min(44dvh, 400px);
+.dx-card-stage > :is(.dx-glyph-box, .dx-answer) {
+  align-self: stretch;
 }
 /* Word prompt: interlinear gloss. Syllables and keywords hold their space before reveal. */
 .dx-gloss {
@@ -1884,6 +1900,10 @@
   font-size: clamp(26px, 5vw, 36px);
 }
 /* A card on a scrolling page (reading) keeps review's column. */
+/* Read ends its action row where learn and review do. */
+.dx-page:has(> .dx-card) {
+  padding-bottom: var(--dx-space-group);
+}
 .dx-page > .dx-card {
   width: 100%;
   max-width: 760px;
@@ -1895,70 +1915,47 @@
   font-size: var(--dx-text-xl);
 }
 .dx-answer {
+  position: relative;
   display: grid;
-  flex-shrink: 0;
   width: 100%;
-  height: 212px;
-}
-.dx-card[data-type="word"] .dx-answer {
-  height: 150px;
 }
 .dx-answer > * {
   grid-area: 1 / 1;
 }
-.dx-answer-ghost {
-  display: grid;
-  gap: 12px;
-  align-content: center;
-  transition: opacity 180ms;
-}
-.dx-answer-ghost > div {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin: 0;
-  font: var(--dx-type-label);
-  color: var(--dx-faint);
-}
-.dx-answer-ghost > :where(div) > span {
-  width: 56px;
-}
-.dx-answer-ghost > :where(div) > i {
-  position: relative;
-  flex: 1;
-  height: 10px;
-  overflow: hidden;
-  border-radius: 2px;
-}
-.dx-answer-ghost > :where(div:nth-child(2)) > i {
-  flex: 0.6;
-}
-.dx-answer-ghost > :where(div:nth-child(3)) > i {
-  flex: 0.8;
-}
+/* The answer in three steps: the meaning with its "also" line (tight), the sound (an item
+   below), and the clues as their own group. It is laid out before the reveal too, so revealing
+   it moves nothing. */
 .dx-answer-real {
   display: grid;
-  gap: 8px;
+  gap: 0;
   align-content: center;
   justify-items: center;
   text-align: center;
-  opacity: 0;
-  transition: opacity 200ms;
 }
-.dx-card[data-revealed="true"] .dx-answer-ghost {
-  opacity: 0;
+/* Before the reveal the answer is unseen in place, under one dither haze rising from the bottom. */
+.dx-answer-real[aria-hidden="true"] {
+  visibility: hidden;
 }
-.dx-card[data-revealed="true"] .dx-answer-real {
-  opacity: 1;
+.dx-answer-veil {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: var(--dx-radius);
+}
+.dx-answer-real > * + * {
+  margin-top: var(--dx-space-item);
+}
+.dx-answer-real > .dx-meaning + :is(.dx-alt, .dx-link) {
+  margin-top: var(--dx-space-tight);
 }
 .dx-answer-real .dx-sound {
   position: relative;
-  margin-top: 0;
 }
 /* Keep the pinyin itself centred; the audio button hangs off its right edge. */
 .dx-answer-real .dx-sound > .dx-audio {
   position: absolute;
-  left: calc(100% + 10px);
+  left: calc(100% + var(--dx-space-tight));
 }
 .dx-audio-labeled {
   display: inline-flex;
@@ -1975,11 +1972,12 @@
   flex-wrap: wrap;
   gap: var(--dx-space-tight);
   justify-content: center;
-  max-height: 68px;
   padding: 0;
   margin: var(--dx-space-pair) 0 0;
-  overflow: hidden;
   list-style: none;
+}
+.dx-answer-real > .dx-scene-chips {
+  margin-top: var(--dx-space-group);
 }
 .dx-scene-chips > li {
   --k: var(--dx-faint);
@@ -2024,8 +2022,11 @@
 .dx-card-actions {
   display: grid;
 }
+/* The button and the grades share one place; both sit on its bottom edge, where every study
+   page keeps its button. */
 .dx-card-actions > * {
   grid-area: 1 / 1;
+  align-self: end;
 }
 .dx-card-actions > [inert] {
   visibility: hidden;
@@ -2044,6 +2045,10 @@
   gap: 6px;
   justify-content: center;
   margin: 4px 0 0;
+}
+/* Shadowing starts after the reveal. */
+.dx-card:not([data-revealed="true"]) .dx-shadow-pips {
+  visibility: hidden;
 }
 .dx-shadow-pips > i {
   width: 18px;
@@ -2088,19 +2093,39 @@
 .dx-rate:not([data-picked="true"]) > canvas {
   opacity: 0.45;
 }
+/* Names hold one line across the row, even where a note wraps to two. */
 .dx-rate > span {
   position: absolute !important;
   inset: 0;
   display: grid;
-  gap: 2px;
-  place-content: center;
+  gap: var(--dx-space-pair);
+  place-content: start center;
   justify-items: center;
+  padding-top: 13px;
 }
 .dx-rate > :where(span) > span {
   font: var(--dx-type-action);
 }
-.dx-rate > :where(span) > small {
+.dx-rate-slot {
+  display: grid;
+  gap: var(--dx-space-tight);
+  min-width: 0;
+}
+/* When the card comes back after this grade. */
+.dx-rate-slot > em {
   font: var(--dx-type-micro);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  color: var(--dx-muted);
+  text-align: center;
+}
+/* Four across on a phone, the note wraps onto two lines rather than spilling out. */
+.dx-rate > :where(span) > small {
+  padding: 0 4px;
+  font: var(--dx-type-micro);
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
   opacity: 0.8;
 }
 .dx-rate > :where(span) > kbd {
@@ -2114,7 +2139,6 @@
   grid-template-rows: minmax(0, 1fr) auto;
   gap: 16px;
   min-height: 0;
-  animation: dx-enter 0.2s ease-out;
 }
 .dx-done > .dx-empty {
   min-height: 0;
@@ -2152,20 +2176,9 @@
   color: var(--dx-red);
   text-align: center;
 }
-@media (max-width: 400px) {
-  .dx-rate > small {
-    display: none;
-  }
-}
 @media (max-height: 700px) {
-  .dx-answer {
-    height: 170px;
-  }
   .dx-card-stage {
     gap: var(--dx-space-tight);
-  }
-  .dx-scene-chips {
-    max-height: 32px;
   }
 }
 
@@ -2992,7 +3005,6 @@ a.dx-pal-row:hover {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--dx-space-item);
-  margin-top: 8px;
 }
 .dx-scores > p {
   display: grid;
@@ -3344,15 +3356,6 @@ a.dx-pal-row:hover {
   .dx-next-glyph {
     font-size: 80px;
   }
-}
-
-/* When the card comes back after this grade. */
-.dx-rate > :where(span) > em {
-  position: absolute;
-  top: 6px;
-  left: 8px;
-  font: var(--dx-type-micro);
-  font-style: normal;
 }
 
 .dx-scene-chips > li > button {
