@@ -1,6 +1,12 @@
 {
   "name": "fluenc",
   "private": true,
+  "description": "A Mandarin study app built on the Hanzi Movie Method",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mergemat/fluenc.git"
+  },
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "bun scripts/build.ts",
