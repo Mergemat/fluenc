@@ -2933,21 +2933,16 @@ a.dx-pro-row:hover {
   background: var(--cell);
   border-radius: 2px;
 }
-/* One pixel per character; a block per milestone, labelled with the count it reaches. */
-:is(.dx-pro-key > span, .dx-cells > i) {
-  --cell: var(--dx-raised);
-}
-:is(.dx-pro-key > span, .dx-cells > i)[data-tone="review"],
-.dx-cells > i[data-status="review"] {
+.dx-pro-key > [data-tone="review"] {
   --cell: var(--dx-green);
 }
-:is(.dx-pro-key > span, .dx-cells > i)[data-tone="learning"],
-.dx-cells > i[data-status="learning"] {
+.dx-pro-key > [data-tone="learning"] {
   --cell: var(--dx-orange);
 }
 .dx-pro-key > [data-tone="new"] {
-  --cell: var(--dx-line-strong);
+  --cell: var(--dx-grey);
 }
+/* One pixel per character; a block per milestone, labelled with the count it reaches. */
 .dx-blocks {
   display: grid;
   gap: 10px;
@@ -2972,10 +2967,12 @@ a.dx-pro-row:hover {
   flex-wrap: wrap;
   gap: 3px;
 }
+/* Each pixel hosts a dither-kit gradient in its status colour. */
 .dx-cells > i {
+  position: relative;
   width: 10px;
   height: 10px;
-  background: var(--cell);
+  overflow: hidden;
   border-radius: 2px;
 }
 @media (max-width: 520px) {
