@@ -1,5 +1,4 @@
 // A progress bar divided into learned and learning, over a grey track of what is still to come.
-// Optional marks sit on the bar where milestones fall.
 import { DitherGradient } from "../dither-kit/gradient";
 
 const percent = (part: number, total: number) =>
@@ -10,7 +9,6 @@ export function SplitMeter({
   learned,
   learning = 0,
   total,
-  marks = [],
   text,
   className = "",
 }: {
@@ -20,8 +18,6 @@ export function SplitMeter({
   learned: number;
   learning?: number;
   total: number;
-  /** Milestone positions; one is lit once the learner has passed it. */
-  marks?: number[];
   className?: string;
 }) {
   const started = learned + learning;
@@ -51,16 +47,6 @@ export function SplitMeter({
       >
         <DitherGradient cell={2} direction="left" from="green" />
       </span>
-      {marks
-        .filter((mark) => mark > 0 && mark < total)
-        .map((mark) => (
-          <i
-            className="dx-split-mark"
-            data-passed={started >= mark}
-            key={mark}
-            style={{ left: percent(mark, total) }}
-          />
-        ))}
     </div>
   );
 }

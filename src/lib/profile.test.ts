@@ -7,8 +7,6 @@ import {
   emptyLearnerState,
   type LearnerState,
 } from "./learner-state";
-import { deriveLibrary, derivePalace } from "./learner-views";
-import { buildPalaceBoard } from "./palace-board";
 import { deriveProfile } from "./profile";
 
 const hour = (index: number) =>
@@ -91,23 +89,4 @@ test("progress saved before dates were recorded still reaches its milestones", (
     reachedAt: null,
   });
   expect(deriveProfile(withoutDates(3)).since).toBe(hour(3));
-});
-
-test("naming every set the course uses completes the sets milestone", () => {
-  const board = buildPalaceBoard(
-    deriveLibrary(emptyLearnerState),
-    derivePalace(emptyLearnerState)
-  );
-  const state: LearnerState = {
-    ...emptyLearnerState,
-    sets: Object.fromEntries(board.sets.map((set) => [set.key, "a place"])),
-    actors: { b: "Bruce" },
-  };
-
-  expect(milestone(state, "code:sets")?.reached).toBe(true);
-  expect(milestone(state, "code:actors")).toMatchObject({
-    reached: false,
-    progress: 1,
-  });
-  expect(track(state, "code").learned).toBe(board.sets.length + 1);
 });

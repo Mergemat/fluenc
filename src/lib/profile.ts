@@ -6,7 +6,7 @@ import { cardKey, type LearnerState, parseCardKey } from "./learner-state";
 import { deriveLibrary, derivePalace } from "./learner-views";
 import { buildPalaceBoard } from "./palace-board";
 
-export type TrackId = "code" | "props" | "characters" | "words" | "sentences";
+export type TrackId = "characters" | "words" | "sentences";
 type Status = "new" | "learning" | "review";
 
 export interface Milestone {
@@ -26,9 +26,9 @@ export interface Milestone {
 export interface ProgressTrack {
   id: TrackId;
   label: string;
-  /** In review for study material; named for palace clues. */
+  /** In review. */
   learned: number;
-  /** Introduced but still in learning steps. Palace clues have no learning stage. */
+  /** Introduced but still in learning steps. */
   learning: number;
   milestones: Milestone[];
   total: number;
@@ -37,7 +37,8 @@ export interface ProgressTrack {
 const roundNumbers = [10, 50, 100, 250, 500, 1000];
 
 /**
- * Round-number milestones below the total, then the whole track. `count` items are done, `dates`
+ * Round-number milestones short of the total (one right before it says nothing new), then the
+ * whole track. `count` items are done, `dates`
  * holds the ones with a recorded date; undated ones came first, before dates were recorded.
  */
 function countMilestones(
@@ -48,7 +49,7 @@ function countMilestones(
 ): Milestone[] {
   const sorted = dates.toSorted();
   const undated = count - sorted.length;
-  return [...roundNumbers.filter((target) => target < total), total].map(
+  return [...roundNumbers.filter((target) => target < total * 0.9), total].map(
     (target) => {
       const reached = total > 0 && count >= target;
       return {
@@ -65,21 +66,6 @@ function countMilestones(
   );
 }
 
-/** Done once every clue of a kind has a name. */
-function namedMilestone(unit: string, items: { name: string }[]): Milestone {
-  const named = items.filter((item) => item.name).length;
-  return {
-    key: `code:${unit}`,
-    track: "code",
-    unit,
-    target: items.length,
-    all: true,
-    progress: named,
-    reached: items.length > 0 && named === items.length,
-    reachedAt: null,
-  };
-}
-
 function split(statuses: Status[]) {
   return {
     learned: statuses.filter((status) => status === "review").length,
@@ -88,15 +74,10 @@ function split(statuses: Status[]) {
   };
 }
 
-const named = (items: { name: string }[]) => ({
-  named: items.filter((item) => item.name).length,
-  total: items.length,
-});
-
 /**
- * The course divided into the method's stages, each as learned, learning and still to come, with
- * the milestones along the way. Study milestones count introduced items and carry the date the
- * deciding item was introduced; palace names are not dated.
+ * Characters, words and sentences, each as learned, learning and still to come, with the
+ * milestones along the way. Milestones count introduced items and carry the date the deciding
+ * item was introduced. The palace is summed up as how many of its clues have a name.
  */
 export function deriveProfile(
   state: LearnerState,
@@ -151,29 +132,7 @@ export function deriveProfile(
   const sentences = split(
     catalog.sentences.map((item) => sentenceStatus(item.id))
   );
-  const code = [...board.actors, ...board.sets];
-  const props = named(board.props);
-
   const tracks: ProgressTrack[] = [
-    {
-      id: "code",
-      label: "pronunciation code",
-      learned: named(code).named,
-      learning: 0,
-      total: code.length,
-      milestones: [
-        namedMilestone("sets", board.sets),
-        namedMilestone("actors", board.actors),
-      ],
-    },
-    {
-      id: "props",
-      label: "props",
-      learned: props.named,
-      learning: 0,
-      total: props.total,
-      milestones: countMilestones("props", props.total, props.named),
-    },
     {
       id: "characters",
       label: "characters",
@@ -218,15 +177,20 @@ export function deriveProfile(
     },
   ];
 
+  const clues = [
+    ...board.actors,
+    ...board.sets,
+    ...board.rooms,
+    ...board.props,
+  ];
   return {
     tracks,
     /** When the learner met their first item, if it was recorded. */
     since: [...introducedAt.values()].toSorted()[0] ?? null,
+    /** Clues with a learner's name, counted like the palace page. */
     palace: {
-      cast: named(board.actors),
-      sets: named(board.sets),
-      areas: named(board.rooms),
-      props,
+      named: clues.filter((clue) => clue.name).length,
+      total: clues.length,
     },
   };
 }
