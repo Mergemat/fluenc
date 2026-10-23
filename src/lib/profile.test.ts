@@ -12,14 +12,16 @@ import { deriveProfile } from "./profile";
 const hour = (index: number) =>
   new Date(Date.UTC(2026, 8, 1, index)).toISOString();
 
-function introduce(ids: string[], state = emptyLearnerState): LearnerState {
-  return ids.reduce(
-    (next, itemId, index) =>
+function introduce(
+  items: { itemType: "character" | "word" | "sentence"; itemId: string }[]
+): LearnerState {
+  return items.reduce(
+    (next, item, index) =>
       applyOperation(next, {
         kind: "enroll",
-        data: { itemType: "character", itemId, enrolledAt: hour(index) },
+        data: { ...item, enrolledAt: hour(index) },
       }),
-    state
+    emptyLearnerState
   );
 }
 
@@ -30,13 +32,16 @@ const track = (state: LearnerState, id: string) => {
   }
   return found;
 };
-const milestone = (state: LearnerState, key: string) =>
-  deriveProfile(state)
-    .tracks.flatMap((item) => item.milestones)
-    .find((item) => item.key === key);
+
+const twoCharacterWord = catalog.uniqueWords.find(
+  (word) => word.characterIds.length === 2
+);
 
 test("a character that is also a word divides both tracks by review state", () => {
-  const state = introduce(["我", "你"]);
+  const state = introduce([
+    { itemType: "character", itemId: "我" },
+    { itemType: "character", itemId: "你" },
+  ]);
   const remembered: LearnerState = {
     ...state,
     cards: {
@@ -52,53 +57,31 @@ test("a character that is also a word divides both tracks by review state", () =
   expect(track(remembered, "words")).toMatchObject({ learned: 1, learning: 1 });
 });
 
-test("a milestone is dated by the introduction that reached it", () => {
-  const ids = catalog.characters.slice(0, 12).map((item) => item.id);
-  const state = introduce(ids);
-
-  expect(milestone(state, "characters:10")).toMatchObject({
-    reached: true,
-    reachedAt: hour(9),
-  });
-  expect(milestone(state, "characters:50")).toMatchObject({
-    reached: false,
-    progress: 12,
-    reachedAt: null,
-  });
-});
-
-test("progress saved before dates were recorded still reaches its milestones", () => {
-  const ids = catalog.characters.slice(0, 10).map((item) => item.id);
-  const state = introduce(ids);
-  const withoutDates = (count: number): LearnerState => ({
-    ...state,
-    cards: Object.fromEntries(
-      Object.entries(state.cards).map(([key, card], index) => {
-        const { introducedAt: _, ...undated } = card;
-        return [key, index < count ? undated : card];
-      })
-    ),
-  });
-
-  expect(milestone(withoutDates(3), "characters:10")).toMatchObject({
-    reached: true,
-    reachedAt: hour(9),
-  });
-  expect(milestone(withoutDates(10), "characters:10")).toMatchObject({
-    reached: true,
-    reachedAt: null,
-  });
-  expect(deriveProfile(withoutDates(3)).since).toBe(hour(3));
-});
-
-test("the character wall starts with met characters in the order they were met", () => {
-  const state = introduce(["你", "我"]);
-  const { wall } = deriveProfile(state);
-
-  expect(wall.slice(0, 2).map((item) => [item.id, item.status])).toEqual([
-    ["你", "learning"],
-    ["我", "learning"],
+test("a single-character word is met when its character is", () => {
+  const state = introduce([
+    { itemType: "character", itemId: "我" },
+    { itemType: "word", itemId: String(twoCharacterWord?.id) },
   ]);
-  expect(wall.slice(2).every((item) => item.status === "new")).toBe(true);
-  expect(wall).toHaveLength(catalog.characters.length);
+
+  expect(track(state, "characters").introducedAt).toEqual([hour(0)]);
+  expect(track(state, "words").introducedAt.toSorted()).toEqual([
+    hour(0),
+    hour(1),
+  ]);
+  expect(deriveProfile(state).introductions).toHaveLength(2);
+});
+
+test("progress saved before dates were recorded counts but has no dates", () => {
+  const state = introduce([{ itemType: "character", itemId: "我" }]);
+  const { introducedAt: _, ...undated } = state.cards["character:我"];
+  const legacy = {
+    ...state,
+    cards: { "character:我": undated },
+  } as LearnerState;
+
+  expect(track(legacy, "characters")).toMatchObject({
+    learning: 1,
+    introducedAt: [],
+  });
+  expect(deriveProfile(legacy).introductions).toEqual([]);
 });

@@ -2874,17 +2874,110 @@ a.dx-pal-row:hover {
 .dx-split {
   max-width: none;
 }
+.dx-scores {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+.dx-scores > p {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  margin: 0;
+}
+.dx-score {
+  font: 400 clamp(44px, 9vw, 96px) / 0.95 var(--dx-pixel);
+  font-variant-numeric: tabular-nums;
+  color: var(--dx-fg);
+}
+.dx-scores span {
+  font: 500 var(--dx-text-lg) var(--dx-sans);
+  color: var(--dx-fg);
+}
+.dx-scores small {
+  font: var(--dx-text-xs) var(--dx-mono);
+  color: var(--dx-faint);
+}
+.dx-scores small[data-added="true"] {
+  color: var(--dx-green);
+}
+.dx-pro-group {
+  margin: 34px 0 14px;
+  font-weight: 400;
+}
+/* A week per column, a day per cell; each cell hosts a dither-kit gradient. */
+.dx-activity {
+  --day: 15px;
+  display: flex;
+  flex-direction: row-reverse;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.dx-activity-grid {
+  display: grid;
+  flex: none;
+  gap: 6px;
+}
+.dx-activity-months {
+  display: grid;
+  grid-auto-columns: calc(var(--day) + 3px);
+  grid-auto-flow: column;
+  height: 12px;
+  font: var(--dx-text-2xs) var(--dx-mono);
+  color: var(--dx-faint);
+  white-space: nowrap;
+}
+.dx-activity-weeks {
+  display: flex;
+  gap: 3px;
+}
+.dx-activity-week {
+  display: grid;
+  gap: 3px;
+}
+:is(.dx-activity-week, .dx-activity-key) > i {
+  position: relative;
+  display: block;
+  width: var(--day);
+  height: var(--day);
+  overflow: hidden;
+  border-radius: 2px;
+}
+.dx-activity-week > i[data-future="true"] {
+  visibility: hidden;
+}
+.dx-activity-key {
+  --day: 10px;
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  font-size: var(--dx-text-2xs);
+  color: var(--dx-faint);
+}
+.dx-pro-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  margin: 16px 0 30px;
+  font: var(--dx-text-sm) var(--dx-mono);
+  color: var(--dx-muted);
+}
+.dx-pro-num {
+  font-weight: 500;
+  color: var(--dx-fg);
+}
 .dx-pro-row {
   display: flex;
   gap: 12px;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   min-height: 56px;
   padding: 16px 0;
-  margin: 0;
   font: var(--dx-text-sm) var(--dx-mono);
   font-variant-numeric: tabular-nums;
   color: var(--dx-faint);
+  border-top: 1px solid var(--dx-line);
   border-bottom: 1px solid var(--dx-line);
 }
 .dx-pro-row > span:last-child {
@@ -2892,101 +2985,16 @@ a.dx-pal-row:hover {
   gap: 2px;
   align-items: center;
 }
-.dx-pro-row :is(h2, .dx-pro-name) {
-  margin: 0;
+.dx-pro-name {
   font: 400 var(--dx-text-xl) var(--dx-pixel);
   color: var(--dx-fg);
 }
-a.dx-pro-row:hover {
+.dx-pro-row:hover {
   color: var(--dx-muted);
-}
-.dx-pro-num {
-  font-weight: 500;
-  color: var(--dx-fg);
-}
-.dx-wall-chars {
-  padding-bottom: 22px;
-  border-bottom: 1px solid var(--dx-line);
-}
-.dx-wall-chars > .dx-pro-row {
-  padding-bottom: 6px;
-  border-bottom: 0;
-}
-.dx-pro-key {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 16px;
-  margin: 0 0 18px;
-  font: var(--dx-text-xs) var(--dx-mono);
-  font-variant-numeric: tabular-nums;
-  color: var(--dx-muted);
-}
-.dx-pro-key > span {
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
-}
-.dx-pro-key > span::before {
-  width: 7px;
-  height: 7px;
-  content: "";
-  background: var(--cell);
-  border-radius: 2px;
-}
-.dx-pro-key > [data-tone="review"] {
-  --cell: var(--dx-green);
-}
-.dx-pro-key > [data-tone="learning"] {
-  --cell: var(--dx-orange);
-}
-.dx-pro-key > [data-tone="new"] {
-  --cell: var(--dx-grey);
-}
-/* One pixel per character; a block per milestone, labelled with the count it reaches. */
-.dx-blocks {
-  display: grid;
-  gap: 10px;
-}
-.dx-block {
-  display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  gap: 12px;
-  align-items: start;
-}
-.dx-block-label {
-  font: var(--dx-text-2xs) / 10px var(--dx-mono);
-  font-variant-numeric: tabular-nums;
-  color: var(--dx-faint);
-  text-align: right;
-}
-.dx-block[data-reached="true"] > .dx-block-label {
-  color: var(--dx-fg);
-}
-.dx-cells {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px;
-}
-/* Each pixel hosts a dither-kit gradient in its status colour. */
-.dx-cells > i {
-  position: relative;
-  width: 10px;
-  height: 10px;
-  overflow: hidden;
-  border-radius: 2px;
 }
 @media (max-width: 520px) {
-  .dx-block {
-    grid-template-columns: 28px minmax(0, 1fr);
-    gap: 8px;
-  }
-  .dx-cells {
-    gap: 2px;
-  }
-  .dx-cells > i {
-    width: 7px;
-    height: 7px;
-    border-radius: 1.5px;
+  .dx-activity {
+    --day: 11px;
   }
 }
 
