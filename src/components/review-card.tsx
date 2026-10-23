@@ -7,10 +7,12 @@ import {
   useEffectEvent,
   useState,
 } from "react";
-import { Rating } from "ts-fsrs";
+import { type Grade, Rating } from "ts-fsrs";
+import { toCard } from "../lib/learner-state";
 import type { ReviewItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { getMovieCoordinates } from "../lib/pinyin";
+import { previewDue, waitLabel } from "../lib/review-schedule";
 import { saveReview } from "../offline/progress";
 import { useProgressMutation } from "../offline/use-progress-mutation";
 import { ClueCode } from "./character-studio/clue-code";
@@ -22,7 +24,7 @@ import { AudioButton, HanziGlyph, MoviePinyin, ToneContour } from "./ui/hanzi";
 import { partColor } from "./ui/part-colors";
 
 const ratings: {
-  value: number;
+  value: Grade;
   label: string;
   note: string;
   color: DitherColor;
@@ -45,13 +47,36 @@ type CharacterReview = Extract<ReviewItem, { type: "character" }>;
 type WordReview = Extract<ReviewItem, { type: "word" }>;
 type Clue = ReturnType<typeof lessonClues>[number];
 
+/** One graded card, for the summary at the end of a review. */
+export interface Graded {
+  /** When it comes back, as on its grade button. */
+  after: string;
+  hanzi: string;
+  key: string;
+  rating: Grade;
+}
+
+/** Each grade's wait, worked out once when the card appears. */
+function useWaits(item: ReviewItem) {
+  const [waits] = useState(() => {
+    const now = new Date();
+    const due = previewDue(toCard(item.card), now);
+    return new Map(
+      ratings.map(({ value }) => [value, waitLabel(now, due.get(value) ?? now)])
+    );
+  });
+  return waits;
+}
+
 function RatingButton({
   rating,
+  after,
   picked,
   pending,
   onRate,
 }: {
   rating: (typeof ratings)[number];
+  after: string;
   picked: boolean;
   pending: boolean;
   onRate: (rating: number) => void;
@@ -69,6 +94,7 @@ function RatingButton({
     >
       <span>{rating.label}</span>
       <small>{rating.note}</small>
+      <em>{after}</em>
       <kbd>{rating.value}</kbd>
     </DitherButton>
   );
@@ -95,7 +121,35 @@ export function AnswerGhost({ labels }: { labels: string[] }) {
   );
 }
 
-function SceneChips({ clues }: { clues: Clue[] }) {
+interface PartPointer {
+  highlighted: string | null;
+  onHover: (code: string | null) => void;
+  onSelect: (code: string) => void;
+}
+
+function PropChip({ clue, parts }: { clue: Clue; parts: PartPointer }) {
+  const { onHover, onSelect } = parts;
+  const enter = useCallback(() => onHover(clue.code), [onHover, clue.code]);
+  const leave = useCallback(() => onHover(null), [onHover]);
+  const select = useCallback(() => onSelect(clue.code), [onSelect, clue.code]);
+  return (
+    <button
+      aria-pressed={parts.highlighted === clue.code}
+      onClick={select}
+      onPointerEnter={enter}
+      onPointerLeave={leave}
+      type="button"
+    >
+      <b className="font-hanzi-props">
+        <ClueCode clue={clue} />
+      </b>
+      {clue.name || "—"}
+    </button>
+  );
+}
+
+/** The clues as chips; a prop's chip lights its part of the character. */
+function SceneChips({ clues, parts }: { clues: Clue[]; parts: PartPointer }) {
   return (
     <ul className="dx-scene-chips">
       {clues.map((clue) => (
@@ -108,10 +162,16 @@ function SceneChips({ clues }: { clues: Clue[] }) {
               : undefined
           }
         >
-          <b className={clue.kind === "prop" ? "font-hanzi-props" : ""}>
-            <ClueCode clue={clue} />
-          </b>
-          {clue.name || "—"}
+          {clue.kind === "prop" ? (
+            <PropChip clue={clue} parts={parts} />
+          ) : (
+            <>
+              <b>
+                <ClueCode clue={clue} />
+              </b>
+              {clue.name || "—"}
+            </>
+          )}
         </li>
       ))}
     </ul>
@@ -122,10 +182,12 @@ function CharacterAnswer({
   item,
   also,
   clues,
+  parts,
 }: {
   item: CharacterReview;
   also: string | null;
   clues: Clue[];
+  parts: PartPointer;
 }) {
   return (
     <>
@@ -139,7 +201,7 @@ function CharacterAnswer({
         />
         <AudioButton pinyin={item.pinyin} text={item.hanzi} />
       </div>
-      <SceneChips clues={clues} />
+      <SceneChips clues={clues} parts={parts} />
     </>
   );
 }
@@ -163,10 +225,12 @@ function ReviewPrompt({
   item,
   clues,
   revealed,
+  parts,
 }: {
   item: ReviewItem;
   clues: Clue[];
   revealed: boolean;
+  parts: PartPointer;
 }) {
   if (item.type === "character") {
     return (
@@ -174,8 +238,10 @@ function ReviewPrompt({
         <HanziGlyph
           concealed={!revealed}
           hanzi={item.hanzi}
+          highlighted={parts.highlighted}
+          onHover={parts.onHover}
+          onSelect={parts.onSelect}
           parts={clues.map((prop) => prop.code)}
-          xray={revealed}
         />
       </div>
     );
@@ -198,7 +264,15 @@ function ReviewPrompt({
   );
 }
 
-function ReviewAnswer({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
+function ReviewAnswer({
+  item,
+  clues,
+  parts,
+}: {
+  item: ReviewItem;
+  clues: Clue[];
+  parts: PartPointer;
+}) {
   if (item.type === "sentence") {
     return (
       <>
@@ -215,7 +289,12 @@ function ReviewAnswer({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
     <>
       <h2 className="dx-meaning">{meaning.primary}</h2>
       {item.type === "character" ? (
-        <CharacterAnswer also={meaning.also} clues={clues} item={item} />
+        <CharacterAnswer
+          also={meaning.also}
+          clues={clues}
+          item={item}
+          parts={parts}
+        />
       ) : (
         <WordAnswer also={meaning.also} item={item} />
       )}
@@ -223,13 +302,20 @@ function ReviewAnswer({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
   );
 }
 
-export function ReviewCard({ item }: { item: ReviewItem }) {
+export function ReviewCard({
+  item,
+  onGraded,
+}: {
+  item: ReviewItem;
+  onGraded?: (graded: Graded) => void;
+}) {
   const [startedAt] = useState(Date.now);
   const [revealed, setRevealed] = useState(false);
+  const waits = useWaits(item);
   const mutation = useProgressMutation(saveReview);
   const { isPending, mutate } = mutation;
   const rate = useCallback(
-    (rating: number) => {
+    (rating: Grade) => {
       if (isPending) {
         return;
       }
@@ -239,9 +325,37 @@ export function ReviewCard({ item }: { item: ReviewItem }) {
         rating,
         durationMs: Math.min(3_600_000, Math.max(0, Date.now() - startedAt)),
       });
+      onGraded?.({
+        key: `${item.type}:${item.id}`,
+        hanzi: item.hanzi,
+        rating,
+        after: waits.get(rating) ?? "",
+      });
     },
-    [isPending, mutate, item.type, item.id, startedAt]
+    [
+      isPending,
+      mutate,
+      item.type,
+      item.id,
+      item.hanzi,
+      startedAt,
+      onGraded,
+      waits,
+    ]
   );
+  // A part lights while the pointer is on it or its chip; a tap keeps it lit.
+  const [hover, setHover] = useState<string | null>(null);
+  const [pinned, setPinned] = useState<string | null>(null);
+  const select = useCallback(
+    (code: string) =>
+      setPinned((previous) => (previous === code ? null : code)),
+    []
+  );
+  const parts: PartPointer = {
+    highlighted: revealed ? (hover ?? pinned) : null,
+    onHover: setHover,
+    onSelect: select,
+  };
   const reveal = useCallback(() => setRevealed(true), []);
 
   // Space or Enter reveals; 1–4 rates once the answer shows.
@@ -259,7 +373,7 @@ export function ReviewCard({ item }: { item: ReviewItem }) {
       event.preventDefault();
       setRevealed(true);
     } else if (revealed && RATING_KEY.test(event.key)) {
-      rate(Number(event.key));
+      rate(Number(event.key) as Grade);
     }
   });
   useEffect(() => {
@@ -280,7 +394,12 @@ export function ReviewCard({ item }: { item: ReviewItem }) {
   return (
     <div className="dx-card" data-revealed={revealed} data-type={item.type}>
       <div className="dx-card-stage">
-        <ReviewPrompt clues={props} item={item} revealed={revealed} />
+        <ReviewPrompt
+          clues={props}
+          item={item}
+          parts={parts}
+          revealed={revealed}
+        />
 
         <div className="dx-answer">
           <AnswerGhost labels={ghostLabels[item.type]} />
@@ -289,7 +408,7 @@ export function ReviewCard({ item }: { item: ReviewItem }) {
             className="dx-answer-real"
             inert={!revealed}
           >
-            <ReviewAnswer clues={clues} item={item} />
+            <ReviewAnswer clues={clues} item={item} parts={parts} />
           </div>
         </div>
       </div>
@@ -314,6 +433,7 @@ export function ReviewCard({ item }: { item: ReviewItem }) {
         >
           {ratings.map((rating) => (
             <RatingButton
+              after={waits.get(rating.value) ?? ""}
               key={rating.value}
               onRate={rate}
               pending={mutation.isPending}

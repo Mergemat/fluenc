@@ -20,9 +20,8 @@ import type { CharacterItem } from "./character-studio/types";
 import { DitherButton } from "./dither-kit/button";
 import { Tile } from "./library-view";
 import { WordGloss } from "./review-card";
-import { Rule } from "./ui/dither";
 import { AudioButton, HanziGlyph, MoviePinyin } from "./ui/hanzi";
-import { Page, PageHeader } from "./ui/layout";
+import { Page, PageHeader, SectionHead } from "./ui/layout";
 import { partColor } from "./ui/part-colors";
 
 const statusLabel = {
@@ -193,10 +192,7 @@ function CharacterEntry({
       </header>
 
       <section aria-label="Scene" className="dx-entry-section">
-        <div className="dx-label">
-          <span>{props.length === clues.length ? "prop" : "scene"}</span>
-          <Rule />
-        </div>
+        <SectionHead label={props.length === clues.length ? "prop" : "scene"} />
         <div className="dx-rows dx-rows-static">
           {clues.map((clue) => (
             <ClueRow
@@ -219,11 +215,7 @@ function CharacterEntry({
       </section>
 
       <section aria-label="Words" className="dx-entry-section">
-        <div className="dx-label">
-          <span>in words</span>
-          <Rule />
-          <span>{words.length}</span>
-        </div>
+        <SectionHead label="in words" meta={words.length} />
         {words.length ? (
           <div className="dx-wall dx-wall-tight">
             {words.map((word) => (
@@ -323,10 +315,7 @@ function WordEntry({
       </header>
 
       <section aria-label="Characters" className="dx-entry-section">
-        <div className="dx-label">
-          <span>characters</span>
-          <Rule />
-        </div>
+        <SectionHead label="characters" />
         <div className="dx-wall dx-wall-tight">
           {characters.map(({ part, character }) =>
             character ? (
@@ -344,10 +333,7 @@ function WordEntry({
       </section>
 
       <section aria-label="Memory link" className="dx-entry-section">
-        <div className="dx-label">
-          <span>memory link</span>
-          <Rule />
-        </div>
+        <SectionHead label="memory link" />
         {item.livingLink ? (
           <p className="dx-entry-link">{item.livingLink}</p>
         ) : (

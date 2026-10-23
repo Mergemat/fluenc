@@ -38,22 +38,37 @@
      sans: content. Meanings, sentences, names, prose, and the numbers that matter.
      mono: interface. Labels, controls, meta, counts; and spelled sound (pinyin, clue codes).
      pixel: page titles and the loader only. Never content, never data.
-     Every text rule sets `font` to one role; only a hero size or a fixed line box overrides it. */
+     Every text rule sets `font` to one role; only a hero size or a fixed line box overrides it.
+     Interface roles (action, control, label, micro) are one line, so their line box is the type
+     size and the spacing tokens are the gaps you see; text in them that wraps sets `--dx-wrap`. */
   --dx-type-title: 400 var(--dx-text-title) / 1 var(--dx-pixel);
-  --dx-type-display: 560 var(--dx-text-3xl) / 1.15 var(--dx-sans);
+  /* One weight step under what reads right on light: light type on a dark ground looks bolder. */
+  --dx-type-display: 500 var(--dx-text-3xl) / 1.15 var(--dx-sans);
   --dx-type-heading: 500 var(--dx-text-lg) / 1.3 var(--dx-sans);
   --dx-type-body: 400 var(--dx-text-base) / 1.55 var(--dx-sans);
-  --dx-type-action: 600 var(--dx-text-md) / 1.2 var(--dx-mono);
-  --dx-type-control: 400 var(--dx-text-sm) / 1.4 var(--dx-mono);
-  --dx-type-label: 400 var(--dx-text-xs) / 1.45 var(--dx-mono);
-  --dx-type-micro: 500 var(--dx-text-2xs) / 1.2 var(--dx-mono);
+  --dx-type-action: 600 var(--dx-text-md) / 1 var(--dx-mono);
+  --dx-type-control: 400 var(--dx-text-sm) / 1 var(--dx-mono);
+  --dx-type-label: 400 var(--dx-text-xs) / 1 var(--dx-mono);
+  --dx-type-micro: 500 var(--dx-text-2xs) / 1 var(--dx-mono);
   --dx-type-pinyin: 500 var(--dx-text-2xl) / 1 var(--dx-mono);
   --dx-type-code: 700 var(--dx-text-lg) / 1 var(--dx-mono);
   /* Page frame: one width and gutter for every page, so headers line up from page to page. */
   --dx-page: 1000px;
   --dx-gutter: 16px;
   --dx-page-top: 12px;
-  --dx-section: 20px;
+  /* Spacing: six steps, each clearly bigger than the last, so space alone can show what belongs
+     together. Layout gaps use these; the inside of a control (chip padding, icon gaps) and the
+     study screens, fitted to the viewport, keep their own measures. */
+  /* Line height for interface text that wraps. */
+  --dx-wrap: 1.45;
+  --dx-space-pair: 4px;
+  --dx-space-tight: 8px;
+  --dx-space-item: 16px;
+  --dx-space-group: 24px;
+  --dx-space-section: 48px;
+  --dx-space-page: 64px;
+  /* Page header to the first content. */
+  --dx-section: var(--dx-space-group);
 }
 @media (min-width: 768px) {
   :root {
@@ -178,7 +193,7 @@
   position: relative;
   display: flex;
   flex-shrink: 0;
-  gap: 20px;
+  gap: var(--dx-space-group);
   align-items: center;
   height: 60px;
   padding: 0 28px;
@@ -198,7 +213,7 @@
 }
 .dx-nav {
   display: flex;
-  gap: 6px;
+  gap: var(--dx-space-tight);
   margin-left: auto;
 }
 .dx-nav-chip {
@@ -353,7 +368,7 @@
   .dx-nav {
     flex-direction: column;
     gap: 2px;
-    margin: 28px 0 0;
+    margin: var(--dx-space-group) 0 0;
   }
   .dx-nav-chip {
     height: 38px;
@@ -379,14 +394,14 @@
   }
   .dx-course {
     display: grid;
-    gap: 14px;
+    gap: var(--dx-space-item);
     padding: 14px 12px;
     margin-top: auto;
     border-top: 1px solid var(--dx-line);
   }
   .dx-course-meter {
     display: grid;
-    gap: 7px;
+    gap: var(--dx-space-tight);
   }
   .dx-course-meter > p {
     display: flex;
@@ -429,6 +444,13 @@
   }
 }
 @media (max-width: 767px) {
+  /* The top bar's edge already sits right above the page title; a second rule would stack on it. */
+  .dx-head > .dx-rule {
+    display: none;
+  }
+  .dx-head-meta {
+    margin-left: auto;
+  }
   /* iOS blurs a band below the status bar as well; drop the header clear of it. */
   .dx-shell {
     padding-top: calc(env(safe-area-inset-top) + 14px);
@@ -444,6 +466,9 @@
     width: 30px;
     height: 30px;
     margin-left: auto;
+  }
+  .dx-icon-button + .dx-icon-button {
+    margin-left: -12px;
   }
   .dx-tabbar {
     position: relative;
@@ -507,13 +532,13 @@
   width: 100%;
   max-width: calc(var(--dx-page) + 2 * var(--dx-gutter));
   min-height: 100%;
-  padding: var(--dx-page-top) var(--dx-gutter) 40px;
+  padding: var(--dx-page-top) var(--dx-gutter) var(--dx-space-section);
   margin: 0 auto;
 }
 .dx-head {
   display: flex;
   flex-shrink: 0;
-  gap: 14px;
+  gap: var(--dx-space-item);
   align-items: center;
   min-width: 0;
   min-height: 32px;
@@ -522,7 +547,7 @@
 .dx-head-title {
   display: inline-flex;
   flex-shrink: 0;
-  gap: 10px;
+  gap: var(--dx-space-tight);
   align-items: center;
   margin: 0;
   font: var(--dx-type-title);
@@ -549,7 +574,7 @@
 .dx-head-meta {
   display: flex;
   flex-shrink: 0;
-  gap: 10px;
+  gap: var(--dx-space-tight);
   align-items: center;
   font: var(--dx-type-label);
   font-variant-numeric: tabular-nums;
@@ -578,10 +603,10 @@
 .dx-empty {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--dx-space-item);
   align-items: center;
   justify-content: center;
-  padding: 56px 0;
+  padding: var(--dx-space-page) 0;
   text-align: center;
   animation: dx-enter 0.2s ease-out;
 }
@@ -616,11 +641,11 @@
 /* Loading, missing or failed: one line and a way out. */
 .dx-status {
   display: grid;
-  gap: 14px;
+  gap: var(--dx-space-item);
   place-content: center;
   justify-items: center;
   min-height: 200px;
-  padding: 40px 0;
+  padding: var(--dx-space-section) 0;
   color: var(--dx-muted);
   text-align: center;
 }
@@ -633,6 +658,7 @@
   padding-left: 10px;
   margin: 0;
   font: var(--dx-type-label);
+  line-height: var(--dx-wrap);
   color: var(--dx-red);
   border-left: 2px solid var(--dx-red);
 }
@@ -674,11 +700,40 @@
 }
 .dx-label {
   display: flex;
-  gap: 10px;
+  gap: var(--dx-space-tight);
   align-items: center;
   height: 16px;
   font: var(--dx-type-label);
   color: var(--dx-muted);
+}
+/* A section head names a group: label, then its meta after a dot. Space binds it to the content
+   below (tight) and parts it from the section above (section), so it needs no rule or box. */
+.dx-section-head {
+  align-self: stretch;
+  height: auto;
+  margin: 0 0 var(--dx-space-tight);
+  white-space: nowrap;
+}
+.dx-section-head > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--dx-fg);
+}
+.dx-section-meta::before {
+  margin-right: var(--dx-space-tight);
+  color: var(--dx-faint);
+  content: "·";
+}
+/* Inside a container that already spaces its children, the gap is the label's spacing. */
+:is(.dx-clues, .dx-entry-section) > .dx-section-head {
+  margin-bottom: 0;
+}
+.dx-section-end {
+  display: flex;
+  gap: var(--dx-space-tight);
+  align-items: center;
+  margin-left: auto;
 }
 .dx-label > [data-tone="todo"] {
   color: var(--dx-orange);
@@ -926,12 +981,15 @@
   grid-template-areas: "head" "read" "clues" "actions";
   grid-template-rows: auto minmax(0, 1fr) auto auto;
   grid-template-columns: minmax(0, 1fr);
-  gap: 12px;
+  gap: var(--dx-space-item);
   width: 100%;
   max-width: calc(var(--dx-page) + 2 * var(--dx-gutter));
   height: 100%;
   padding: var(--dx-page-top) var(--dx-gutter) 12px;
   margin: 0 auto;
+}
+/* A new lesson fades in under a header that stays put, as a review card does. */
+.dx-studio > :not(.dx-head) {
   animation: dx-enter 0.24s ease-out;
 }
 @keyframes dx-enter {
@@ -952,7 +1010,7 @@
   display: flex;
   flex-direction: column;
   grid-area: read;
-  gap: 8px;
+  gap: var(--dx-space-tight);
   align-items: center;
   min-height: 0;
 }
@@ -965,7 +1023,7 @@
 .dx-read-layout {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--dx-space-tight);
   align-items: center;
   justify-content: center;
   height: 100%;
@@ -973,7 +1031,7 @@
 @container read (aspect-ratio > 1.15) {
   .dx-read-layout {
     flex-direction: row;
-    gap: 18px;
+    gap: var(--dx-space-item);
   }
   .dx-read-layout > .dx-glyph-box {
     flex: 0 1 62%;
@@ -992,7 +1050,7 @@
 .dx-ident {
   display: grid;
   flex-shrink: 0;
-  gap: 3px;
+  gap: var(--dx-space-pair);
   justify-items: center;
   max-width: 100%;
   text-align: center;
@@ -1016,9 +1074,9 @@
 }
 .dx-sound {
   display: flex;
-  gap: 10px;
+  gap: var(--dx-space-tight);
   align-items: center;
-  margin-top: 6px;
+  margin-top: var(--dx-space-tight);
 }
 .dx-clues {
   position: relative;
@@ -1027,11 +1085,9 @@
   gap: 8px;
   min-width: 0;
 }
+/* Content sits on the page, not in boxes: rows are split by their own hairlines. */
 .dx-rows {
   overflow: hidden;
-  background: var(--dx-surface);
-  border: 1px solid var(--dx-line);
-  border-radius: var(--dx-radius);
 }
 .dx-rows-sound,
 .dx-rows-props {
@@ -1238,7 +1294,7 @@
 }
 .dx-words-item {
   display: flex;
-  gap: 10px;
+  gap: var(--dx-space-tight);
   align-items: baseline;
   min-width: 0;
   font: var(--dx-type-body);
@@ -1267,6 +1323,7 @@
 .dx-usage-empty {
   margin: 0;
   font: var(--dx-type-label);
+  line-height: var(--dx-wrap);
   color: var(--dx-faint);
 }
 .dx-usage-empty button {
@@ -1308,7 +1365,7 @@
 
 /* Word lessons: the gloss sits where the glyph would. */
 .dx-word-read {
-  gap: 22px;
+  gap: var(--dx-space-group);
   justify-content: center;
 }
 .dx-row[data-kind="link"] {
@@ -1336,17 +1393,17 @@
     grid-template-areas: "head head" "read ." "read clues" "read actions" "read .";
     grid-template-rows: auto minmax(0, 1fr) auto auto minmax(0, 1fr);
     grid-template-columns: minmax(0, 1fr) minmax(400px, 460px);
-    row-gap: 14px;
+    row-gap: var(--dx-space-item);
     column-gap: 48px;
     padding-bottom: 24px;
   }
   .dx-read {
     --glyph-max: 440px;
-    gap: 18px;
+    gap: var(--dx-space-item);
     justify-content: center;
   }
   .dx-read-layout {
-    gap: 18px;
+    gap: var(--dx-space-group);
   }
   .dx-read-layout > .dx-glyph-box {
     flex: 0 1 var(--glyph-max);
@@ -1365,8 +1422,8 @@
    height, and each clue is one line: code · name · category or meaning. */
 @media (max-width: 959px) {
   .dx-studio {
-    gap: 10px;
-    padding-top: 6px;
+    gap: var(--dx-space-tight);
+    padding-top: var(--dx-space-tight);
   }
   .dx-meaning {
     font-size: 28px;
@@ -1382,7 +1439,7 @@
   .dx-row {
     grid-template-rows: auto;
     grid-template-columns: 46px minmax(0, 1fr) auto;
-    column-gap: 10px;
+    column-gap: var(--dx-space-tight);
     align-items: center;
     height: 48px;
   }
@@ -1420,7 +1477,7 @@
 }
 @media (max-height: 680px) and (max-width: 959px) {
   .dx-studio {
-    gap: 7px;
+    gap: var(--dx-space-tight);
   }
   .dx-alt {
     display: none;
@@ -1468,7 +1525,7 @@
   --pad: min(calc(100vw - 48px), calc(100dvh - 190px), 480px);
   box-sizing: border-box;
   display: grid;
-  gap: 12px;
+  gap: var(--dx-space-item);
   justify-items: center;
   width: calc(var(--pad) + 28px);
   padding: 10px 14px 16px;
@@ -1480,7 +1537,7 @@
 .dx-writing > header {
   display: grid;
   grid-template-columns: 1fr auto auto;
-  gap: 10px;
+  gap: var(--dx-space-tight);
   align-items: center;
   width: 100%;
   font: var(--dx-type-label);
@@ -1634,10 +1691,11 @@
   left: 50%;
   z-index: 60;
   display: flex;
-  gap: 10px;
+  gap: var(--dx-space-tight);
   align-items: center;
   padding: 9px 14px;
   font: var(--dx-type-control);
+  line-height: var(--dx-wrap);
   color: var(--dx-fg);
   white-space: nowrap;
   pointer-events: none;
@@ -1681,7 +1739,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--dx-space-item);
   width: 100%;
   max-width: calc(var(--dx-page) + 2 * var(--dx-gutter));
   height: 100%;
@@ -1722,7 +1780,7 @@
 .dx-card-stage {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--dx-space-item);
   align-items: center;
   justify-content: center;
   min-height: 0;
@@ -1739,7 +1797,7 @@
 }
 .dx-gloss-col {
   display: grid;
-  gap: 6px;
+  gap: var(--dx-space-pair);
   justify-items: center;
   min-width: 0;
 }
@@ -1749,7 +1807,7 @@
 }
 .dx-gloss-py {
   display: inline-flex;
-  gap: 5px;
+  gap: var(--dx-space-pair);
   align-items: center;
   height: 26px;
   font: var(--dx-type-pinyin);
@@ -1794,7 +1852,7 @@
 .dx-sentence-prompt {
   display: grid;
   flex-shrink: 0;
-  gap: 14px;
+  gap: var(--dx-space-item);
   justify-items: center;
   max-width: 100%;
   text-align: center;
@@ -1909,11 +1967,11 @@
 .dx-scene-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--dx-space-tight);
   justify-content: center;
   max-height: 68px;
   padding: 0;
-  margin: 4px 0 0;
+  margin: var(--dx-space-pair) 0 0;
   overflow: hidden;
   list-style: none;
 }
@@ -1993,7 +2051,7 @@
 }
 /* Listen: the whole line stays visible; the cue flips between hearing and saying. */
 .dx-listen .dx-sentence-prompt {
-  gap: 10px;
+  gap: var(--dx-space-tight);
 }
 .dx-listen-meaning {
   max-width: 32ch;
@@ -2013,7 +2071,7 @@
 .dx-ratings {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
+  gap: var(--dx-space-tight);
 }
 .dx-rate {
   height: 56px;
@@ -2057,7 +2115,7 @@
   padding: 0;
 }
 .dx-empty > .dx-done-next {
-  margin: 18px 0 0;
+  margin: var(--dx-space-group) 0 0;
   font: var(--dx-type-control);
   color: var(--dx-muted);
 }
@@ -2084,6 +2142,7 @@
 .dx-review-error {
   margin: 0;
   font: var(--dx-type-label);
+  line-height: var(--dx-wrap);
   color: var(--dx-red);
   text-align: center;
 }
@@ -2097,7 +2156,7 @@
     height: 170px;
   }
   .dx-card-stage {
-    gap: 10px;
+    gap: var(--dx-space-tight);
   }
   .dx-scene-chips {
     max-height: 32px;
@@ -2112,10 +2171,15 @@
   display: grid;
   grid-template-areas: "head actions" "status status";
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px 16px;
+  gap: var(--dx-space-tight) var(--dx-space-item);
   align-items: center;
-  padding: 16px 0;
+  padding: calc(var(--dx-space-group) / 2) 0;
   border-bottom: 1px solid var(--dx-line);
+}
+/* A list ends without a line: the gap to the next group parts it. */
+.dx-set-row:has(+ .dx-section-head),
+.dx-set > .dx-set-row:last-child {
+  border-bottom: 0;
 }
 .dx-set-head {
   grid-area: head;
@@ -2126,17 +2190,19 @@
   font: var(--dx-type-heading);
 }
 .dx-set-head p {
-  margin: 3px 0 0;
+  margin: var(--dx-space-pair) 0 0;
   font: var(--dx-type-label);
+  line-height: var(--dx-wrap);
   color: var(--dx-muted);
 }
 .dx-set-status {
   display: flex;
   grid-area: status;
-  gap: 9px;
+  gap: var(--dx-space-tight);
   align-items: baseline;
   margin: 0;
   font: var(--dx-type-control);
+  line-height: var(--dx-wrap);
   color: var(--dx-fg);
 }
 .dx-set-status > i {
@@ -2166,7 +2232,7 @@
 .dx-set-actions {
   display: flex;
   grid-area: actions;
-  gap: 6px;
+  gap: var(--dx-space-tight);
   align-items: center;
   justify-content: flex-end;
 }
@@ -2175,7 +2241,7 @@
   font-weight: 400;
 }
 .dx-set-group:not(:first-child) {
-  margin-top: 30px;
+  margin-top: var(--dx-space-section);
 }
 .dx-set-meter {
   flex: none;
@@ -2195,7 +2261,7 @@
 /* ── Account ─────────────────────────────────────── */
 .dx-account {
   display: grid;
-  gap: 14px;
+  gap: var(--dx-space-item);
   max-width: 420px;
 }
 .dx-account-note {
@@ -2210,7 +2276,7 @@
 }
 .dx-field {
   display: grid;
-  gap: 6px;
+  gap: var(--dx-space-tight);
 }
 .dx-field > span {
   font: var(--dx-type-label);
@@ -2233,9 +2299,9 @@
 .dx-account-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 16px;
+  gap: var(--dx-space-tight) var(--dx-space-item);
   align-items: center;
-  margin-top: 4px;
+  margin-top: var(--dx-space-tight);
 }
 .dx-account-switch {
   font: var(--dx-type-label);
@@ -2273,8 +2339,8 @@
 /* ── Library ─────────────────────────────────────── */
 .dx-lib-controls {
   display: grid;
-  gap: 12px;
-  margin-bottom: 22px;
+  gap: var(--dx-space-item);
+  margin-bottom: var(--dx-space-group);
 }
 .dx-search {
   display: flex;
@@ -2342,12 +2408,12 @@
 .dx-lib-filters > div {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 14px;
+  gap: var(--dx-space-tight) var(--dx-space-item);
 }
 .dx-lib-filters fieldset {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: var(--dx-space-tight);
 }
 .dx-chip-toggle {
   position: relative;
@@ -2423,17 +2489,13 @@
   padding: 10px 8px;
   overflow: hidden;
   text-align: center;
-  background: var(--dx-surface);
-  border: 1px solid var(--dx-line);
   border-radius: var(--dx-radius);
   transition:
-    border-color 150ms,
     background 150ms,
     opacity 150ms;
 }
 .dx-tile:hover {
-  background: var(--dx-raised);
-  border-color: var(--dx-line-strong);
+  background: var(--dx-surface);
 }
 .dx-tile[data-kind="words"] {
   grid-column: span 2;
@@ -2538,26 +2600,41 @@
   border-color: var(--dx-line-strong);
 }
 .dx-lib-section {
-  padding-top: 22px;
+  padding-top: var(--dx-space-section);
   scroll-margin-top: 40px;
 }
+/* Group heads read like every section head: label, then its count after a dot. */
 .dx-lib-section > .dx-head {
-  margin-bottom: 12px;
+  gap: var(--dx-space-tight);
+  min-height: 0;
+  margin-bottom: var(--dx-space-tight);
+}
+.dx-lib-section > .dx-head:not(:has(.dx-progress)) > .dx-head-meta {
+  margin-left: 0;
+}
+.dx-lib-section > .dx-head:not(:has(.dx-progress)) > .dx-head-meta::before {
+  margin-right: var(--dx-space-tight);
+  color: var(--dx-faint);
+  content: "·";
+}
+.dx-lib-section:first-of-type {
+  padding-top: var(--dx-space-group);
 }
 .dx-lib-section-title {
   flex-shrink: 0;
   min-width: 2ch;
   margin: 0;
   font: var(--dx-type-label);
-  color: var(--dx-muted);
+  color: var(--dx-fg);
   white-space: nowrap;
 }
 .dx-lib-sentinel {
   height: 1px;
 }
 .dx-lib-credit {
-  margin: 28px 0 0;
+  margin: var(--dx-space-section) 0 0;
   font: var(--dx-type-label);
+  line-height: var(--dx-wrap);
   color: var(--dx-faint);
   text-align: center;
 }
@@ -2568,7 +2645,7 @@
 @media (max-width: 520px) {
   .dx-wall {
     --tile: 78px;
-    --wall-gap: 6px;
+    --wall-gap: var(--dx-space-tight);
   }
   .dx-tile {
     min-height: 98px;
@@ -2598,9 +2675,9 @@
 }
 .dx-entry-hero {
   display: grid;
-  gap: 18px;
+  gap: var(--dx-space-group);
   justify-items: center;
-  padding-bottom: 28px;
+  padding-bottom: var(--dx-space-group);
   text-align: center;
 }
 .dx-entry-glyph {
@@ -2612,7 +2689,7 @@
 }
 .dx-entry-def {
   display: grid;
-  gap: 10px;
+  gap: var(--dx-space-tight);
   justify-items: center;
 }
 .dx-entry-def .dx-meaning {
@@ -2624,7 +2701,7 @@
 }
 .dx-senses {
   display: grid;
-  gap: 4px;
+  gap: var(--dx-space-pair);
   max-width: 46ch;
   padding: 0;
   margin: 0;
@@ -2643,7 +2720,8 @@
 .dx-senses li.dx-senses-more {
   counter-increment: none;
 }
-.dx-senses li.dx-senses-more::before {
+.dx-senses li.dx-senses-more::before,
+.dx-senses li:only-child::before {
   content: none;
 }
 .dx-senses-more button {
@@ -2652,8 +2730,8 @@
 }
 .dx-entry-section {
   display: grid;
-  gap: 12px;
-  margin-top: 26px;
+  gap: var(--dx-space-tight);
+  margin-top: var(--dx-space-section);
 }
 .dx-static {
   display: flex;
@@ -2674,15 +2752,14 @@
   color: var(--dx-muted);
 }
 .dx-entry-link {
-  padding: 14px 16px;
+  padding: 12px 0;
   color: var(--dx-fg);
-  background: var(--dx-surface);
-  border: 1px solid var(--dx-line);
-  border-radius: var(--dx-radius);
+  border-bottom: 1px solid var(--dx-line);
 }
 .dx-entry-empty {
   margin: 0;
   font: var(--dx-type-control);
+  line-height: var(--dx-wrap);
   color: var(--dx-faint);
 }
 .dx-entry-word .dx-gloss-hanzi {
@@ -2691,7 +2768,7 @@
 @media (min-width: 760px) {
   .dx-entry-hero {
     grid-template-columns: 300px minmax(0, 1fr);
-    gap: 40px;
+    gap: var(--dx-space-section);
     align-items: center;
     justify-items: start;
     text-align: left;
@@ -2708,26 +2785,19 @@
 .dx-pal-list {
   display: grid;
   overflow: hidden;
-  background: var(--dx-surface);
-  border: 1px solid var(--dx-line);
-  border-radius: var(--dx-radius);
 }
-.dx-pal-group h3 {
-  padding: 14px 16px 6px;
-  margin: 0;
-  font: var(--dx-type-label);
-  color: var(--dx-muted);
-  border-top: 1px solid var(--dx-line);
+.dx-pal-group > .dx-section-head {
+  margin: var(--dx-space-section) 0 var(--dx-space-tight);
 }
-.dx-pal-group:first-child h3 {
-  border-top: 0;
+.dx-pal-group:first-child > .dx-section-head {
+  margin-top: 0;
 }
 .dx-pal-row {
   --k: var(--dx-faint);
   position: relative;
   display: grid;
   grid-template-columns: 52px minmax(0, 1fr) auto 16px;
-  gap: 12px;
+  gap: var(--dx-space-item);
   align-items: center;
   min-height: 54px;
   padding: 6px 14px 6px 8px;
@@ -2773,7 +2843,7 @@ a.dx-pal-row:hover {
 }
 .dx-pal-text {
   display: grid;
-  gap: 2px;
+  gap: var(--dx-space-pair);
   min-width: 0;
 }
 .dx-pal-name {
@@ -2802,9 +2872,10 @@ a.dx-pal-row:hover {
   font-size: var(--dx-text-xs);
   color: var(--dx-muted);
 }
+/* Under the code, clear of the divider below the row. */
 .dx-pal-bar {
   position: absolute;
-  bottom: 0;
+  bottom: var(--dx-space-tight);
   left: 0;
   height: 2px;
   overflow: hidden;
@@ -2825,9 +2896,9 @@ a.dx-pal-row:hover {
   --k: var(--dx-faint);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 22px;
+  gap: var(--dx-space-group);
   align-items: center;
-  padding: 8px 0 6px;
+  padding: var(--dx-space-tight) 0;
 }
 .dx-clue-hero[data-kind="cast"] {
   --k: var(--dx-blue);
@@ -2887,7 +2958,7 @@ a.dx-pal-row:hover {
 @media (max-width: 520px) {
   .dx-pal-row {
     grid-template-columns: 44px minmax(0, 1fr) auto 14px;
-    gap: 10px;
+    gap: var(--dx-space-tight);
   }
   .dx-pal-count small {
     display: none;
@@ -2909,7 +2980,7 @@ a.dx-pal-row:hover {
 .dx-scores {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: var(--dx-space-item);
   margin-top: 8px;
 }
 .dx-scores > p {
@@ -2938,7 +3009,7 @@ a.dx-pal-row:hover {
   color: var(--dx-green);
 }
 .dx-pro-group {
-  margin: 34px 0 14px;
+  margin: var(--dx-space-section) 0 var(--dx-space-tight);
   font-weight: 400;
 }
 /* A week per column, a day per cell; each cell hosts a dither-kit gradient. */
@@ -2993,8 +3064,8 @@ a.dx-pal-row:hover {
 .dx-pro-facts {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 22px;
-  margin: 16px 0 30px;
+  gap: var(--dx-space-tight) var(--dx-space-group);
+  margin: var(--dx-space-item) 0 var(--dx-space-section);
   font: var(--dx-type-control);
   color: var(--dx-muted);
 }
@@ -3004,16 +3075,14 @@ a.dx-pal-row:hover {
 }
 .dx-pro-row {
   display: flex;
-  gap: 12px;
+  gap: var(--dx-space-item);
   align-items: center;
   justify-content: space-between;
   min-height: 56px;
-  padding: 16px 0;
+  padding: calc(var(--dx-space-group) / 2) 0;
   font: var(--dx-type-control);
   font-variant-numeric: tabular-nums;
   color: var(--dx-faint);
-  border-top: 1px solid var(--dx-line);
-  border-bottom: 1px solid var(--dx-line);
 }
 .dx-pro-row > span:last-child {
   display: inline-flex;
@@ -3048,4 +3117,305 @@ a.dx-pal-row:hover {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+/* ── Review grades, summary and Today ─────────── */
+/* ── Today ───────────────────────────────────────── */
+/* Next up, wide, beside later today, narrow. Three sizes: the next item's character and count are
+   the only large things; list titles are 16px; labels are the mono label size. One-line text gets
+   a line box its own size, so the spacing tokens are the gaps you see. */
+.dx-today {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--dx-space-section);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .dx-today {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+}
+/* Next up: the page's one raised surface. It reaches into the gutter by its padding on wide
+   screens, so its text lines up with the page title; on a phone it sits inside the gutters. */
+.dx-next {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dx-space-item);
+  padding: var(--dx-space-group);
+  background: var(--dx-surface);
+  border-radius: 14px;
+}
+@media (min-width: 768px) {
+  .dx-next {
+    margin-left: calc(var(--dx-space-group) * -1);
+  }
+}
+.dx-next > .dx-section-head.dx-label {
+  margin: 0;
+}
+.dx-next-hero {
+  display: flex;
+  gap: var(--dx-space-group);
+  align-items: flex-end;
+  min-width: 0;
+}
+.dx-next-glyph {
+  flex: none;
+  font-size: 96px;
+  line-height: 1;
+}
+.dx-next-what {
+  display: grid;
+  gap: var(--dx-space-tight);
+  min-width: 0;
+  padding-bottom: var(--dx-space-tight);
+  margin: 0;
+}
+.dx-next-num {
+  font: var(--dx-type-display);
+  font-size: 40px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  /* Trim the empty space above the figures so the gaps around them are the tokens. */
+  text-box: trim-both cap alphabetic;
+}
+.dx-next-what > span {
+  font: var(--dx-type-body);
+  line-height: 1;
+  color: var(--dx-muted);
+}
+.dx-next-title {
+  font: var(--dx-type-display);
+  font-size: var(--dx-text-2xl);
+  line-height: 1;
+}
+.dx-next-what .dx-py,
+.dx-next-pinyin {
+  font: var(--dx-type-control);
+  font-size: var(--dx-text-lg);
+  line-height: 1;
+}
+.dx-next-queue {
+  display: flex;
+  gap: var(--dx-space-item);
+  padding: 0;
+  margin: 0;
+  overflow-x: clip;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--dx-muted);
+  white-space: nowrap;
+  list-style: none;
+}
+.dx-next-queue > li {
+  flex: none;
+}
+.dx-next-sentence {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+}
+.dx-next-done {
+  margin: 0;
+  font: var(--dx-type-body);
+  color: var(--dx-muted);
+}
+.dx-next > .dx-action {
+  margin-top: var(--dx-space-tight);
+}
+/* Later today: a list, so hairlines split the rows; each row is one link. */
+.dx-later > .dx-section-head.dx-label {
+  margin-bottom: var(--dx-space-tight);
+}
+.dx-later-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.dx-later-list > :where(li) + :where(li) {
+  box-shadow: inset 0 1px 0 var(--dx-line);
+}
+.dx-later-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  column-gap: var(--dx-space-item);
+  align-items: center;
+  padding: calc(var(--dx-space-group) / 2) var(--dx-space-tight);
+  margin-inline: calc(var(--dx-space-tight) * -1);
+  border-radius: var(--dx-radius);
+  transition: background 150ms;
+}
+.dx-later-row:hover {
+  background: var(--dx-surface);
+}
+.dx-later-lead {
+  font-size: 28px;
+  line-height: 1;
+  color: var(--dx-muted);
+  text-align: center;
+}
+.dx-later-body {
+  display: grid;
+  gap: var(--dx-space-tight);
+  min-width: 0;
+}
+.dx-later-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font: var(--dx-type-label);
+  line-height: 1;
+  color: var(--dx-muted);
+  white-space: nowrap;
+}
+.dx-later-title {
+  display: flex;
+  gap: var(--dx-space-tight);
+  align-items: baseline;
+  min-width: 0;
+  overflow: hidden;
+  font: var(--dx-type-heading);
+  line-height: 1;
+  white-space: nowrap;
+}
+.dx-later-title .dx-py {
+  font: var(--dx-type-control);
+  line-height: 1;
+}
+.dx-later-title .dx-py-tone {
+  width: 14px;
+  height: 10px;
+  margin-left: var(--dx-space-pair);
+}
+.dx-later-quiet {
+  font: var(--dx-type-body);
+  line-height: 1;
+  color: var(--dx-muted);
+}
+.dx-later-sentence {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+}
+.dx-later-days {
+  display: flex;
+  gap: 6px;
+}
+.dx-later-day {
+  display: grid;
+  gap: var(--dx-space-pair);
+  justify-items: center;
+  font: var(--dx-type-micro);
+  color: var(--dx-faint);
+}
+.dx-later-day > i {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  overflow: hidden;
+  background: var(--dx-raised);
+  border-radius: 4px;
+}
+.dx-later-day[data-today="true"] > i {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--dx-blue);
+}
+@media (max-width: 767px) {
+  .dx-next {
+    padding: 20px;
+  }
+  .dx-next-glyph {
+    font-size: 80px;
+  }
+}
+
+/* When the card comes back after this grade. */
+.dx-rate > :where(span) > em {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font: var(--dx-type-micro);
+  font-style: normal;
+}
+
+.dx-scene-chips > li > button {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  height: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+}
+.dx-scene-chips > li:has(> button[aria-pressed="true"]),
+.dx-scene-chips > li:has(> button:hover) {
+  border-color: var(--part);
+}
+
+/* End of a review: how many, the cards that slipped and when they return. */
+.dx-recap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  text-align: center;
+}
+.dx-recap > h2:not(.dx-section-head) {
+  margin: 0;
+  font: var(--dx-type-display);
+  font-size: 40px;
+  letter-spacing: -0.025em;
+}
+.dx-recap > .dx-section-head.dx-label {
+  width: min(440px, 100%);
+  margin: var(--dx-space-group) 0 var(--dx-space-tight);
+}
+.dx-recap-slipped {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dx-space-item);
+  justify-content: center;
+  max-width: 560px;
+  max-height: 180px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  list-style: none;
+}
+.dx-recap-slipped > li {
+  display: grid;
+  gap: var(--dx-space-tight);
+  justify-items: center;
+}
+.dx-recap-slipped > li > span {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  min-width: 56px;
+  height: 60px;
+  padding: 0 4px 10px;
+  font-size: 30px;
+  line-height: 1;
+}
+.dx-recap-bar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+}
+.dx-recap-slipped > li > small {
+  font: var(--dx-type-label);
+  color: var(--dx-muted);
+}
+.dx-recap > .dx-done-next {
+  margin: var(--dx-space-group) 0 0;
+  font: var(--dx-type-control);
+  color: var(--dx-muted);
 }

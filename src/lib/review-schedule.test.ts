@@ -9,8 +9,10 @@ import {
 import { deriveDashboard } from "./learner-views";
 import {
   compareReviewOrder,
+  previewDue,
   reviewDueAt,
   scheduleReview,
+  waitLabel,
 } from "./review-schedule";
 
 const review = (state: LearnerState, rating: number, reviewedAt: string) =>
@@ -122,4 +124,38 @@ test("due learning steps precede established reviews, which precede newly introd
     "recent",
     "new",
   ]);
+});
+
+test("each grade's preview is where grading would actually put the card", () => {
+  const start = new Date("2026-09-01T02:00:00.000Z");
+  const established = scheduleReview(
+    createEmptyCard(start),
+    start,
+    Rating.Easy
+  );
+  const now = new Date(established.due.getTime() + 3_600_000);
+  const preview = previewDue(established, now);
+  for (const grade of [
+    Rating.Again,
+    Rating.Hard,
+    Rating.Good,
+    Rating.Easy,
+  ] as const) {
+    expect(preview.get(grade)).toEqual(
+      scheduleReview(established, now, grade).due
+    );
+  }
+  expect(waitLabel(now, preview.get(Rating.Again) as Date)).toBe("10 min");
+});
+
+test("waits read in minutes, then hours within the day, then Shanghai calendar days", () => {
+  const now = new Date("2026-09-23T02:00:00.000Z");
+  const later = (ms: number) => new Date(now.getTime() + ms);
+  expect(waitLabel(now, later(30_000))).toBe("1 min");
+  expect(waitLabel(now, later(10 * 60_000))).toBe("10 min");
+  expect(waitLabel(now, later(5 * 3_600_000))).toBe("5 h");
+  // Due at the start of the next Shanghai day, 14 hours away, is tomorrow.
+  expect(waitLabel(now, new Date("2026-09-23T16:00:00.000Z"))).toBe("1 day");
+  expect(waitLabel(now, new Date("2026-10-04T16:00:00.000Z"))).toBe("12 days");
+  expect(waitLabel(now, new Date("2026-12-23T16:00:00.000Z"))).toBe("3 mo");
 });

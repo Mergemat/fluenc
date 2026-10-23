@@ -1,6 +1,6 @@
 // Every route sits in the pull-to-refresh scroller. Study routes (/lessons, /review) get a stage
 // exactly the scroller's height, so they never scroll. Older pages use the shared colour tokens.
-// Desktop gets a sidebar (navigation, course progress, settings) so pages keep the full height;
+// Desktop gets a sidebar (navigation, course progress, profile, settings) so pages keep the full height;
 // tablets get a top bar and phones a tab bar.
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
@@ -11,6 +11,7 @@ import {
   GraduationCap,
   LibraryBig,
   Settings,
+  Sun,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useHydrated } from "../hooks/use-hydrated";
@@ -28,13 +29,19 @@ import { BrandMark } from "./ui/brand-mark";
 import { PixelLoader, Rule } from "./ui/dither";
 import { SplitMeter } from "./ui/split-meter";
 
-// Learn is the home page and sits in the middle of the bar.
+// Today is the home page; the activities follow in the order Today suggests them.
 const navigation = [
-  { to: "/reading", label: "read", icon: BookOpen },
+  { to: "/today", label: "today", icon: Sun },
   { to: "/review", label: "review", icon: Brain },
   { to: "/lessons", label: "learn", icon: GraduationCap },
+  { to: "/reading", label: "read", icon: BookOpen },
   { to: "/library", label: "library", icon: LibraryBig },
+] as const;
+
+/** Profile and settings sit apart from the activities: under the sidebar, or as icons up top. */
+const corner = [
   { to: "/profile", label: "profile", icon: CircleUserRound },
+  { to: "/settings", label: "settings", icon: Settings },
 ] as const;
 
 /** How far through the course the learner is, learned and learning; shown in the desktop sidebar. */
@@ -113,7 +120,7 @@ export function AppShell({
         </span>
       )}
       <header className="dx-top">
-        <Link aria-label="Fluenc home" className="dx-brand" to="/lessons">
+        <Link aria-label="Fluenc home" className="dx-brand" to="/today">
           <BrandMark />
           <span>fluenc</span>
         </Link>
@@ -151,28 +158,31 @@ export function AppShell({
           ))}
         </nav>
         <CourseProgress />
-        <Link
-          activeProps={{ "aria-current": "page" }}
-          aria-label="Settings"
-          className="dx-icon-button dx-settings-link"
-          to="/settings"
-        >
-          {({ isActive }) => (
-            <>
-              {isActive ? (
-                <DitherGradient
-                  cell={2}
-                  direction="up"
-                  from="blue"
-                  opacity={0.45}
-                />
-              ) : null}
-              <Settings size={16} strokeWidth={1.75} />
-              <span className="dx-nav-label">settings</span>
-              <SyncMark />
-            </>
-          )}
-        </Link>
+        {corner.map((item) => (
+          <Link
+            activeProps={{ "aria-current": "page" }}
+            aria-label={item.label}
+            className="dx-icon-button dx-settings-link"
+            key={item.to}
+            to={item.to}
+          >
+            {({ isActive }) => (
+              <>
+                {isActive ? (
+                  <DitherGradient
+                    cell={2}
+                    direction="up"
+                    from="blue"
+                    opacity={0.45}
+                  />
+                ) : null}
+                <item.icon size={16} strokeWidth={1.75} />
+                <span className="dx-nav-label">{item.label}</span>
+                {item.to === "/settings" ? <SyncMark /> : null}
+              </>
+            )}
+          </Link>
+        ))}
         <Rule className="dx-edge dx-edge-bottom" />
       </header>
       <main className="dx-main" data-fixed={fixed}>

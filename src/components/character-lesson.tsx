@@ -31,7 +31,6 @@ import {
 import type { CharacterItem, Cue } from "./character-studio/types";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
-import { Rule } from "./ui/dither";
 import {
   AudioButton,
   HanziGlyph,
@@ -39,7 +38,7 @@ import {
   UsageHanzi,
   useUsage,
 } from "./ui/hanzi";
-import { PageHeader } from "./ui/layout";
+import { PageHeader, SectionHead } from "./ui/layout";
 import { partColor } from "./ui/part-colors";
 import { useToast } from "./ui/toast";
 import { WritingModal } from "./writing-modal";
@@ -550,9 +549,11 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
       </section>
 
       <section aria-label="Clues" className="dx-clues">
-        <div className="dx-label">
-          <span>{direct ? "prop" : "clues"}</span>
-          <Rule />
+        <SectionHead
+          label={direct ? "prop" : "clues"}
+          meta={missing.length ? `${missing.length} to name` : "ready"}
+          tone={missing.length ? "todo" : "done"}
+        >
           {item.movie.componentNote ? (
             <button
               aria-expanded={noteOpen}
@@ -564,10 +565,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
               <Info size={12} /> shape
             </button>
           ) : null}
-          <span data-tone={missing.length ? "todo" : "done"}>
-            {missing.length ? `${missing.length} to name` : "ready"}
-          </span>
-        </div>
+        </SectionHead>
         <div className="dx-rows">
           {direct ? null : (
             <div className="dx-rows-sound">

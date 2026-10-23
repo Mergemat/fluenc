@@ -248,3 +248,25 @@ test("no introduced material leads to learning rather than an invented review se
   expect(host.textContent).toContain("start your first lesson");
   expect(host.querySelector(".dx-card")).toBeNull();
 });
+
+test("a card graded hard is listed at the end with the wait its button showed", async () => {
+  let data = fixture();
+  await show(data, "recap");
+  await reveal();
+  const hard = expectDefined(
+    [...host.querySelectorAll("button")].find((candidate) =>
+      candidate.textContent?.includes("with effort")
+    )
+  );
+  const wait = expectDefined(hard.querySelector("em")?.textContent);
+  await act(() => hard.click());
+  data = rate(data, "s0", Rating.Hard);
+  await show(data, "recap");
+  expect(host.querySelector(".dx-card")).toBeNull();
+  const recap = expectDefined(host.querySelector(".dx-recap"));
+  expect(recap.textContent).toContain("1 reviewed");
+  expect(recap.textContent).toContain("look at these again");
+  expect(recap.querySelector(".dx-recap-slipped")?.textContent).toBe(
+    `你好。${wait}`
+  );
+});

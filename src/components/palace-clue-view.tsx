@@ -9,8 +9,7 @@ import { getToneDetail } from "../lib/tones";
 import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
 import { Tile } from "./library-view";
 import { clueRows } from "./palace-rows";
-import { Rule } from "./ui/dither";
-import { Page, PageHeader, Status } from "./ui/layout";
+import { Page, PageHeader, SectionHead, Status } from "./ui/layout";
 
 const kindLabel: Record<ClueKind, string> = {
   cast: "actor",
@@ -179,11 +178,7 @@ export function PalaceClueView({
         </p>
       )}
       <section aria-label="Characters" className="dx-entry-section">
-        <div className="dx-label">
-          <span>in characters</span>
-          <Rule />
-          <span>{characters.length}</span>
-        </div>
+        <SectionHead label="in characters" meta={characters.length} />
         <div className="dx-wall">
           {characters.map((character) => (
             <Tile
