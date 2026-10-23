@@ -1,361 +1,318 @@
 import { afterAll, beforeEach, expect, mock, test } from "bun:test";
 import "fake-indexeddb/auto";
-import { QueryClient } from "@tanstack/react-query";
 import { openDB } from "idb";
-import { State } from "ts-fsrs";
 
-import { emptyLearnerState, type LearnerState } from "../lib/learner-state";
-import { deriveDashboard } from "../lib/learner-views";
-import { expectDefined } from "../test/expect-defined";
+import {
+  emptyLearnerState,
+  type LearnerPatch,
+  type LearnerState,
+} from "../lib/learner-state";
+import type { SyncResponse } from "../server/sync.contract";
 
-const stateRequest = mock(async (): Promise<LearnerState> => emptyLearnerState);
-const enrollRequest = mock(async (_input: unknown): Promise<unknown> => ({}));
-const reviewRequest = mock(async (_input: unknown): Promise<unknown> => ({}));
-mock.module("../server/curriculum", () => ({
-  getLearnerState: stateRequest,
-  enrollItem: enrollRequest,
-  reviewItem: reviewRequest,
-  saveMovie: mock(async () => ({})),
-  saveLivingLink: mock(async () => ({})),
-}));
-
-const {
-  flushProgress,
-  getCachedLearner,
-  getOfflineLearner,
-  hasPendingProgress,
-  persistLearner,
-  saveEnrollment,
-  saveReview,
-  seedLearner,
-} = await import("./progress");
-const { learnerQueryOptions, loadLearner } = await import("./queries");
 const originalWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
 const originalNavigator = Object.getOwnPropertyDescriptor(
   globalThis,
   "navigator"
 );
+const originalFetch = globalThis.fetch;
 Object.defineProperty(globalThis, "window", { configurable: true, value: {} });
 Object.defineProperty(globalThis, "navigator", {
   configurable: true,
   value: { onLine: true },
 });
 
-const snapshot = (state: LearnerState = emptyLearnerState) => ({
-  state,
-  at: Date.now(),
-});
-const dashboard = (data: { state: LearnerState; at: number } | null) => {
-  const current = expectDefined(data);
-  return deriveDashboard(current.state, new Date(current.at));
-};
-const cardIds = (data: { state: LearnerState } | null) =>
-  Object.keys(data?.state.cards ?? {});
-const withStory = (story: string): LearnerState => ({
-  ...emptyLearnerState,
-  livingLinks: { 5: story },
-});
-
-async function clearDatabase() {
-  const database = await openDB("fluenc-offline", 1);
-  await database.clear("outbox");
-  await database.clear("cache");
-  database.close();
-}
-
-beforeEach(async () => {
-  Object.defineProperty(globalThis, "navigator", {
-    configurable: true,
-    value: { onLine: true },
-  });
-  stateRequest.mockReset().mockImplementation(async () => emptyLearnerState);
-  enrollRequest.mockReset().mockImplementation(async () => ({}));
-  reviewRequest.mockReset().mockImplementation(async () => ({}));
-  await persistLearner(snapshot());
-  await clearDatabase();
-  await persistLearner(snapshot());
-});
-
-afterAll(() => {
-  if (originalWindow) {
-    Object.defineProperty(globalThis, "window", originalWindow);
-  } else {
-    Reflect.deleteProperty(globalThis, "window");
-  }
-  if (originalNavigator) {
-    Object.defineProperty(globalThis, "navigator", originalNavigator);
-  } else {
-    Reflect.deleteProperty(globalThis, "navigator");
-  }
-  mock.restore();
-});
-
-test("a stalled server does not hold up enrollment, rating, or the next card", async () => {
-  const started = Promise.withResolvers<void>();
-  const response = Promise.withResolvers<unknown>();
-  enrollRequest.mockImplementationOnce(() => {
-    started.resolve();
-    return response.promise;
-  });
-  await saveEnrollment({ itemType: "sentence", itemId: "s01" });
-  const flush = flushProgress();
-  await started.promise;
-  try {
-    const next = await saveEnrollment({ itemType: "sentence", itemId: "s02" });
-    expect(dashboard(next).reviewQueue.map((item) => item.id)).toEqual([
-      "s01",
-      "s02",
-    ]);
-    const rated = await saveReview({
-      itemType: "sentence",
-      itemId: "s01",
-      rating: 3,
-      durationMs: 100,
+// A device from before accounts: its copy of the shared learner and one unsent review.
+const legacy = await openDB("fluenc-offline", 1, {
+  upgrade(database) {
+    database.createObjectStore("cache", { keyPath: "key" });
+    database.createObjectStore("outbox", {
+      keyPath: "sequence",
+      autoIncrement: true,
     });
-    expect(dashboard(rated).reviewQueue.map((item) => item.id)).toEqual([
-      "s02",
-    ]);
-    expect(dashboard(rated).scheduledQueue[0]?.reps).toBe(1);
-    expect(
-      dashboard(await getCachedLearner()).reviewQueue.map((item) => item.id)
-    ).toEqual(["s02"]);
-    expect(
-      dashboard(await getOfflineLearner()).reviewQueue.map((item) => item.id)
-    ).toEqual(["s02"]);
-    expect(stateRequest).not.toHaveBeenCalled();
-  } finally {
-    response.resolve({});
-    await flush;
-  }
-  expect(await hasPendingProgress()).toBe(false);
-  expect(enrollRequest).toHaveBeenCalledTimes(2);
-  expect(reviewRequest).toHaveBeenCalledTimes(1);
+  },
 });
-
-test("a late state response cannot restore a card even after its save has synced", async () => {
-  const started = Promise.withResolvers<void>();
-  const response = Promise.withResolvers<LearnerState>();
-  stateRequest.mockImplementationOnce(() => {
-    started.resolve();
-    return response.promise;
-  });
-  const fetch = getOfflineLearner();
-  await started.promise;
-  await saveEnrollment({ itemType: "sentence", itemId: "s01" });
-  await flushProgress();
-  expect(await hasPendingProgress()).toBe(false);
-  response.resolve(emptyLearnerState);
-  expect(cardIds(await fetch)).toEqual(["sentence:s01"]);
-  expect(cardIds(await getCachedLearner())).toEqual(["sentence:s01"]);
+await legacy.put("cache", {
+  key: "learner-v1",
+  value: {
+    ...emptyLearnerState,
+    cards: {
+      "sentence:s01": serverCardShape(),
+      "sentence:s02": serverCardShape(),
+    },
+    livingLinks: { 5: "we stand together" },
+  },
 });
-
-test("failed sync retains ordered operations and retries the same review event", async () => {
-  await saveEnrollment({ itemType: "sentence", itemId: "s01" });
-  await saveReview({
-    itemType: "sentence",
-    itemId: "s01",
-    rating: 4,
-    durationMs: 100,
-  });
-  reviewRequest.mockRejectedValueOnce(
-    new Error("Connection lost after sending")
-  );
-  expect(await flushProgress()).toBe(1);
-  expect(await hasPendingProgress()).toBe(true);
-  expect(dashboard(await getCachedLearner()).reviewQueue).toHaveLength(0);
-  expect(await flushProgress()).toBe(1);
-  expect(reviewRequest.mock.calls[0]).toEqual(reviewRequest.mock.calls[1]);
-  expect(await hasPendingProgress()).toBe(false);
-});
-
-test("concurrent local saves and a stale persisted snapshot do not lose progress", async () => {
-  await Promise.all([
-    saveEnrollment({ itemType: "sentence", itemId: "s01" }),
-    saveEnrollment({ itemType: "sentence", itemId: "s02" }),
-  ]);
-  await persistLearner(snapshot());
-  expect(cardIds(await getCachedLearner()).sort()).toEqual([
-    "sentence:s01",
-    "sentence:s02",
-  ]);
-});
-
-test("offline saves advance locally and can be synchronized after reconnecting", async () => {
-  Object.defineProperty(globalThis, "navigator", {
-    configurable: true,
-    value: { onLine: false },
-  });
-  await saveEnrollment({ itemType: "sentence", itemId: "s01" });
-  await saveReview({
-    itemType: "sentence",
-    itemId: "s01",
-    rating: 1,
-    durationMs: 100,
-  });
-  expect(await flushProgress()).toBe(0);
-  const waiting = dashboard(await getOfflineLearner());
-  expect(waiting.reviewQueue).toHaveLength(0);
-  expect(waiting.scheduledQueue.map((item) => item.id)).toEqual(["s01"]);
-  expect(Date.parse(expectDefined(waiting.nextReviewAt))).toBeGreaterThan(
-    Date.now()
-  );
-  expect(enrollRequest).not.toHaveBeenCalled();
-  Object.defineProperty(globalThis, "navigator", {
-    configurable: true,
-    value: { onLine: true },
-  });
-  expect(await flushProgress()).toBe(2);
-});
-
-test("cancelled requests cannot write their response into the offline cache", async () => {
-  const started = Promise.withResolvers<void>();
-  const response = Promise.withResolvers<LearnerState>();
-  stateRequest.mockImplementationOnce(() => {
-    started.resolve();
-    return response.promise;
-  });
-  const controller = new AbortController();
-  const fetch = getOfflineLearner(controller.signal);
-  const rejected = fetch.catch((error: unknown) => error);
-  await started.promise;
-  controller.abort();
-  response.resolve(withStory("late"));
-  expect(await rejected).toBeInstanceOf(Error);
-  expect((await getCachedLearner())?.state.livingLinks).toEqual({});
-});
-
-test("cold offline startup restores the last synced state without contacting the server", async () => {
-  await saveEnrollment({ itemType: "sentence", itemId: "s01" });
-  await saveReview({
+await legacy.add("outbox", {
+  kind: "review",
+  data: {
+    eventId: "old-review-1",
     itemType: "sentence",
     itemId: "s01",
     rating: 3,
-    durationMs: 100,
-  });
-  await flushProgress();
-  expect(await hasPendingProgress()).toBe(false);
-  Object.defineProperty(globalThis, "navigator", {
-    configurable: true,
-    value: { onLine: false },
-  });
-  const client = new QueryClient();
-  try {
-    await loadLearner(client);
-    const restored = dashboard(
-      client.getQueryData(learnerQueryOptions.queryKey) ?? null
-    );
-    expect(restored.reviewQueue).toHaveLength(0);
-    expect(restored.scheduledQueue[0]?.id).toBe("s01");
-    expect(stateRequest).not.toHaveBeenCalled();
-  } finally {
-    client.clear();
-  }
+    durationMs: 0,
+    reviewedAt: "2026-10-01T08:00:00.000Z",
+  },
 });
+legacy.close();
 
-test("cold startup opens cached lessons while a network refresh is still pending", async () => {
-  await persistLearner(snapshot(withStory("cached")));
-  const started = Promise.withResolvers<void>();
-  const response = Promise.withResolvers<LearnerState>();
-  stateRequest.mockImplementationOnce(() => {
-    started.resolve();
-    return response.promise;
-  });
-  const client = new QueryClient();
-  try {
-    await loadLearner(client);
-    await started.promise;
-    expect(
-      client.getQueryData(learnerQueryOptions.queryKey)?.state.livingLinks[5]
-    ).toBe("cached");
-    expect(client.isFetching()).toBe(1);
-    response.resolve(withStory("fresh"));
-    await client.fetchQuery(learnerQueryOptions);
-    expect(
-      client.getQueryData(learnerQueryOptions.queryKey)?.state.livingLinks[5]
-    ).toBe("fresh");
-  } finally {
-    response.resolve(emptyLearnerState);
-    client.clear();
-  }
-});
+const {
+  clearProgress,
+  countPending,
+  readLearner,
+  readOutgoing,
+  saveEnrollment,
+  saveReview,
+} = await import("./progress");
+const migrated = await readLearner();
+const migratedQueue = await readOutgoing(10);
+const { getSyncStatus, syncNow } = await import("./sync");
 
-test("seeding stores learner state only when none is cached", async () => {
-  await clearDatabase();
-  await seedLearner(snapshot(withStory("seeded")));
-  await seedLearner(snapshot(withStory("ignored")));
-  expect((await getCachedLearner())?.state.livingLinks[5]).toBe("seeded");
-});
+const learner = { id: "user-1", email: "learner@example.com" };
+const emptyPatch: LearnerPatch = {
+  cards: {},
+  actors: {},
+  sets: {},
+  rooms: {},
+  props: {},
+  livingLinks: {},
+  focus: [],
+  removedFocus: [],
+};
 
-test("progress cached by an older version migrates to learner state, even offline", async () => {
-  await clearDatabase();
-  const card = {
-    due: "2026-09-24T16:00:00.000Z",
+interface SentBody {
+  cursor: number | null;
+  learner: string | null;
+  operations: { id: string; kind: string; data: { itemId?: string } }[];
+}
+const requests: SentBody[] = [];
+
+/** A server that acknowledges what it is sent and answers with `respond`'s patch. */
+function serve(
+  respond: (
+    body: SentBody
+  ) => Partial<SyncResponse> | Promise<Partial<SyncResponse>>,
+  statusCode = 200
+) {
+  globalThis.fetch = mock(
+    async (_url: string | URL | Request, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)) as SentBody;
+      requests.push(body);
+      if (statusCode !== 200) {
+        return Response.json({ error: "no" }, { status: statusCode });
+      }
+      const answer = await respond(body);
+      return Response.json({
+        learner,
+        acknowledged: body.operations.map((operation) => operation.id),
+        cursor: 1,
+        reset: body.cursor === null,
+        patch: emptyPatch,
+        ...answer,
+      } satisfies SyncResponse);
+    }
+  ) as unknown as typeof fetch;
+}
+
+const cardIds = (state: LearnerState) => Object.keys(state.cards).toSorted();
+const serverCard = serverCardShape();
+function serverCardShape() {
+  return {
+    due: "2026-10-01T00:00:00.000Z",
     stability: 3,
     difficulty: 5,
     elapsedDays: 0,
-    scheduledDays: 1,
+    scheduledDays: 3,
     learningSteps: 0,
-    reps: 2,
+    reps: 4,
     lapses: 0,
-    state: State.Review,
-    lastReview: "2026-09-23T02:00:00.000Z",
+    state: 2,
+    lastReview: "2026-09-28T00:00:00.000Z",
+    introducedAt: "2026-09-01T00:00:00.000Z",
   };
-  const database = await openDB("fluenc-offline", 1);
-  await database.put("cache", {
-    key: "lessons-v3:dashboard",
-    value: {
-      reviewQueue: [],
-      lockedWords: [],
-      scheduledQueue: [{ type: "sentence", id: "s01", card }],
-      buildQueue: [
-        {
-          type: "character",
-          id: "马",
-          movie: {
-            actorKey: "m",
-            actorName: "Mia",
-            finalKey: "a",
-            setName: "Garden",
-            tone: 3,
-            roomName: "Bedroom",
-            components: [{ hanzi: "马", propName: "horse" }],
-          },
-        },
-      ],
+}
+
+beforeEach(async () => {
+  requests.length = 0;
+  Object.defineProperty(globalThis, "navigator", {
+    configurable: true,
+    value: { onLine: true },
+  });
+  await clearProgress();
+});
+
+afterAll(() => {
+  globalThis.fetch = originalFetch;
+  for (const [key, original] of [
+    ["window", originalWindow],
+    ["navigator", originalNavigator],
+  ] as const) {
+    if (original) {
+      Object.defineProperty(globalThis, key, original);
+    } else {
+      Reflect.deleteProperty(globalThis, key);
+    }
+  }
+});
+
+test("progress and unsent saves from before accounts carry over", () => {
+  expect(cardIds(migrated.state)).toEqual(["sentence:s01", "sentence:s02"]);
+  expect(migrated.state.livingLinks[5]).toBe("we stand together");
+  // The old save keeps its id, so the server applies it once even if it was half sent.
+  expect(migratedQueue.operations).toEqual([
+    {
+      id: "old-review-1",
+      at: "2026-10-01T08:00:00.000Z",
+      kind: "review",
+      data: {
+        itemType: "sentence",
+        itemId: "s01",
+        rating: 3,
+        durationMs: 0,
+        reviewedAt: "2026-10-01T08:00:00.000Z",
+      },
     },
-  });
-  await database.put("cache", {
-    key: "lessons-v3:library",
-    value: { words: [{ id: "5", livingLink: "we stand together" }] },
-  });
-  database.close();
+  ]);
+  expect(migratedQueue.cursor).toBeNull();
+});
+
+test("a device that has never been online saves and shows progress", async () => {
   Object.defineProperty(globalThis, "navigator", {
     configurable: true,
     value: { onLine: false },
   });
-
-  const migrated = await getCachedLearner();
-  expect(migrated?.state).toEqual({
-    cards: { "sentence:s01": card },
-    focus: [],
-    actors: { m: "Mia" },
-    sets: { a: "Garden" },
-    rooms: {},
-    props: { 马: "horse" },
-    livingLinks: { 5: "we stand together" },
-  });
-  const reopened = await openDB("fluenc-offline", 1);
-  expect(await reopened.getAllKeys("cache")).toEqual(["learner-v1"]);
-  reopened.close();
+  const saved = await saveEnrollment({ itemType: "sentence", itemId: "s01" });
+  expect(cardIds(saved.state)).toEqual(["sentence:s01"]);
+  expect(cardIds((await readLearner()).state)).toEqual(["sentence:s01"]);
+  expect(await countPending()).toBe(1);
+  expect(await syncNow()).toBe(false);
+  expect(getSyncStatus().phase).toBe("offline");
 });
 
-test("without local state, unsynced saves are replayed on the server state", async () => {
+test("signing in sends the device's progress and adopts the account's", async () => {
   await saveEnrollment({ itemType: "sentence", itemId: "s01" });
-  const database = await openDB("fluenc-offline", 1);
-  await database.clear("cache");
-  database.close();
-  stateRequest.mockImplementationOnce(async () => withStory("remote"));
-  const restored = await getOfflineLearner();
-  expect(cardIds(restored)).toEqual(["sentence:s01"]);
-  expect(restored.state.livingLinks[5]).toBe("remote");
+  serve(() => ({
+    // The account already had a card from another device.
+    patch: { ...emptyPatch, cards: { "sentence:s02": serverCard } },
+  }));
+  expect(await syncNow()).toBe(true);
+  expect(requests[0]?.cursor).toBeNull();
+  expect(requests[0]?.operations.map((operation) => operation.kind)).toEqual([
+    "enroll",
+  ]);
+  // The server's answer is the whole account, which already includes what was sent.
+  expect(cardIds((await readLearner()).state)).toEqual(["sentence:s02"]);
+  expect(await countPending()).toBe(0);
+  expect(getSyncStatus()).toMatchObject({ signedIn: true, learner });
+});
+
+test("a save made while a sync is on its way survives the answer", async () => {
+  const answer = Promise.withResolvers<void>();
+  const arrived = Promise.withResolvers<void>();
+  serve(async () => {
+    arrived.resolve();
+    await answer.promise;
+    return { patch: { ...emptyPatch, cards: { "sentence:s02": serverCard } } };
+  });
+  const sync = syncNow();
+  await arrived.promise;
+  await saveEnrollment({ itemType: "sentence", itemId: "s01" });
+  answer.resolve();
+  await sync;
+
+  const { state } = await readLearner();
+  expect(cardIds(state)).toEqual(["sentence:s01", "sentence:s02"]);
+  expect(await countPending()).toBe(1);
+});
+
+test("a review saved during a sync applies on top of the server's newer card", async () => {
+  serve(() => ({
+    cursor: 5,
+    patch: { ...emptyPatch, cards: { "sentence:s02": serverCard } },
+  }));
+  await syncNow();
+
+  // Another device reviewed the card; this device reviews it while its next sync is out.
+  const newer = {
+    ...serverCard,
+    reps: 9,
+    lastReview: "2026-09-30T00:00:00.000Z",
+  };
+  const answer = Promise.withResolvers<void>();
+  const arrived = Promise.withResolvers<void>();
+  serve(async () => {
+    arrived.resolve();
+    await answer.promise;
+    return {
+      cursor: 7,
+      patch: { ...emptyPatch, cards: { "sentence:s02": newer } },
+    };
+  });
+  const sync = syncNow();
+  await arrived.promise;
+  await saveReview({
+    itemType: "sentence",
+    itemId: "s02",
+    rating: 3,
+    durationMs: 100,
+  });
+  answer.resolve();
+  await sync;
+
+  expect(requests.at(-1)?.cursor).toBe(5);
+  expect((await readLearner()).state.cards["sentence:s02"]?.reps).toBe(10);
+  expect(await countPending()).toBe(1);
+});
+
+test("a full queue goes out in batches", async () => {
+  for (let index = 0; index < 205; index += 1) {
+    // biome-ignore lint/performance/noAwaitInLoops: saves queue in the order they are made.
+    await saveEnrollment({ itemType: "sentence", itemId: `s${index}` });
+  }
+  serve(() => ({}));
+  expect(await syncNow()).toBe(true);
+  expect(requests.map((request) => request.operations.length)).toEqual([
+    200, 5,
+  ]);
+  expect(await countPending()).toBe(0);
+});
+
+test("a signed-out device keeps its progress until it signs in again", async () => {
+  await saveEnrollment({ itemType: "sentence", itemId: "s01" });
+  serve(() => ({}), 401);
+  expect(await syncNow()).toBe(false);
+  expect(getSyncStatus().signedIn).toBe(false);
+  expect(await countPending()).toBe(1);
+  expect(cardIds((await readLearner()).state)).toEqual(["sentence:s01"]);
+});
+
+test("progress from another account is replaced by this account's", async () => {
+  serve(() => ({
+    patch: { ...emptyPatch, cards: { "sentence:s09": serverCard } },
+  }));
+  await syncNow();
+  let calls = 0;
+  globalThis.fetch = mock(
+    (_url: string | URL | Request, init?: RequestInit) => {
+      calls += 1;
+      const body = JSON.parse(String(init?.body)) as SentBody;
+      requests.push(body);
+      if (calls === 1) {
+        return Promise.resolve(
+          Response.json({ error: "another account" }, { status: 409 })
+        );
+      }
+      return Promise.resolve(
+        Response.json({
+          learner: { ...learner, id: "user-2" },
+          acknowledged: [],
+          cursor: 3,
+          reset: true,
+          patch: { ...emptyPatch, cards: { "sentence:s01": serverCard } },
+        } satisfies SyncResponse)
+      );
+    }
+  ) as unknown as typeof fetch;
+  expect(await syncNow()).toBe(true);
+  expect(requests.at(-1)).toMatchObject({ cursor: null, learner: null });
+  expect(cardIds((await readLearner()).state)).toEqual(["sentence:s01"]);
 });

@@ -17,7 +17,6 @@ const review = (state: LearnerState, rating: number, reviewedAt: string) =>
   applyOperation(state, {
     kind: "review",
     data: {
-      eventId: crypto.randomUUID(),
       itemType: "sentence",
       itemId: "s01",
       rating,

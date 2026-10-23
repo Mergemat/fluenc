@@ -153,7 +153,6 @@ function rate(
       {
         kind: "review",
         data: {
-          eventId: crypto.randomUUID(),
           itemType: "sentence",
           itemId: id,
           rating,

@@ -5,7 +5,7 @@ import {
   applyOperation,
   emptyLearnerState,
   type LearnerState,
-  type ProgressOperation,
+  type ProgressChange,
 } from "./learner-state";
 import { deriveDashboard, deriveLibrary } from "./learner-views";
 
@@ -37,7 +37,7 @@ const learnAt = (
       applyOperation(next, {
         kind: "enroll",
         data: { itemType, itemId, enrolledAt },
-      } satisfies ProgressOperation),
+      } satisfies ProgressChange),
     state
   );
 const learn = (
@@ -83,7 +83,13 @@ test("focus is taught in the order it was added", () => {
 test("a word missing from the course becomes the learner's own word when its characters are in it", () => {
   const state = {
     ...emptyLearnerState,
-    focus: [entry("word", "中国", "zhōngguó", "China")],
+    // The server splits the pinyin per character before a device sees the entry.
+    focus: [
+      {
+        ...entry("word", "中国", "zhōngguó", "China"),
+        syllables: ["zhōng", "guó"],
+      },
+    ],
   };
   expect(build(state).slice(0, 2).toSorted()).toEqual(["中", "国"].toSorted());
 
