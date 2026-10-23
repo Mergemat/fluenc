@@ -1,0 +1,17 @@
+{
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
+  },
+  "files.readonlyInclude": {
+    "src/routeTree.gen.ts": true,
+    "src/data/*.generated.json": true
+  },
+  "search.exclude": {
+    "public/hanzi": true,
+    "src/data/*.json": true,
+    "drizzle/meta": true
+  }
+}

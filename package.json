@@ -18,14 +18,18 @@
     "data:sync": "bun scripts/sync-curriculum.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:reset": "bun scripts/setup.ts --reset",
+    "db:seed": "bun scripts/seed.ts",
     "db:studio": "drizzle-kit studio",
     "dev": "vite dev",
     "doctor": "react-doctor",
     "fix": "ultracite fix",
     "focus": "bun scripts/focus.ts",
     "preview": "bun scripts/preview.ts",
+    "setup": "bun scripts/setup.ts",
     "test": "bun test",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify": "bun run check && bun run typecheck && bun test && bun run build"
   },
   "dependencies": {
     "@better-auth/drizzle-adapter": "^1.7.12",
@@ -79,5 +83,6 @@
     "ultracite": "7.12.4",
     "vite": "^8.3.2",
     "workbox-build": "^7.4.1"
-  }
+  },
+  "packageManager": "bun@1.3.14"
 }
