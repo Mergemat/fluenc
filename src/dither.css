@@ -2874,11 +2874,51 @@ a.dx-pal-row:hover {
 .dx-split {
   max-width: none;
 }
+.dx-pro-row {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 16px 0;
+  margin: 0;
+  font: var(--dx-text-sm) var(--dx-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--dx-faint);
+  border-bottom: 1px solid var(--dx-line);
+}
+.dx-pro-row > span:last-child {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+}
+.dx-pro-row :is(h2, .dx-pro-name) {
+  margin: 0;
+  font: 400 var(--dx-text-xl) var(--dx-pixel);
+  color: var(--dx-fg);
+}
+a.dx-pro-row:hover {
+  color: var(--dx-muted);
+}
+.dx-pro-num {
+  font-weight: 500;
+  color: var(--dx-fg);
+}
+.dx-wall-chars {
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--dx-line);
+}
+.dx-wall-chars > .dx-pro-row {
+  padding-bottom: 6px;
+  border-bottom: 0;
+}
 .dx-pro-key {
   display: flex;
-  gap: 16px;
-  margin: 0 0 6px;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0 0 18px;
   font: var(--dx-text-xs) var(--dx-mono);
+  font-variant-numeric: tabular-nums;
   color: var(--dx-muted);
 }
 .dx-pro-key > span {
@@ -2890,81 +2930,67 @@ a.dx-pal-row:hover {
   width: 7px;
   height: 7px;
   content: "";
+  background: var(--cell);
   border-radius: 2px;
 }
-.dx-pro-key > [data-tone="learned"]::before {
-  background: var(--dx-green);
+/* One pixel per character; a block per milestone, labelled with the count it reaches. */
+:is(.dx-pro-key > span, .dx-cells > i) {
+  --cell: var(--dx-raised);
 }
-.dx-pro-key > [data-tone="learning"]::before {
-  background: var(--dx-orange);
+:is(.dx-pro-key > span, .dx-cells > i)[data-tone="review"],
+.dx-cells > i[data-status="review"] {
+  --cell: var(--dx-green);
 }
-.dx-pro-track {
+:is(.dx-pro-key > span, .dx-cells > i)[data-tone="learning"],
+.dx-cells > i[data-status="learning"] {
+  --cell: var(--dx-orange);
+}
+.dx-pro-key > [data-tone="new"] {
+  --cell: var(--dx-line-strong);
+}
+.dx-blocks {
   display: grid;
-  gap: 12px;
-  padding: 22px 0;
-  border-bottom: 1px solid var(--dx-line);
+  gap: 10px;
 }
-.dx-pro-track > header {
+.dx-block {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+.dx-block-label {
+  font: var(--dx-text-2xs) / 10px var(--dx-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--dx-faint);
+  text-align: right;
+}
+.dx-block[data-reached="true"] > .dx-block-label {
+  color: var(--dx-fg);
+}
+.dx-cells {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 3px;
 }
-.dx-pro-track h2 {
-  margin: 0;
-  font: 400 var(--dx-text-xl) var(--dx-pixel);
+.dx-cells > i {
+  width: 10px;
+  height: 10px;
+  background: var(--cell);
+  border-radius: 2px;
 }
-.dx-pro-track > header > span,
-.dx-pro-palace > span:nth-child(2) {
-  font: var(--dx-text-sm) var(--dx-mono);
-  font-variant-numeric: tabular-nums;
-  color: var(--dx-faint);
-}
-.dx-pro-num {
-  font-weight: 500;
-  color: var(--dx-fg);
-}
-/* One bar cut at the milestones: each piece fills on its way to the next one. */
-.dx-steps {
-  display: grid;
-  grid-auto-columns: minmax(0, 1fr);
-  grid-auto-flow: column;
-  gap: 4px;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-.dx-step {
-  display: grid;
-  gap: 7px;
-}
-.dx-step > .dx-progress {
-  max-width: none;
-  height: 8px;
-}
-.dx-step-label {
-  justify-self: end;
-  font: var(--dx-text-2xs) var(--dx-mono);
-  font-variant-numeric: tabular-nums;
-  color: var(--dx-faint);
-}
-.dx-step[data-reached="true"] > .dx-step-label {
-  color: var(--dx-fg);
-}
-.dx-pro-palace {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto 16px;
-  gap: 12px;
-  align-items: center;
-  min-height: 64px;
-  color: var(--dx-muted);
-  transition: color 150ms;
-}
-.dx-pro-palace > span:first-child {
-  font: 400 var(--dx-text-xl) var(--dx-pixel);
-  color: var(--dx-fg);
-}
-.dx-pro-palace:hover {
-  color: var(--dx-fg);
+@media (max-width: 520px) {
+  .dx-block {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 8px;
+  }
+  .dx-cells {
+    gap: 2px;
+  }
+  .dx-cells > i {
+    width: 7px;
+    height: 7px;
+    border-radius: 1.5px;
+  }
 }
 
 /* ── Form controls ───────────────────────────────── */

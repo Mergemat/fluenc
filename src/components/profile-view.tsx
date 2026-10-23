@@ -1,13 +1,13 @@
-// The learner's own page: characters, words and sentences, each a bar divided at its milestones,
-// and a way into the memory palace. Derived from the cached progress, so it works offline.
+// The learner's own page: every course character as one pixel on a wall, cut into blocks at the
+// milestones, then words, sentences and the memory palace as a line each. Derived from the cached
+// progress, so it works offline.
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 
-import type { Milestone, ProgressTrack } from "../lib/profile";
+import type { Milestone, ProfileData } from "../lib/profile";
 import { profileQueryOptions } from "../offline/queries";
 import { useSyncStatus } from "../offline/sync";
-import { DitherGradient } from "./dither-kit/gradient";
 import { Page, PageHeader, Status } from "./ui/layout";
 
 const dayFormat = new Intl.DateTimeFormat("en-GB", {
@@ -15,41 +15,17 @@ const dayFormat = new Intl.DateTimeFormat("en-GB", {
   month: "short",
 });
 
-const share = (part: number, size: number) =>
-  `${Math.min(Math.max(part / size, 0), 1) * 100}%`;
-
-/** The stretch of a track between the previous milestone and this one. */
-function Segment({
-  from,
+function Block({
   milestone,
-  track,
+  cells,
 }: {
-  from: number;
   milestone: Milestone;
-  track: ProgressTrack;
+  cells: ProfileData["wall"];
 }) {
-  const size = milestone.target - from;
-  const learned = track.learned - from;
-  const started = track.learned + track.learning - from;
   return (
-    <li className="dx-step" data-reached={milestone.reached}>
-      <span className="dx-progress">
-        <DitherGradient cell={2} direction="right" from="grey" opacity={0.5} />
-        <span
-          className="dx-progress-fill"
-          style={{ width: share(started, size) }}
-        >
-          <DitherGradient cell={2} direction="left" from="orange" />
-        </span>
-        <span
-          className="dx-progress-fill"
-          style={{ width: share(learned, size) }}
-        >
-          <DitherGradient cell={2} direction="left" from="green" />
-        </span>
-      </span>
+    <div className="dx-block" data-reached={milestone.reached}>
       <span
-        className="dx-step-label"
+        className="dx-block-label"
         title={
           milestone.reachedAt
             ? `reached ${dayFormat.format(new Date(milestone.reachedAt))}`
@@ -58,36 +34,52 @@ function Segment({
       >
         {milestone.target}
       </span>
-    </li>
+      <span className="dx-cells">
+        {cells.map((cell) => (
+          <i
+            data-status={cell.status}
+            key={cell.id}
+            title={`${cell.hanzi} ${cell.keyword}`}
+          />
+        ))}
+      </span>
+    </div>
   );
 }
 
-function Track({ track }: { track: ProgressTrack }) {
-  const started = track.learned + track.learning;
-  const next = track.milestones.find((milestone) => !milestone.reached);
+function Wall({ data }: { data: ProfileData }) {
+  const track = data.tracks.find((item) => item.id === "characters");
+  if (!track) {
+    return null;
+  }
   return (
-    <section aria-labelledby={`track-${track.id}`} className="dx-pro-track">
-      <header>
-        <h2 id={`track-${track.id}`}>{track.label}</h2>
+    <section aria-labelledby="wall-title" className="dx-wall-chars">
+      <header className="dx-pro-row">
+        <h2 id="wall-title">characters</h2>
         <span>
-          <b className="dx-pro-num">{started}</b>/{track.total}
+          <b className="dx-pro-num">{track.learned + track.learning}</b>/
+          {track.total}
         </span>
       </header>
-      <ol
-        aria-label={`${track.label}: ${track.learned} learned, ${track.learning} learning${
-          next ? `, ${next.target - next.progress} to the next milestone` : ""
-        }`}
-        className="dx-steps"
-      >
+      <p className="dx-pro-key">
+        <span data-tone="review">{track.learned} learned</span>
+        <span data-tone="learning">{track.learning} learning</span>
+        <span data-tone="new">
+          {track.total - track.learned - track.learning} new
+        </span>
+      </p>
+      <div aria-hidden="true" className="dx-blocks">
         {track.milestones.map((milestone, index) => (
-          <Segment
-            from={track.milestones[index - 1]?.target ?? 0}
+          <Block
+            cells={data.wall.slice(
+              track.milestones[index - 1]?.target ?? 0,
+              milestone.target
+            )}
             key={milestone.key}
             milestone={milestone}
-            track={track}
           />
         ))}
-      </ol>
+      </div>
     </section>
   );
 }
@@ -110,19 +102,24 @@ export function ProfileView() {
   return (
     <Page>
       <PageHeader meta={<Link to="/settings">{who}</Link>} title="profile" />
-      <p aria-hidden="true" className="dx-pro-key">
-        <span data-tone="learned">learned</span>
-        <span data-tone="learning">learning</span>
-      </p>
-      {tracks.map((track) => (
-        <Track key={track.id} track={track} />
-      ))}
-      <Link className="dx-pro-palace" to="/profile/palace">
-        <span>memory palace</span>
+      <Wall data={profile.data} />
+      {tracks
+        .filter((track) => track.id !== "characters")
+        .map((track) => (
+          <p className="dx-pro-row" key={track.id}>
+            <span className="dx-pro-name">{track.label}</span>
+            <span>
+              <b className="dx-pro-num">{track.learned + track.learning}</b>/
+              {track.total}
+            </span>
+          </p>
+        ))}
+      <Link className="dx-pro-row" to="/profile/palace">
+        <span className="dx-pro-name">memory palace</span>
         <span>
           <b className="dx-pro-num">{palace.named}</b>/{palace.total} named
+          <ChevronRight aria-hidden="true" size={15} />
         </span>
-        <ChevronRight aria-hidden="true" size={15} />
       </Link>
     </Page>
   );

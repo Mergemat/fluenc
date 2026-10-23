@@ -90,3 +90,15 @@ test("progress saved before dates were recorded still reaches its milestones", (
   });
   expect(deriveProfile(withoutDates(3)).since).toBe(hour(3));
 });
+
+test("the character wall starts with met characters in the order they were met", () => {
+  const state = introduce(["你", "我"]);
+  const { wall } = deriveProfile(state);
+
+  expect(wall.slice(0, 2).map((item) => [item.id, item.status])).toEqual([
+    ["你", "learning"],
+    ["我", "learning"],
+  ]);
+  expect(wall.slice(2).every((item) => item.status === "new")).toBe(true);
+  expect(wall).toHaveLength(catalog.characters.length);
+});
