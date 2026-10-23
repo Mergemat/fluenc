@@ -169,5 +169,4 @@ test("reading offers the newest word's sentences first, and listening plays back
     "about-liking",
     "about-eating",
   ]);
-  expect(dashboard.listenQueue.map((item) => item.id)).toEqual(["about-me"]);
 });

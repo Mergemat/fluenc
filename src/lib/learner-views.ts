@@ -386,23 +386,6 @@ export function deriveDashboard(
     ],
     lockedWords,
     getQueue,
-    // Sentences already read and shadowed: what Listen plays back.
-    listenQueue: items.flatMap((item) => {
-      const sentence =
-        item.type === "sentence"
-          ? catalog.sentencesById.get(item.id)
-          : undefined;
-      return sentence
-        ? [
-            {
-              id: sentence.id,
-              hanzi: sentence.hanzi,
-              pinyin: sentence.pinyin,
-              meaning: sentence.meaning,
-            },
-          ]
-        : [];
-    }),
     scheduledQueue,
     nextReviewAt: scheduledQueue.reduce<string | null>(
       (earliest, item) =>
