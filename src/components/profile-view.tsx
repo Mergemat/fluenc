@@ -1,101 +1,88 @@
-// The learner's own page: every course character as one pixel on a wall, cut into blocks at the
-// milestones, then words, sentences and the memory palace as a line each. Derived from the cached
-// progress, so it works offline.
+// The learner's own page: how many characters, words and sentences they have met, a year of
+// activity, and a way into the memory palace. Derived from the cached progress, so it works
+// offline.
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 
-import type { Milestone, ProfileData } from "../lib/profile";
+import {
+  type ActivityDay,
+  activityCalendar,
+  activityStreaks,
+  countThisWeek,
+} from "../lib/activity";
 import { profileQueryOptions } from "../offline/queries";
 import { useSyncStatus } from "../offline/sync";
 import { DitherGradient } from "./dither-kit/gradient";
-import type { PixelColor } from "./dither-kit/pixel";
+import { Rule } from "./ui/dither";
 import { Page, PageHeader, Status } from "./ui/layout";
 
-const dayFormat = new Intl.DateTimeFormat("en-GB", {
-  day: "numeric",
-  month: "short",
-});
+const WEEKS = 52;
+const monthFormat = new Intl.DateTimeFormat("en-GB", { month: "short" });
+const levelOpacity = [0.22, 0.45, 0.65, 0.85, 1];
+const levels = [0, 1, 2, 3, 4];
 
-const cellColor: Record<ProfileData["wall"][number]["status"], PixelColor> = {
-  review: "green",
-  learning: "orange",
-  new: "grey",
-};
+/** GitHub-style shade: nothing, 1–2, 3–5, 6–8, more. */
+function levelOf(count: number) {
+  if (count === 0) {
+    return 0;
+  }
+  if (count <= 2) {
+    return 1;
+  }
+  if (count <= 5) {
+    return 2;
+  }
+  return count <= 8 ? 3 : 4;
+}
 
-function Block({
-  milestone,
-  cells,
-}: {
-  milestone: Milestone;
-  cells: ProfileData["wall"];
-}) {
+function Cell({ level }: { level: number }) {
   return (
-    <div className="dx-block" data-reached={milestone.reached}>
-      <span
-        className="dx-block-label"
-        title={
-          milestone.reachedAt
-            ? `reached ${dayFormat.format(new Date(milestone.reachedAt))}`
-            : undefined
-        }
-      >
-        {milestone.target}
-      </span>
-      <span className="dx-cells">
-        {cells.map((cell) => (
-          <i
-            data-status={cell.status}
-            key={cell.id}
-            title={`${cell.hanzi} ${cell.keyword}`}
-          >
-            <DitherGradient
-              cell={1}
-              direction="up"
-              from={cellColor[cell.status]}
-              opacity={cell.status === "new" ? 0.45 : 1}
-            />
-          </i>
-        ))}
-      </span>
-    </div>
+    <DitherGradient
+      cell={1}
+      direction="up"
+      from={level ? "green" : "grey"}
+      opacity={levelOpacity[level]}
+    />
   );
 }
 
-function Wall({ data }: { data: ProfileData }) {
-  const track = data.tracks.find((item) => item.id === "characters");
-  if (!track) {
-    return null;
-  }
+/** One column per week, newest on the right; on a phone it scrolls, opening at this week. */
+function ActivityGraph({ weeks }: { weeks: ActivityDay[][] }) {
   return (
-    <section aria-labelledby="wall-title" className="dx-wall-chars">
-      <header className="dx-pro-row">
-        <h2 id="wall-title">characters</h2>
-        <span>
-          <b className="dx-pro-num">{track.learned + track.learning}</b>/
-          {track.total}
-        </span>
-      </header>
-      <p className="dx-pro-key">
-        <span data-tone="review">{track.learned} learned</span>
-        <span data-tone="learning">{track.learning} learning</span>
-        <span data-tone="new">
-          {track.total - track.learned - track.learning} new
-        </span>
-      </p>
-      <div aria-hidden="true" className="dx-blocks">
-        {track.milestones.map((milestone, index) => (
-          <Block
-            cells={data.wall.slice(
-              track.milestones[index - 1]?.target ?? 0,
-              milestone.target
-            )}
-            key={milestone.key}
-            milestone={milestone}
-          />
-        ))}
+    <div className="dx-activity">
+      <div className="dx-activity-grid">
+        <div aria-hidden="true" className="dx-activity-months">
+          {weeks.map((week, index) => {
+            const month = week[0]?.date.getMonth();
+            const starts =
+              index > 0 && month !== weeks[index - 1]?.[0]?.date.getMonth();
+            return (
+              <span key={week[0]?.key}>
+                {starts && week[0]
+                  ? monthFormat.format(week[0].date).toLowerCase()
+                  : null}
+              </span>
+            );
+          })}
+        </div>
+        <div className="dx-activity-weeks">
+          {weeks.map((week) => (
+            <div className="dx-activity-week" key={week[0]?.key}>
+              {week.map((day) => (
+                <i
+                  data-future={day.future}
+                  key={day.key}
+                  title={`${day.key} · ${day.count} new`}
+                >
+                  {day.future ? null : <Cell level={levelOf(day.count)} />}
+                </i>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -113,22 +100,52 @@ export function ProfileView() {
       </Page>
     );
   }
-  const { tracks, palace } = profile.data;
+  const { tracks, introductions, palace } = profile.data;
+  const today = new Date();
+  const weeks = activityCalendar(introductions, today, WEEKS);
+  const streaks = activityStreaks(introductions, today);
   return (
     <Page>
       <PageHeader meta={<Link to="/settings">{who}</Link>} title="profile" />
-      <Wall data={profile.data} />
-      {tracks
-        .filter((track) => track.id !== "characters")
-        .map((track) => (
-          <p className="dx-pro-row" key={track.id}>
-            <span className="dx-pro-name">{track.label}</span>
-            <span>
-              <b className="dx-pro-num">{track.learned + track.learning}</b>/
-              {track.total}
-            </span>
-          </p>
-        ))}
+      <div className="dx-scores">
+        {tracks.map((track) => {
+          const added = countThisWeek(track.introducedAt, today);
+          return (
+            <p key={track.id}>
+              <b className="dx-score">{track.learned + track.learning}</b>
+              <span>{track.label}</span>
+              <small data-added={added > 0}>
+                {added ? `+${added} this week` : "none this week"}
+              </small>
+            </p>
+          );
+        })}
+      </div>
+      <h2 className="dx-label dx-pro-group">
+        <span>activity</span>
+        <Rule />
+        <span aria-hidden="true" className="dx-activity-key">
+          less
+          {levels.map((level) => (
+            <i key={level}>
+              <Cell level={level} />
+            </i>
+          ))}
+          more
+        </span>
+      </h2>
+      <ActivityGraph weeks={weeks} />
+      <p className="dx-pro-facts">
+        <span>
+          <b className="dx-pro-num">{streaks.current}</b> day streak
+        </span>
+        <span>
+          <b className="dx-pro-num">{streaks.longest}</b> longest
+        </span>
+        <span>
+          <b className="dx-pro-num">{streaks.activeDays}</b> days learning
+        </span>
+      </p>
       <Link className="dx-pro-row" to="/profile/palace">
         <span className="dx-pro-name">memory palace</span>
         <span>
