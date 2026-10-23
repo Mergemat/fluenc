@@ -1,9 +1,11 @@
 import "dotenv/config";
 
 import { createHash } from "node:crypto";
+import { getRequest } from "@tanstack/react-start/server";
 import { BlobNotFoundError, head, put } from "@vercel/blob";
 
 import type { PronunciationInput } from "./audio.contract";
+import { auth } from "./auth.server";
 
 const OUTPUT_FORMAT = "mp3_44100_128";
 const PRONUNCIATION_VERSION = 7;
@@ -49,7 +51,19 @@ async function getCachedAudioUrl(pathname: string) {
 // Text that already ends a sentence; anything else gets a full stop so it is read as one.
 const SENTENCE_END = /[。！？!?]$/;
 
+// Each new text costs ElevenLabs credits, so only the app's own signed-in pages may ask.
+async function assertSignedInApp() {
+  const request = getRequest();
+  if (request.headers.get("origin") !== new URL(request.url).origin) {
+    throw new Error("Invalid origin");
+  }
+  if (!(await auth.api.getSession({ headers: request.headers }))) {
+    throw new Error("Sign in to play audio");
+  }
+}
+
 export async function getPronunciationAudioHandler(data: PronunciationInput) {
+  await assertSignedInApp();
   const apiKey = process.env.ELEVENLABS_API_KEY;
   const voiceId = process.env.ELEVENLABS_VOICE_ID;
   if (!(apiKey && voiceId)) {
