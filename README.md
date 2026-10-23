@@ -2,6 +2,8 @@
 
 A Mandarin study app for reading Chinese characters, built on the Hanzi Movie Method by Mandarin Blueprint. Fluenc is an independent project and is not affiliated with or endorsed by Mandarin Blueprint.
 
+![Fluenc's today, review, learn and library screens](.github/screenshot.png)
+
 It covers about 1,000 of the most common spoken words and the 750 characters they use. Each part is its own activity, done whenever you like:
 
 - **Lessons** teach the next character or word whose parts you already know. You build a Hanzi Movie for each character from your actors, sets and props.
@@ -10,8 +12,6 @@ It covers about 1,000 of the most common spoken words and the 750 characters the
 - **Focus** puts words from a class you're taking at the front of the queue.
 
 Progress is stored on the device first and syncs to your account when you're online, so the app works offline once installed. A daily push notification can remind you to review.
-
-[CONTEXT.md](CONTEXT.md) defines the terms the code uses.
 
 ## Stack
 

@@ -11,3 +11,4 @@ dist
 *.db-shm
 *.db-wal
 src/routeTree.gen.ts
+docs
