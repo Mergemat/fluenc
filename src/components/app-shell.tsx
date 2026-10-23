@@ -2,11 +2,12 @@
 // exactly the scroller's height, so they never scroll. Older pages use the shared colour tokens.
 // Desktop gets a sidebar (navigation, course progress, settings) so pages keep the full height;
 // tablets get a top bar and phones a tab bar.
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
   BookOpen,
   Brain,
-  Clapperboard,
+  CircleUserRound,
   GraduationCap,
   LibraryBig,
   Settings,
@@ -15,6 +16,7 @@ import type { ReactNode } from "react";
 import { useHydrated } from "../hooks/use-hydrated";
 
 import type { DashboardData } from "../lib/learner-views";
+import { profileQueryOptions } from "../offline/queries";
 import {
   type SyncAttention,
   syncAttention,
@@ -24,6 +26,7 @@ import { AppScroll } from "./app-scroll";
 import { DitherGradient } from "./dither-kit/gradient";
 import { BrandMark } from "./ui/brand-mark";
 import { PixelLoader, Rule } from "./ui/dither";
+import { SplitMeter } from "./ui/split-meter";
 
 // Learn is the home page and sits in the middle of the bar.
 const navigation = [
@@ -31,60 +34,36 @@ const navigation = [
   { to: "/review", label: "review", icon: Brain },
   { to: "/lessons", label: "learn", icon: GraduationCap },
   { to: "/library", label: "library", icon: LibraryBig },
-  { to: "/palace", label: "palace", icon: Clapperboard },
+  { to: "/profile", label: "profile", icon: CircleUserRound },
 ] as const;
 
-/** How far through the course the learner is; shown in the desktop sidebar. */
-function CourseProgress({ data }: { data: DashboardData }) {
-  const meters = [
-    {
-      label: "characters",
-      done: data.progress.introducedCharacters,
-      total: data.curriculum.characters,
-    },
-    {
-      label: "words",
-      done: data.progress.introducedWords,
-      total: data.curriculum.words,
-    },
-  ];
+/** How far through the course the learner is, learned and learning; shown in the desktop sidebar. */
+function CourseProgress() {
+  const { data } = useQuery(profileQueryOptions);
+  const meters = data?.tracks.filter(
+    (track) => track.id === "characters" || track.id === "words"
+  );
   return (
-    <section aria-label="Course progress" className="dx-course">
-      {meters.map((meter) => (
-        <div className="dx-course-meter" key={meter.label}>
+    <Link aria-label="Course progress" className="dx-course" to="/profile">
+      {meters?.map((meter) => (
+        <div className="dx-course-meter" key={meter.id}>
           <p>
             <span>{meter.label}</span>
             <b>
-              {meter.done}
+              {meter.learned + meter.learning}
               <small>/{meter.total}</small>
             </b>
           </p>
-          <div
-            aria-label={`${meter.label} learned`}
-            aria-valuemax={meter.total}
-            aria-valuemin={0}
-            aria-valuenow={meter.done}
-            className="dx-progress"
-            role="progressbar"
-          >
-            <DitherGradient
-              cell={2}
-              direction="right"
-              from="grey"
-              opacity={0.5}
-            />
-            <span
-              className="dx-progress-fill"
-              style={{
-                width: `${meter.total ? (meter.done / meter.total) * 100 : 0}%`,
-              }}
-            >
-              <DitherGradient cell={2} direction="left" from="green" />
-            </span>
-          </div>
+          <SplitMeter
+            label={`${meter.label} learned`}
+            learned={meter.learned}
+            learning={meter.learning}
+            text={`${meter.learned} learned, ${meter.learning} learning`}
+            total={meter.total}
+          />
         </div>
       ))}
-    </section>
+    </Link>
   );
 }
 
@@ -171,7 +150,7 @@ export function AppShell({
             </Link>
           ))}
         </nav>
-        <CourseProgress data={data} />
+        <CourseProgress />
         <Link
           activeProps={{ "aria-current": "page" }}
           aria-label="Settings"

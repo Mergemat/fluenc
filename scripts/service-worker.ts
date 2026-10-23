@@ -55,9 +55,10 @@ self.addEventListener("notificationclick", (event) => {
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL("/offline.html"), {
     allowlist: [
-      /^\/(?:review|lessons|reading|listen|library|palace|settings|account)?\/?(?:\?.*)?$/,
+      /^\/(?:review|lessons|reading|listen|library|profile|settings|account)?\/?(?:\?.*)?$/,
       /^\/library\/(?:characters|words)\/[^/?]+\/?(?:\?.*)?$/,
-      /^\/palace\/(?:cast|sets|areas|props)\/[^/?]+\/?(?:\?.*)?$/,
+      /^\/profile\/palace\/?(?:\?.*)?$/,
+      /^\/profile\/palace\/(?:cast|sets|areas|props)\/[^/?]+\/?(?:\?.*)?$/,
     ],
   })
 );

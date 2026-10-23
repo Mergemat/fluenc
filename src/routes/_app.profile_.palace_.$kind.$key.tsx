@@ -5,7 +5,7 @@ import type { ClueKind } from "../lib/palace-board";
 
 const kinds = new Set<ClueKind>(["cast", "sets", "areas", "props"]);
 
-export const Route = createFileRoute("/_app/palace_/$kind/$key")({
+export const Route = createFileRoute("/_app/profile_/palace_/$kind/$key")({
   beforeLoad: ({ params }) => {
     if (!kinds.has(params.kind as ClueKind)) {
       throw notFound();

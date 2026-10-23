@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useEffectEvent,
   useMemo,
   useRef,
   useState,
@@ -32,23 +33,6 @@ interface AppUpdate {
 const AppUpdateContext = createContext<AppUpdate | null>(null);
 // Set just before the reload that applies an update, so the new version can say it arrived.
 const UPDATED_KEY = "fluenc-updated";
-
-/** Check for a new version whenever the app is in use. */
-function watchForUpdates(worker: Workbox) {
-  const check = () => {
-    if (document.visibilityState === "visible" && navigator.onLine) {
-      worker.update().catch(() => undefined);
-    }
-  };
-  document.addEventListener("visibilitychange", check);
-  window.addEventListener("online", check);
-  const interval = window.setInterval(check, 60 * 60 * 1000);
-  return () => {
-    document.removeEventListener("visibilitychange", check);
-    window.removeEventListener("online", check);
-    window.clearInterval(interval);
-  };
-}
 
 /**
  * New versions install in the background and wait. One takes over the next time fluenc is out of
@@ -83,35 +67,47 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
       return;
     }
     let active = true;
-    let unwatch: () => void = () => undefined;
+    let worker: Workbox | null = null;
+    const onWaiting = () => {
+      if (active) {
+        setStatus("ready");
+      }
+    };
+    // Only a version replacing this one reloads; the first install already runs this code.
+    const onControlling = (event: { isUpdate?: boolean }) => {
+      if (event.isUpdate) {
+        sessionStorage.setItem(UPDATED_KEY, "1");
+        window.location.reload();
+      }
+    };
+    const onRedundant = () => {
+      if (active) {
+        setStatus("error");
+      }
+    };
+    // Check for a new version whenever the app is in use.
+    const check = () => {
+      if (document.visibilityState === "visible" && navigator.onLine) {
+        worker?.update().catch(() => undefined);
+      }
+    };
+    document.addEventListener("visibilitychange", check);
+    window.addEventListener("online", check);
+    const interval = window.setInterval(check, 60 * 60 * 1000);
+
     const prepare = async () => {
       const { Workbox: WorkboxClient } = await import("workbox-window");
       if (!active) {
         return;
       }
-      const worker = new WorkboxClient("/sw.js", {
+      worker = new WorkboxClient("/sw.js", {
         scope: "/",
         updateViaCache: "none",
       });
       workbox.current = worker;
-      worker.addEventListener("waiting", () => {
-        if (active) {
-          setStatus("ready");
-        }
-      });
-      worker.addEventListener("controlling", (event) => {
-        // Only a version replacing this one reloads; the first install already runs this code.
-        if (event.isUpdate) {
-          sessionStorage.setItem(UPDATED_KEY, "1");
-          window.location.reload();
-        }
-      });
-      worker.addEventListener("redundant", () => {
-        if (active) {
-          setStatus("error");
-        }
-      });
-      unwatch = watchForUpdates(worker);
+      worker.addEventListener("waiting", onWaiting);
+      worker.addEventListener("controlling", onControlling);
+      worker.addEventListener("redundant", onRedundant);
       const registration = await worker.register({ immediate: true });
       if (!registration) {
         throw new Error("App registration failed");
@@ -127,7 +123,12 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
     });
     return () => {
       active = false;
-      unwatch();
+      document.removeEventListener("visibilitychange", check);
+      window.removeEventListener("online", check);
+      window.clearInterval(interval);
+      worker?.removeEventListener("waiting", onWaiting);
+      worker?.removeEventListener("controlling", onControlling);
+      worker?.removeEventListener("redundant", onRedundant);
       workbox.current = null;
     };
   }, []);
@@ -141,19 +142,19 @@ export function AppUpdateProvider({ children }: { children: ReactNode }) {
   }, [saving, status]);
 
   // Leaving fluenc is the moment: the reload happens out of sight.
+  const applyWhenHidden = useEffectEvent(() => {
+    if (document.visibilityState === "hidden") {
+      apply();
+    }
+  });
   useEffect(() => {
     if (status !== "ready" || saving || drafting) {
       return;
     }
-    const applyWhenHidden = () => {
-      if (document.visibilityState === "hidden") {
-        apply();
-      }
-    };
-    document.addEventListener("visibilitychange", applyWhenHidden);
-    return () =>
-      document.removeEventListener("visibilitychange", applyWhenHidden);
-  }, [apply, drafting, saving, status]);
+    const onVisibility = () => applyWhenHidden();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [drafting, saving, status]);
 
   const update = useMemo(() => ({ status, apply }), [status, apply]);
   return (

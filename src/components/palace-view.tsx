@@ -1,9 +1,9 @@
-// The memory palace as a lookup: search your cast, sets, tone areas and props by code, name or
+// The memory palace as a lookup, under the profile: search your cast, sets, tone areas and props by code, name or
 // meaning, then open a clue to see every character it appears in. Rows stay compact because
 // the props list grows to hundreds over the course. Derived from the cached library and palace.
 import { useQuery } from "@tanstack/react-query";
 import { getRouteApi, Link } from "@tanstack/react-router";
-import { ChevronRight, Search, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, Search, X } from "lucide-react";
 import {
   type ChangeEvent,
   type CSSProperties,
@@ -21,7 +21,7 @@ import { Chip } from "./ui/chip";
 
 import { Page, PageHeader, Status } from "./ui/layout";
 
-const route = getRouteApi("/_app/palace");
+const route = getRouteApi("/_app/profile_/palace");
 const tabs: { id: ClueKind; label: string }[] = [
   { id: "cast", label: "cast" },
   { id: "sets", label: "sets" },
@@ -152,7 +152,16 @@ export function PalaceView() {
     <Page>
       <PageHeader
         meta={rows.length ? `${named}/${rows.length} named` : undefined}
-        title="palace"
+        title={
+          <>
+            <Link to="/profile">
+              <ArrowLeft size={14} />
+              profile
+            </Link>
+            <span aria-hidden="true">/</span>
+            palace
+          </>
+        }
       />
       <div className="dx-lib-controls">
         <label className="dx-search">
@@ -230,7 +239,7 @@ function ClueLink({ row }: { row: ClueRow }) {
       data-open={!row.name}
       params={{ kind: row.kind, key: row.key }}
       style={row.color ? ({ "--part": row.color } as CSSProperties) : undefined}
-      to="/palace/$kind/$key"
+      to="/profile/palace/$kind/$key"
     >
       <span
         className={`dx-pal-code ${row.kind === "props" ? "font-hanzi-props" : ""}`}
