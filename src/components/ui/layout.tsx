@@ -35,7 +35,7 @@ export function PageHeader({
   );
 }
 
-/** A dithered tile with a character in it, over a pixel title and a line of detail. */
+/** A dithered tile with a character in it, over a title and a line of detail. */
 export function Empty({
   title,
   detail,
