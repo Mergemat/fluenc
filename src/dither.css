@@ -1791,6 +1791,7 @@
   transition: width 300ms ease-out;
 }
 .dx-card {
+  --dx-rate-height: 56px;
   display: grid;
   flex: 1;
   grid-template-rows: minmax(0, 1fr) auto;
@@ -1802,7 +1803,10 @@
    line up top to top and bottom to bottom. A prompt or answer that needs more takes it. */
 .dx-card-stage {
   display: grid;
-  grid-template-rows: minmax(min-content, var(--dx-glyph)) minmax(min-content, 1fr);
+  grid-template-rows: minmax(min-content, var(--dx-glyph)) minmax(
+      min-content,
+      1fr
+    );
   gap: var(--dx-space-item);
   align-items: center;
   min-height: 0;
@@ -2019,8 +2023,15 @@
   font: var(--dx-type-body);
   color: var(--dx-muted);
 }
+/* Every study card keeps room for review's grades (a wait line over the buttons), so the answer
+   above ends on the same line on every page. */
 .dx-card-actions {
   display: grid;
+  min-height: calc(
+    var(--dx-text-2xs) +
+    var(--dx-space-tight) +
+    var(--dx-rate-height)
+  );
 }
 /* The button and the grades share one place; both sit on its bottom edge, where every study
    page keeps its button. */
@@ -2066,7 +2077,7 @@
   gap: var(--dx-space-tight);
 }
 .dx-rate {
-  height: 56px;
+  height: var(--dx-rate-height);
   padding: 0;
   border-radius: var(--dx-radius);
 }

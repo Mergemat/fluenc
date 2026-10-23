@@ -31,7 +31,7 @@ const ratings: {
   note: string;
   color: DitherColor;
 }[] = [
-  { value: Rating.Again, label: "again", note: "missed a part", color: "red" },
+  { value: Rating.Again, label: "again", note: "missed", color: "red" },
   { value: Rating.Hard, label: "hard", note: "with effort", color: "orange" },
   { value: Rating.Good, label: "good", note: "small pause", color: "blue" },
   { value: Rating.Easy, label: "easy", note: "instant", color: "green" },
