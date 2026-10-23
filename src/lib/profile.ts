@@ -38,8 +38,8 @@ const roundNumbers = [10, 50, 100, 250, 500, 1000];
 
 /**
  * Round-number milestones short of the total (one right before it says nothing new), then the
- * whole track. `count` items are done, `dates`
- * holds the ones with a recorded date; undated ones came first, before dates were recorded.
+ * whole track. `count` items are done and `dates` holds the ones with a recorded date; undated
+ * ones came first, before dates were recorded.
  */
 function countMilestones(
   track: TrackId,
