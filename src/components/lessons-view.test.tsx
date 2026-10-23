@@ -118,8 +118,6 @@ async function show(
   lockedWords: DashboardData["lockedWords"] = []
 ) {
   const data: DashboardData = {
-    curriculum: { version: "test", characters: 2, words: 1 },
-    progress: { introducedCharacters: 0, introducedWords: 0 },
     reviewQueue: [],
     scheduledQueue: [],
     nextReviewAt: null,

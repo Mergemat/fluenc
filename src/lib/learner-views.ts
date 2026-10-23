@@ -377,15 +377,6 @@ export function deriveDashboard(
     );
 
   return {
-    curriculum: {
-      version: catalog.version,
-      characters: catalog.characters.length,
-      words: catalog.uniqueWords.length,
-    },
-    progress: {
-      introducedCharacters: introducedCharacters.size,
-      introducedWords: learnedWords.size,
-    },
     reviewQueue,
     buildQueue: [
       ...newWords.filter((item) => item.focus !== null),
