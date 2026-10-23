@@ -178,7 +178,11 @@ function getDatabase() {
       await migrateLegacyDatabase(database);
     }
     return database;
-  })();
+  })().catch((error: unknown) => {
+    // A failed open is not kept, so the next save tries again.
+    databasePromise = null;
+    throw error;
+  });
   return databasePromise;
 }
 
