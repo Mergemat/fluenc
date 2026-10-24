@@ -1,20 +1,26 @@
 // A new sentence, read for meaning on a card like review's: the sentence is the front, its sound
 // and meaning the back. Then it is shadowed (heard and said aloud a few times, each time laying
 // down one small card) before it joins Review, where it is recalled from English.
-import {
-  type CSSProperties,
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useState,
-} from "react";
+import { useCallback, useEffect, useEffectEvent, useState } from "react";
 import { useMandarinSpeech } from "../hooks/use-mandarin-speech";
 import type { DashboardData } from "../lib/learner-views";
+import { cn } from "../lib/utils";
 import { saveEnrollment } from "../offline/progress";
 import { useProgressMutation } from "../offline/use-progress-mutation";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
-import { DeckCard, DeckPile, DeckTable } from "./ui/deck";
+import { action, actionKey } from "./ui/buttons";
+import {
+  cardMeaning,
+  cardReading,
+  cardSentence,
+  DeckCard,
+  DeckPile,
+  DeckTable,
+  deck,
+  deckActions,
+  sentenceAnswer,
+} from "./ui/deck";
 import { AudioButton } from "./ui/hanzi";
 import { ErrorNote } from "./ui/layout";
 
@@ -88,17 +94,24 @@ export function ReadingLesson({
   }, []);
 
   return (
-    <div className="dx-deck" data-revealed={revealed} data-type="sentence">
-      <DeckTable caption={<ShadowTakes playing={playing} reps={reps} />}>
+    <div className={deck} data-revealed={revealed} data-type="sentence">
+      <DeckTable
+        caption={
+          <ShadowTakes dimmed={!revealed} playing={playing} reps={reps} />
+        }
+      >
         <DeckPile under={remaining - 1} wide>
           <DeckCard
             back={
-              <div className="dx-deck-answer dx-deck-answer-sentence">
-                <p className="dx-deck-sentence-small font-hanzi" lang="zh-CN">
+              <div className={sentenceAnswer}>
+                <p
+                  className="m-0 font-hanzi text-muted-foreground text-title"
+                  lang="zh-CN"
+                >
                   {item.hanzi}
                 </p>
-                <p className="dx-deck-reading">{item.pinyin}</p>
-                <h2 className="dx-meaning">{item.meaning}</h2>
+                <p className={cardReading}>{item.pinyin}</p>
+                <h2 className={cardMeaning}>{item.meaning}</h2>
                 <AudioButton
                   label="listen"
                   pinyin={item.pinyin}
@@ -108,7 +121,7 @@ export function ReadingLesson({
             }
             flipped={revealed}
             front={
-              <p className="dx-deck-sentence font-hanzi" lang="zh-CN">
+              <p className={cn(cardSentence, "relative")} lang="zh-CN">
                 {item.hanzi}
               </p>
             }
@@ -117,27 +130,27 @@ export function ReadingLesson({
           />
         </DeckPile>
       </DeckTable>
-      <footer className="dx-deck-actions dx-deck-actions-pair">
+      <footer className={deckActions(true)}>
         <DitherButton
-          className="dx-action"
+          className={cn(action, "h-14 self-end")}
           color="blue"
           disabled={playing || isPending}
           onClick={revealed ? shadow : reveal}
           variant={revealed && shadowed ? "dotted" : "gradient"}
         >
           <span>{actionLabel(revealed, playing)}</span>
-          <kbd>space</kbd>
+          <kbd className={actionKey}>space</kbd>
         </DitherButton>
         {revealed && shadowed ? (
           <DitherButton
-            className="dx-action"
+            className={cn(action, "h-14 self-end")}
             color="green"
             disabled={isPending}
             onClick={enroll}
             variant="gradient"
           >
             <span>{isPending ? "saving" : "add to review"}</span>
-            <kbd>↵</kbd>
+            <kbd className={actionKey}>↵</kbd>
           </DitherButton>
         ) : null}
       </footer>
@@ -150,30 +163,43 @@ export function ReadingLesson({
 
 const takeSlots = Array.from({ length: SHADOW_TARGET }, (_, slot) => slot);
 
-/** One small card per time the sentence was said aloud; the one being said fills blue. */
+/**
+ * One small card per time the sentence was said aloud; the one being said fills blue. `dimmed`
+ * quiets them until the meaning shows.
+ */
 export function ShadowTakes({
   reps,
   playing,
+  dimmed = false,
 }: {
   reps: number;
   playing: boolean;
+  dimmed?: boolean;
 }) {
   return (
     <span
       aria-label={`Repeated ${reps} of ${SHADOW_TARGET} times`}
-      className="dx-takes"
+      className={cn("inline-flex gap-2.5 align-middle", dimmed && "opacity-35")}
       role="img"
     >
       {takeSlots.map((slot) => {
         const live = playing && slot === reps;
+        // A take fanned out at rest; laid down, it straightens and lifts.
+        const laid = slot < reps || live;
         return (
           <i
-            data-done={slot < reps}
-            data-live={live}
+            className={cn(
+              "relative h-10 w-7 overflow-hidden rounded-sm border bg-deck transition-transform duration-360 ease-settle motion-reduce:transition-none",
+              laid ? "border-transparent" : "border-deck-edge"
+            )}
             key={slot}
-            style={{ "--i": slot - 2 } as CSSProperties}
+            style={{
+              transform: laid
+                ? "rotate(0) translateY(-6px)"
+                : `rotate(${(slot - 2) * 5}deg)`,
+            }}
           >
-            {slot < reps || live ? (
+            {laid ? (
               <DitherGradient
                 cell={2}
                 direction="up"

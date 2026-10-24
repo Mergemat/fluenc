@@ -25,7 +25,7 @@ export function LessonsView({ data }: { data: DashboardData }) {
   }
 
   return (
-    <div className="dx-lesson-page">
+    <div className="overflow-y-auto overscroll-contain">
       <Page head={<PageHeader meta="nothing new" title="learn" />}>
         <Empty
           detail="you’ve learned every character and word here. keep going with reviews and reading"

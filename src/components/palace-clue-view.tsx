@@ -2,14 +2,24 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useCanGoBack } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { type CSSProperties, type ReactNode, useMemo } from "react";
+import { useMemo } from "react";
 import { useGoBack } from "../hooks/use-go-back";
 import { buildPalaceBoard, type ClueKind } from "../lib/palace-board";
 import { getToneDetail } from "../lib/tones";
+import { cn } from "../lib/utils";
 import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
-import { Tile } from "./library-view";
-import { clueRows } from "./palace-rows";
-import { Page, PageHeader, SectionHead, Status } from "./ui/layout";
+import { ClueCode } from "./character-studio/clue-code";
+import { type ClueRow, clueRows, kindStyle } from "./palace-rows";
+import {
+  CrumbSlash,
+  crumb,
+  Page,
+  PageHeader,
+  SectionHead,
+  Status,
+  statusAction,
+} from "./ui/layout";
+import { StatusDot, Tile, Wall } from "./ui/tile";
 
 const kindLabel: Record<ClueKind, string> = {
   cast: "actor",
@@ -44,11 +54,11 @@ function clueKindText(
 /** Back to the palace, the clue's code, and whether it has a name yet. */
 function ClueHeader({
   kind,
-  code,
+  cue,
   named,
 }: {
   kind: ClueKind;
-  code: ReactNode;
+  cue: ClueRow["cue"];
   named: boolean;
 }) {
   const goBack = useGoBack();
@@ -58,33 +68,30 @@ function ClueHeader({
     <PageHeader
       heading={false}
       meta={
-        <span
-          className="dx-entry-status"
-          data-status={named ? "review" : "new"}
-        >
-          <i aria-hidden="true" />
+        <span className="inline-flex items-center gap-2">
+          <StatusDot status={named ? "review" : "new"} />
           {named ? "named" : "open"}
         </span>
       }
       title={
         <>
           {canGoBack ? (
-            <button onClick={goBack} type="button">
+            <button className={crumb} onClick={goBack} type="button">
               <ArrowLeft size={14} />
               palace
             </button>
           ) : (
-            <Link search={{ tab: kind }} to="/profile/palace">
+            <Link className={crumb} search={{ tab: kind }} to="/profile/palace">
               <ArrowLeft size={14} />
               palace
             </Link>
           )}
-          <span aria-hidden="true">/</span>
+          <CrumbSlash />
           <span
             className={props ? "font-hanzi-props" : undefined}
             lang={props ? "zh-CN" : undefined}
           >
-            {code}
+            <ClueCode clue={cue} />
           </span>
         </>
       }
@@ -136,7 +143,7 @@ export function PalaceClueView({
       <Page>
         <Status
           action={
-            <Link className="dx-chip" to="/profile/palace">
+            <Link className={statusAction} to="/profile/palace">
               back to palace
             </Link>
           }
@@ -147,49 +154,62 @@ export function PalaceClueView({
   }
 
   const kindText = clueKindText(kind, row);
+  const props = kind === "props";
 
   return (
     <Page
-      head={
-        <ClueHeader code={row.code} kind={kind} named={Boolean(row.name)} />
-      }
+      head={<ClueHeader cue={row.cue} kind={kind} named={Boolean(row.name)} />}
     >
       <header
-        className="dx-clue-hero"
+        className="flex items-center gap-6 py-2"
         data-kind={kind}
-        style={
-          row.color ? ({ "--part": row.color } as CSSProperties) : undefined
-        }
+        style={kindStyle(row)}
       >
         <span
-          className={`dx-clue-code ${kind === "props" ? "font-hanzi-props" : ""}`}
-          lang={kind === "props" ? "zh-CN" : undefined}
+          className={cn(
+            "type-code grid h-24 min-w-24 shrink-0 place-items-center rounded-2xl border border-kind/45 px-3 text-4xl text-kind max-xs:h-20 max-xs:min-w-20 max-xs:text-2xl",
+            props && "font-hanzi-props font-normal text-6xl max-xs:text-5xl"
+          )}
+          lang={props ? "zh-CN" : undefined}
         >
-          {row.code}
+          <ClueCode clue={row.cue} toneClassName="h-9 w-12" />
         </span>
-        <div>
-          <p className="dx-clue-kind">{kindText}</p>
-          <h1 data-open={!row.name}>{row.name || "not named yet"}</h1>
-          <p className="dx-clue-stats">
+        <div className="min-w-0 flex-1">
+          <p className="type-control m-0 text-muted-foreground">{kindText}</p>
+          <h1
+            className={cn(
+              "wrap-anywhere my-1 tracking-tight",
+              row.name
+                ? "type-display"
+                : "type-control text-faint-foreground text-xl"
+            )}
+          >
+            {row.name || "not named yet"}
+          </h1>
+          <p className="type-control m-0 text-muted-foreground">
             {row.characters} characters · {row.started} started
           </p>
         </div>
       </header>
       {row.name ? null : (
-        <p className="dx-entry-empty">
+        <p className="type-control m-0 text-faint-foreground leading-wrap">
           it gets its name in the lesson of its first character
         </p>
       )}
-      <section aria-label="Characters" className="dx-entry-section">
-        <SectionHead label="in characters" meta={characters.length} />
-        <div className="dx-wall">
+      <section aria-label="Characters" className="mt-12 grid gap-2">
+        <SectionHead
+          className="mb-0"
+          label="in characters"
+          meta={characters.length}
+        />
+        <Wall>
           {characters.map((character) => (
             <Tile
               item={{ ...character, kind: "characters" }}
               key={character.id}
             />
           ))}
-        </div>
+        </Wall>
       </section>
     </Page>
   );

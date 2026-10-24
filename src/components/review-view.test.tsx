@@ -169,10 +169,11 @@ function rate(
 
 /** The card being answered: not the next one waiting under it, not one flying off. */
 const topCard = () =>
-  host.querySelector(".dx-deck-card:not([data-waiting]):not([data-ghost])");
+  host.querySelector("[data-flipped]:not([data-waiting]):not([data-ghost])");
+/** The finished deck's verdict, on the empty place where the pile was. */
+const verdict = () => host.querySelector('[data-state="finished"] b');
 /** The top card's answer side is only filled in once it has been flipped. */
-const answerShown = () =>
-  topCard()?.querySelector(".dx-deck-back .dx-deck-answer");
+const answerShown = () => topCard()?.querySelector("[data-answer]");
 
 test("a last missed card waits face down and returns unflipped instead of falsely completing the reviews", async () => {
   let data = fixture();
@@ -185,7 +186,7 @@ test("a last missed card waits face down and returns unflipped instead of falsel
   expect(host.querySelector('[data-state="waiting"]')?.textContent).toContain(
     "1 card"
   );
-  expect(host.querySelector(".dx-deck-verdict")).toBeNull();
+  expect(verdict()).toBeNull();
   expect(host.textContent).not.toContain("learn new characters");
   data = {
     ...data,
@@ -218,14 +219,14 @@ test("all overdue cards remain in one session beyond twenty reviews", async () =
   );
   expect(host.textContent).toContain("6 left");
   expect(topCard()?.textContent).toContain("Sentence 20");
-  expect(host.querySelector(".dx-deck-verdict")).toBeNull();
+  expect(verdict()).toBeNull();
   for (let index = 20; index < 26; index += 1) {
     data = rate(data, `s${index}`, Rating.Easy);
   }
   await show(data, "all-due");
-  expect(host.querySelector(".dx-deck-verdict")?.textContent).toBe("done");
+  expect(verdict()?.textContent).toBe("done");
   expect(host.textContent).toContain("learn new characters");
-  expect(host.querySelector(".dx-deck-card")).toBeNull();
+  expect(host.querySelector("[data-flipped]")).toBeNull();
 });
 
 test("a learning step becoming due does not replace the currently revealed card", async () => {
@@ -251,7 +252,7 @@ test("no introduced material leads to learning rather than an invented review se
   await show(fixture(0), "empty");
   expect(host.textContent).toContain("start with a lesson");
   expect(host.textContent).toContain("start your first lesson");
-  expect(host.querySelector(".dx-deck-card")).toBeNull();
+  expect(host.querySelector("[data-flipped]")).toBeNull();
 });
 
 test("a finished review says when the next reviews come, not which cards were reviewed", async () => {
@@ -261,7 +262,7 @@ test("a finished review says when the next reviews come, not which cards were re
   data = rate(data, "s0", Rating.Easy);
   await show(data, "finished");
   const slot = expectDefined(host.querySelector('[data-state="finished"]'));
-  expect(slot.querySelector(".dx-deck-verdict")?.textContent).toBe("done");
+  expect(slot.querySelector("b")?.textContent).toBe("done");
   expect(slot.textContent).toMatch(NEXT_REVIEWS);
   expect(slot.textContent).not.toContain("你好");
 });

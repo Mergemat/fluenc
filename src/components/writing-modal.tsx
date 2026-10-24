@@ -15,6 +15,7 @@ import {
 } from "react";
 
 import { gradeStroke, type Point } from "../lib/stroke-match";
+import { cn } from "../lib/utils";
 import { DitherGradient } from "./dither-kit/gradient";
 import { PixelLoader } from "./ui/dither";
 import { useStrokes } from "./ui/hanzi";
@@ -91,9 +92,18 @@ function StrokePips({
     part: codes.indexOf(owner),
   }));
   return (
-    <span aria-hidden="true" className="dx-writing-pips">
+    <span
+      aria-hidden="true"
+      className="flex min-h-2.5 max-w-writing flex-wrap justify-center gap-1.5"
+    >
       {pips.map((pip) => (
-        <i data-next={pip.stroke === written} key={pip.id}>
+        <i
+          className={cn(
+            "relative size-2.5 overflow-hidden rounded-xs border border-border-strong",
+            pip.stroke === written && "border-blue"
+          )}
+          key={pip.id}
+        >
           {pip.stroke < written ? (
             <DitherGradient
               cell={1}
@@ -106,6 +116,9 @@ function StrokePips({
   );
 }
 
+const partLine =
+  "flex h-6 items-baseline gap-2 type-control text-muted-foreground leading-6";
+
 /** Which prop the next stroke belongs to, in that prop's colour. */
 function NextPart({
   done,
@@ -117,21 +130,20 @@ function NextPart({
   index: number;
 }) {
   if (done) {
-    return (
-      <p className="dx-writing-part" data-done="true">
-        written
-      </p>
-    );
+    return <p className={cn(partLine, "text-green")}>written</p>;
   }
   if (!part) {
-    return <p className="dx-writing-part">write each stroke in order</p>;
+    return <p className={partLine}>write each stroke in order</p>;
   }
   return (
     <p
-      className="dx-writing-part"
+      className={partLine}
       style={{ "--part": partColor(index) } as CSSProperties}
     >
-      <b className="dx-writing-code font-hanzi-props" lang="zh-CN">
+      <b
+        className="font-hanzi-props font-normal text-part text-xl"
+        lang="zh-CN"
+      >
         {part.code}
       </b>
       {part.label}
@@ -142,11 +154,11 @@ function NextPart({
 /** The 米字格 practice grid: a cross and both diagonals, under the strokes. */
 function PracticeGrid() {
   return (
-    <g className="dx-writing-grid">
+    <g className="fill-none stroke-1 stroke-border">
       <path d="M512 0V1024M0 512H1024" vectorEffect="non-scaling-stroke" />
       <path
-        className="dx-writing-grid-diagonal"
         d="M0 0L1024 1024M1024 0L0 1024"
+        strokeDasharray="4 6"
         vectorEffect="non-scaling-stroke"
       />
     </g>
@@ -175,11 +187,11 @@ function StrokeLayers({
   return (
     <>
       {strokes.map((stroke) => (
-        <path className="dx-writing-outline" d={stroke} key={stroke} />
+        <path className="fill-border" d={stroke} key={stroke} />
       ))}
       {current && misses > 0 ? (
         <path
-          className="dx-writing-hint"
+          className="animate-writing-hint fill-part opacity-35"
           d={strokes[written]}
           key={`hint-${written}`}
           style={{ "--part": colors[written] } as CSSProperties}
@@ -191,17 +203,18 @@ function StrokeLayers({
             <path d={stroke} />
           </clipPath>
           <path
-            className="dx-writing-paint"
+            className="animate-writing-paint fill-none stroke-260 stroke-part"
             clipPath={`url(#${id}-${index})`}
             d={paintPath(medians[index])}
             pathLength={1}
+            strokeDasharray="1 2"
             style={{ "--part": colors[index] } as CSSProperties}
           />
         </g>
       ))}
       {current ? (
         <circle
-          className="dx-writing-start"
+          className="animate-writing-start fill-part opacity-80"
           cx={current[0].x}
           cy={current[0].y}
           key={`start-${written}`}
@@ -242,7 +255,7 @@ export function WritingModal({
   const colors =
     data?.owners.map((owner) => {
       const part = codes.indexOf(owner);
-      return part >= 0 ? partColor(part) : "var(--dx-fg)";
+      return part >= 0 ? partColor(part) : "var(--color-foreground)";
     }) ?? [];
 
   // A modal dialog: Escape and a tap on the backdrop close it.
@@ -283,11 +296,11 @@ export function WritingModal({
     }
     const { isMatch } = gradeStroke(points, medians, written, LENIENCY);
     if (isMatch || misses + 1 >= MISSES_BEFORE_DRAWN) {
-      path.dataset.result = "hit";
+      path.dataset.hit = "";
       setWritten((count) => count + 1);
       setMisses(0);
     } else {
-      path.dataset.result = "miss";
+      path.dataset.miss = "";
       setMisses((count) => count + 1);
     }
   });
@@ -318,7 +331,8 @@ export function WritingModal({
       element.setPointerCapture(pointer);
       toGlyph = group.getScreenCTM()?.inverse() ?? null;
       points = [at(event)];
-      delete path.dataset.result;
+      delete path.dataset.hit;
+      delete path.dataset.miss;
       path.setAttribute("d", inkPath(points));
     };
     const move = (event: PointerEvent) => {
@@ -337,7 +351,7 @@ export function WritingModal({
       }
       pointer = null;
       if (event.type === "pointercancel" || points.length < 2) {
-        path.dataset.result = "miss";
+        path.dataset.miss = "";
         return;
       }
       finish(points);
@@ -359,28 +373,41 @@ export function WritingModal({
   return (
     <dialog
       aria-label={`Write ${hanzi}`}
-      className="dx-writing-modal"
+      className="m-auto max-h-none max-w-none animate-enter overflow-visible border-0 bg-transparent p-0 text-inherit backdrop:bg-background/82 backdrop:backdrop-blur-sm"
       ref={dialog}
     >
-      <section className="dx-writing">
-        <header>
-          <span>
-            write <b className="dx-writing-hanzi font-hanzi">{hanzi}</b>
+      <section className="box-border grid w-writing-frame justify-items-center gap-4 rounded-2xl border border-border-strong bg-card px-3.5 pt-2.5 pb-4 shadow-modal">
+        <header className="type-label flex w-full items-center gap-2 text-muted-foreground">
+          <span className="flex-1">
+            write{" "}
+            <b className="font-hanzi font-normal text-foreground text-lg">
+              {hanzi}
+            </b>
           </span>
-          <span className="dx-writing-count">
+          <span className="tabular-nums">
             {total ? `${Math.min(written, total)}/${total}` : ""}
           </span>
           <button
             aria-label="Close"
-            className="dx-icon-button"
+            className="grid size-8 place-items-center rounded-md border border-border text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
             onClick={close}
             type="button"
           >
             <X size={16} />
           </button>
         </header>
-        <div className="dx-writing-pad" data-done={done}>
-          <svg aria-hidden="true" ref={svg} viewBox="0 0 1024 1024">
+        <div
+          className={cn(
+            "relative grid size-writing touch-none select-none overflow-hidden rounded-xl border border-border bg-background transition-colors duration-200 *:col-start-1 *:row-start-1",
+            done && "border-green"
+          )}
+        >
+          <svg
+            aria-hidden="true"
+            className="size-full cursor-crosshair"
+            ref={svg}
+            viewBox="0 0 1024 1024"
+          >
             <PracticeGrid />
             <g ref={glyph} transform={data?.transform}>
               {data && medians ? (
@@ -394,11 +421,17 @@ export function WritingModal({
                   written={written}
                 />
               ) : null}
-              <path className="dx-writing-ink" ref={ink} />
+              {/* A fitting stroke hands over to the paint; a miss goes red and fades. */}
+              <path
+                className="pointer-events-none fill-none stroke-34 stroke-foreground data-miss:stroke-red data-hit:opacity-0 data-miss:opacity-0 data-hit:transition-opacity data-miss:transition-opacity data-miss:delay-120 data-hit:duration-180 data-miss:duration-400 data-hit:ease-out data-miss:ease-in"
+                ref={ink}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </g>
           </svg>
           {data || shape.isError ? null : (
-            <span className="dx-writing-loader">
+            <span className="grid place-items-center">
               <PixelLoader label="Loading strokes" size={5} />
             </span>
           )}
@@ -407,7 +440,7 @@ export function WritingModal({
           <StrokePips codes={codes} owners={data.owners} written={written} />
         ) : null}
         {shape.isError ? (
-          <p className="dx-writing-part">strokes unavailable offline</p>
+          <p className={partLine}>strokes unavailable offline</p>
         ) : (
           <NextPart
             done={done}

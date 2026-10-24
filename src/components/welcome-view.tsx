@@ -12,17 +12,37 @@ import {
 } from "react";
 
 import { defaultToneRooms } from "../lib/pinyin";
+import { cn } from "../lib/utils";
+import { brand, shell } from "./app-shell";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import { BrandMark } from "./ui/brand-mark";
-import { HanziGlyph, ToneContour } from "./ui/hanzi";
-import { PageHeader } from "./ui/layout";
+import { action, actionKey } from "./ui/buttons";
+import { glyphBox, HanziGlyph, ToneContour } from "./ui/hanzi";
+import { chip, label, PageHeader } from "./ui/layout";
 import { partColor } from "./ui/part-colors";
 
 const SLIDE_MS = 8000;
 const parts = ["女", "子"];
 type Part = "actor" | "set" | "room";
 type PartState = "todo" | "now" | "done";
+
+/** Each part of the sound keeps one colour through the reel. */
+const kindColors: Record<Part, string> = {
+  actor: "text-blue",
+  set: "text-purple",
+  room: "text-green",
+};
+
+/** The part being explained glows, the ones shown keep their colour. */
+const soundStates = (part: Part): Record<PartState, string> => ({
+  todo: "text-faint-foreground",
+  done: kindColors[part],
+  now: cn(kindColors[part], "-translate-y-1 text-shadow-glow-lg"),
+});
+
+/** The small line under a code or a name. */
+const note = "block type-label text-muted-foreground";
 
 /** A part of hǎo is lit on its own slide and keeps its colour after. Slide 0 is the intro. */
 function partState(part: Part, slide: number): PartState {
@@ -35,29 +55,33 @@ function partState(part: Part, slide: number): PartState {
 
 function Subject({ slide }: { slide: number }) {
   return (
-    <div className="dx-welcome-subject">
-      <div className="dx-glyph-box">
+    <div className="flex min-h-0 flex-1 flex-col items-center gap-2">
+      <div className={cn(glyphBox, "glyph-max-50")}>
         <HanziGlyph hanzi="好" parts={parts} xray={slide >= 4} />
       </div>
       {/* Hidden on the intro but keeps its line, so 好 doesn't move when it appears. */}
       <span
         aria-hidden={slide === 0}
         aria-label="hǎo"
-        className="dx-welcome-py"
-        data-shown={slide > 0}
+        className={cn(
+          "type-pinyin flex shrink-0 items-center justify-center text-3xl transition-opacity duration-500",
+          slide === 0 && "opacity-0"
+        )}
         role="img"
       >
         {(
           [
             ["actor", "h"],
             ["set", "ǎo"],
-            ["room", <ToneContour key="tone" tone={3} />],
+            ["room", <ToneContour className="h-5 w-7" key="tone" tone={3} />],
           ] as const
         ).map(([part, text]) => (
           <span
-            className="dx-welcome-sound"
-            data-k={part}
-            data-state={partState(part, slide)}
+            className={cn(
+              "transition-glow duration-400",
+              part === "room" && "ml-3",
+              soundStates(part)[partState(part, slide)]
+            )}
             key={part}
           >
             {text}
@@ -71,7 +95,7 @@ function Subject({ slide }: { slide: number }) {
 /** Story segments: seen ones full, the current one filling over the slide's time. */
 function Reel({ slide, total }: { slide: number; total: number }) {
   return (
-    <span aria-hidden="true" className="dx-welcome-reel">
+    <span aria-hidden="true" className="flex min-w-10 flex-1 gap-1">
       {Array.from({ length: total }, (_, index) => {
         let state: PartState = "todo";
         if (index < slide) {
@@ -82,13 +106,15 @@ function Reel({ slide, total }: { slide: number; total: number }) {
         return (
           // Keyed by the current slide too, so its fill restarts when you go back.
           <i
-            className="dx-welcome-seg"
-            data-state={state}
+            className="relative h-1.5 flex-1 overflow-hidden rounded-xs bg-border"
             key={index === slide ? `now-${slide}` : index}
           >
             {state === "todo" ? null : (
               <span
-                className="dx-welcome-seg-fill"
+                className={cn(
+                  "absolute inset-0",
+                  state === "now" && "animate-reel"
+                )}
                 style={{ "--ms": `${SLIDE_MS}ms` } as CSSProperties}
               >
                 <DitherGradient cell={2} direction="up" from="blue" />
@@ -110,11 +136,21 @@ const actorKinds = [
 
 function Actors() {
   return (
-    <div className="dx-welcome-kinds">
+    <div className="grid grid-cols-2 gap-1.5">
       {actorKinds.map((kind) => (
-        <span className="dx-welcome-kind" data-lit={kind.lit} key={kind.label}>
-          <small className="dx-welcome-note">{kind.label}</small>
-          <b className="dx-welcome-kind-codes">{kind.codes}</b>
+        <span
+          className={cn(
+            "grid gap-1.5 rounded-lg border px-3 py-2.5",
+            kind.lit ? "border-blue/50 bg-blue/10" : "border-border"
+          )}
+          key={kind.label}
+        >
+          <small className={cn(note, kind.lit && "text-foreground")}>
+            {kind.label}
+          </small>
+          <b className="type-code whitespace-pre text-base text-blue">
+            {kind.codes}
+          </b>
         </span>
       ))}
     </div>
@@ -123,11 +159,13 @@ function Actors() {
 
 function Place() {
   return (
-    <div className="dx-welcome-place">
-      <b className="dx-welcome-place-code">-ao</b>
-      <span aria-hidden="true">→</span>
+    <div className="type-heading flex items-center gap-4 rounded-lg border border-purple/50 bg-purple/10 px-4 py-3.5">
+      <b className="type-code text-purple text-xl">-ao</b>
+      <span aria-hidden="true" className="text-faint-foreground">
+        →
+      </span>
       <span>
-        <small className="dx-welcome-note">for example</small>
+        <small className={cn(note, "mb-1")}>for example</small>
         your grandma’s house
       </span>
     </div>
@@ -136,10 +174,18 @@ function Place() {
 
 function Rooms() {
   return (
-    <ul className="dx-welcome-rooms">
+    <ul className="grid grid-cols-5 gap-1.5">
       {[1, 2, 3, 4, 5].map((tone) => (
-        <li data-lit={tone === 3} key={tone}>
-          <ToneContour className="dx-welcome-room-tone" tone={tone} />
+        <li
+          className={cn(
+            "type-label grid justify-items-center gap-2 rounded-lg border px-0.5 pt-3 pb-2.5 text-center leading-wrap",
+            tone === 3
+              ? "border-green/50 bg-green/12 text-foreground"
+              : "border-border text-muted-foreground"
+          )}
+          key={tone}
+        >
+          <ToneContour className="h-4 w-6 text-green" tone={tone} />
           <span>{defaultToneRooms[tone]}</span>
         </li>
       ))}
@@ -150,22 +196,25 @@ function Rooms() {
 /** One prop picked by meaning, one by look, left and right as their parts sit in 好. */
 function Props() {
   return (
-    <div className="dx-welcome-props">
+    <div className="grid grid-cols-2 gap-1.5">
       {[
         { code: "女", prop: "a woman", how: "by meaning" },
         { code: "子", prop: "a hook", how: "by look" },
       ].map((prop, index) => (
         <span
-          className="dx-welcome-prop"
+          className="type-heading flex items-center gap-3 rounded-lg border border-part/50 px-3 py-2.5"
           key={prop.code}
           style={{ "--part": partColor(index) } as CSSProperties}
         >
-          <b className="dx-welcome-prop-code font-hanzi-props" lang="zh-CN">
+          <b
+            className="font-hanzi-props font-normal text-3xl text-part"
+            lang="zh-CN"
+          >
             {prop.code}
           </b>
           <span>
             {prop.prop}
-            <small className="dx-welcome-note">{prop.how}</small>
+            <small className={note}>{prop.how}</small>
           </span>
         </span>
       ))}
@@ -173,33 +222,29 @@ function Props() {
   );
 }
 
+const clue = "font-semibold";
+
 function Script() {
   return (
-    <p className="dx-welcome-script">
-      Your{" "}
-      <b className="dx-welcome-clue" data-k="actor">
-        h- actor
-      </b>{" "}
-      is in the{" "}
-      <b className="dx-welcome-clue" data-k="room">
-        bedroom
-      </b>{" "}
-      at your{" "}
-      <b className="dx-welcome-clue" data-k="set">
-        -ao place
-      </b>
-      .{" "}
-      <b className="dx-welcome-clue" style={{ color: partColor(0) }}>
+    <p className="type-heading text-pretty text-muted-foreground leading-body">
+      Your <b className={cn(clue, kindColors.actor)}>h- actor</b> is in the{" "}
+      <b className={cn(clue, kindColors.room)}>bedroom</b> at your{" "}
+      <b className={cn(clue, kindColors.set)}>-ao place</b>.{" "}
+      <b className={clue} style={{ color: partColor(0) }}>
         A woman
       </b>{" "}
       on the left can’t reach her bag; he hands it over with{" "}
-      <b className="dx-welcome-clue" style={{ color: partColor(1) }}>
+      <b className={clue} style={{ color: partColor(1) }}>
         a hook
       </b>{" "}
-      on the right. She grins. <b className="dx-welcome-clue">Good.</b>
+      on the right. She grins.{" "}
+      <b className={cn(clue, "text-foreground")}>Good.</b>
     </p>
   );
 }
+
+/** A sound's code in a slide's title. */
+const code = "inline-flex items-center font-bold font-mono";
 
 // The explanations follow Mandarin Blueprint's own introduction to the method.
 const slides: {
@@ -217,10 +262,7 @@ const slides: {
     kicker: "initial",
     title: (
       <>
-        <b className="dx-welcome-code" data-k="actor">
-          h-
-        </b>{" "}
-        is an actor
+        <b className={cn(code, kindColors.actor)}>h-</b> is an actor
       </>
     ),
     line: "Pick someone you can picture clearly, real or famous. Every h- sound stars them. Actors come in four kinds.",
@@ -230,10 +272,7 @@ const slides: {
     kicker: "final",
     title: (
       <>
-        <b className="dx-welcome-code" data-k="set">
-          -ao
-        </b>{" "}
-        is a place
+        <b className={cn(code, kindColors.set)}>-ao</b> is a place
       </>
     ),
     line: "Pick a building you know well enough to walk through in your head. Every -ao scene happens there.",
@@ -243,8 +282,8 @@ const slides: {
     kicker: "tone",
     title: (
       <>
-        <b className="dx-welcome-code" data-k="room">
-          <ToneContour tone={3} />
+        <b className={cn(code, kindColors.room)}>
+          <ToneContour className="h-6 w-8" tone={3} />
         </b>{" "}
         is a room in that place
       </>
@@ -307,17 +346,21 @@ export function WelcomeView({
 
   const { kicker, title, line, visual } = slides[slide];
   return (
-    <div className="dx-shell dx-welcome">
-      <div className="dx-welcome-top">
-        <span className="dx-brand">
+    <div className={shell}>
+      <div className="flex h-14 shrink-0 items-center border-border border-b px-gutter">
+        <span className={brand}>
           <BrandMark />
           fluenc
         </span>
       </div>
-      <main className="dx-welcome-frame">
+      <main className="mx-auto box-border flex min-h-0 w-full max-w-welcome flex-1 flex-col gap-4 px-gutter pt-page-top pb-6">
         <PageHeader
           meta={
-            <button className="dx-welcome-skip" onClick={skip} type="button">
+            <button
+              className="type-control text-muted-foreground hover:text-foreground"
+              onClick={skip}
+              type="button"
+            >
               skip
             </button>
           }
@@ -329,29 +372,35 @@ export function WelcomeView({
         {/* Tapping the slide skips ahead, as in stories; Enter and the button do the same. */}
         {/* biome-ignore lint/a11y: a pointer shortcut; the button and Enter are the accessible path */}
         <div
-          className="dx-welcome-slide"
+          className="grid min-h-80 welcome-short:min-h-72 shrink-0 animate-rise content-start gap-2"
           key={slide}
           onClick={last ? undefined : next}
         >
-          <p className="dx-label">{kicker}</p>
-          <h1>{title}</h1>
-          <p className="dx-welcome-line">{line}</p>
-          {visual ? <div className="dx-welcome-visual">{visual}</div> : null}
+          <p className={label}>{kicker}</p>
+          <h1 className="type-display flex flex-wrap items-center gap-x-2 welcome-short:gap-x-1.5 text-2xl welcome-short:text-xl tracking-snug">
+            {title}
+          </h1>
+          <p className="type-body text-pretty text-muted-foreground">{line}</p>
+          {visual ? <div className="mt-2">{visual}</div> : null}
         </div>
-        <footer className="dx-welcome-actions">
+        <footer className="flex shrink-0 gap-2">
           {slide > 0 ? (
-            <button className="dx-chip" onClick={back} type="button">
+            <button
+              className={cn(chip, "h-12 rounded-lg px-4 short:max-studio:h-11")}
+              onClick={back}
+              type="button"
+            >
               back
             </button>
           ) : null}
           <DitherButton
-            className="dx-action"
+            className={cn(action, "short:max-studio:h-11")}
             color="blue"
             onClick={next}
             variant="gradient"
           >
             <span>{last ? "start learning" : "next"}</span>
-            <kbd>↵</kbd>
+            <kbd className={actionKey}>↵</kbd>
           </DitherButton>
         </footer>
       </main>

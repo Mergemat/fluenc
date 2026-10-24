@@ -125,11 +125,7 @@ export function AppScroll({
   }, []);
 
   if (!ready) {
-    return (
-      <div className="app-scroll-placeholder" style={{ overflowY: "auto" }}>
-        {children}
-      </div>
-    );
+    return <div className="h-full overflow-y-auto">{children}</div>;
   }
 
   return (

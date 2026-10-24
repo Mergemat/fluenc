@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { signOut, unsyncedChanges } from "../account/account";
 import { type SyncStatus, syncNow, useSyncStatus } from "../offline/sync";
 import { DitherButton } from "./dither-kit/button";
+import { tool } from "./ui/buttons";
 import { SettingRow, type Tone } from "./ui/setting-row";
 import { useToast } from "./ui/toast";
 
@@ -121,12 +122,12 @@ export function AccountSettings() {
         tone="idle"
       >
         <DitherButton
-          className="dx-tool"
+          className={tool}
           color="blue"
           onClick={openAccount}
           variant="gradient"
         >
-          <LogIn size={13} />
+          <LogIn className="shrink-0" size={13} />
           sign in
         </DitherButton>
       </SettingRow>
@@ -155,19 +156,19 @@ export function AccountSettings() {
     >
       {status.signedIn === false ? (
         <DitherButton
-          className="dx-tool"
+          className={tool}
           color="blue"
           onClick={openAccount}
           variant="gradient"
         >
-          <LogIn size={13} />
+          <LogIn className="shrink-0" size={13} />
           sign in
         </DitherButton>
       ) : null}
       {leaving.step === "confirm" ? (
         <>
           <DitherButton
-            className="dx-tool"
+            className={tool}
             color="grey"
             onClick={keep}
             variant="dotted"
@@ -175,12 +176,12 @@ export function AccountSettings() {
             keep
           </DitherButton>
           <DitherButton
-            className="dx-tool"
+            className={tool}
             color="red"
             onClick={forceSignOut}
             variant="dotted"
           >
-            <LogOut size={13} />
+            <LogOut className="shrink-0" size={13} />
             sign out anyway
           </DitherButton>
         </>
@@ -189,23 +190,23 @@ export function AccountSettings() {
           {status.signedIn ? (
             <DitherButton
               aria-label="Sync now"
-              className="dx-tool"
+              className={tool}
               color="grey"
               disabled={status.phase === "syncing"}
               onClick={sync}
               variant="dotted"
             >
-              <RefreshCw size={13} />
+              <RefreshCw className="shrink-0" size={13} />
             </DitherButton>
           ) : null}
           <DitherButton
-            className="dx-tool"
+            className={tool}
             color="red"
             disabled={leaving.step === "checking"}
             onClick={startSignOut}
             variant="dotted"
           >
-            <LogOut size={13} />
+            <LogOut className="shrink-0" size={13} />
             sign out
           </DitherButton>
         </>

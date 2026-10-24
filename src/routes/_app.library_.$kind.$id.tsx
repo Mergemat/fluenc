@@ -7,7 +7,7 @@ import {
 import { useCallback } from "react";
 
 import { LibraryEntryPage } from "../components/library-entry-page";
-import { Page, Status } from "../components/ui/layout";
+import { Page, Status, statusAction } from "../components/ui/layout";
 import type { LibraryEntry } from "../lib/library-search";
 import { oneOf } from "../lib/search-params";
 import { learnerQueryOptions, selectLibrary } from "../offline/queries";
@@ -55,7 +55,7 @@ export const Route = createFileRoute("/_app/library_/$kind/$id")({
     <Page>
       <Status
         action={
-          <Link className="dx-chip" to="/library">
+          <Link className={statusAction} to="/library">
             back to library
           </Link>
         }
@@ -81,7 +81,7 @@ function DetailError() {
     <Page>
       <Status
         action={
-          <button className="dx-chip" onClick={retry} type="button">
+          <button className={statusAction} onClick={retry} type="button">
             retry
           </button>
         }

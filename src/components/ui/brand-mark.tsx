@@ -8,7 +8,7 @@ export function BrandMark() {
   return (
     <svg
       aria-hidden="true"
-      className="dx-mark"
+      className="block shrink-0 overflow-visible"
       height={SIZE}
       shapeRendering="crispEdges"
       viewBox={`0 0 ${SIZE} ${SIZE}`}
@@ -16,7 +16,7 @@ export function BrandMark() {
     >
       {cells.map((cell) => (
         <rect
-          fill={`var(--dx-${cell.color})`}
+          fill={`var(--color-${cell.color})`}
           height={2}
           key={`${cell.x},${cell.y}`}
           width={2}

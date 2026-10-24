@@ -1,12 +1,13 @@
 import type { DashboardData } from "../lib/learner-views";
 import { ReadingLesson } from "./reading-lesson";
+import { deckPage } from "./ui/deck";
 import { Empty, PageHeader } from "./ui/layout";
 
 export function ReadingView({ data }: { data: DashboardData }) {
   const [sentence] = data.getQueue;
 
   return (
-    <section className="dx-deck-page">
+    <section className={deckPage}>
       <PageHeader title="read" />
       {sentence ? (
         <ReadingLesson

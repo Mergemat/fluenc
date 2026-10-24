@@ -12,11 +12,29 @@ import {
 } from "react";
 import type { BuildItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
+import { cn } from "../lib/utils";
 import { saveEnrollment, saveLivingLinkOffline } from "../offline/progress";
 import { useProgressMutation } from "../offline/use-progress-mutation";
+import {
+  clueCode,
+  clueName,
+  clueRole,
+  clueRow,
+  kindStyle,
+} from "./character-studio/clue-row";
+import {
+  studio,
+  studioAction,
+  studioActions,
+  studioAlt,
+  studioClues,
+  studioMeaning,
+  studioPinyin,
+  studioRead,
+} from "./character-studio/studio";
 import { DitherButton } from "./dither-kit/button";
 import { WordGloss } from "./review-card";
-import { AudioButton } from "./ui/hanzi";
+import { AudioButton, ident, pinyinText, soundRow } from "./ui/hanzi";
 import { PageHeader, SectionHead } from "./ui/layout";
 import { useToast } from "./ui/toast";
 
@@ -120,26 +138,34 @@ export function WordLesson({ item }: { item: WordItem }) {
 
   return (
     <article
-      className="dx-studio dx-word-lesson"
+      className={studio(false)}
       data-hanzi={item.hanzi}
-      data-leaving={finish.isPending}
+      data-leaving={finish.isPending || undefined}
     >
       <PageHeader heading={false} title="learn" />
-      <section aria-label="Word" className="dx-read dx-word-read">
+      <section
+        aria-label="Word"
+        className={cn(
+          studioRead,
+          "flex flex-col items-center justify-center gap-6 studio:gap-4"
+        )}
+      >
         <WordGloss
           glosses={item.characterParts.map((part) => part.meaning)}
           hanzi={item.hanzi}
           revealed
           syllables={syllables}
         />
-        <div className="dx-ident">
-          <h1 className="dx-meaning">{meaning.primary}</h1>
-          <p className="dx-alt">
+        <div className={ident}>
+          <h1 className={studioMeaning}>{meaning.primary}</h1>
+          <p className={studioAlt}>
             {meaning.also ? `also ${meaning.also}` : " "}
           </p>
-          <div className="dx-sound">
+          <div className={soundRow}>
             {syllables ? null : (
-              <span className="dx-py dx-py-plain">{item.pinyin}</span>
+              <span className={cn(pinyinText, "text-foreground", studioPinyin)}>
+                {item.pinyin}
+              </span>
             )}
             <AudioButton
               label="listen"
@@ -150,19 +176,26 @@ export function WordLesson({ item }: { item: WordItem }) {
         </div>
       </section>
 
-      <section aria-label="Memory link" className="dx-clues">
-        <SectionHead label="memory link" meta="optional" />
-        <div className="dx-rows">
-          <label className="dx-row" data-empty={!trimmed} data-kind="link">
-            <span className="dx-code">
+      <section aria-label="Memory link" className={studioClues}>
+        <SectionHead className="mb-0" label="memory link" meta="optional" />
+        <div className="overflow-hidden">
+          <label
+            className={clueRow({
+              editable: true,
+              marker: trimmed ? null : "empty",
+            })}
+            data-kind="link"
+            style={kindStyle("link")}
+          >
+            <span className={clueCode({ kind: "link", editable: true })}>
               <Link2 size={18} />
             </span>
-            <span className="dx-role">{prompt}</span>
+            <span className={clueRole()}>{prompt}</span>
             <input
               aria-invalid={tooShort}
               aria-label="Memory link"
               autoComplete="off"
-              className="dx-input"
+              className={clueName({ empty: !trimmed, editable: true })}
               disabled={finish.isPending}
               enterKeyHint="done"
               onChange={editStory}
@@ -180,9 +213,9 @@ export function WordLesson({ item }: { item: WordItem }) {
         </div>
       </section>
 
-      <footer className="dx-actions">
+      <footer className={studioActions} data-actions>
         <DitherButton
-          className="dx-action"
+          className={studioAction}
           color={tooShort ? "grey" : "blue"}
           disabled={finish.isPending}
           onClick={primary}

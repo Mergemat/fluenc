@@ -1,17 +1,18 @@
-import type { ReactNode } from "react";
+import type { CSSProperties } from "react";
 
 import {
   actorCategories,
   type ClueKind,
   type PalaceBoard,
 } from "../lib/palace-board";
-import { ToneContour } from "./ui/hanzi";
+import type { Cue } from "./character-studio/types";
 import { partColor } from "./ui/part-colors";
 
 export interface ClueRow {
   characters: number;
-  code: ReactNode;
   color?: string;
+  /** The clue's code, shown with `ClueCode`. */
+  cue: Pick<Cue, "kind" | "code">;
   group?: string;
   hint: string | null;
   ids: string[];
@@ -20,6 +21,18 @@ export interface ClueRow {
   name: string;
   started: number;
   text: string;
+}
+
+const kindColors: Record<ClueKind, string> = {
+  cast: "var(--color-blue)",
+  sets: "var(--color-purple)",
+  areas: "var(--color-green)",
+  props: "var(--color-faint-foreground)",
+};
+
+/** Sets `--k` (the `kind` colour) to the clue's colour: its kind's, or a prop's own. */
+export function kindStyle(row: Pick<ClueRow, "kind" | "color">) {
+  return { "--k": row.color ?? kindColors[row.kind] } as CSSProperties;
 }
 
 /** Every clue on the board as a flat row, in the order each tab lists them. */
@@ -31,7 +44,7 @@ export function clueRows(board: PalaceBoard): ClueRow[] {
         .map((actor) => ({
           kind: "cast" as const,
           key: actor.key,
-          code: actor.key === "ø" ? "ø" : `${actor.key}-`,
+          cue: { kind: "actor" as const, code: actor.key },
           text: actor.key,
           name: actor.name,
           hint: null,
@@ -44,7 +57,7 @@ export function clueRows(board: PalaceBoard): ClueRow[] {
     ...board.sets.map((set) => ({
       kind: "sets" as const,
       key: set.key,
-      code: set.key === "ø" ? "-ø" : `-${set.key}`,
+      cue: { kind: "set" as const, code: set.key },
       text: set.key,
       name: set.name,
       hint: set.key === "ø" ? "childhood home" : null,
@@ -55,7 +68,7 @@ export function clueRows(board: PalaceBoard): ClueRow[] {
     ...board.rooms.map((room) => ({
       kind: "areas" as const,
       key: String(room.tone),
-      code: <ToneContour tone={room.tone} />,
+      cue: { kind: "room" as const, code: String(room.tone) },
       text: "",
       name: room.name,
       hint: null,
@@ -66,7 +79,7 @@ export function clueRows(board: PalaceBoard): ClueRow[] {
     ...board.props.map((prop, index) => ({
       kind: "props" as const,
       key: prop.key,
-      code: prop.key,
+      cue: { kind: "prop" as const, code: prop.key },
       text: prop.key,
       name: prop.name,
       hint: prop.meaning,

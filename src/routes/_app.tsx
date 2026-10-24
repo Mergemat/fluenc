@@ -8,7 +8,7 @@ import {
 import { useCallback } from "react";
 
 import { AppShell } from "../components/app-shell";
-import { Status } from "../components/ui/layout";
+import { Status, statusAction } from "../components/ui/layout";
 import { ToastProvider } from "../components/ui/toast";
 import { OfflineDownloadProvider } from "../offline/offline-download-provider";
 import { dashboardQueryOptions, loadLearner } from "../offline/queries";
@@ -53,7 +53,7 @@ function StartupError() {
   return (
     <Status
       action={
-        <button className="dx-chip" onClick={retry} type="button">
+        <button className={statusAction} onClick={retry} type="button">
           try again
         </button>
       }

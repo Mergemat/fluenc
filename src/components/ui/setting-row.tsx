@@ -1,8 +1,21 @@
 import type { ReactNode } from "react";
 
+import { cn } from "../../lib/utils";
+
 export type Tone = "ok" | "busy" | "warn" | "error" | "idle";
 
-/** One line of the settings panel: what it is, its current state, and its action. */
+const dots: Record<Tone, string> = {
+  ok: "bg-green",
+  busy: "bg-blue animate-pulse-fast",
+  warn: "bg-orange",
+  error: "bg-red",
+  idle: "bg-faint-foreground",
+};
+
+/**
+ * One line of the settings panel: what it is, its current state, and its action. On a phone the
+ * state goes under the rest. A group's rows are split by lines; the last one ends without one.
+ */
 export function SettingRow({
   id,
   title,
@@ -19,16 +32,39 @@ export function SettingRow({
   children?: ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="dx-set-row">
-      <div className="dx-set-head">
-        <h2 id={id}>{title}</h2>
-        <p>{note}</p>
+    <section
+      aria-labelledby={id}
+      className="grid grid-cols-setting items-center gap-x-4 gap-y-2 border-border not-last:border-b py-3 sm:grid-cols-setting-wide"
+    >
+      <div className="col-start-1 row-start-1 min-w-0">
+        <h2 className="type-heading m-0" id={id}>
+          {title}
+        </h2>
+        <p className="type-label mt-1 mb-0 text-muted-foreground leading-wrap">
+          {note}
+        </p>
       </div>
-      <p className="dx-set-status" data-tone={tone} role="status">
-        <i aria-hidden="true" />
+      <p
+        className={cn(
+          "type-control col-span-2 row-start-2 m-0 flex items-baseline gap-2 leading-wrap sm:col-span-1 sm:col-start-2 sm:row-start-1",
+          tone === "idle" ? "text-muted-foreground" : "text-foreground"
+        )}
+        role="status"
+      >
+        <i
+          aria-hidden="true"
+          className={cn(
+            "size-2 shrink-0 -translate-y-px rounded-xs",
+            dots[tone]
+          )}
+        />
         <span>{status}</span>
       </p>
-      {children ? <div className="dx-set-actions">{children}</div> : null}
+      {children ? (
+        <div className="col-start-2 row-start-1 flex items-center justify-end gap-2 sm:col-start-3">
+          {children}
+        </div>
+      ) : null}
     </section>
   );
 }

@@ -13,6 +13,7 @@ import {
 
 import { useMandarinSpeech } from "../../hooks/use-mandarin-speech";
 import { getToneDetail } from "../../lib/tones";
+import { cn } from "../../lib/utils";
 import { libraryQueryOptions } from "../../offline/queries";
 import { DitherGradient } from "../dither-kit/gradient";
 import { PixelLoader } from "./dither";
@@ -50,6 +51,27 @@ const partAt = (target: EventTarget | null) =>
   target instanceof Element
     ? (target.closest<SVGGElement>("[data-part]")?.dataset.part ?? null)
     : null;
+
+/**
+ * The room a glyph sizes itself to: as large as the box, up to `--glyph-max` (set with a
+ * `glyph-max-*` utility on the box or above it).
+ */
+export const glyphBox =
+  "@container-size grid min-h-0 w-full flex-1 place-items-center";
+
+/** A character's meaning, its other meanings, and its sound row, as lessons and cards show them. */
+export const ident =
+  "grid max-w-full shrink-0 justify-items-center gap-1 text-center";
+export const meaningText = "m-0 type-display text-2xl tracking-tight";
+export const altText =
+  "m-0 h-4 max-w-full truncate type-label text-muted-foreground leading-4";
+export const soundRow = "mt-2 flex items-center gap-2";
+
+const ghostState = {
+  loading: "animate-pulse text-faint-foreground",
+  ready: "opacity-0",
+  font: "",
+} as const;
 
 function glyphState(ready: boolean, failed: boolean) {
   if (ready) {
@@ -124,20 +146,30 @@ export function HanziGlyph({
     data?.strokes.filter((_, index) => data.owners[index] === code).join(" ") ??
     "";
 
+  const state = glyphState(ready, shape.isError || Boolean(data));
   return (
     <div
-      className="dx-glyph"
-      data-state={glyphState(ready, shape.isError || Boolean(data))}
+      className="relative grid size-glyph-box *:col-start-1 *:row-start-1"
+      data-state={state}
     >
       <span
         aria-hidden={ready}
-        className="dx-glyph-ghost font-hanzi"
+        className={cn(
+          "grid select-none place-items-center font-hanzi text-foreground text-glyph-ghost leading-none",
+          ghostState[state]
+        )}
         lang="zh-CN"
       >
         {hanzi}
       </span>
       {ready && data ? (
-        <svg aria-label={hanzi} ref={svg} role="img" viewBox="0 0 1024 1024">
+        <svg
+          aria-label={hanzi}
+          className="size-full overflow-visible"
+          ref={svg}
+          role="img"
+          viewBox="0 0 1024 1024"
+        >
           <defs>
             {parts.map((code, index) => (
               <clipPath
@@ -155,19 +187,27 @@ export function HanziGlyph({
           <g transform={data.transform}>
             {parts.map((code, index) => (
               <g
-                className="dx-part"
-                data-dim={
+                className={cn(
+                  "cursor-pointer transition-opacity duration-180",
                   !concealed &&
-                  Boolean(highlighted) &&
-                  highlighted !== code &&
-                  !xray
-                }
-                data-lit={lit(code)}
+                    Boolean(highlighted) &&
+                    highlighted !== code &&
+                    !xray &&
+                    "opacity-14"
+                )}
                 data-part={code}
                 key={code}
                 style={{ "--part": partColor(index) } as CSSProperties}
               >
-                <path d={partPath(code)} />
+                <path
+                  className={cn(
+                    "paint-stroke-first transition-colors duration-180",
+                    lit(code)
+                      ? "fill-transparent stroke-5 stroke-part"
+                      : "fill-foreground stroke-7 stroke-transparent"
+                  )}
+                  d={partPath(code)}
+                />
               </g>
             ))}
           </g>
@@ -177,7 +217,7 @@ export function HanziGlyph({
         ? parts.map((code, index) =>
             lit(code) ? (
               <div
-                className="dx-part-fill"
+                className="pointer-events-none absolute inset-0"
                 key={code}
                 style={{ clipPath: `url(#${id}-c${index})` }}
               >
@@ -205,6 +245,9 @@ function actorLetters(total: number, actorKey: string, finalKey?: string) {
   return actorKey === "ø" ? 0 : Math.min(total, Array.from(actorKey).length);
 }
 
+/** Pinyin set large, as a lesson and a card's answer show it. */
+export const pinyinText = "inline-flex items-center type-pinyin tracking-snug";
+
 /**
  * Pinyin coloured by Hanzi Movie Method codes: the actor part (e.g. ti- in tīng) and the set
  * part (-eng). With the Ø set the actor carries the whole syllable (yī → y-/Ø).
@@ -223,7 +266,11 @@ export function MoviePinyin({
   className?: string;
 }) {
   if (!(tone >= 1 && tone <= 5 && actorKey)) {
-    return <span className={`dx-py dx-py-plain ${className}`}>{pinyin}</span>;
+    return (
+      <span className={cn(pinyinText, "text-foreground", className)}>
+        {pinyin}
+      </span>
+    );
   }
   const syllable = pinyin.split(SYLLABLE_SEPARATOR)[0] ?? pinyin;
   const letters = Array.from(syllable);
@@ -234,17 +281,17 @@ export function MoviePinyin({
   return (
     <span
       aria-label={`${pinyin}, ${detail?.label ?? ""} tone`}
-      className={`dx-py ${className}`}
+      className={cn(pinyinText, className)}
       role="img"
       title={`${actorKey}- actor · -${finalKey} set`}
     >
       {actor ? (
-        <span aria-hidden="true" data-k="actor">
+        <span aria-hidden="true" className="text-blue" data-k="actor">
           {actor}
         </span>
       ) : null}
       {set ? (
-        <span aria-hidden="true" data-k="set">
+        <span aria-hidden="true" className="text-purple" data-k="set">
           {set}
         </span>
       ) : null}
@@ -285,36 +332,54 @@ export function ToneContour({
   return (
     <svg
       aria-hidden="true"
-      className={`dx-tone ${className}`.trim()}
+      className={cn(
+        "tone-stroke h-tone-h w-tone overflow-visible fill-current stroke-current",
+        className
+      )}
       viewBox="0 0 20 15"
     >
       {points ? (
-        <polyline points={points.map((point) => point.join(",")).join(" ")} />
+        <polyline
+          className="fill-none"
+          points={points.map((point) => point.join(",")).join(" ")}
+        />
       ) : (
-        <circle cx="10" cy="11" r="2.2" />
+        <circle className="stroke-none" cx="10" cy="11" r="2.2" />
       )}
     </svg>
   );
 }
 
+const audioBars = ["h-1.5", "h-3", "h-2", "h-1"];
+
 export function AudioButton({
   text,
   pinyin,
   label,
+  className,
 }: {
   text: string;
   pinyin: string;
   label?: string;
+  className?: string;
 }) {
   const speech = useMandarinSpeech();
   const { speak } = speech;
   const play = useCallback(() => {
     speak(text, pinyin);
   }, [speak, text, pinyin]);
+  const speaking = speech.status === "speaking";
   return (
     <button
       aria-label={`Play ${text}`}
-      className={`dx-audio ${label ? "dx-audio-labeled" : ""}`.trim()}
+      className={cn(
+        "grid size-8 shrink-0 place-items-center rounded-md border border-border text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground disabled:cursor-progress disabled:opacity-100",
+        label && "type-control inline-flex w-auto gap-2 pr-3 pl-2.5",
+        speaking &&
+          "border-blue/50 text-blue hover:border-blue/50 hover:text-blue",
+        speech.status === "error" && "text-red hover:text-red",
+        className
+      )}
       data-status={speech.status}
       disabled={speech.status === "loading"}
       onClick={play}
@@ -323,11 +388,18 @@ export function AudioButton({
       {speech.status === "loading" ? (
         <PixelLoader label="Loading audio" size={3} />
       ) : (
-        <span aria-hidden="true" className="dx-audio-bars">
-          <i />
-          <i />
-          <i />
-          <i />
+        <span aria-hidden="true" className="flex h-3 items-center gap-0.5">
+          {audioBars.map((height, bar) => (
+            <i
+              className={cn(
+                "w-0.5 rounded-xs bg-current",
+                height,
+                speaking && "animate-eq"
+              )}
+              key={height}
+              style={bar % 2 ? { animationDelay: "-0.25s" } : undefined}
+            />
+          ))}
         </span>
       )}
       {label ? <span>{label}</span> : null}
@@ -397,11 +469,17 @@ export function useUsage(hanzi: string, alsoKnown = noExtraKnown) {
 
 export function UsageHanzi({ chars }: { chars: UsageWord["chars"] }) {
   return (
-    <span className="dx-usage-hanzi font-hanzi" lang="zh-CN">
+    <span
+      className="whitespace-nowrap font-hanzi text-xl leading-none"
+      lang="zh-CN"
+    >
       {chars.map((entry) => (
         <span
-          data-known={entry.known}
-          data-target={entry.target}
+          className={cn(
+            entry.target && "text-blue text-shadow-blue/60 text-shadow-glow-sm",
+            !entry.known &&
+              "text-faint-foreground underline decoration-dotted underline-offset-4"
+          )}
           key={entry.position}
         >
           {entry.char}

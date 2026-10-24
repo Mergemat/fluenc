@@ -2,10 +2,26 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useEffectEvent, useState } from "react";
 import type { DashboardData } from "../lib/learner-views";
 import { isLearning, nextReviews } from "../lib/review-schedule";
+import { cn } from "../lib/utils";
 import { DitherButton } from "./dither-kit/button";
 import { ReviewDeck } from "./review-card";
-import { DeckPile, DeckSlot, DeckTable } from "./ui/deck";
+import { action, actionKey } from "./ui/buttons";
+import {
+  DeckPile,
+  DeckSlot,
+  DeckTable,
+  deck,
+  deckAction,
+  deckActions,
+  deckPage,
+  slotNote,
+} from "./ui/deck";
 import { PageHeader } from "./ui/layout";
+
+/** The figure on a card lying on the table, at its size: a timer or a verdict. */
+const slotFigure = (size: string) =>
+  cn("type-display relative", size, "leading-none");
+const verdict = slotFigure("text-center text-verdict");
 
 type DoneState = "waiting" | "finished" | "empty";
 
@@ -27,7 +43,7 @@ export function ReviewView({ data }: { data: DashboardData }) {
   }
 
   return (
-    <section className="dx-deck-page">
+    <section className={deckPage}>
       <PageHeader title="review" />
       <ReviewDeck
         done={
@@ -94,28 +110,28 @@ function ReviewDone({
   if (waiting) {
     // The dashboard refetches when the first card is due, which deals the deck back in.
     return (
-      <div className="dx-deck" data-state="waiting" role="status">
+      <div className={deck} data-state="waiting" role="status">
         <DeckTable caption="back after a short break">
           <DeckPile under={coming - 1}>
             <DeckSlot state="down">
-              <b className="dx-deck-timer">
+              <b className={slotFigure("text-timer tabular-nums")}>
                 {countdown(Date.parse(nextLearningAt ?? "") - now)}
               </b>
-              <small>
+              <small className={slotNote}>
                 {coming} {coming === 1 ? "card" : "cards"}
               </small>
             </DeckSlot>
           </DeckPile>
         </DeckTable>
-        <footer className="dx-deck-actions" />
+        <footer className={deckActions()} />
       </div>
     );
   }
 
   const [lesson] = data.buildQueue;
-  let action = <span>start your first lesson</span>;
+  let label = <span>start your first lesson</span>;
   if (state === "finished") {
-    action = lesson ? (
+    label = lesson ? (
       <span>
         learn{" "}
         <b className="font-hanzi" lang="zh-CN">
@@ -128,35 +144,41 @@ function ReviewDone({
     );
   }
   return (
-    <div className="dx-deck" data-state={state}>
+    <div className={deck} data-state={state}>
       <DeckTable>
         <DeckPile under={0}>
           <DeckSlot state="empty">
             {state === "finished" ? (
               <>
-                <b className="dx-deck-verdict">done</b>
-                <small>next · {nextReviews(data, now) ?? "tomorrow"}</small>
+                <b className={verdict}>done</b>
+                <small className={slotNote}>
+                  next · {nextReviews(data, now) ?? "tomorrow"}
+                </small>
               </>
             ) : (
               <>
-                <b className="dx-deck-verdict dx-deck-verdict-long">
+                <b
+                  className={slotFigure(
+                    "text-balance text-center text-verdict-long"
+                  )}
+                >
                   start with a lesson
                 </b>
-                <small>reviews keep what you learn</small>
+                <small className={slotNote}>reviews keep what you learn</small>
               </>
             )}
           </DeckSlot>
         </DeckPile>
       </DeckTable>
-      <footer className="dx-deck-actions">
+      <footer className={deckActions()}>
         <DitherButton
-          className="dx-action"
+          className={cn(action, deckAction, "h-14")}
           color="blue"
           onClick={next}
           variant="gradient"
         >
-          {action}
-          <kbd>↵</kbd>
+          {label}
+          <kbd className={actionKey}>↵</kbd>
         </DitherButton>
       </footer>
     </div>

@@ -16,6 +16,7 @@ import {
   dayKey,
 } from "../lib/activity";
 import type { ProfileData } from "../lib/profile";
+import { cn } from "../lib/utils";
 import { profileQueryOptions } from "../offline/queries";
 import { useSyncStatus } from "../offline/sync";
 import { DitherGradient } from "./dither-kit/gradient";
@@ -24,6 +25,9 @@ import { Page, PageHeader, SectionHead, Status } from "./ui/layout";
 const WEEKS = 52;
 const monthFormat = new Intl.DateTimeFormat("en-GB", { month: "short" });
 const keyDensities = [0, 0.25, 0.5, 0.75, 1];
+// A day's square; each hosts a dither-kit gradient.
+const dayCell = "relative block overflow-hidden rounded-xs";
+const num = "font-medium text-foreground";
 
 /** A day's square: a faint grey base, and green dither as dense and bright as the day was busy. */
 function Cell({ density }: { density: number }) {
@@ -46,15 +50,18 @@ function Cell({ density }: { density: number }) {
 function ActivityGraph({ weeks }: { weeks: ActivityDay[][] }) {
   const busiest = Math.max(...weeks.flat().map((day) => day.count));
   return (
-    <div className="dx-activity">
-      <div className="dx-activity-grid">
-        <div aria-hidden="true" className="dx-activity-months">
+    <div className="scrollbar-none flex flex-row-reverse overflow-x-auto">
+      <div className="grid flex-none gap-1.5">
+        <div
+          aria-hidden="true"
+          className="type-micro flex h-3 whitespace-nowrap text-faint-foreground"
+        >
           {weeks.map((week, index) => {
             const month = week[0]?.date.getMonth();
             const starts =
               index > 0 && month !== weeks[index - 1]?.[0]?.date.getMonth();
             return (
-              <span key={week[0]?.key}>
+              <span className="w-5 flex-none max-xs:w-3.5" key={week[0]?.key}>
                 {starts && week[0]
                   ? monthFormat.format(week[0].date).toLowerCase()
                   : null}
@@ -62,12 +69,16 @@ function ActivityGraph({ weeks }: { weeks: ActivityDay[][] }) {
             );
           })}
         </div>
-        <div className="dx-activity-weeks">
+        <div className="flex gap-1">
           {weeks.map((week) => (
-            <div className="dx-activity-week" key={week[0]?.key}>
+            <div className="grid gap-1" key={week[0]?.key}>
               {week.map((day) => (
                 <i
-                  data-future={day.future}
+                  className={cn(
+                    dayCell,
+                    "size-4 max-xs:size-3",
+                    day.future && "invisible"
+                  )}
                   key={day.key}
                   title={`${day.key} · ${day.count} new`}
                 >
@@ -122,25 +133,37 @@ function Profile({ data }: { data: ProfileData }) {
   }, [introductions, tracks, today]);
   return (
     <>
-      <div className="dx-scores">
+      <div className="grid grid-cols-3 gap-4">
         {tracks.map((track, index) => {
           const count = added[index] ?? 0;
           return (
-            <p key={track.id}>
-              <b className="dx-score">{track.learned + track.learning}</b>
-              <span>{track.label}</span>
-              <small data-added={count > 0}>
+            <p className="m-0 grid min-w-0 gap-1" key={track.id}>
+              <b className="type-display text-foreground text-score tabular-nums leading-none tracking-tighter">
+                {track.learned + track.learning}
+              </b>
+              <span className="type-heading text-foreground">
+                {track.label}
+              </span>
+              <small
+                className={cn(
+                  "type-label",
+                  count > 0 ? "text-green" : "text-faint-foreground"
+                )}
+              >
                 {count ? `+${count} this week` : "none this week"}
               </small>
             </p>
           );
         })}
       </div>
-      <SectionHead className="dx-pro-group" label="activity">
-        <span aria-hidden="true" className="dx-activity-key">
+      <SectionHead className="mt-12" label="activity">
+        <span
+          aria-hidden="true"
+          className="type-micro inline-flex items-center gap-1 text-faint-foreground"
+        >
           less
           {keyDensities.map((density) => (
-            <i key={density}>
+            <i className={cn(dayCell, "size-2.5")} key={density}>
               <Cell density={density} />
             </i>
           ))}
@@ -148,21 +171,24 @@ function Profile({ data }: { data: ProfileData }) {
         </span>
       </SectionHead>
       <ActivityGraph weeks={weeks} />
-      <p className="dx-pro-facts">
+      <p className="type-control mt-4 mb-12 flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
         <span>
-          <b className="dx-pro-num">{streaks.current}</b> day streak
+          <b className={num}>{streaks.current}</b> day streak
         </span>
         <span>
-          <b className="dx-pro-num">{streaks.longest}</b> longest
+          <b className={num}>{streaks.longest}</b> longest
         </span>
         <span>
-          <b className="dx-pro-num">{streaks.activeDays}</b> days learning
+          <b className={num}>{streaks.activeDays}</b> days learning
         </span>
       </p>
-      <Link className="dx-pro-row" to="/profile/palace">
-        <span className="dx-pro-name">memory palace</span>
-        <span>
-          <b className="dx-pro-num">{palace.named}</b>/{palace.total} named
+      <Link
+        className="type-control flex min-h-14 items-center justify-between gap-4 py-3 text-faint-foreground tabular-nums hover:text-muted-foreground"
+        to="/profile/palace"
+      >
+        <span className="type-heading text-foreground">memory palace</span>
+        <span className="inline-flex items-center gap-0.5">
+          <b className={num}>{palace.named}</b>/{palace.total} named
           <ChevronRight aria-hidden="true" size={15} />
         </span>
       </Link>

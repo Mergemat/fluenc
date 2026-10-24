@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useCanGoBack } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { type CSSProperties, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useGoBack } from "../hooks/use-go-back";
 import type { LibraryData, PalaceData } from "../lib/learner-views";
 import type {
@@ -13,16 +13,43 @@ import type {
 } from "../lib/library-search";
 import { getItemMeaning } from "../lib/meaning";
 import { defaultToneRooms } from "../lib/pinyin";
+import { cn } from "../lib/utils";
 import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
 import { ClueCode } from "./character-studio/clue-code";
+import {
+  clueCode,
+  clueCount,
+  clueName,
+  clueRole,
+  clueRow,
+  clueTone,
+  kindStyle,
+} from "./character-studio/clue-row";
 import { type Clue, lessonClues } from "./character-studio/clues";
 import type { CharacterItem } from "./character-studio/types";
 import { DitherButton } from "./dither-kit/button";
-import { Tile } from "./library-view";
 import { WordGloss } from "./review-card";
-import { AudioButton, HanziGlyph, MoviePinyin } from "./ui/hanzi";
-import { Page, PageHeader, SectionHead } from "./ui/layout";
-import { partColor } from "./ui/part-colors";
+import { tool } from "./ui/buttons";
+import {
+  AudioButton,
+  glyphBox,
+  HanziGlyph,
+  MoviePinyin,
+  meaningText,
+  pinyinText,
+  soundRow,
+} from "./ui/hanzi";
+import { CrumbSlash, crumb, Page, PageHeader, SectionHead } from "./ui/layout";
+import { StatusDot, Tile, TileGlyph, tileClass, Wall } from "./ui/tile";
+
+/** The character or gloss beside its definition; stacked and centred on phones. */
+const hero =
+  "grid justify-items-center gap-6 pb-6 text-center hero:grid-cols-entry hero:items-center hero:justify-items-start hero:gap-12 hero:text-left";
+const definition = "grid justify-items-center gap-2 hero:justify-items-start";
+const entryMeaning = cn(meaningText, "text-3xl");
+const entrySound = cn(soundRow, "mt-0");
+const section = "mt-12 grid gap-2";
+const emptyNote = "type-control text-faint-foreground leading-wrap";
 
 const statusLabel = {
   review: "learned",
@@ -49,25 +76,28 @@ export function LibraryEntryPage({
         <PageHeader
           heading={false}
           meta={
-            <span className="dx-entry-status" data-status={item.status}>
-              <i aria-hidden="true" />
+            <span className="inline-flex items-center gap-2">
+              <StatusDot status={item.status} />
               {statusLabel[item.status]}
             </span>
           }
           title={
             <>
               {canGoBack ? (
-                <button onClick={goBack} type="button">
+                <button className={crumb} onClick={goBack} type="button">
                   <ArrowLeft size={14} />
                   {back}
                 </button>
               ) : (
-                <Link to={from === "palace" ? "/profile/palace" : "/library"}>
+                <Link
+                  className={crumb}
+                  to={from === "palace" ? "/profile/palace" : "/library"}
+                >
                   <ArrowLeft size={14} />
                   {back}
                 </Link>
               )}
-              <span aria-hidden="true">/</span>
+              <CrumbSlash />
               <span className="font-hanzi" lang="zh-CN">
                 {item.hanzi}
               </span>
@@ -157,9 +187,9 @@ function CharacterEntry({
 
   return (
     <>
-      <header className="dx-entry-hero">
-        <div className="dx-entry-glyph">
-          <div className="dx-glyph-box">
+      <header className={hero}>
+        <div className="h-entry-glyph w-full max-w-72">
+          <div className={cn(glyphBox, "h-full")}>
             <HanziGlyph
               hanzi={item.hanzi}
               highlighted={hover}
@@ -170,9 +200,9 @@ function CharacterEntry({
             />
           </div>
         </div>
-        <div className="dx-entry-def">
-          <h1 className="dx-meaning">{meaning.primary}</h1>
-          <div className="dx-sound">
+        <div className={definition}>
+          <h1 className={entryMeaning}>{meaning.primary}</h1>
+          <div className={entrySound}>
             <MoviePinyin
               actorKey={item.movie.actorKey}
               finalKey={item.movie.finalKey}
@@ -182,7 +212,7 @@ function CharacterEntry({
             <AudioButton pinyin={item.pinyin} text={item.hanzi} />
           </div>
           <Senses meanings={meaning.alternatives} />
-          <p className="dx-entry-facts">
+          <p className="type-control max-w-measure text-center text-faint-foreground">
             {item.strokes} strokes · radical{" "}
             <span className="font-hanzi" lang="zh-CN">
               {item.radical}
@@ -196,7 +226,7 @@ function CharacterEntry({
           </p>
           <DitherButton
             aria-pressed={xray}
-            className="dx-tool"
+            className={tool}
             color={xray ? "blue" : "grey"}
             onClick={toggleXray}
             variant={xray ? "gradient" : "dotted"}
@@ -206,13 +236,22 @@ function CharacterEntry({
         </div>
       </header>
 
-      <section aria-label="Scene" className="dx-entry-section">
-        <SectionHead label={props.length === clues.length ? "prop" : "scene"} />
-        <div className="dx-rows dx-rows-static">
-          {clues.map((clue) => (
+      <section aria-label="Scene" className={section}>
+        <SectionHead
+          className="mb-0"
+          label={props.length === clues.length ? "prop" : "scene"}
+        />
+        <div className="overflow-hidden">
+          {clues.map((clue, index) => (
             <ClueRow
               clue={clue}
               key={clue.id}
+              // The hairline under a row gives way when it or the row below is lit.
+              lined={
+                index < clues.length - 1 &&
+                hover !== clue.code &&
+                hover !== clues[index + 1]?.code
+              }
               lit={hover === clue.code}
               onHover={setHover}
             />
@@ -221,7 +260,7 @@ function CharacterEntry({
         {item.componentNote ? (
           <p
             aria-label="How the parts fit"
-            className="dx-entry-note"
+            className="type-body text-muted-foreground"
             role="note"
           >
             {item.componentNote}
@@ -229,16 +268,16 @@ function CharacterEntry({
         ) : null}
       </section>
 
-      <section aria-label="Words" className="dx-entry-section">
-        <SectionHead label="in words" meta={words.length} />
+      <section aria-label="Words" className={section}>
+        <SectionHead className="mb-0" label="in words" meta={words.length} />
         {words.length ? (
-          <div className="dx-wall dx-wall-tight">
+          <Wall tight>
             {words.map((word) => (
               <Tile item={{ ...word, kind: "words" }} key={word.id} />
             ))}
-          </div>
+          </Wall>
         ) : (
-          <p className="dx-entry-empty">used on its own in this course</p>
+          <p className={emptyNote}>used on its own in this course</p>
         )}
       </section>
     </>
@@ -248,41 +287,40 @@ function CharacterEntry({
 function ClueRow({
   clue,
   lit,
+  lined,
   onHover,
 }: {
   clue: Clue;
   lit: boolean;
+  lined: boolean;
   onHover: (code: string | null) => void;
 }) {
   const empty = !clue.name.trim();
   return (
     <div
-      className="dx-row"
+      className={clueRow({ lit, lined })}
       data-kind={clue.kind}
-      data-lit={lit}
       onPointerEnter={
         clue.kind === "prop" ? () => onHover(clue.code) : undefined
       }
       onPointerLeave={clue.kind === "prop" ? () => onHover(null) : undefined}
-      style={
-        clue.kind === "prop"
-          ? ({ "--part": partColor(clue.partIndex) } as CSSProperties)
-          : undefined
-      }
+      style={kindStyle(clue.kind, clue.partIndex)}
     >
       <span
-        className={`dx-code ${clue.kind === "prop" ? "font-hanzi-props" : ""}`}
+        className={clueCode({ kind: clue.kind, lit })}
         lang={clue.kind === "prop" ? "zh-CN" : undefined}
       >
-        <ClueCode clue={clue} />
-        {clue.count && clue.count > 1 ? <sup>×{clue.count}</sup> : null}
+        <ClueCode clue={clue} toneClassName={clueTone} />
+        {clue.count && clue.count > 1 ? (
+          <sup className={clueCount}>×{clue.count}</sup>
+        ) : null}
       </span>
-      <span className="dx-role">
+      <span className={clueRole()}>
         {clue.kind === "prop"
           ? (clue.meaning ?? "prop")
           : clue.role.toLowerCase()}
       </span>
-      <span className="dx-input dx-static" data-empty={empty}>
+      <span className={clueName({ empty })}>
         {empty ? "not named yet" : clue.name}
       </span>
     </div>
@@ -306,18 +344,21 @@ function WordEntry({
 
   return (
     <>
-      <header className="dx-entry-hero dx-entry-word">
+      <header className={cn(hero, "hero:grid-cols-entry-word")}>
         <WordGloss
           glosses={item.characterParts.map((part) => part.meaning)}
           hanzi={item.hanzi}
+          hanziClassName="text-gloss-entry"
           revealed
           syllables={syllables}
         />
-        <div className="dx-entry-def">
-          <h1 className="dx-meaning">{meaning.primary}</h1>
-          <div className="dx-sound">
+        <div className={definition}>
+          <h1 className={entryMeaning}>{meaning.primary}</h1>
+          <div className={entrySound}>
             {syllables ? null : (
-              <span className="dx-py dx-py-plain">{item.pinyin}</span>
+              <span className={cn(pinyinText, "text-foreground")}>
+                {item.pinyin}
+              </span>
             )}
             <AudioButton
               label="listen"
@@ -329,9 +370,9 @@ function WordEntry({
         </div>
       </header>
 
-      <section aria-label="Characters" className="dx-entry-section">
-        <SectionHead label="characters" />
-        <div className="dx-wall dx-wall-tight">
+      <section aria-label="Characters" className={section}>
+        <SectionHead className="mb-0" label="characters" />
+        <Wall tight>
           {characters.map(({ part, character }) =>
             character ? (
               <Tile
@@ -339,20 +380,26 @@ function WordEntry({
                 key={character.id}
               />
             ) : (
-              <span className="dx-tile" data-status="new" key={part.id}>
-                <span className="dx-tile-hanzi font-hanzi">{part.hanzi}</span>
+              <span
+                className={tileClass("characters", "new")}
+                data-character
+                key={part.id}
+              >
+                <TileGlyph kind="characters">{part.hanzi}</TileGlyph>
               </span>
             )
           )}
-        </div>
+        </Wall>
       </section>
 
-      <section aria-label="Memory link" className="dx-entry-section">
-        <SectionHead label="memory link" />
+      <section aria-label="Memory link" className={section}>
+        <SectionHead className="mb-0" label="memory link" />
         {item.livingLink ? (
-          <p className="dx-entry-link">{item.livingLink}</p>
+          <p className="type-body border-border border-b py-3 text-foreground">
+            {item.livingLink}
+          </p>
         ) : (
-          <p className="dx-entry-empty">
+          <p className={emptyNote}>
             no memory link yet — add one in its lesson
           </p>
         )}
@@ -370,13 +417,20 @@ function Senses({ meanings }: { meanings: string[] }) {
   }
   const hidden = meanings.length - 3;
   return (
-    <ol className="dx-senses">
+    <ol className="type-body grid max-w-measure list-inside list-decimal gap-1 text-muted-foreground marker:text-faint-foreground">
       {(open ? meanings : meanings.slice(0, 3)).map((meaning) => (
-        <li key={meaning}>{meaning}</li>
+        <li className="only:list-none" key={meaning}>
+          {meaning}
+        </li>
       ))}
       {hidden > 0 ? (
-        <li className="dx-senses-more">
-          <button aria-expanded={open} onClick={toggle} type="button">
+        <li className="list-none">
+          <button
+            aria-expanded={open}
+            className="text-blue"
+            onClick={toggle}
+            type="button"
+          >
             {open ? "fewer" : `+${hidden} more`}
           </button>
         </li>

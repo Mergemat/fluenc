@@ -20,9 +20,11 @@ import {
 import type { BuildItem, DashboardData } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { nextReviews } from "../lib/review-schedule";
+import { cn } from "../lib/utils";
 import { profileQueryOptions } from "../offline/queries";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
+import { action, actionKey } from "./ui/buttons";
 import { MoviePinyin } from "./ui/hanzi";
 import { Page, PageHeader, SectionHead } from "./ui/layout";
 
@@ -51,18 +53,31 @@ function leadOf(data: DashboardData): Lead | null {
 const plural = (count: number, one: string, many: string) =>
   `${count} ${count === 1 ? one : many}`;
 
+// Next up: the page's one raised surface. It reaches into the gutter by its padding on wide
+// screens, so its text lines up with the page title; on a phone it sits inside the gutters.
+const nextCard =
+  "flex flex-col gap-4 rounded-xl bg-card p-6 max-md:p-5 md:-ml-6";
+const nextHero = "flex min-w-0 items-end gap-6";
+const nextGlyph = "flex-none font-hanzi text-7xl leading-none max-md:text-7xl";
+const nextWhat = "m-0 grid min-w-0 gap-2 pb-2";
+const nextPinyin = "type-control text-lg text-muted-foreground leading-none";
+
+function NextHead({ meta }: { meta?: string }) {
+  return <SectionHead className="mb-0" label="next up" meta={meta} />;
+}
+
 function Primary({ to, label }: { to: Lead; label: string }) {
   const navigate = useNavigate();
   const go = useCallback(() => navigate({ to }), [navigate, to]);
   return (
     <DitherButton
-      className="dx-action"
+      className={cn(action, "mt-2 short:max-studio:h-11")}
       color="blue"
       onClick={go}
       variant="gradient"
     >
       <span>{label}</span>
-      <kbd>space</kbd>
+      <kbd className={actionKey}>space</kbd>
     </DitherButton>
   );
 }
@@ -74,26 +89,35 @@ function ReviewNext({ data }: { data: DashboardData }) {
     .filter((item) => item.type !== "sentence")
     .slice(0, QUEUE_SHOWN);
   return (
-    <section aria-label="Next up" className="dx-next">
-      <SectionHead label="next up" meta="review · due now" />
-      <div className="dx-next-hero">
+    <section aria-label="Next up" className={nextCard}>
+      <NextHead meta="review · due now" />
+      <div className={nextHero}>
         {first ? (
-          <span className="dx-next-glyph font-hanzi" lang="zh-CN">
+          <span className={nextGlyph} lang="zh-CN">
             {first.hanzi}
           </span>
         ) : null}
-        <p className="dx-next-what">
-          <b className="dx-next-num">{due}</b>
-          <span>
+        <p className={nextWhat}>
+          <b className="trim-cap type-display text-4xl tabular-nums leading-none tracking-snug">
+            {due}
+          </b>
+          <span className="type-body text-muted-foreground leading-none">
             {due === 1 ? "card" : "cards"} · about{" "}
             {Math.max(1, Math.round((due * SECONDS_PER_CARD) / 60))} min
           </span>
         </p>
       </div>
       {rest.length ? (
-        <ol aria-label="Cards after it" className="dx-next-queue" lang="zh-CN">
+        <ol
+          aria-label="Cards after it"
+          className="m-0 flex list-none gap-4 overflow-x-clip whitespace-nowrap p-0 text-muted-foreground text-xl leading-none"
+          lang="zh-CN"
+        >
           {rest.map((item) => (
-            <li className="font-hanzi" key={`${item.type}:${item.id}`}>
+            <li
+              className="flex-none font-hanzi"
+              key={`${item.type}:${item.id}`}
+            >
               {item.hanzi}
             </li>
           ))}
@@ -107,26 +131,28 @@ function ReviewNext({ data }: { data: DashboardData }) {
 function LessonNext({ item }: { item: BuildItem }) {
   const meaning = getItemMeaning(item);
   return (
-    <section aria-label="Next up" className="dx-next">
-      <SectionHead
-        label="next up"
+    <section aria-label="Next up" className={nextCard}>
+      <NextHead
         meta={`learn · ${item.focus ?? (item.type === "word" ? "new word" : "new character")}`}
       />
-      <div className="dx-next-hero">
-        <span className="dx-next-glyph font-hanzi" lang="zh-CN">
+      <div className={nextHero}>
+        <span className={nextGlyph} lang="zh-CN">
           {item.hanzi}
         </span>
-        <div className="dx-next-what">
-          <b className="dx-next-title">{meaning.primary}</b>
+        <div className={nextWhat}>
+          <b className="type-display text-2xl leading-none">
+            {meaning.primary}
+          </b>
           {item.type === "character" ? (
             <MoviePinyin
               actorKey={item.movie.actorKey}
+              className={nextPinyin}
               finalKey={item.movie.finalKey}
               pinyin={item.pinyin}
               tone={item.movie.tone}
             />
           ) : (
-            <span className="dx-next-pinyin">{item.pinyin}</span>
+            <span className={nextPinyin}>{item.pinyin}</span>
           )}
         </div>
       </div>
@@ -143,12 +169,12 @@ function ReadingNext({
   count: number;
 }) {
   return (
-    <section aria-label="Next up" className="dx-next">
-      <SectionHead
-        label="next up"
-        meta={`read · ${plural(count, "sentence", "sentences")}`}
-      />
-      <p className="dx-next-sentence font-hanzi" lang="zh-CN">
+    <section aria-label="Next up" className={nextCard}>
+      <NextHead meta={`read · ${plural(count, "sentence", "sentences")}`} />
+      <p
+        className="m-0 font-hanzi text-3xl leading-snug tracking-wide"
+        lang="zh-CN"
+      >
         {sentence.hanzi}
       </p>
       <Primary label="read" to="/reading" />
@@ -170,9 +196,11 @@ function NextUp({ data, lead }: { data: DashboardData; lead: Lead | null }) {
     return <ReadingNext count={data.getQueue.length} sentence={sentence} />;
   }
   return (
-    <section aria-label="Next up" className="dx-next">
-      <SectionHead label="next up" />
-      <p className="dx-next-done">nothing waiting — every lesson is learned</p>
+    <section aria-label="Next up" className={nextCard}>
+      <NextHead />
+      <p className="type-body m-0 text-muted-foreground">
+        nothing waiting — every lesson is learned
+      </p>
     </section>
   );
 }
@@ -192,14 +220,27 @@ function Later({
   children: ReactNode;
 }) {
   return (
-    <li>
-      <Link aria-label={name} className="dx-later-row" to={to}>
-        <span aria-hidden="true" className="dx-later-lead font-hanzi">
+    // Hairlines split the rows. A hovered row is raised over them, and its ring in the row's own
+    // colour hides the one under it.
+    <li className="not-first:inset-shadow-hairline">
+      <Link
+        aria-label={name}
+        className="relative -mx-2 flex items-center gap-4 rounded-lg px-2 py-3 ring-card transition hover:bg-card hover:ring-1"
+        to={to}
+      >
+        <span
+          aria-hidden="true"
+          className="w-10 flex-none text-center font-hanzi text-3xl text-muted-foreground leading-none"
+        >
           {lead}
         </span>
-        <span className="dx-later-body">
-          <span className="dx-later-label">{label}</span>
-          <span className="dx-later-title">{children}</span>
+        <span className="grid min-w-0 flex-1 gap-2">
+          <span className="type-label truncate text-muted-foreground">
+            {label}
+          </span>
+          <span className="type-heading flex min-w-0 items-baseline gap-2 overflow-hidden whitespace-nowrap leading-none">
+            {children}
+          </span>
         </span>
       </Link>
     </li>
@@ -238,12 +279,12 @@ function LaterToday({
   const [sentence] = data.getQueue;
   const next = nextReviews(data, Date.now());
   return (
-    <section aria-label="Later today" className="dx-later">
+    <section aria-label="Later today">
       <SectionHead label="later today" />
-      <ul className="dx-later-list">
+      <ul className="m-0 list-none p-0">
         {lead === "/review" ? null : (
           <Later label="review" lead="复" name="Review" to="/review">
-            <span className="dx-later-quiet">
+            <span className="type-body text-muted-foreground leading-none">
               all caught up{next ? ` · next ${next}` : ""}
             </span>
           </Later>
@@ -259,6 +300,7 @@ function LaterToday({
             {lesson.type === "character" ? (
               <MoviePinyin
                 actorKey={lesson.movie.actorKey}
+                className="type-control"
                 finalKey={lesson.movie.finalKey}
                 pinyin={lesson.pinyin}
                 tone={lesson.movie.tone}
@@ -273,7 +315,10 @@ function LaterToday({
             name="Read"
             to="/reading"
           >
-            <span className="dx-later-sentence font-hanzi" lang="zh-CN">
+            <span
+              className="truncate font-hanzi text-xl tracking-wide"
+              lang="zh-CN"
+            >
               {sentence.hanzi}
             </span>
           </Later>
@@ -288,14 +333,21 @@ function LaterToday({
           name="This week"
           to="/profile"
         >
-          <span className="dx-later-days">
+          <span className="flex gap-1.5">
             {(week?.days ?? []).map((day, index) => (
               <span
-                className="dx-later-day"
-                data-today={day.key === week?.today}
+                className="type-micro grid justify-items-center gap-1 text-faint-foreground"
                 key={day.key}
               >
-                <i title={`${day.key} · ${day.count} new`}>
+                <i
+                  className={cn(
+                    "relative size-6 overflow-hidden rounded-sm",
+                    day.key === week?.today
+                      ? "inset-ring inset-ring-blue"
+                      : "bg-popover"
+                  )}
+                  title={`${day.key} · ${day.count} new`}
+                >
                   {day.count ? (
                     <DitherGradient
                       cell={2}
@@ -354,7 +406,7 @@ export function TodayView({ data }: { data: DashboardData }) {
         />
       }
     >
-      <div className="dx-today">
+      <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-today">
         <NextUp data={data} lead={lead} />
         <LaterToday data={data} lead={lead} />
       </div>

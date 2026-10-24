@@ -91,7 +91,10 @@ const button = (label: string) =>
     candidate.textContent?.includes(label)
   );
 
-const takes = () => host.querySelector(".dx-takes")?.getAttribute("aria-label");
+const takes = () =>
+  host
+    .querySelector('[role="img"][aria-label^="Repeated"]')
+    ?.getAttribute("aria-label");
 
 test("a sentence joins review only after it has been shadowed three times", async () => {
   expect(button("add to review")).toBeUndefined();
