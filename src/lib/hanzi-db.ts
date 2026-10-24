@@ -15,37 +15,35 @@ const syllable = z
 const gloss = z.string().trim().min(1).max(80);
 const sources = z.array(z.url({ protocol: /^https$/ })).min(1);
 
-export const characterSchema = z
-  .object({
-    hanzi: unit,
-    /** The reading the course teaches. */
-    pinyin: syllable,
-    /** The one English word the learner's movie is about; unique across the course. */
-    keyword: z
-      .string()
-      .trim()
-      .min(1)
-      .max(40)
-      .refine((value) => !LIST_PUNCTUATION.test(value), "One keyword"),
-    /** Senses of the taught reading, most useful first. */
-    meanings: z.array(gloss).min(1).max(8),
-    /** A short second cue shown beside the keyword, or null. */
-    also: gloss.nullable(),
-    /** Other readings in common use, with their senses. */
-    readings: z.array(
-      z.object({ pinyin: syllable, meanings: z.array(gloss).min(1).max(6) })
-    ),
-    strokes: z.int().min(1).max(40),
-    radical: unit,
-    /** How the character is taught: as one shape, or assembled from props. */
-    structure: z.enum(["atomic", "compound"]),
-    /** The props of the movie, in writing order. Repeated props are listed each time. */
-    components: z.array(unit).min(1).max(6),
-    /** Learner guidance for an unusual assembly, or null. */
-    note: z.string().trim().min(1).max(240).nullable(),
-    sources,
-  })
-  .strict();
+export const characterSchema = z.strictObject({
+  hanzi: unit,
+  /** The reading the course teaches. */
+  pinyin: syllable,
+  /** The one English word the learner's movie is about; unique across the course. */
+  keyword: z
+    .string()
+    .trim()
+    .min(1)
+    .max(40)
+    .refine((value) => !LIST_PUNCTUATION.test(value), "One keyword"),
+  /** Senses of the taught reading, most useful first. */
+  meanings: z.array(gloss).min(1).max(8),
+  /** A short second cue shown beside the keyword, or null. */
+  also: gloss.nullable(),
+  /** Other readings in common use, with their senses. */
+  readings: z.array(
+    z.object({ pinyin: syllable, meanings: z.array(gloss).min(1).max(6) })
+  ),
+  strokes: z.int().min(1).max(40),
+  radical: unit,
+  /** How the character is taught: as one shape, or assembled from props. */
+  structure: z.enum(["atomic", "compound"]),
+  /** The props of the movie, in writing order. Repeated props are listed each time. */
+  components: z.array(unit).min(1).max(6),
+  /** Learner guidance for an unusual assembly, or null. */
+  note: z.string().trim().min(1).max(240).nullable(),
+  sources,
+});
 
 const wordIdentity = z.object({
   id: z.int().positive(),
@@ -53,32 +51,32 @@ const wordIdentity = z.object({
 });
 
 export const wordSchema = z.union([
-  wordIdentity
-    .extend({
-      pinyin: z.string().min(1),
-      /** One syllable per character; 儿 after a syllable is "r". */
-      syllables: z.array(z.string()).min(1),
-      meaning: gloss,
-      meanings: z.array(gloss).min(1).max(8),
-      also: gloss.nullable(),
-      sources,
-    })
-    .strict(),
-  wordIdentity.extend({ exclude: z.string().trim().min(1) }).strict(),
+  z.strictObject({
+    ...wordIdentity.shape,
+    pinyin: z.string().min(1),
+    /** One syllable per character; 儿 after a syllable is "r". */
+    syllables: z.array(z.string()).min(1),
+    meaning: gloss,
+    meanings: z.array(gloss).min(1).max(8),
+    also: gloss.nullable(),
+    sources,
+  }),
+  z.strictObject({
+    ...wordIdentity.shape,
+    exclude: z.string().trim().min(1),
+  }),
 ]);
 
-export const componentSchema = z
-  .object({
-    hanzi: unit,
-    /** A concrete, picturable object the learner can reuse in every movie with this part. */
-    prop: z.string().trim().min(1).max(40),
-    /** What the part means or depicts. */
-    meaning: gloss,
-    /** The full form this part is a variant of, such as 水 for 氵, or null. */
-    variantOf: unit.nullable(),
-    strokes: z.int().min(1).max(30),
-  })
-  .strict();
+export const componentSchema = z.strictObject({
+  hanzi: unit,
+  /** A concrete, picturable object the learner can reuse in every movie with this part. */
+  prop: z.string().trim().min(1).max(40),
+  /** What the part means or depicts. */
+  meaning: gloss,
+  /** The full form this part is a variant of, such as 水 for 氵, or null. */
+  variantOf: unit.nullable(),
+  strokes: z.int().min(1).max(30),
+});
 
 export type CharacterEntry = z.infer<typeof characterSchema>;
 export type WordEntry = z.infer<typeof wordSchema>;
@@ -96,9 +94,11 @@ const normalize = (value: string) =>
 
 /** Every way a character may be read, without tones. */
 export function readingsOf(character: CharacterEntry) {
-  return [character.pinyin, ...character.readings.map((item) => item.pinyin)]
-    .map((item) => parseSyllable(item)?.base)
-    .filter((item) => item !== undefined);
+  return new Set(
+    [character.pinyin, ...character.readings.map((item) => item.pinyin)]
+      .map((item) => parseSyllable(item)?.base)
+      .filter((item) => item !== undefined)
+  );
 }
 
 /** Problems in one character entry that don't need the rest of the database. */
@@ -151,7 +151,7 @@ export function wordProblems(
     const parsed = isStandardSyllable(piece) ? parseSyllable(piece) : null;
     if (!parsed) {
       problems.push(`${piece} is not a standard syllable`);
-    } else if (!readingsOf(known).includes(parsed.base)) {
+    } else if (!readingsOf(known).has(parsed.base)) {
       problems.push(`${character} is never read ${parsed.base}`);
     }
   }

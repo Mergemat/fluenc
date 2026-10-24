@@ -48,14 +48,16 @@ async function generatedSpeech(pronunciation: PronunciationInput) {
   }
   try {
     const cache = await caches.open(SPEECH_CACHE);
-    let response = await cache.match(url);
-    if (!response) {
-      response = await fetch(url);
-      if (!response.ok) {
-        return url;
-      }
+    const cached = await cache.match(url);
+    const response = cached ?? (await fetch(url));
+    if (!response.ok) {
+      return url;
+    }
+    if (!cached) {
       await cache.put(url, response.clone());
     }
+    // Kept in `audioSourceCache` for replays this session, so it is never revoked.
+    // react-doctor-disable-next-line react-doctor/no-create-object-url-without-revoke
     return URL.createObjectURL(await response.blob());
   } catch {
     return url;

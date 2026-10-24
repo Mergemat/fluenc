@@ -1,5 +1,7 @@
 import { type Card, fsrs, type Grade, Rating, State } from "ts-fsrs";
 
+import type { DashboardData } from "./learner-views";
+
 export const REVIEW_TIME_ZONE = "Asia/Shanghai";
 
 const dayMs = 86_400_000;
@@ -85,4 +87,40 @@ export function waitLabel(from: Date, due: Date) {
   return days < 365
     ? `${Math.round(days / 30)} mo`
     : `${Math.round(days / 365)} yr`;
+}
+
+/** "tomorrow", or a short weekday and date in Shanghai time ("thu 8"). */
+function reviewDayLabel(date: string, now: number) {
+  const day = (time: number) =>
+    new Date(time).toLocaleDateString("en-CA", { timeZone: REVIEW_TIME_ZONE });
+  if (day(Date.parse(date)) === day(now + dayMs)) {
+    return "tomorrow";
+  }
+  return new Date(date)
+    .toLocaleDateString("en-GB", {
+      timeZone: REVIEW_TIME_ZONE,
+      weekday: "short",
+      day: "numeric",
+    })
+    .toLowerCase();
+}
+
+/** When reviews come back and how many that day: "tomorrow · 14", or "in 8 min · 2" today. */
+export function nextReviews(
+  data: Pick<DashboardData, "nextReviewAt" | "scheduledQueue">,
+  now: number
+) {
+  if (!data.nextReviewAt) {
+    return null;
+  }
+  const at = new Date(data.nextReviewAt);
+  const day = reviewDay(at);
+  const count = data.scheduledQueue.filter(
+    (item) => reviewDay(new Date(item.card.due)) === day
+  ).length;
+  const when =
+    day === reviewDay(new Date(now))
+      ? `in ${waitLabel(new Date(now), at)}`
+      : reviewDayLabel(data.nextReviewAt, now);
+  return `${when} · ${count}`;
 }

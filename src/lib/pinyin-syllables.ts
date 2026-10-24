@@ -93,7 +93,7 @@ const SEPARATORS = /[\s'’-]/g;
 export function splitReading(
   hanzi: string,
   reading: string,
-  readings: (character: string) => readonly string[] | undefined
+  readings: (character: string) => ReadonlySet<string> | undefined
 ) {
   const characters = Array.from(hanzi);
   const letters = Array.from(
@@ -118,7 +118,7 @@ export function splitReading(
     ) {
       const piece = letters.slice(offset, end).join("");
       const parsed = parseSyllable(piece);
-      if (parsed && (!known || known.includes(parsed.base))) {
+      if (parsed && (!known || known.has(parsed.base))) {
         walk(position + 1, end, [...taken, piece]);
       }
     }

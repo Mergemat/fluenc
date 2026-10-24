@@ -8,12 +8,7 @@ import {
 } from "react";
 import { Rating } from "ts-fsrs";
 import type { DashboardData } from "../lib/learner-views";
-import {
-  isLearning,
-  REVIEW_TIME_ZONE,
-  reviewDay as shanghaiDay,
-  waitLabel,
-} from "../lib/review-schedule";
+import { isLearning, nextReviews } from "../lib/review-schedule";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import { type Graded, ReviewCard } from "./review-card";
@@ -65,23 +60,6 @@ function doneNext(
   }
   const next = nextReviews(data, now);
   return next ? ["next reviews", next] : null;
-}
-
-/** When reviews come back and how many that day: "tomorrow · 14", or "in 8 min · 2" today. */
-export function nextReviews(data: DashboardData, now: number) {
-  if (!data.nextReviewAt) {
-    return null;
-  }
-  const at = new Date(data.nextReviewAt);
-  const day = shanghaiDay(at);
-  const count = data.scheduledQueue.filter(
-    (item) => shanghaiDay(new Date(item.card.due)) === day
-  ).length;
-  const when =
-    day === shanghaiDay(new Date(now))
-      ? `in ${waitLabel(new Date(now), at)}`
-      : reviewDay(data.nextReviewAt, now);
-  return `${when} · ${count}`;
 }
 
 export function ReviewView({ data }: { data: DashboardData }) {
@@ -354,22 +332,6 @@ function useNow(ticking: boolean) {
     return () => clearInterval(timer);
   }, [ticking]);
   return now;
-}
-
-/** "tomorrow", or a short weekday and date in Shanghai time ("thu 8"). */
-function reviewDay(date: string, now: number) {
-  const day = (time: number) =>
-    new Date(time).toLocaleDateString("en-CA", { timeZone: REVIEW_TIME_ZONE });
-  if (day(Date.parse(date)) === day(now + 86_400_000)) {
-    return "tomorrow";
-  }
-  return new Date(date)
-    .toLocaleDateString("en-GB", {
-      timeZone: REVIEW_TIME_ZONE,
-      weekday: "short",
-      day: "numeric",
-    })
-    .toLowerCase();
 }
 
 function countdown(milliseconds: number) {

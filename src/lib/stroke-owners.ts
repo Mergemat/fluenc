@@ -15,9 +15,8 @@ export function remapStrokeOwners(
     return only ? previous.map(() => only) : null;
   }
   const kept = previous.map((owner) => (wanted.has(owner) ? owner : null));
-  const missing = parts.filter(
-    (part, index) => !kept.includes(part) && parts.indexOf(part) === index
-  );
+  const drawn = new Set(kept);
+  const missing = [...wanted].filter((part) => !drawn.has(part));
   const handed = handOver(
     missing,
     kept.filter((owner) => owner === null).length,
@@ -28,7 +27,8 @@ export function remapStrokeOwners(
     return null;
   }
   const owners = kept.map((owner) => owner ?? handed.shift() ?? "");
-  return parts.every((part) => owners.includes(part)) ? owners : null;
+  const covered = new Set(owners);
+  return [...wanted].every((part) => covered.has(part)) ? owners : null;
 }
 
 /** The props, in writing order, that take over `loose` strokes, or null if their counts don't fit. */

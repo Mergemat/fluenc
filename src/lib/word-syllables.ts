@@ -5,11 +5,15 @@ import { parseSyllable, splitReading } from "./pinyin-syllables";
 const readings = new Map(
   (curriculumJson as Curriculum).characters.map((character) => [
     character.hanzi,
-    [character.pinyin, ...character.readings.map((item) => item.pinyin)]
-      .map((pinyin) => parseSyllable(pinyin)?.base)
-      .filter((base) => base !== undefined),
+    new Set(
+      [character.pinyin, ...character.readings.map((item) => item.pinyin)]
+        .map((pinyin) => parseSyllable(pinyin)?.base)
+        .filter((base) => base !== undefined)
+    ),
   ])
 );
+
+const erReadings = new Set(["er", "r"]);
 
 /**
  * Split a word's pinyin into one syllable per character, keeping its spelling and tones (东西
@@ -18,6 +22,6 @@ const readings = new Map(
  */
 export function wordSyllables(hanzi: string, reading: string): string[] | null {
   return splitReading(hanzi, reading, (character) =>
-    character === "儿" ? ["er", "r"] : readings.get(character)
+    character === "儿" ? erReadings : readings.get(character)
   );
 }
