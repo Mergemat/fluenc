@@ -1,7 +1,12 @@
 // Review and read are a deck of cards: the top card flips to its answer, a grade throws it away
 // and the next one rises off the pile, which thins as the session runs down. The cards carry the
 // dither; the page behind them stays plain.
-import type { CSSProperties, ReactNode } from "react";
+import {
+  type AnimationEvent,
+  type CSSProperties,
+  type ReactNode,
+  useCallback,
+} from "react";
 
 import { DitherGradient } from "../dither-kit/gradient";
 import type { DitherColor } from "../dither-kit/palette";
@@ -79,34 +84,42 @@ export function DeckTable({
   );
 }
 
-/** A pile: `under` cards beneath whatever lies on top. Wide piles hold sentences. */
+/**
+ * A pile: `under` cards beneath whatever lies on top, and `over` it the cards still flying off.
+ * Wide piles hold sentences.
+ */
 export function DeckPile({
   under,
   wide = false,
+  over = null,
   children,
 }: {
   under: number;
   wide?: boolean;
-  children: ReactNode;
+  over?: ReactNode;
+  children?: ReactNode;
 }) {
   return (
     <div className="dx-deck-pile" data-wide={wide}>
       <Under count={under} />
       {children}
+      {over}
     </div>
   );
 }
 
 /**
  * The top card: a prompt face and an answer face. The prompt face is the button that flips it;
- * `thrown` sends the card off the pile to that side.
+ * `thrown` sends the card off the pile to that side. A `ghost` is a copy only to be seen leaving.
  */
 export function DeckCard({
   suit,
   flipped,
   thrown = null,
   tint = null,
+  ghost = false,
   onFlip,
+  onThrown,
   front,
   back,
 }: {
@@ -114,15 +127,31 @@ export function DeckCard({
   flipped: boolean;
   thrown?: "left" | "right" | null;
   tint?: DitherColor | null;
+  ghost?: boolean;
   onFlip: () => void;
+  /** Called once a throw has carried the card off. */
+  onThrown?: () => void;
   front: ReactNode;
   back: ReactNode;
 }) {
+  const thrownEnd = useCallback(
+    (event: AnimationEvent<HTMLDivElement>) => {
+      // The faces' own fades bubble up here too; only the card's throw counts.
+      if (event.target === event.currentTarget && thrown) {
+        onThrown?.();
+      }
+    },
+    [thrown, onThrown]
+  );
   return (
     <div
+      aria-hidden={ghost || undefined}
       className="dx-deck-card"
       data-flipped={flipped}
+      data-ghost={ghost || undefined}
       data-thrown={thrown ?? undefined}
+      inert={ghost || undefined}
+      onAnimationEnd={thrownEnd}
     >
       <button
         aria-label="Show answer"

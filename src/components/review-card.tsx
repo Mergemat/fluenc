@@ -1,14 +1,15 @@
 // A review is the top card of a deck. The front asks; the back answers with its focus (big pinyin,
 // the meaning, its other meanings) centred where the front's character stood, so the eye lands on
-// the answer in the same place. A grade throws the card off the pile, then saves it. The reveal
-// button and the grades share one slot, so revealing never moves anything.
+// the answer in the same place. A grade hands the card to the page, which throws it off the pile
+// while the next one deals in. The reveal button and the grades share one slot, so revealing
+// never moves anything.
 import {
   type CSSProperties,
   type PointerEvent,
+  type ReactNode,
   useCallback,
   useEffect,
   useEffectEvent,
-  useRef,
   useState,
 } from "react";
 import { type Grade, Rating } from "ts-fsrs";
@@ -16,8 +17,6 @@ import { toCard } from "../lib/learner-state";
 import type { ReviewItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { previewDue, waitLabel } from "../lib/review-schedule";
-import { saveReview } from "../offline/progress";
-import { useProgressMutation } from "../offline/use-progress-mutation";
 import { ClueCode } from "./character-studio/clue-code";
 import { lessonClues } from "./character-studio/clues";
 import { DitherButton } from "./dither-kit/button";
@@ -39,9 +38,6 @@ const ratings: {
 ];
 
 const RATING_KEY = /^[1-4]$/;
-// Long enough to see the card leave, short enough not to wait on it; the save follows it.
-// Matches the throw animation in dither.css.
-const THROW_MS = 160;
 
 type CharacterReview = Extract<ReviewItem, { type: "character" }>;
 type Clue = ReturnType<typeof lessonClues>[number];
@@ -61,15 +57,11 @@ function useWaits(item: ReviewItem) {
 function RatingButton({
   rating,
   after,
-  picked,
-  pending,
   onRate,
   onTint,
 }: {
   rating: (typeof ratings)[number];
   after: string;
-  picked: boolean;
-  pending: boolean;
   onRate: (rating: Grade) => void;
   onTint: (color: DitherColor | null) => void;
 }) {
@@ -89,15 +81,12 @@ function RatingButton({
     <div className="dx-rate-slot">
       <em>{after}</em>
       <DitherButton
-        bloom={picked ? "high" : "off"}
         className="dx-rate"
         color={rating.color}
-        data-picked={picked}
-        disabled={pending && !picked}
         onClick={rate}
         onPointerEnter={tint}
         onPointerLeave={untint}
-        variant={picked ? "solid" : "dotted"}
+        variant="dotted"
       >
         <span>{rating.label}</span>
         <small>{rating.note}</small>
@@ -306,43 +295,73 @@ function CardAnswer({
   );
 }
 
+/** Which way a grade throws its card: misses to the left, recalls to the right. */
+export const throwSide = (rating: Grade) =>
+  rating <= Rating.Hard ? "left" : "right";
+
+const noFlip = () => undefined;
+const stillParts: PartPointer = {
+  highlighted: null,
+  onHover: () => undefined,
+  onSelect: () => undefined,
+};
+
+/** A graded card on its way off the pile, answer up, drawn over the card dealt in under it. */
+export function ThrownCard({
+  id,
+  item,
+  side,
+  onGone,
+}: {
+  id: number;
+  item: ReviewItem;
+  side: "left" | "right";
+  onGone: (id: number) => void;
+}) {
+  const gone = useCallback(() => onGone(id), [onGone, id]);
+  const clues = item.type === "character" ? lessonClues(item) : [];
+  return (
+    <DeckCard
+      back={<CardAnswer clues={clues} item={item} parts={stillParts} />}
+      flipped
+      front={null}
+      ghost
+      onFlip={noFlip}
+      onThrown={gone}
+      suit={item.type}
+      thrown={side}
+    />
+  );
+}
+
 export function ReviewCard({
   item,
   remaining,
+  thrown,
+  failed,
+  onGrade,
 }: {
   item: ReviewItem;
   /** Cards left in the session, this one included. */
   remaining: number;
+  /** Cards still flying off the pile, drawn over this one. */
+  thrown: ReactNode;
+  /** The last grade could not be saved, so this card came back. */
+  failed: boolean;
+  onGrade: (item: ReviewItem, rating: Grade, durationMs: number) => void;
 }) {
   const [startedAt] = useState(Date.now);
   const [revealed, setRevealed] = useState(false);
-  const [thrown, setThrown] = useState<Grade | null>(null);
   const [tint, setTint] = useState<DitherColor | null>(null);
   const waits = useWaits(item);
-  const mutation = useProgressMutation(saveReview);
-  const { isPending, mutate } = mutation;
-  // A failed save puts the card back so the grade can be tried again.
-  const leaving = thrown !== null && !mutation.isError;
-  const throwTimer = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(throwTimer.current), []);
   const rate = useCallback(
-    (rating: Grade) => {
-      if (leaving || isPending) {
-        return;
-      }
-      const durationMs = Math.min(
-        3_600_000,
-        Math.max(0, Date.now() - startedAt)
-      );
-      setThrown(rating);
-      setTint(null);
-      throwTimer.current = window.setTimeout(
-        () =>
-          mutate({ itemType: item.type, itemId: item.id, rating, durationMs }),
-        THROW_MS
-      );
-    },
-    [leaving, isPending, mutate, item.type, item.id, startedAt]
+    (rating: Grade) =>
+      onGrade(
+        item,
+        rating,
+        Math.min(3_600_000, Math.max(0, Date.now() - startedAt))
+      ),
+    [onGrade, item, startedAt]
   );
   // A part lights while the pointer is on it or its chip; a tap keeps it lit.
   const [hover, setHover] = useState<string | null>(null);
@@ -383,10 +402,6 @@ export function ReviewCard({
   }, []);
 
   const clues = item.type === "character" ? lessonClues(item) : [];
-  let thrownTo: "left" | "right" | null = null;
-  if (thrown !== null && leaving) {
-    thrownTo = thrown <= Rating.Hard ? "left" : "right";
-  }
 
   return (
     <div className="dx-deck" data-revealed={revealed} data-type={item.type}>
@@ -397,14 +412,13 @@ export function ReviewCard({
           </>
         }
       >
-        <DeckPile under={remaining - 1}>
+        <DeckPile over={thrown} under={remaining - 1}>
           <DeckCard
             back={<CardAnswer clues={clues} item={item} parts={parts} />}
             flipped={revealed}
             front={<CardFront clues={clues} item={item} />}
             onFlip={reveal}
             suit={item.type}
-            thrown={thrownTo}
             tint={tint}
           />
         </DeckPile>
@@ -434,14 +448,12 @@ export function ReviewCard({
               key={rating.value}
               onRate={rate}
               onTint={setTint}
-              pending={leaving || isPending}
-              picked={leaving && thrown === rating.value}
               rating={rating}
             />
           ))}
         </fieldset>
       </footer>
-      {mutation.isError ? (
+      {failed ? (
         <p className="dx-deck-error" role="alert">
           could not save this review — try again
         </p>

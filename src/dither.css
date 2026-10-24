@@ -2025,7 +2025,7 @@
   transform-style: preserve-3d;
   transition: transform 360ms cubic-bezier(0.3, 1.15, 0.6, 1);
   /* Backwards only: a held filter would flatten the 3D flip. */
-  animation: dx-deck-deal 240ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  animation: dx-deck-deal 180ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
 @keyframes dx-deck-deal {
   from {
@@ -2050,6 +2050,11 @@
 .dx-deck-card[data-flipped="true"] {
   transform: rotateY(180deg);
 }
+/* A thrown copy flies over the card dealt in under it and takes no input. */
+.dx-deck-card[data-ghost="true"] {
+  z-index: 6;
+  pointer-events: none;
+}
 /* A throw starts flipped, with the same transform list as its end, so it never turns back over.
    It fades the faces, not the card: opacity on the card would flatten the flip and show the
    front through the back. */
@@ -2059,10 +2064,10 @@
   }
 }
 .dx-deck-card[data-thrown="left"] {
-  animation: dx-deck-throw-left 160ms cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+  animation: dx-deck-throw-left 180ms cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
 }
 .dx-deck-card[data-thrown="right"] {
-  animation: dx-deck-throw-right 160ms cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+  animation: dx-deck-throw-right 180ms cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
 }
 @keyframes dx-deck-throw-left {
   from {
@@ -2108,7 +2113,7 @@
   transform: rotateY(180deg);
 }
 .dx-deck-card[data-thrown] > .dx-deck-face {
-  animation: dx-deck-fade-out 160ms linear forwards;
+  animation: dx-deck-fade-out 180ms linear forwards;
 }
 .dx-deck-suit {
   position: absolute;

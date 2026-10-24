@@ -1,24 +1,117 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useEffectEvent, useState } from "react";
-import type { DashboardData } from "../lib/learner-views";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
+import type { Grade } from "ts-fsrs";
+import type { DashboardData, ReviewItem } from "../lib/learner-views";
 import { isLearning, nextReviews } from "../lib/review-schedule";
+import { saveReview } from "../offline/progress";
+import { useProgressMutation } from "../offline/use-progress-mutation";
 import { DitherButton } from "./dither-kit/button";
-import { ReviewCard } from "./review-card";
+import { ReviewCard, ThrownCard, throwSide } from "./review-card";
 import { DeckPile, DeckSlot, DeckTable } from "./ui/deck";
 import { PageHeader } from "./ui/layout";
 
 type DoneState = "waiting" | "finished" | "empty";
 
+// A thrown card goes when its throw ends; this only clears it where no animation runs.
+const THROWN_FALLBACK_MS = 600;
+
+const cardKey = (item: ReviewItem) => `${item.type}:${item.id}:${item.reps}`;
+
+interface Thrown {
+  id: number;
+  item: ReviewItem;
+  side: "left" | "right";
+}
+
+/**
+ * A grade deals the next card at once: the graded card leaves the queue and flies off over the
+ * pile while its save runs. A save that fails puts the card back.
+ */
+function useGrading() {
+  const { mutateAsync } = useProgressMutation(saveReview);
+  const [graded, setGraded] = useState<ReadonlySet<string>>(() => new Set());
+  const [failed, setFailed] = useState(false);
+  const [thrown, setThrown] = useState<Thrown[]>([]);
+  const lastThrow = useRef(0);
+  const timers = useRef(new Set<number>());
+  useEffect(() => {
+    const pending = timers.current;
+    return () => {
+      for (const timer of pending) {
+        window.clearTimeout(timer);
+      }
+    };
+  }, []);
+  const drop = useCallback(
+    (id: number) =>
+      setThrown((previous) => previous.filter((card) => card.id !== id)),
+    []
+  );
+  const grade = useCallback(
+    (item: ReviewItem, rating: Grade, durationMs: number) => {
+      const key = cardKey(item);
+      lastThrow.current += 1;
+      const id = lastThrow.current;
+      setGraded((previous) => new Set(previous).add(key));
+      setFailed(false);
+      setThrown((previous) => [
+        ...previous,
+        { id, item, side: throwSide(rating) },
+      ]);
+      const timer = window.setTimeout(() => {
+        timers.current.delete(timer);
+        drop(id);
+      }, THROWN_FALLBACK_MS);
+      timers.current.add(timer);
+      mutateAsync({
+        itemType: item.type,
+        itemId: item.id,
+        rating,
+        durationMs,
+      }).catch(() => {
+        setGraded((previous) => {
+          const next = new Set(previous);
+          next.delete(key);
+          return next;
+        });
+        setFailed(true);
+      });
+    },
+    [mutateAsync, drop]
+  );
+  const flying = thrown.map((card) => (
+    <ThrownCard
+      id={card.id}
+      item={card.item}
+      key={card.id}
+      onGone={drop}
+      side={card.side}
+    />
+  ));
+  return { graded, failed, flying, grade };
+}
+
 export function ReviewView({ data }: { data: DashboardData }) {
-  const [selected, setSelected] = useState(() => data.reviewQueue[0]);
+  const { graded, failed, flying, grade } = useGrading();
+  // Graded cards wait for their save outside the queue.
+  const queue = data.reviewQueue.filter((item) => !graded.has(cardKey(item)));
+  const saving = queue.length < data.reviewQueue.length;
+  const [selected, setSelected] = useState(() => queue[0]);
   // A learning step becoming due must not replace the card being answered.
   const active =
-    data.reviewQueue.find(
+    queue.find(
       (item) =>
         item.type === selected?.type &&
         item.id === selected.id &&
         item.reps === selected.reps
-    ) ?? data.reviewQueue[0];
+    ) ?? queue[0];
   if (
     active?.type !== selected?.type ||
     active?.id !== selected?.id ||
@@ -43,23 +136,44 @@ export function ReviewView({ data }: { data: DashboardData }) {
     state = "finished";
   }
 
+  let body: ReactNode;
+  if (active) {
+    body = (
+      <ReviewCard
+        failed={failed}
+        item={active}
+        key={cardKey(active)}
+        onGrade={grade}
+        remaining={queue.length}
+        thrown={flying}
+      />
+    );
+  } else if (saving) {
+    // The last grade is still saving: an empty pile until it says what comes next.
+    body = (
+      <div className="dx-deck">
+        <DeckTable>
+          <DeckPile over={flying} under={0} />
+        </DeckTable>
+        <footer className="dx-deck-actions" />
+      </div>
+    );
+  } else {
+    body = (
+      <ReviewDone
+        coming={learning.length}
+        data={data}
+        nextLearningAt={nextLearningAt}
+        state={state}
+        thrown={flying}
+      />
+    );
+  }
+
   return (
     <section className="dx-deck-page">
       <PageHeader title="review" />
-      {active ? (
-        <ReviewCard
-          item={active}
-          key={`${active.type}:${active.id}:${active.reps}`}
-          remaining={data.reviewQueue.length}
-        />
-      ) : (
-        <ReviewDone
-          coming={learning.length}
-          data={data}
-          nextLearningAt={nextLearningAt}
-          state={state}
-        />
-      )}
+      {body}
     </section>
   );
 }
@@ -73,11 +187,14 @@ function ReviewDone({
   data,
   coming,
   nextLearningAt,
+  thrown,
 }: {
   state: DoneState;
   data: DashboardData;
   coming: number;
   nextLearningAt: string | null;
+  /** The last card, still flying off. */
+  thrown: ReactNode;
 }) {
   const navigate = useNavigate();
   const waiting = state === "waiting";
@@ -116,7 +233,7 @@ function ReviewDone({
     return (
       <div className="dx-deck" data-state="waiting" role="status">
         <DeckTable caption="back after a short break">
-          <DeckPile under={coming - 1}>
+          <DeckPile over={thrown} under={coming - 1}>
             <DeckSlot state="down">
               <b className="dx-deck-timer">
                 {countdown(Date.parse(nextLearningAt ?? "") - now)}
@@ -150,7 +267,7 @@ function ReviewDone({
   return (
     <div className="dx-deck" data-state={state}>
       <DeckTable>
-        <DeckPile under={0}>
+        <DeckPile over={thrown} under={0}>
           <DeckSlot state="empty">
             {state === "finished" ? (
               <>

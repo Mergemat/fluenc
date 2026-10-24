@@ -261,3 +261,24 @@ test("a finished review says when the next reviews come, not which cards were re
   expect(slot.textContent).toMatch(NEXT_REVIEWS);
   expect(slot.textContent).not.toContain("你好");
 });
+
+test("a grade deals the next card before its save lands, and a failed save brings the card back", async () => {
+  const data = fixture(2);
+  await show(data, "optimistic");
+  expect(host.textContent).toContain("Sentence 0");
+  await reveal();
+  const good = expectDefined(
+    [...host.querySelectorAll("button")].find((candidate) =>
+      candidate.textContent?.includes("small pause")
+    )
+  );
+  act(() => good.click());
+  expect(host.textContent).toContain("Sentence 1");
+  expect(host.textContent).toContain("1 left");
+  // This test has no device database, so the save fails and the graded card returns.
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  });
+  expect(host.textContent).toContain("could not save this review");
+  expect(host.textContent).toContain("2 left");
+});
