@@ -4,8 +4,9 @@ import { injectManifest } from "workbox-build";
 
 import {
   OFFLINE_FILES_URL,
-  type OfflineFile,
   type OfflineFiles,
+  type OfflineGroup,
+  packFiles,
 } from "../src/offline/files";
 
 const outputDirectory = process.env.VERCEL ? ".vercel/output" : ".output";
@@ -65,25 +66,35 @@ if (!result.count) {
 }
 
 // Audio and strokes download from the page after install; see src/offline/files.ts.
-const listFiles = async (pattern: string): Promise<OfflineFile[]> => {
-  const files: OfflineFile[] = [];
+const md5 = (bytes: Uint8Array) => {
+  const hasher = new Bun.CryptoHasher("md5");
+  hasher.update(bytes);
+  return hasher.digest("hex").slice(0, 12);
+};
+const packGroup = async (
+  name: string,
+  pattern: string,
+  json: boolean
+): Promise<OfflineGroup> => {
+  const files: Parameters<typeof packFiles>[0] = [];
   for await (const path of new Bun.Glob(pattern).scan({
     cwd: publicDirectory,
   })) {
-    const hasher = new Bun.CryptoHasher("md5");
-    hasher.update(await Bun.file(resolve(publicDirectory, path)).arrayBuffer());
-    files.push({
-      url: `/${path}`,
-      revision: hasher.digest("hex").slice(0, 12),
-    });
+    const bytes = await Bun.file(resolve(publicDirectory, path)).bytes();
+    files.push({ url: `/${path}`, revision: md5(bytes), bytes });
   }
-  return files.sort((a, b) => a.url.localeCompare(b.url));
+  files.sort((a, b) => a.url.localeCompare(b.url));
+  const packed = packFiles(files, json);
+  // Named by its content, so it can be cached for good; see the /offline rule in vite.config.ts.
+  const pack = `/offline/${name}.${md5(packed.bytes)}.${json ? "json" : "bin"}`;
+  await Bun.write(resolve(publicDirectory, pack.slice(1)), packed.bytes);
+  return { pack, size: packed.bytes.length, files: packed.files };
 };
 const offlineFiles: OfflineFiles = {
-  audio: await listFiles("audio/pinyin/*.mp3"),
-  strokes: await listFiles("hanzi/*.json"),
+  audio: await packGroup("audio", "audio/pinyin/*.mp3", false),
+  strokes: await packGroup("strokes", "hanzi/*.json", true),
 };
-if (!(offlineFiles.audio.length && offlineFiles.strokes.length)) {
+if (!(offlineFiles.audio.files.length && offlineFiles.strokes.files.length)) {
   throw new Error("Offline practice files are missing");
 }
 await Bun.write(

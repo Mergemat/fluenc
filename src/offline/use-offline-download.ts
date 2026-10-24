@@ -5,9 +5,11 @@ import { useHydrated } from "../hooks/use-hydrated";
 
 import {
   OFFLINE_CACHES,
+  OFFLINE_CONTENT_TYPES,
   OFFLINE_FILES_URL,
   type OfflineFile,
   type OfflineFiles,
+  type OfflineGroup,
 } from "./files";
 
 export interface DownloadProgress {
@@ -25,7 +27,7 @@ export type DownloadStatus =
 
 // Each cache keeps the list it was last filled from, so a changed file is fetched again.
 const REVISIONS_KEY = "/__revisions";
-const PARALLEL = 6;
+// How long a download may go without receiving anything.
 const STEP_TIMEOUT = 30_000;
 
 const withTimeout = <T>(promise: Promise<T>, ms = STEP_TIMEOUT) =>
@@ -59,9 +61,9 @@ interface DownloadCallbacks {
   onProgress: (progress: DownloadProgress) => void;
 }
 
-interface CacheGroup {
+interface CacheGroup extends OfflineGroup {
   cache: Cache;
-  files: OfflineFile[];
+  contentType: string;
   stale: OfflineFile[];
 }
 
@@ -79,23 +81,65 @@ async function readCacheGroups(lists: OfflineFiles) {
       async (key): Promise<CacheGroup> => {
         const cache = await caches.open(OFFLINE_CACHES[key]);
         return {
+          ...lists[key],
           cache,
-          files: lists[key],
-          stale: await staleFiles(cache, lists[key]),
+          contentType: OFFLINE_CONTENT_TYPES[key],
+          stale: await staleFiles(cache, lists[key].files),
         };
       }
     )
   );
 }
 
-async function fetchInto(cache: Cache, file: OfflineFile) {
-  // The worker answers cache-first, so drop an outdated copy before fetching it again.
-  await cache.delete(file.url);
-  const fetched = await withTimeout(fetch(file.url, { cache: "no-cache" }));
-  if (!fetched.ok) {
-    throw new Error(`Could not download ${file.url}`);
+/**
+ * Download a group's pack and store each stale file from it as soon as its bytes are in. False if
+ * the download was called off.
+ */
+async function fillFromPack(
+  group: CacheGroup,
+  isActive: () => boolean,
+  onFile: () => void
+) {
+  const response = await withTimeout(fetch(group.pack));
+  if (!(response.ok && response.body)) {
+    throw new Error(`Could not download ${group.pack}`);
   }
-  await cache.put(file.url, fetched);
+  const bytes = new Uint8Array(group.size);
+  const waiting = group.stale.toSorted((a, b) => a.offset - b.offset);
+  const reader = response.body.getReader();
+  let received = 0;
+  while (isActive()) {
+    // biome-ignore lint/performance/noAwaitInLoops: a stream is read one chunk at a time.
+    const { done, value } = await withTimeout(reader.read());
+    if (done) {
+      break;
+    }
+    bytes.set(value, received);
+    received += value.length;
+    const arrived: OfflineFile[] = [];
+    while (waiting[0] && waiting[0].offset + waiting[0].length <= received) {
+      arrived.push(waiting.shift() as OfflineFile);
+    }
+    await Promise.all(
+      arrived.map(async (file) => {
+        await group.cache.put(
+          file.url,
+          new Response(bytes.slice(file.offset, file.offset + file.length), {
+            headers: { "Content-Type": group.contentType },
+          })
+        );
+        onFile();
+      })
+    );
+  }
+  if (!isActive()) {
+    await reader.cancel();
+    return false;
+  }
+  if (waiting.length) {
+    throw new Error(`Could not download ${group.pack}`);
+  }
+  return true;
 }
 
 /** Fill every stale file, recording each cache's file list once all of its files are in. */
@@ -104,32 +148,22 @@ async function fillCaches(groups: CacheGroup[], callbacks: DownloadCallbacks) {
   let completed =
     total - groups.reduce((sum, group) => sum + group.stale.length, 0);
   callbacks.onProgress({ completed, total });
-
-  const remaining = new Map(groups.map((group) => [group, group.stale.length]));
-  const queue = groups.flatMap((group) =>
-    group.stale.map((file) => ({ group, file }))
-  );
-  await Promise.all(
-    groups.filter((group) => !group.stale.length).map(saveRevisions)
-  );
-  const worker = async (): Promise<void> => {
-    const next = queue.shift();
-    if (!(next && callbacks.isActive())) {
-      return;
-    }
-    await fetchInto(next.group.cache, next.file);
+  const onFile = () => {
     completed += 1;
     if (callbacks.isActive()) {
       callbacks.onProgress({ completed, total });
     }
-    const left = (remaining.get(next.group) ?? 1) - 1;
-    remaining.set(next.group, left);
-    if (left === 0 && callbacks.isActive()) {
-      await saveRevisions(next.group);
-    }
-    return worker();
   };
-  await Promise.all(Array.from({ length: PARALLEL }, worker));
+  await Promise.all(
+    groups.map(async (group) => {
+      if (
+        !group.stale.length ||
+        (await fillFromPack(group, callbacks.isActive, onFile))
+      ) {
+        await saveRevisions(group);
+      }
+    })
+  );
 }
 
 /** Download everything practice needs offline: "ready" once done, "idle" while waiting to be. */

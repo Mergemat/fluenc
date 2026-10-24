@@ -31,6 +31,19 @@ const parsedJson = (): Plugin => ({
   },
 });
 
+const DAY = 24 * 60 * 60;
+
+// Files in these folders are served by Vercel's CDN. A missing one answers 404 there too, instead
+// of starting the server to render a not-found page. Every request to the CDN is billed, so the
+// browser keeps each file a while rather than asking again on every use.
+const staticFolders = {
+  audio: 7 * DAY,
+  brand: DAY,
+  fonts: DAY,
+  hanzi: DAY,
+  licenses: DAY,
+};
+
 export default defineConfig({
   resolve: { tsconfigPaths: true },
   server: {
@@ -82,7 +95,23 @@ export default defineConfig({
         },
       ],
     }),
-    nitro(),
+    nitro({
+      publicAssets: Object.entries(staticFolders).map(([folder, maxAge]) => ({
+        baseURL: `/${folder}`,
+        dir: `public/${folder}`,
+        maxAge,
+      })),
+      routeRules: {
+        // Offline packs are named by their content (see scripts/build.ts).
+        "/offline/**": {
+          headers: { "cache-control": "public, max-age=31536000, immutable" },
+        },
+      },
+      vercel: {
+        // A request stuck on a slow upstream stops here instead of billing up to five minutes.
+        functions: { maxDuration: 60 },
+      },
+    }),
     viteReact(),
   ],
 });
