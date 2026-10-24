@@ -204,19 +204,25 @@ function Focus({ item }: { item: Exclude<ReviewItem, { type: "sentence" }> }) {
   ].slice(0, 3);
   return (
     <div className="dx-deck-focus">
+      {/* Play buttons as in lessons: beside a character's pinyin, a labelled one under a word. */}
       {item.type === "character" ? (
-        <MoviePinyin
-          actorKey={item.movie.actorKey}
-          finalKey={item.movie.finalKey}
-          pinyin={item.pinyin}
-          tone={item.movie.tone}
-        />
+        <div className="dx-sound">
+          <MoviePinyin
+            actorKey={item.movie.actorKey}
+            finalKey={item.movie.finalKey}
+            pinyin={item.pinyin}
+            tone={item.movie.tone}
+          />
+          <AudioButton pinyin={item.pinyin} text={item.hanzi} />
+        </div>
       ) : (
         <span className="dx-py dx-py-plain">{item.pinyin}</span>
       )}
       <h2 className="dx-deck-meaning">{meaning.primary}</h2>
       <p className="dx-deck-others">{others.join(" · ") || " "}</p>
-      <AudioButton label="listen" pinyin={item.pinyin} text={item.hanzi} />
+      {item.type === "character" ? null : (
+        <AudioButton label="listen" pinyin={item.pinyin} text={item.hanzi} />
+      )}
     </div>
   );
 }

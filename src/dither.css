@@ -2198,6 +2198,18 @@
   text-align: center;
   transform: translateY(-50%);
 }
+/* The pinyin stays on the centre line; its play button hangs off the right edge. */
+.dx-deck-focus > .dx-sound {
+  position: relative;
+  display: inline-flex;
+  margin: 0;
+}
+.dx-deck-focus > .dx-sound > .dx-audio {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + var(--dx-space-tight));
+  translate: 0 -50%;
+}
 .dx-deck-focus .dx-py {
   font-size: clamp(44px, 16cqw, 64px);
 }
