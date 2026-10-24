@@ -171,9 +171,11 @@ function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
 }
 
 /** Big pinyin, the meaning, then its other meanings, each said once. */
-/** A character's identity, as in its lesson: pinyin with its play button, the meaning, then its
- * other meanings. */
-function CharacterFocus({ item }: { item: CharacterReview }) {
+/**
+ * A character's or word's identity, as in its lesson: pinyin with its play button, the meaning,
+ * then its other meanings. Centred where the front showed the character or word.
+ */
+function Focus({ item }: { item: Exclude<ReviewItem, { type: "sentence" }> }) {
   const meaning = getItemMeaning(item);
   const others = [
     ...new Set([
@@ -184,12 +186,16 @@ function CharacterFocus({ item }: { item: CharacterReview }) {
   return (
     <div className="dx-ident dx-deck-focus">
       <div className="dx-sound">
-        <MoviePinyin
-          actorKey={item.movie.actorKey}
-          finalKey={item.movie.finalKey}
-          pinyin={item.pinyin}
-          tone={item.movie.tone}
-        />
+        {item.type === "character" ? (
+          <MoviePinyin
+            actorKey={item.movie.actorKey}
+            finalKey={item.movie.finalKey}
+            pinyin={item.pinyin}
+            tone={item.movie.tone}
+          />
+        ) : (
+          <span className="dx-py dx-py-plain">{item.pinyin}</span>
+        )}
         <AudioButton pinyin={item.pinyin} text={item.hanzi} />
       </div>
       <h2 className="dx-meaning">{meaning.primary}</h2>
@@ -222,7 +228,7 @@ function CharacterAnswer({
           xray={!parts.highlighted}
         />
       </div>
-      <CharacterFocus item={item} />
+      <Focus item={item} />
       <div className="dx-deck-edge">
         <SceneChips clues={clues} parts={parts} />
       </div>
@@ -253,31 +259,37 @@ function CardAnswer({
       </div>
     );
   }
-  // A word answers as its lesson shows it: glossed where the front showed it, then its meaning.
-  const meaning = getItemMeaning(item);
+  // A word answers like a character: itself in the corner, its identity centred, and the
+  // characters it is made of along the bottom. A character can repeat (谢谢), so each is keyed by
+  // its fixed position.
+  const made = item.characterParts.map((part, position) => ({
+    ...part,
+    position,
+  }));
   return (
-    <div className="dx-deck-answer dx-deck-answer-word">
-      <WordGloss
-        glosses={item.characterParts.map((part) => part.meaning)}
-        hanzi={item.hanzi}
-        revealed
-        syllables={item.syllables ?? null}
-      />
-      <div className="dx-ident">
-        <h2 className="dx-meaning">{meaning.primary}</h2>
-        <p className="dx-alt">{meaning.also ? `also ${meaning.also}` : " "}</p>
-        <div className="dx-sound">
-          {item.syllables ? null : (
-            <span className="dx-py dx-py-plain">{item.pinyin}</span>
-          )}
-          <AudioButton label="listen" pinyin={item.pinyin} text={item.hanzi} />
-        </div>
-      </div>
-      {item.livingLink ? (
-        <div className="dx-deck-edge">
+    <div className="dx-deck-answer">
+      <span
+        className="dx-deck-index dx-deck-index-word font-hanzi"
+        lang="zh-CN"
+      >
+        {item.hanzi}
+      </span>
+      <Focus item={item} />
+      <div className="dx-deck-edge">
+        {item.livingLink ? (
           <p className="dx-deck-link">{item.livingLink}</p>
-        </div>
-      ) : null}
+        ) : null}
+        <ul className="dx-scene-chips">
+          {made.map((part) => (
+            <li data-kind="character" key={part.position}>
+              <b className="font-hanzi-props" lang="zh-CN">
+                {part.hanzi}
+              </b>
+              {part.meaning}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
