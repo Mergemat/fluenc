@@ -9,11 +9,11 @@ import { useCallback } from "react";
 
 import { AppShell } from "../components/app-shell";
 import { Status, statusAction } from "../components/ui/layout";
-import { ToastProvider } from "../components/ui/toast";
+import { Toaster } from "../components/ui/sonner";
 import { OfflineDownloadProvider } from "../offline/offline-download-provider";
 import { dashboardQueryOptions, loadLearner } from "../offline/queries";
 import { useOfflineSync } from "../offline/use-offline-sync";
-import { AppUpdateProvider } from "../updates/app-update-provider";
+import { useAppUpdate } from "../updates/use-app-update";
 
 export const Route = createFileRoute("/_app")({
   // Progress lives on the device, so the server only sends the shell; the device fills it in.
@@ -31,17 +31,15 @@ function AppLayout() {
   const { data } = useSuspenseQuery(dashboardQueryOptions);
   const pathname = useLocation({ select: (location) => location.pathname });
   useOfflineSync();
+  useAppUpdate();
 
   return (
-    <ToastProvider>
-      <AppUpdateProvider>
-        <OfflineDownloadProvider>
-          <AppShell data={data} pathname={pathname}>
-            <Outlet />
-          </AppShell>
-        </OfflineDownloadProvider>
-      </AppUpdateProvider>
-    </ToastProvider>
+    <OfflineDownloadProvider>
+      <AppShell data={data} pathname={pathname}>
+        <Outlet />
+      </AppShell>
+      <Toaster />
+    </OfflineDownloadProvider>
   );
 }
 

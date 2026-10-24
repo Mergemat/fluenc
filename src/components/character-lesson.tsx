@@ -14,6 +14,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { toast } from "sonner";
 
 import { directCharacters } from "../lib/character-props";
 import { getItemMeaning } from "../lib/meaning";
@@ -62,7 +63,6 @@ import {
   useUsage,
 } from "./ui/hanzi";
 import { PageHeader, SectionHead } from "./ui/layout";
-import { useToast } from "./ui/toast";
 import { WritingModal } from "./writing-modal";
 
 interface ClueRowEvents {
@@ -427,7 +427,6 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
   const direct = directCharacters.has(item.hanzi);
   const meaning = getItemMeaning(item);
   const usage = useUsage(item.hanzi);
-  const toast = useToast();
   const inputs = useRef(new Map<string, HTMLInputElement>());
   const [active, setActive] = useState<string | null>(null);
   const [hover, setHover] = useState<string | null>(null);
@@ -465,7 +464,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
           </>
         ),
     });
-  }, [firstMissing, focusClue, isPending, mutate, toast, item.hanzi]);
+  }, [firstMissing, focusClue, isPending, mutate, item.hanzi]);
 
   useLessonShortcuts({
     finish: primary,

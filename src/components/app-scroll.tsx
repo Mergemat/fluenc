@@ -10,7 +10,6 @@ import {
 } from "react";
 
 import { syncNow } from "../offline/sync";
-import { useAppUpdate } from "../updates/app-update-provider";
 import {
   IonContent,
   IonRefresher,
@@ -41,7 +40,6 @@ export function AppScroll({
   pathname: string;
 }) {
   const pending = useIsMutating() > 0;
-  const update = useAppUpdate();
   const content = useRef<HTMLIonContentElement>(null);
   const refresher = useRef<HTMLIonRefresherElement>(null);
   // The pull gesture: whether a finger is down, and whether releasing it should refresh.
@@ -71,7 +69,6 @@ export function AppScroll({
     }
   }, [ready, pathname]);
 
-  // Pulling syncs, or switches to a new version waiting to take over.
   const scheduleRefresh = useCallback(() => {
     clearTimeout(refreshTimer.current);
     if (!pull.current.refresh) {
@@ -80,15 +77,11 @@ export function AppScroll({
     // Give the released spinner time to settle before it reports back.
     refreshTimer.current = setTimeout(() => {
       pull.current.refresh = false;
-      if (update.status === "ready") {
-        update.apply();
-        return;
-      }
       syncNow()
         .catch(() => undefined)
         .finally(() => refresher.current?.complete());
     }, 450);
-  }, [update]);
+  }, []);
   const refresh = useCallback(
     (event: RefresherCustomEvent) => {
       if (pending) {

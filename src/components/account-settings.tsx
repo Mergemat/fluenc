@@ -1,13 +1,13 @@
 import { useNavigate } from "@tanstack/react-router";
 import { LogIn, LogOut, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 import { signOut, unsyncedChanges } from "../account/account";
 import { type SyncStatus, syncNow, useSyncStatus } from "../offline/sync";
 import { DitherButton } from "./dither-kit/button";
 import { tool } from "./ui/buttons";
 import { SettingRow, type Tone } from "./ui/setting-row";
-import { useToast } from "./ui/toast";
 
 const MINUTE = 60_000;
 
@@ -73,7 +73,6 @@ type SignOut =
 export function AccountSettings() {
   const status = useSyncStatus();
   const navigate = useNavigate();
-  const toast = useToast();
   const now = useMinute();
   const [leaving, setLeaving] = useState<SignOut>({ step: "idle" });
 
@@ -83,27 +82,24 @@ export function AccountSettings() {
   const sync = useCallback(() => {
     syncNow().catch(() => undefined);
   }, []);
-  const leave = useCallback(
-    async (force: boolean) => {
-      setLeaving({ step: "checking" });
-      try {
-        const unsynced = force ? 0 : await unsyncedChanges();
-        if (unsynced) {
-          setLeaving({ step: "confirm", unsynced });
-          return;
-        }
-        await signOut();
-        setLeaving({ step: "idle" });
-        toast("signed out · this device starts fresh");
-      } catch {
-        setLeaving({
-          step: "error",
-          message: "couldn’t sign out · connect and try again",
-        });
+  const leave = useCallback(async (force: boolean) => {
+    setLeaving({ step: "checking" });
+    try {
+      const unsynced = force ? 0 : await unsyncedChanges();
+      if (unsynced) {
+        setLeaving({ step: "confirm", unsynced });
+        return;
       }
-    },
-    [toast]
-  );
+      await signOut();
+      setLeaving({ step: "idle" });
+      toast("signed out · this device starts fresh");
+    } catch {
+      setLeaving({
+        step: "error",
+        message: "couldn’t sign out · connect and try again",
+      });
+    }
+  }, []);
   const startSignOut = useCallback(() => {
     leave(false).catch(() => undefined);
   }, [leave]);

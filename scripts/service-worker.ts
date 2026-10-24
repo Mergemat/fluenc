@@ -20,7 +20,7 @@ declare const self: ServiceWorkerGlobalScope & {
 const STROKES_PATH = /^\/hanzi\/[^/]+\.json$/;
 const AUDIO_PATH = /^\/audio\/pinyin\/[^/]+\.mp3$/;
 
-// A new version waits until the page says it is a good moment (see app-update-provider), so a
+// A new version waits until the learner asks for it (see use-app-update), so a
 // running page never loses the files it was built with. Workers from before that handshake
 // would never send the message; replacing one of them takes over at once, as they did.
 const HANDSHAKE_CACHE = "fluenc-update-handshake";

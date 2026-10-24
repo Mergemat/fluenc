@@ -1,13 +1,13 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { LogIn, UserPlus } from "lucide-react";
 import { type FormEvent, useCallback, useState } from "react";
+import { toast } from "sonner";
 
 import { signIn } from "../account/account";
 import { useSyncStatus } from "../offline/sync";
 import { DitherButton } from "./dither-kit/button";
 import { tool } from "./ui/buttons";
 import { ErrorNote, Page, PageHeader } from "./ui/layout";
-import { useToast } from "./ui/toast";
 
 type Mode = "sign-in" | "sign-up";
 
@@ -37,7 +37,6 @@ const copy: Record<Mode, { title: string; submit: string; switch: string }> = {
 export function AccountView() {
   const status = useSyncStatus();
   const navigate = useNavigate();
-  const toast = useToast();
   const [mode, setMode] = useState<Mode>("sign-in");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -69,7 +68,7 @@ export function AccountView() {
         setBusy(false);
       }
     },
-    [mode, navigate, toast]
+    [mode, navigate]
   );
 
   if (status.learner && status.signedIn) {

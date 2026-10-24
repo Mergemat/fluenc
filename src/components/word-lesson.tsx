@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { toast } from "sonner";
 import type { BuildItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { cn } from "../lib/utils";
@@ -36,7 +37,6 @@ import { DitherButton } from "./dither-kit/button";
 import { WordGloss } from "./review-card";
 import { AudioButton, ident, pinyinText, soundRow } from "./ui/hanzi";
 import { PageHeader, SectionHead } from "./ui/layout";
-import { useToast } from "./ui/toast";
 
 type WordItem = Extract<BuildItem, { type: "word" }>;
 
@@ -61,7 +61,6 @@ export function WordLesson({ item }: { item: WordItem }) {
   // The server keeps links of four or more characters; anything shorter is a typo, not a link.
   const tooShort = trimmed.length > 0 && trimmed.length < 4;
   const input = useRef<HTMLInputElement>(null);
-  const toast = useToast();
   const finish = useProgressMutation(async () => {
     if (trimmed) {
       await saveLivingLinkOffline({ wordId: item.id, story: trimmed });
@@ -87,7 +86,7 @@ export function WordLesson({ item }: { item: WordItem }) {
           </>
         ),
     });
-  }, [tooShort, isPending, mutate, toast, item.hanzi]);
+  }, [tooShort, isPending, mutate, item.hanzi]);
   const onEnter = useEffectEvent(primary);
   const editStory = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => setDraft(event.target.value),
