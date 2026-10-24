@@ -19,14 +19,36 @@ import { toCard } from "../lib/learner-state";
 import type { ReviewItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { previewDue, waitLabel } from "../lib/review-schedule";
+import { cn } from "../lib/utils";
 import { saveReview } from "../offline/progress";
 import { useProgressMutation } from "../offline/use-progress-mutation";
 import { ClueCode } from "./character-studio/clue-code";
 import { lessonClues } from "./character-studio/clues";
 import { DitherButton } from "./dither-kit/button";
 import type { DitherColor } from "./dither-kit/palette";
-import { DeckCard, DeckPile, DeckTable } from "./ui/deck";
-import { AudioButton, HanziGlyph, MoviePinyin } from "./ui/hanzi";
+import { action, actionKey } from "./ui/buttons";
+import {
+  cardAnswer,
+  cardMeaning,
+  cardReading,
+  cardSentence,
+  DeckCard,
+  DeckPile,
+  DeckTable,
+  deck,
+  deckAction,
+  deckActions,
+  sentenceAnswer,
+} from "./ui/deck";
+import {
+  AudioButton,
+  altText,
+  glyphBox,
+  HanziGlyph,
+  ident,
+  MoviePinyin,
+  pinyinText,
+} from "./ui/hanzi";
 import { partColor } from "./ui/part-colors";
 
 const ratings: {
@@ -55,6 +77,11 @@ function waitsFor(item: ReviewItem) {
   );
 }
 
+// Quieter dots than an action's. The names hold one line across the row, even where a note wraps
+// to two: the kit's content fills the button and starts at a fixed line.
+const rateButton =
+  "h-14 rounded-xl p-0 focus-visible:outline-solid *:first:opacity-45 *:last:absolute *:last:inset-0 *:last:grid *:last:content-start *:last:justify-center *:last:justify-items-center *:last:gap-pair *:last:pt-3.25";
+
 function RatingButton({
   rating,
   after,
@@ -67,17 +94,21 @@ function RatingButton({
   const rate = useCallback(() => onRate(rating.value), [onRate, rating.value]);
   // The wait sits above its button, so it reads as when the card returns, not as part of the name.
   return (
-    <div className="dx-rate-slot">
-      <em>{after}</em>
+    <div className="grid min-w-0 gap-tight">
+      <em className="type-micro text-center text-muted-foreground tabular-nums">
+        {after}
+      </em>
       <DitherButton
-        className="dx-rate"
+        className={rateButton}
         color={rating.color}
         onClick={rate}
         variant="dotted"
       >
-        <span>{rating.label}</span>
-        <small>{rating.note}</small>
-        <kbd>{rating.value}</kbd>
+        <span className="type-action">{rating.label}</span>
+        <small className="type-micro text-balance px-1 text-center leading-snug opacity-80">
+          {rating.note}
+        </small>
+        <kbd className="absolute top-1.25 right-1.75">{rating.value}</kbd>
       </DitherButton>
     </div>
   );
@@ -97,12 +128,13 @@ function PropChip({ clue, parts }: { clue: Clue; parts: PartPointer }) {
   return (
     <button
       aria-pressed={parts.highlighted === clue.code}
+      className="inline-flex h-full items-center gap-1.75"
       onClick={select}
       onPointerEnter={enter}
       onPointerLeave={leave}
       type="button"
     >
-      <b className="font-hanzi-props">
+      <b className={cn(chipCode, chipHanzi, "text-part")}>
         <ClueCode clue={clue} />
       </b>
       {clue.name || "—"}
@@ -110,13 +142,35 @@ function PropChip({ clue, parts }: { clue: Clue; parts: PartPointer }) {
   );
 }
 
+/** A row of chips along a card's bottom edge; smaller on a short card. */
+const sceneChips = "m-0 flex list-none flex-wrap justify-center gap-tight p-0";
+const sceneChip =
+  "inline-flex h-7.5 items-center gap-1.75 rounded-chip border border-border bg-deck pr-2.5 pl-2 type-body text-base card-short:h-6.5 card-short:text-sm";
+/** A tone contour as a chip's code. */
+const chipTone = "h-3.25 w-4.5 align-middle";
+/** A chip's code, in its kind's colour. */
+const chipCode = "type-code text-md";
+/** A code that is a character. */
+const chipHanzi = "font-hanzi-props text-18 font-normal";
+const kindColors: Record<Clue["kind"], string> = {
+  actor: "text-blue",
+  set: "text-purple",
+  room: "text-green",
+  prop: "text-part",
+};
+
 /** The clues as chips; a prop's chip lights its part of the character. */
 function SceneChips({ clues, parts }: { clues: Clue[]; parts: PartPointer }) {
   return (
-    <ul className="dx-scene-chips">
+    <ul className={sceneChips}>
       {clues.map((clue) => (
         <li
-          data-kind={clue.kind}
+          className={cn(
+            sceneChip,
+            clue.kind === "prop" &&
+              parts.highlighted === clue.code &&
+              "border-part"
+          )}
           key={clue.id}
           style={
             clue.kind === "prop"
@@ -128,8 +182,8 @@ function SceneChips({ clues, parts }: { clues: Clue[]; parts: PartPointer }) {
             <PropChip clue={clue} parts={parts} />
           ) : (
             <>
-              <b>
-                <ClueCode clue={clue} />
+              <b className={cn(chipCode, kindColors[clue.kind])}>
+                <ClueCode clue={clue} toneClassName={chipTone} />
               </b>
               {clue.name || "—"}
             </>
@@ -147,7 +201,7 @@ const propCodes = (clues: Clue[]) =>
 function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
   if (item.type === "character") {
     return (
-      <div className="dx-glyph-box dx-deck-glyph">
+      <div className={cn(glyphBox, "glyph-max-75 relative h-full")}>
         <HanziGlyph concealed hanzi={item.hanzi} parts={propCodes(clues)} />
       </div>
     );
@@ -155,22 +209,32 @@ function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
   if (item.type === "word") {
     return (
       <WordGloss
+        className="relative"
         glosses={item.characterParts.map((part) => part.meaning)}
         hanzi={item.hanzi}
+        hanziClassName="text-gloss-card"
         revealed={false}
         syllables={item.syllables ?? null}
       />
     );
   }
   return (
-    <div className="dx-deck-prompt">
-      <p className="dx-deck-cue">say it in mandarin</p>
-      <p className="dx-deck-question">{item.meaning}</p>
+    <div className="relative grid justify-items-center gap-item text-center">
+      <p className="type-label m-0 text-muted-foreground">say it in mandarin</p>
+      <p className="type-display m-0 text-balance">{item.meaning}</p>
     </div>
   );
 }
 
-/** Big pinyin, the meaning, then its other meanings, each said once. */
+// Pinyin set as a lesson sets it.
+const focusPinyin = "text-24 studio:text-3xl";
+
+/** Where an answer's corner, centre and edge sit: a card's inset, smaller on a short card. */
+const answerIndex =
+  "absolute top-group left-group card-short:top-item card-short:left-item card-short:size-11";
+const answerEdge =
+  "absolute right-group bottom-group left-group border-deck-edge border-t pt-item card-short:static card-short:mx-item card-short:mt-auto card-short:mb-item card-short:pt-tight";
+
 /**
  * A character's or word's identity, as in its lesson: pinyin with its play button, the meaning,
  * then its other meanings. Centred where the front showed the character or word.
@@ -184,22 +248,41 @@ function Focus({ item }: { item: Exclude<ReviewItem, { type: "sentence" }> }) {
     ]),
   ].slice(0, 3);
   return (
-    <div className="dx-ident dx-deck-focus">
-      <div className="dx-sound">
+    <div
+      className={cn(
+        ident,
+        "card-short:translate-none card-short:static absolute top-1/2 right-group left-group -translate-y-1/2 gap-tight card-short:px-16 card-short:pt-item"
+      )}
+    >
+      {/* The pinyin stays on the centre line; its play button hangs off the right edge. */}
+      <div className="relative inline-flex items-center gap-tight">
         {item.type === "character" ? (
           <MoviePinyin
             actorKey={item.movie.actorKey}
+            className={focusPinyin}
             finalKey={item.movie.finalKey}
             pinyin={item.pinyin}
             tone={item.movie.tone}
           />
         ) : (
-          <span className="dx-py dx-py-plain">{item.pinyin}</span>
+          <span className={cn(pinyinText, focusPinyin, "text-foreground")}>
+            {item.pinyin}
+          </span>
         )}
-        <AudioButton pinyin={item.pinyin} text={item.hanzi} />
+        <AudioButton
+          className="absolute top-1/2 left-full ml-tight -translate-y-1/2"
+          pinyin={item.pinyin}
+          text={item.hanzi}
+        />
       </div>
-      <h2 className="dx-meaning">{meaning.primary}</h2>
-      <p className="dx-alt">
+      <h2 className={cardMeaning}>{meaning.primary}</h2>
+      <p
+        // Below the side-by-side layout it may wrap to two lines; on a short phone it gives way.
+        className={cn(
+          altText,
+          "max-studio:short:hidden max-studio:h-auto max-studio:max-h-7.5 max-studio:whitespace-normal"
+        )}
+      >
         {others.length ? `also ${others.join(" · ")}` : " "}
       </p>
     </div>
@@ -216,9 +299,9 @@ function CharacterAnswer({
   parts: PartPointer;
 }) {
   return (
-    <div className="dx-deck-answer">
+    <div className={cardAnswer} data-answer>
       {/* Every part in its colour, until one is pointed at. */}
-      <div className="dx-glyph-box dx-deck-index">
+      <div className={cn(glyphBox, answerIndex, "size-16")}>
         <HanziGlyph
           hanzi={item.hanzi}
           highlighted={parts.highlighted}
@@ -229,7 +312,7 @@ function CharacterAnswer({
         />
       </div>
       <Focus item={item} />
-      <div className="dx-deck-edge">
+      <div className={answerEdge}>
         <SceneChips clues={clues} parts={parts} />
       </div>
     </div>
@@ -250,11 +333,11 @@ function CardAnswer({
   }
   if (item.type === "sentence") {
     return (
-      <div className="dx-deck-answer dx-deck-answer-sentence">
-        <p className="dx-deck-sentence font-hanzi" lang="zh-CN">
+      <div className={sentenceAnswer} data-answer>
+        <p className={cardSentence} lang="zh-CN">
           {item.hanzi}
         </p>
-        <p className="dx-deck-reading">{item.pinyin}</p>
+        <p className={cardReading}>{item.pinyin}</p>
         <AudioButton label="listen" pinyin={item.pinyin} text={item.hanzi} />
       </div>
     );
@@ -267,22 +350,28 @@ function CardAnswer({
     position,
   }));
   return (
-    <div className="dx-deck-answer">
+    <div className={cardAnswer} data-answer>
+      {/* A word in the corner, where a character's lit glyph sits. */}
       <span
-        className="dx-deck-index dx-deck-index-word font-hanzi"
+        className={cn(answerIndex, "font-hanzi text-28 leading-none")}
         lang="zh-CN"
       >
         {item.hanzi}
       </span>
       <Focus item={item} />
-      <div className="dx-deck-edge">
+      <div className={answerEdge}>
         {item.livingLink ? (
-          <p className="dx-deck-link">{item.livingLink}</p>
+          <p className="type-body m-0 text-center text-muted-foreground">
+            {item.livingLink}
+          </p>
         ) : null}
-        <ul className="dx-scene-chips">
+        <ul className={cn(sceneChips, item.livingLink && "mt-tight")}>
           {made.map((part) => (
-            <li data-kind="character" key={part.position}>
-              <b className="font-hanzi-props" lang="zh-CN">
+            <li className={sceneChip} key={part.position}>
+              <b
+                className={cn(chipCode, chipHanzi, "text-foreground")}
+                lang="zh-CN"
+              >
                 {part.hanzi}
               </b>
               {part.meaning}
@@ -549,7 +638,7 @@ export function ReviewDeck({
   ];
   return (
     <div
-      className="dx-deck"
+      className={deck}
       data-revealed={revealed}
       data-type={active?.type ?? "empty"}
     >
@@ -557,7 +646,10 @@ export function ReviewDeck({
         caption={
           active ? (
             <>
-              <b>{queue.length}</b> left
+              <b className="font-medium text-muted-foreground">
+                {queue.length}
+              </b>{" "}
+              left
             </>
           ) : null
         }
@@ -579,22 +671,31 @@ export function ReviewDeck({
         </DeckPile>
       </DeckTable>
 
-      <footer className="dx-deck-actions">
+      <footer className={deckActions()}>
         <DitherButton
           aria-hidden={revealed || !active}
-          className="dx-action"
+          className={cn(
+            action,
+            deckAction,
+            "h-14",
+            (revealed || !active) && "invisible"
+          )}
           color="blue"
           inert={revealed || !active}
           onClick={reveal}
           variant="gradient"
         >
           <span>show answer</span>
-          <kbd>space</kbd>
+          <kbd className={actionKey}>space</kbd>
         </DitherButton>
         <fieldset
           aria-hidden={!revealed}
           aria-label="How well did you recall it?"
-          className="dx-ratings dx-group"
+          className={cn(
+            deckAction,
+            "grid min-w-0 grid-cols-4 gap-tight",
+            !revealed && "invisible"
+          )}
           inert={!revealed}
         >
           {ratings.map((rating) => (
@@ -608,7 +709,10 @@ export function ReviewDeck({
         </fieldset>
       </footer>
       {failed ? (
-        <p className="dx-deck-error" role="alert">
+        <p
+          className="type-label m-0 text-center text-red leading-wrap"
+          role="alert"
+        >
           could not save this review — try again
         </p>
       ) : null}
@@ -622,11 +726,16 @@ export function WordGloss({
   syllables,
   glosses,
   revealed,
+  className,
+  hanziClassName,
 }: {
   hanzi: string;
   syllables: string[] | null;
   glosses: string[];
   revealed: boolean;
+  className?: string;
+  /** Sizes the characters where the gloss sits somewhere other than a lesson. */
+  hanziClassName?: string;
 }) {
   // A character can repeat (谢谢), so columns are keyed by their fixed position.
   const columns = Array.from(hanzi, (char, position) => ({
@@ -636,14 +745,44 @@ export function WordGloss({
     gloss: glosses[position] ?? "",
   }));
   return (
-    <div className="dx-gloss" data-revealed={revealed} lang="zh-CN">
+    <div
+      className={cn("flex shrink-0 justify-center gap-gloss", className)}
+      lang="zh-CN"
+    >
       {columns.map(({ char, position, syllable, gloss }) => (
-        <div className="dx-gloss-col" key={position}>
-          <span aria-hidden={!revealed} className="dx-gloss-py" lang="zh-Latn">
+        <div
+          className="grid min-w-0 content-start justify-items-center gap-pair"
+          key={position}
+        >
+          {/* Syllables and keywords hold their space before the reveal. */}
+          <span
+            aria-hidden={!revealed}
+            className={cn(
+              "type-pinyin inline-flex h-6.5 items-center gap-pair whitespace-nowrap text-xl tracking-snug transition duration-200 ease-out",
+              !revealed && "translate-y-1.5 opacity-0"
+            )}
+            lang="zh-Latn"
+          >
             {syllable || " "}
           </span>
-          <span className="dx-gloss-hanzi font-hanzi">{char}</span>
-          <span aria-hidden={!revealed} className="dx-gloss-en" lang="en">
+          <span
+            // The leading comes after a size passed in, which would otherwise drop it.
+            className={cn(
+              "font-hanzi text-gloss",
+              hanziClassName,
+              "leading-glyph"
+            )}
+          >
+            {char}
+          </span>
+          <span
+            aria-hidden={!revealed}
+            className={cn(
+              "type-body line-clamp-2 min-h-4.5 max-w-31.5 text-center text-muted-foreground leading-tight transition duration-200 ease-out",
+              !revealed && "-translate-y-1.5 opacity-0"
+            )}
+            lang="en"
+          >
             {columns.length > 1 ? gloss : " "}
           </span>
         </div>

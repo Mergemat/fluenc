@@ -1,5 +1,6 @@
 import { type ButtonHTMLAttributes, type ReactNode, useCallback } from "react";
 
+import { cn } from "../../lib/utils";
 import { DitherGradient } from "../dither-kit/gradient";
 
 type ChipProps<T extends string> = Omit<
@@ -17,7 +18,7 @@ type ChipProps<T extends string> = Omit<
 export function Chip<T extends string>({
   pressed,
   children,
-  className = "",
+  className,
   value,
   onSelect,
   onClick,
@@ -31,7 +32,10 @@ export function Chip<T extends string>({
   return (
     <button
       aria-pressed={pressed}
-      className={`dx-chip-toggle ${className}`.trim()}
+      className={cn(
+        "type-control relative isolate inline-flex h-8 items-center overflow-hidden rounded-lg border border-border px-2.75 text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground aria-pressed:border-blue aria-pressed:text-foreground",
+        className
+      )}
       onClick={onSelect ? select : onClick}
       type="button"
       {...props}
@@ -39,7 +43,14 @@ export function Chip<T extends string>({
       {pressed ? (
         <DitherGradient cell={2} direction="up" from="blue" opacity={0.45} />
       ) : null}
-      <span>{children}</span>
+      <span className="relative inline-flex items-center gap-1.75">
+        {children}
+      </span>
     </button>
   );
+}
+
+/** A count inside a chip. */
+export function ChipCount({ children }: { children: ReactNode }) {
+  return <small className="text-xs tabular-nums opacity-60">{children}</small>;
 }

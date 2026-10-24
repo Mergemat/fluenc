@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Play, RefreshCw } from "lucide-react";
+import type { ReactNode } from "react";
 
+import { cn } from "../lib/utils";
 import type {
   DownloadStatus,
   OfflineDownload,
@@ -13,8 +15,10 @@ import { AccountSettings } from "./account-settings";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import { NotificationSettings } from "./notification-settings";
-import { Page, PageHeader, SectionHead } from "./ui/layout";
+import { tool } from "./ui/buttons";
+import { chip, Page, PageHeader, SectionHead } from "./ui/layout";
 import { SettingRow, type Tone } from "./ui/setting-row";
+import { progressFill, progressTrack } from "./ui/split-meter";
 
 type RowState = [Tone, string];
 
@@ -52,6 +56,16 @@ function offlineState(
   return offlineStates[status];
 }
 
+/** A named group of rows. */
+function Group({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <SectionHead className="mb-0" label={label} />
+      {children}
+    </div>
+  );
+}
+
 /**
  * The account and reminders are the real choices. Everything else — offline download, sync,
  * app updates — runs by itself, so this page only reports how the device is doing.
@@ -67,69 +81,76 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
 
   return (
     <Page head={<PageHeader title="settings" />}>
-      <div className="dx-set">
-        <SectionHead className="dx-set-group" label="account" />
-        <AccountSettings />
-        <SectionHead className="dx-set-group" label="reminders" />
-        <NotificationSettings />
-        <SectionHead className="dx-set-group" label="the method" />
-        <SettingRow
-          id="welcome-heading"
-          note="how a character becomes a short movie"
-          status="about a minute"
-          title="welcome reel"
-          tone="idle"
-        >
-          <Link className="dx-chip" to="/welcome">
-            <Play size={13} />
-            watch again
-          </Link>
-        </SettingRow>
-        <SectionHead className="dx-set-group" label="this device" />
-        <SettingRow
-          id="offline-heading"
-          note="lessons, strokes and character audio"
-          status={offlineText}
-          title="offline"
-          tone={offlineTone}
-        >
-          {offline.status === "downloading" && percentage !== null ? (
-            <span aria-hidden="true" className="dx-progress dx-set-meter">
-              <DitherGradient
-                cell={2}
-                direction="right"
-                from="grey"
-                opacity={0.5}
-              />
+      <div className="grid gap-section">
+        <Group label="account">
+          <AccountSettings />
+        </Group>
+        <Group label="reminders">
+          <NotificationSettings />
+        </Group>
+        <Group label="the method">
+          <SettingRow
+            id="welcome-heading"
+            note="how a character becomes a short movie"
+            status="about a minute"
+            title="welcome reel"
+            tone="idle"
+          >
+            <Link className={chip} to="/welcome">
+              <Play size={13} />
+              watch again
+            </Link>
+          </SettingRow>
+        </Group>
+        <Group label="this device">
+          <SettingRow
+            id="offline-heading"
+            note="lessons, strokes and character audio"
+            status={offlineText}
+            title="offline"
+            tone={offlineTone}
+          >
+            {offline.status === "downloading" && percentage !== null ? (
               <span
-                className="dx-progress-fill"
-                style={{ width: `${percentage}%` }}
+                aria-hidden="true"
+                className={cn(progressTrack, "w-30 max-w-none flex-none")}
               >
-                <DitherGradient cell={2} direction="left" from="blue" />
+                <DitherGradient
+                  cell={2}
+                  direction="right"
+                  from="grey"
+                  opacity={0.5}
+                />
+                <span
+                  className={progressFill}
+                  style={{ width: `${percentage}%` }}
+                >
+                  <DitherGradient cell={2} direction="left" from="blue" />
+                </span>
               </span>
-            </span>
-          ) : null}
-        </SettingRow>
-        <SettingRow
-          id="update-heading"
-          note="updates install in the background"
-          status={updateText}
-          title="version"
-          tone={updateTone}
-        >
-          {update.status === "ready" || update.status === "applying" ? (
-            <DitherButton
-              className="dx-tool"
-              color="blue"
-              disabled={update.status === "applying"}
-              onClick={update.apply}
-              variant="gradient"
-            >
-              <RefreshCw size={13} />
-              update now
-            </DitherButton>
-          ) : null}
-        </SettingRow>
+            ) : null}
+          </SettingRow>
+          <SettingRow
+            id="update-heading"
+            note="updates install in the background"
+            status={updateText}
+            title="version"
+            tone={updateTone}
+          >
+            {update.status === "ready" || update.status === "applying" ? (
+              <DitherButton
+                className={tool}
+                color="blue"
+                disabled={update.status === "applying"}
+                onClick={update.apply}
+                variant="gradient"
+              >
+                <RefreshCw className="shrink-0" size={13} />
+                update now
+              </DitherButton>
+            ) : null}
+          </SettingRow>
+        </Group>
       </div>
     </Page>
   );

@@ -4,7 +4,6 @@
 import { ChevronDown, Info, PenLine, X } from "lucide-react";
 import {
   type ChangeEvent,
-  type CSSProperties,
   type KeyboardEvent,
   type PointerEvent,
   useCallback,
@@ -18,9 +17,19 @@ import {
 
 import { directCharacters } from "../lib/character-props";
 import { getItemMeaning } from "../lib/meaning";
+import { cn } from "../lib/utils";
 import { saveEnrollment, saveMovieOffline } from "../offline/progress";
 import { useProgressMutation } from "../offline/use-progress-mutation";
 import { ClueCode } from "./character-studio/clue-code";
+import {
+  clueCode,
+  clueCount,
+  clueName,
+  clueRow,
+  clueTone,
+  kindStyle,
+  clueRole as roleClass,
+} from "./character-studio/clue-row";
 import {
   type Clue,
   cluePrompt,
@@ -28,18 +37,31 @@ import {
   cueKey,
   lessonClues,
 } from "./character-studio/clues";
+import {
+  studio,
+  studioAction,
+  studioActionSide,
+  studioActions,
+  studioAlt,
+  studioClues,
+  studioMeaning,
+  studioPinyin,
+  studioRead,
+} from "./character-studio/studio";
 import type { CharacterItem, Cue } from "./character-studio/types";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import {
   AudioButton,
+  glyphBox,
   HanziGlyph,
+  ident,
   MoviePinyin,
+  soundRow,
   UsageHanzi,
   useUsage,
 } from "./ui/hanzi";
 import { PageHeader, SectionHead } from "./ui/layout";
-import { partColor } from "./ui/part-colors";
 import { useToast } from "./ui/toast";
 import { WritingModal } from "./writing-modal";
 
@@ -52,10 +74,20 @@ interface ClueRowEvents {
   onRegister: (id: string, input: HTMLInputElement | null) => void;
 }
 
+/** A row still to name glows; one named in this lesson keeps a quiet mark. */
+function markerOf(empty: boolean, isNew: boolean) {
+  if (empty) {
+    return "empty";
+  }
+  return isNew ? "new" : null;
+}
+
 /** One clue: its code, what it stands for, and the learner's name for it, edited inline. */
 function ClueRow({
   clue,
   lit,
+  lined,
+  dense,
   invalid,
   disabled,
   othersMissing,
@@ -63,6 +95,8 @@ function ClueRow({
 }: {
   clue: Clue;
   lit: boolean;
+  lined: boolean;
+  dense: boolean;
   invalid: boolean;
   disabled: boolean;
   othersMissing: boolean;
@@ -113,33 +147,34 @@ function ClueRow({
 
   return (
     <label
-      className="dx-row"
-      data-empty={empty}
+      className={clueRow({
+        lit,
+        lined,
+        dense,
+        editable: true,
+        marker: markerOf(empty, clue.status === "new"),
+      })}
       data-kind={clue.kind}
-      data-lit={lit}
-      data-new={clue.status === "new"}
       onPointerEnter={prop ? enter : undefined}
       onPointerLeave={prop ? leave : undefined}
-      style={
-        prop
-          ? ({ "--part": partColor(clue.partIndex) } as CSSProperties)
-          : undefined
-      }
+      style={kindStyle(clue.kind, clue.partIndex)}
     >
       <span
-        className={`dx-code ${prop ? "font-hanzi-props" : ""}`}
+        className={clueCode({ kind: clue.kind, lit, dense, editable: true })}
         lang={prop ? "zh-CN" : undefined}
       >
-        <ClueCode clue={clue} />
-        {clue.count && clue.count > 1 ? <sup>×{clue.count}</sup> : null}
+        <ClueCode clue={clue} toneClassName={clueTone} />
+        {clue.count && clue.count > 1 ? (
+          <sup className={clueCount}>×{clue.count}</sup>
+        ) : null}
       </span>
-      <span className="dx-role">{clueRole(clue)}</span>
+      <span className={roleClass(dense)}>{clueRole(clue)}</span>
       <input
         aria-invalid={invalid && empty}
         aria-label={`${clue.role} ${clue.code}${clue.meaning ? `, ${clue.meaning}` : ""}`}
         autoCapitalize="none"
         autoComplete="off"
-        className="dx-input"
+        className={clueName({ empty, dense, editable: true })}
         disabled={disabled}
         enterKeyHint={othersMissing ? "next" : "done"}
         onBlur={blur}
@@ -159,26 +194,30 @@ function ClueRow({
 function UsageList({ usage }: { usage: ReturnType<typeof useUsage> }) {
   if (usage.pending) {
     return (
-      <span className="dx-usage-skeleton">
+      <span className="relative h-3 w-full max-w-70 animate-pulse overflow-hidden rounded-xs">
         <DitherGradient cell={2} direction="right" from="grey" opacity={0.6} />
       </span>
     );
   }
   if (usage.error) {
     return (
-      <p className="dx-usage-empty">
+      <p className="type-label text-faint-foreground leading-wrap">
         words unavailable offline ·{" "}
-        <button onClick={usage.retry} type="button">
+        <button
+          className="text-muted-foreground underline"
+          onClick={usage.retry}
+          type="button"
+        >
           retry
         </button>
       </p>
     );
   }
   return (
-    <ul className="dx-words-list">
+    <ul className="grid list-none">
       {usage.data?.words.map((word) => (
         <li
-          className="dx-words-item"
+          className="type-body flex min-w-0 items-baseline gap-tight whitespace-nowrap text-muted-foreground leading-8"
           key={word.id}
           title={
             word.unknown
@@ -187,7 +226,9 @@ function UsageList({ usage }: { usage: ReturnType<typeof useUsage> }) {
           }
         >
           <UsageHanzi chars={word.chars} />
-          <span className="dx-words-py">{word.pinyin}</span>
+          <span className="type-label text-faint-foreground">
+            {word.pinyin}
+          </span>
           <span>{word.meaning}</span>
         </li>
       ))}
@@ -238,24 +279,24 @@ function UsageWords({
     return null;
   }
   return (
-    <div className="dx-words" ref={root}>
+    <div className="relative z-6 grid justify-items-end" ref={root}>
       <button
         aria-controls={panel}
         aria-expanded={open}
         aria-label={`Words with ${hanzi}`}
-        className="dx-words-toggle"
+        className="type-label inline-flex h-7 items-center gap-1.5 rounded-lg border border-border bg-background pr-2.25 pl-2.5 text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground aria-expanded:border-border-strong aria-expanded:text-foreground"
         onClick={toggle}
         type="button"
       >
         words
-        {count ? <span className="dx-words-count">{count}</span> : null}
+        {count ? <span className="text-foreground">{count}</span> : null}
         <ChevronDown aria-hidden="true" size={12} />
       </button>
       {open ? (
         <section
           aria-busy={usage.pending}
           aria-label={`Words with ${hanzi}`}
-          className="dx-words-panel"
+          className="absolute top-full right-0 mt-1.5 box-border min-w-55 max-w-panel animate-enter rounded-xl border border-border-strong bg-popover px-3.5 py-2 shadow-popover"
           id={panel}
         >
           <UsageList usage={usage} />
@@ -350,10 +391,10 @@ function LessonActions({
   onWrite: () => void;
 }) {
   return (
-    <footer className="dx-actions">
+    <footer className={studioActions} data-actions>
       {/* Grey dotted until every clue is named, then the blue gradient with bloom. */}
       <DitherButton
-        className="dx-action"
+        className={studioAction}
         color={missing ? "grey" : "blue"}
         disabled={saving}
         onClick={onFinish}
@@ -366,7 +407,7 @@ function LessonActions({
       </DitherButton>
       <DitherButton
         aria-label={`Write ${hanzi}`}
-        className="dx-action-side"
+        className={studioActionSide}
         color="grey"
         onClick={onWrite}
         title="write (w)"
@@ -489,32 +530,51 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
   const openWriting = useCallback(() => setWriting(true), []);
   const closeWriting = useCallback(() => setWriting(false), []);
 
-  const row = (clue: Clue) => (
-    <ClueRow
-      clue={clue}
-      disabled={finish.isPending}
-      events={rowEvents}
-      invalid={finish.isError}
-      key={clue.id}
-      lit={clue.kind === "prop" && highlighted === clue.code}
-      othersMissing={missing.some((entry) => entry.id !== clue.id)}
-    />
-  );
+  const dense = props.length > 3;
+  const lit = (clue: Clue) => clue.kind === "prop" && highlighted === clue.code;
+  // The hairline under a row gives way when it or the row below is lit or being named.
+  const shown = (clue: Clue | undefined) =>
+    clue !== undefined && (lit(clue) || active === clue.id);
+  const rows = (group: Clue[], groupDense: boolean) =>
+    group.map((clue, index) => (
+      <ClueRow
+        clue={clue}
+        dense={groupDense}
+        disabled={finish.isPending}
+        events={rowEvents}
+        invalid={finish.isError}
+        key={clue.id}
+        lined={
+          index < group.length - 1 && !shown(clue) && !shown(group[index + 1])
+        }
+        lit={lit(clue)}
+        othersMissing={missing.some((entry) => entry.id !== clue.id)}
+      />
+    ));
 
   return (
     <article
-      className="dx-studio"
-      data-dense={props.length > 3}
-      data-leaving={finish.isPending}
+      className={studio(true)}
+      data-leaving={finish.isPending || undefined}
     >
       <PageHeader
         heading={false}
         meta={<UsageWords hanzi={item.hanzi} usage={usage} />}
         title="learn"
       />
-      <section aria-label="Character" className="dx-read dx-read-character">
-        <div className="dx-read-layout">
-          <div className="dx-glyph-box">
+      <section
+        aria-label="Character"
+        className={cn(studioRead, "@container-size/read")}
+      >
+        {/* Stacked when tall, side by side when wide for its height: whichever gives the bigger
+            glyph. */}
+        <div className="flex h-full read-wide:flex-row flex-col items-center justify-center gap-tight studio:gap-group read-wide:max-studio:gap-item">
+          <div
+            className={cn(
+              glyphBox,
+              "read-wide:h-full read-wide:grow-0 studio:grow-0 studio:basis-glyph read-wide:max-studio:basis-31/50"
+            )}
+          >
             <HanziGlyph
               hanzi={item.hanzi}
               highlighted={highlighted}
@@ -524,14 +584,22 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
               xray={xray}
             />
           </div>
-          <div className="dx-ident">
-            <h1 className="dx-meaning">{meaning.primary}</h1>
-            <p className="dx-alt">
+          <div
+            className={cn(
+              ident,
+              "read-wide:min-w-0 read-wide:shrink read-wide:basis-9/25 read-wide:justify-items-start read-wide:text-left"
+            )}
+          >
+            <h1 className={cn(studioMeaning, "read-wide:wrap-anywhere")}>
+              {meaning.primary}
+            </h1>
+            <p className={studioAlt}>
               {meaning.also ? `also ${meaning.also}` : " "}
             </p>
-            <div className="dx-sound">
+            <div className={soundRow}>
               <MoviePinyin
                 actorKey={item.movie.actorKey}
+                className={studioPinyin}
                 finalKey={item.movie.finalKey}
                 pinyin={item.pinyin}
                 tone={item.movie.tone}
@@ -542,8 +610,9 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
         </div>
       </section>
 
-      <section aria-label="Clues" className="dx-clues">
+      <section aria-label="Clues" className={studioClues}>
         <SectionHead
+          className="mb-0"
           label={direct ? "prop" : "clues"}
           meta={missing.length ? `${missing.length} to name` : "ready"}
           tone={missing.length ? "todo" : "done"}
@@ -552,7 +621,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
             <button
               aria-expanded={noteOpen}
               aria-label="How the parts fit"
-              className="dx-note-toggle"
+              className="type-label inline-flex items-center gap-1 text-muted-foreground hover:text-foreground aria-expanded:text-foreground"
               onClick={toggleNote}
               type="button"
             >
@@ -560,23 +629,37 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
             </button>
           ) : null}
         </SectionHead>
-        <div className="dx-rows">
+        <div className="overflow-hidden">
           {direct ? null : (
-            <div className="dx-rows-sound">
-              {clues.filter((clue) => clue.kind !== "prop").map(row)}
+            <div className="grid grid-cols-1">
+              {rows(
+                clues.filter((clue) => clue.kind !== "prop"),
+                false
+              )}
             </div>
           )}
-          <div className="dx-rows-props">{props.map(row)}</div>
+          <div
+            className={cn(
+              "grid",
+              dense ? "grid-cols-2" : "grid-cols-1",
+              !direct && "border-border border-t"
+            )}
+          >
+            {rows(props, dense)}
+          </div>
         </div>
         {noteOpen && item.movie.componentNote ? (
           <div
             aria-label="How the parts fit"
-            className="dx-popover"
+            className="absolute inset-x-0 top-6 z-5 animate-enter rounded-xl border border-border-strong bg-popover py-3 pr-10 pl-3.5 shadow-popover"
             role="note"
           >
-            <p>{item.movie.componentNote}</p>
+            <p className="type-body text-foreground">
+              {item.movie.componentNote}
+            </p>
             <button
               aria-label="Close shape note"
+              className="absolute top-2.25 right-2.25 grid size-6 place-items-center text-muted-foreground"
               onClick={closeNote}
               type="button"
             >

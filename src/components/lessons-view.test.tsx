@@ -116,6 +116,13 @@ const word: Extract<BuildItem, { type: "word" }> = {
   ],
 };
 
+/** The character a lesson shows: its font glyph, which holds the place while strokes load. */
+const glyph = () =>
+  host.querySelector('section[aria-label="Character"] [data-state] > span')
+    ?.textContent;
+const wordLesson = () =>
+  host.querySelector('section[aria-label="Word"]')?.closest("article") ?? null;
+
 async function show(
   buildQueue: BuildItem[],
   lockedWords: DashboardData["lockedWords"] = []
@@ -142,11 +149,11 @@ test("sync unlocks a word without replacing the next character or discarding its
   const first = character("太", "tài");
   const next = character("了", "le");
   await show([first, next]);
-  expect(host.querySelector(".dx-glyph-ghost")?.textContent).toBe("太");
+  expect(glyph()).toBe("太");
 
   // The local completion publishes the remaining queue before the server sync finishes.
   await show([next]);
-  expect(host.querySelector(".dx-glyph-ghost")?.textContent).toBe("了");
+  expect(glyph()).toBe("了");
   // Clues are named inline; the first slot is the actor.
   const input = expectDefined(host.querySelector("input"));
   await act(() => {
@@ -165,18 +172,16 @@ test("sync unlocks a word without replacing the next character or discarding its
     word,
     { ...next, movie: { ...next.movie, actorName: "Server actor" } },
   ]);
-  expect(host.querySelector(".dx-glyph-ghost")?.textContent).toBe("了");
+  expect(glyph()).toBe("了");
   expect(host.querySelector("input")?.value).toBe("My actor");
-  expect(host.querySelector(".dx-word-lesson")).toBeNull();
+  expect(wordLesson()).toBeNull();
 
   await show([word]);
-  expect(
-    host.querySelector(".dx-word-lesson")?.getAttribute("data-hanzi")
-  ).toBe("我们");
+  expect(wordLesson()?.getAttribute("data-hanzi")).toBe("我们");
   await show([]);
   expect(host.textContent).toContain("all lessons learned");
   await show([first]);
-  expect(host.querySelector(".dx-glyph-ghost")?.textContent).toBe("太");
+  expect(glyph()).toBe("太");
 });
 
 test("learning the final prerequisite opens a word immediately without a server refresh", async () => {
@@ -192,23 +197,19 @@ test("learning the final prerequisite opens a word immediately without a server 
 
   let data = enroll("character", "我");
   await show(data.buildQueue, data.lockedWords);
-  expect(host.querySelector(".dx-glyph-ghost")?.textContent).toBe("们");
+  expect(glyph()).toBe("们");
   expect(data.lockedWords.map((item) => item.hanzi)).toContain("我们");
 
   data = enroll("character", "们");
   await show(data.buildQueue, data.lockedWords);
-  expect(
-    host.querySelector(".dx-word-lesson")?.getAttribute("data-hanzi")
-  ).toBe("我们");
+  expect(wordLesson()?.getAttribute("data-hanzi")).toBe("我们");
   expect(data.lockedWords.map((item) => item.hanzi)).not.toContain("我们");
 
   const wordId = data.buildQueue[0]?.id;
   data = enroll("word", wordId);
   await show(data.buildQueue, data.lockedWords);
-  expect(host.querySelector(".dx-word-lesson")).toBeNull();
-  expect(host.querySelector(".dx-glyph-ghost")?.textContent).toBe(
-    data.buildQueue[0]?.hanzi
-  );
+  expect(wordLesson()).toBeNull();
+  expect(glyph()).toBe(data.buildQueue[0]?.hanzi);
   expect(
     data.reviewQueue.filter(
       (item) => item.type === "word" && item.id === wordId

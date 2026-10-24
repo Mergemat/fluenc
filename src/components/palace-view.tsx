@@ -6,7 +6,6 @@ import { getRouteApi, Link } from "@tanstack/react-router";
 import { ArrowLeft, ChevronRight, Search, X } from "lucide-react";
 import {
   type ChangeEvent,
-  type CSSProperties,
   useCallback,
   useDeferredValue,
   useMemo,
@@ -14,12 +13,30 @@ import {
 } from "react";
 
 import { buildPalaceBoard, type ClueKind } from "../lib/palace-board";
+import { cn } from "../lib/utils";
 import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
+import { ClueCode } from "./character-studio/clue-code";
 import { DitherGradient } from "./dither-kit/gradient";
-import { type ClueRow, clueRows } from "./palace-rows";
-import { Chip } from "./ui/chip";
-
-import { Page, PageHeader, SectionHead, Status } from "./ui/layout";
+import {
+  controls,
+  filterBar,
+  filterGroup,
+  filterSet,
+  searchBox,
+  searchClear,
+  searchInput,
+} from "./library-view";
+import { type ClueRow, clueRows, kindStyle } from "./palace-rows";
+import { Chip, ChipCount } from "./ui/chip";
+import {
+  CrumbSlash,
+  crumb,
+  Page,
+  PageHeader,
+  SectionHead,
+  Status,
+  statusAction,
+} from "./ui/layout";
 
 const route = getRouteApi("/_app/profile_/palace");
 const tabs: { id: ClueKind; label: string }[] = [
@@ -34,6 +51,13 @@ const skeletonRows = Array.from(
   (_, index) => `skeleton-${index}`
 );
 type Show = "all" | "named" | "open";
+
+/** A palace row; every row after the first has a divider above it. */
+const rowClass = (first: boolean) =>
+  cn(
+    "relative grid min-h-13.5 grid-cols-clue-row items-center gap-item overflow-hidden py-1.5 pr-3.5 pl-2 text-muted-foreground transition-colors max-xs:grid-cols-clue-row-xs max-xs:gap-tight",
+    !first && "inset-shadow-hairline"
+  );
 
 export function PalaceView() {
   const { tab = "cast", q = "", show = "all" } = route.useSearch();
@@ -101,16 +125,19 @@ export function PalaceView() {
       return library.isError || palace.isError ? (
         <Status
           action={
-            <button className="dx-chip" onClick={retry} type="button">
+            <button className={statusAction} onClick={retry} type="button">
               retry
             </button>
           }
           title="your palace isn’t available offline yet"
         />
       ) : (
-        <div aria-busy="true" className="dx-pal-list">
-          {skeletonRows.map((id) => (
-            <span className="dx-pal-row dx-pal-skeleton" key={id}>
+        <div aria-busy="true" className="grid overflow-hidden">
+          {skeletonRows.map((id, index) => (
+            <span
+              className={cn(rowClass(index === 0), "animate-pulse")}
+              key={id}
+            >
               <DitherGradient
                 cell={2}
                 direction="right"
@@ -126,7 +153,7 @@ export function PalaceView() {
       return (
         <Status
           action={
-            <button className="dx-chip" onClick={clearAll} type="button">
+            <button className={statusAction} onClick={clearAll} type="button">
               clear
             </button>
           }
@@ -135,13 +162,16 @@ export function PalaceView() {
       );
     }
     return (
-      <div className="dx-pal-list">
-        {shown.map((row, index) => (
-          <div className="dx-pal-group" key={`${row.kind}:${row.key}`}>
-            {row.group && row.group !== shown[index - 1]?.group ? (
-              <SectionHead label={row.group} />
+      <div className="grid overflow-hidden">
+        {shown.map((entry, index) => (
+          <div key={`${entry.kind}:${entry.key}`}>
+            {entry.group && entry.group !== shown[index - 1]?.group ? (
+              <SectionHead
+                className={index ? "mt-section" : undefined}
+                label={entry.group}
+              />
             ) : null}
-            <ClueLink row={row} />
+            <ClueLink first={index === 0} row={entry} />
           </div>
         ))}
       </div>
@@ -155,23 +185,24 @@ export function PalaceView() {
           meta={rows.length ? `${named}/${rows.length} named` : undefined}
           title={
             <>
-              <Link to="/profile">
+              <Link className={crumb} to="/profile">
                 <ArrowLeft size={14} />
                 profile
               </Link>
-              <span aria-hidden="true">/</span>
+              <CrumbSlash />
               palace
             </>
           }
         />
       }
     >
-      <div className="dx-lib-controls">
-        <label className="dx-search">
+      <div className={controls}>
+        <label className={searchBox}>
           <Search aria-hidden="true" size={16} />
           <input
             aria-label="Search your palace"
             autoComplete="off"
+            className={searchInput}
             onChange={typeQuery}
             placeholder="code, your name, or meaning"
             ref={input}
@@ -182,6 +213,7 @@ export function PalaceView() {
           {q ? (
             <button
               aria-label="Clear search"
+              className={searchClear}
               onClick={clearQuery}
               type="button"
             >
@@ -189,8 +221,12 @@ export function PalaceView() {
             </button>
           ) : null}
         </label>
-        <div className="dx-lib-filters">
-          <div aria-label="Palace sections" role="tablist">
+        <div className={filterBar}>
+          <div
+            aria-label="Palace sections"
+            className={filterSet}
+            role="tablist"
+          >
             {tabs.map((entry) => (
               <Chip
                 aria-selected={tab === entry.id}
@@ -201,13 +237,13 @@ export function PalaceView() {
                 value={entry.id}
               >
                 {entry.label}
-                <small>
-                  {matching.filter((row) => row.kind === entry.id).length}
-                </small>
+                <ChipCount>
+                  {matching.filter((clue) => clue.kind === entry.id).length}
+                </ChipCount>
               </Chip>
             ))}
           </div>
-          <fieldset aria-label="Named" className="dx-group">
+          <fieldset aria-label="Named" className={filterGroup}>
             {(["named", "open"] as const).map((entry) => (
               <Chip
                 key={entry}
@@ -216,13 +252,13 @@ export function PalaceView() {
                 value={entry}
               >
                 {entry}
-                <small>
+                <ChipCount>
                   {
-                    inTab.filter((row) =>
-                      entry === "named" ? row.name : !row.name
+                    inTab.filter((clue) =>
+                      entry === "named" ? clue.name : !clue.name
                     ).length
                   }
-                </small>
+                </ChipCount>
               </Chip>
             ))}
           </fieldset>
@@ -234,34 +270,60 @@ export function PalaceView() {
   );
 }
 
-function ClueLink({ row }: { row: ClueRow }) {
+function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
+  const props = row.kind === "props";
+  // Open clues read as gaps.
+  const open = !row.name;
   return (
     <Link
-      className="dx-pal-row"
+      className={cn(
+        rowClass(first),
+        "follows-hover:inset-shadow-none hover:inset-shadow-none hover:rounded-xl hover:bg-popover"
+      )}
       data-kind={row.kind}
-      data-open={!row.name}
+      data-open={open}
       params={{ kind: row.kind, key: row.key }}
-      style={row.color ? ({ "--part": row.color } as CSSProperties) : undefined}
+      style={kindStyle(row)}
       to="/profile/palace/$kind/$key"
     >
       <span
-        className={`dx-pal-code ${row.kind === "props" ? "font-hanzi-props" : ""}`}
-        lang={row.kind === "props" ? "zh-CN" : undefined}
+        className={cn(
+          "type-code justify-self-center whitespace-nowrap text-kind",
+          props && "font-hanzi-props font-normal text-28",
+          open && "opacity-55"
+        )}
+        lang={props ? "zh-CN" : undefined}
       >
-        {row.code}
+        <ClueCode clue={row.cue} toneClassName="h-5 w-6.5" />
       </span>
-      <span className="dx-pal-text">
-        <span className="dx-pal-name">{row.name || "open"}</span>
-        {row.hint ? <span className="dx-pal-use">{row.hint}</span> : null}
+      <span className="grid min-w-0 gap-pair">
+        <span
+          className={cn(
+            "min-w-0 truncate",
+            open
+              ? "type-control text-faint-foreground"
+              : "type-heading text-foreground"
+          )}
+        >
+          {row.name || "open"}
+        </span>
+        {row.hint ? (
+          <span className="type-label min-w-0 truncate text-muted-foreground">
+            {row.hint}
+          </span>
+        ) : null}
       </span>
-      <span className="dx-pal-count">
+      <span className="type-control whitespace-nowrap text-foreground tabular-nums">
         {row.characters}
-        <small>{row.started ? ` · ${row.started} started` : ""}</small>
+        <small className="text-muted-foreground text-xs max-xs:hidden">
+          {row.started ? ` · ${row.started} started` : ""}
+        </small>
       </span>
       <ChevronRight aria-hidden="true" size={15} />
       {row.started ? (
+        // Under the code, clear of the divider below the row.
         <span
-          className="dx-pal-bar"
+          className="absolute bottom-tight left-0 h-0.5 overflow-hidden"
           style={{ width: `${(row.started / row.characters) * 100}%` }}
         >
           <DitherGradient cell={2} direction="left" from="green" />

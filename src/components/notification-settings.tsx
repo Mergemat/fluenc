@@ -6,6 +6,7 @@ import {
   useNotifications,
 } from "../notifications/use-notifications";
 import { DitherButton } from "./dither-kit/button";
+import { tool } from "./ui/buttons";
 import { SettingRow, type Tone } from "./ui/setting-row";
 
 const statusTone: Record<NotificationStatus, Tone> = {
@@ -52,25 +53,25 @@ export function NotificationSettings() {
     >
       {status === "off" ? (
         <DitherButton
-          className="dx-tool"
+          className={tool}
           color="blue"
           disabled={!!busy}
           onClick={enable}
           variant="gradient"
         >
-          <Bell size={13} />
+          <Bell className="shrink-0" size={13} />
           enable
         </DitherButton>
       ) : null}
       {hasSubscription ? (
         <DitherButton
-          className="dx-tool"
+          className={tool}
           color="red"
           disabled={!!busy || status === "checking"}
           onClick={disable}
           variant="dotted"
         >
-          <BellOff size={13} />
+          <BellOff className="shrink-0" size={13} />
           turn off
         </DitherButton>
       ) : null}
@@ -78,13 +79,13 @@ export function NotificationSettings() {
       status === "blocked" ||
       status === "unconfigured" ? (
         <DitherButton
-          className="dx-tool"
+          className={tool}
           color="grey"
           disabled={!!busy}
           onClick={retry}
           variant="dotted"
         >
-          <RefreshCw size={13} />
+          <RefreshCw className="shrink-0" size={13} />
           check again
         </DitherButton>
       ) : null}

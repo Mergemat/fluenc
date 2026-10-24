@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-import { Page, Status } from "./ui/layout";
+import { Page, Status, statusAction } from "./ui/layout";
 
 /** Any address the app doesn't know, instead of the router's bare "Not Found". */
 export function NotFound() {
@@ -8,7 +8,7 @@ export function NotFound() {
     <Page>
       <Status
         action={
-          <Link className="dx-chip" to="/lessons">
+          <Link className={statusAction} to="/lessons">
             back to learn
           </Link>
         }

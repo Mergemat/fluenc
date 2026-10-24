@@ -1,0 +1,126 @@
+// Library tiles: a character or word with its pinyin and meaning, on walls that fit as many as the
+// room allows. The library, a library entry and a palace clue all list entries this way.
+import { Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
+
+import type { LibraryEntry } from "../../lib/library-search";
+import { getItemMeaning } from "../../lib/meaning";
+import { cn } from "../../lib/utils";
+
+type Status = LibraryEntry["status"];
+
+const dotColors: Record<Status, string> = {
+  review: "bg-green",
+  learning: "bg-orange",
+  new: "bg-faint-foreground",
+};
+
+/** A small square in the colour of a learning status. */
+export function StatusDot({ status }: { status: Status }) {
+  return (
+    <i
+      aria-hidden="true"
+      className={cn("size-1.75 rounded-xs", dotColors[status])}
+    />
+  );
+}
+
+/** A wall of tiles. `tight` packs them closer, for a list inside a page. */
+export function Wall({
+  tight = false,
+  busy,
+  children,
+}: {
+  tight?: boolean;
+  busy?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      aria-busy={busy}
+      className={cn(
+        // Words take two columns beside characters; on a wall of only words the columns double.
+        "group/wall grid grid-flow-row-dense gap-2 has-data-character:grid-cols-wall",
+        tight
+          ? "grid-cols-wall-words-tight has-data-character:grid-cols-wall-tight"
+          : "grid-cols-wall-words",
+        "max-xs:grid-cols-wall-words-xs max-xs:has-data-character:grid-cols-wall-xs"
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+const tileStatus: Record<Status, string> = {
+  review: "after:bg-green",
+  learning: "after:bg-orange",
+  new: "opacity-50 hover:opacity-100",
+};
+
+/** The frame of a tile; `TileGlyph` and the lines under it go inside. */
+export function tileClass(kind: LibraryEntry["kind"], status: Status) {
+  return cn(
+    "relative grid min-h-28 content-center justify-items-center gap-0.75 overflow-hidden rounded-xl px-2 py-2.5 text-center transition hover:bg-card max-xs:min-h-24.5",
+    "after:absolute after:top-2 after:right-2 after:size-1.5 after:rounded-xs",
+    kind === "words" && "col-span-2 group-not-has-data-character/wall:col-auto",
+    tileStatus[status]
+  );
+}
+
+export function TileGlyph({
+  kind,
+  children,
+}: {
+  kind: LibraryEntry["kind"];
+  children: ReactNode;
+}) {
+  return (
+    <span
+      className={cn(
+        "whitespace-nowrap font-hanzi max-xs:text-32",
+        kind === "words" ? "text-32" : "text-38",
+        // After the size: tailwind-merge drops a leading that comes before one.
+        "leading-display"
+      )}
+      lang="zh-CN"
+    >
+      {children}
+    </span>
+  );
+}
+
+/** A placeholder while the library loads. */
+export const tileSkeleton =
+  "relative min-h-28 animate-pulse overflow-hidden rounded-xl max-xs:min-h-24.5";
+
+export function Tile({ item }: { item: LibraryEntry }) {
+  const meaning = getItemMeaning(item);
+  return (
+    <Link
+      aria-label={`${item.hanzi}, ${item.pinyin}: ${meaning.primary}`}
+      className={tileClass(item.kind, item.status)}
+      data-character={item.kind === "characters" || undefined}
+      data-kind={item.kind}
+      data-status={item.status}
+      params={{ kind: item.kind, id: item.id }}
+      to="/library/$kind/$id"
+    >
+      <TileGlyph kind={item.kind}>{item.hanzi}</TileGlyph>
+      <span className="type-label max-w-full truncate text-muted-foreground">
+        {item.pinyin}
+      </span>
+      <span className="type-body max-w-full truncate text-foreground">
+        {meaning.primary}
+      </span>
+      {item.approximate ? (
+        <span
+          className="type-label absolute top-1.25 left-2 text-faint-foreground"
+          title="Similar match"
+        >
+          ≈
+        </span>
+      ) : null}
+    </Link>
+  );
+}

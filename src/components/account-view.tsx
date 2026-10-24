@@ -5,10 +5,17 @@ import { type FormEvent, useCallback, useState } from "react";
 import { signIn } from "../account/account";
 import { useSyncStatus } from "../offline/sync";
 import { DitherButton } from "./dither-kit/button";
+import { tool } from "./ui/buttons";
 import { ErrorNote, Page, PageHeader } from "./ui/layout";
 import { useToast } from "./ui/toast";
 
 type Mode = "sign-in" | "sign-up";
+
+const note = "m-0 max-w-measure type-body text-muted-foreground";
+const field = "grid gap-tight";
+const fieldLabel = "type-label text-muted-foreground";
+const input =
+  "h-12 rounded-xl border border-border bg-card px-3.5 type-heading text-foreground transition-colors focus:border-blue";
 
 const copy: Record<Mode, { title: string; submit: string; switch: string }> = {
   "sign-in": {
@@ -68,9 +75,10 @@ export function AccountView() {
   if (status.learner && status.signedIn) {
     return (
       <Page head={<PageHeader title="account" />}>
-        <p className="dx-account-note">
-          signed in as <b className="dx-account-name">{status.learner.email}</b>
-          . <Link to="/settings">back to settings</Link>
+        <p className={note}>
+          signed in as{" "}
+          <b className="font-medium text-foreground">{status.learner.email}</b>.{" "}
+          <Link to="/settings">back to settings</Link>
         </p>
       </Page>
     );
@@ -80,16 +88,17 @@ export function AccountView() {
   const Icon = mode === "sign-in" ? LogIn : UserPlus;
   return (
     <Page head={<PageHeader title={text.title} />}>
-      <form className="dx-account" onSubmit={submit}>
-        <p className="dx-account-note">
+      <form className="grid max-w-form gap-item" onSubmit={submit}>
+        <p className={note}>
           sync progress between your devices. what you learned here joins the
           account.
         </p>
-        <label className="dx-field">
-          <span>email</span>
+        <label className={field}>
+          <span className={fieldLabel}>email</span>
           <input
             autoCapitalize="none"
             autoComplete="email"
+            className={input}
             inputMode="email"
             name="email"
             required
@@ -97,12 +106,13 @@ export function AccountView() {
             type="email"
           />
         </label>
-        <label className="dx-field">
-          <span>password</span>
+        <label className={field}>
+          <span className={fieldLabel}>password</span>
           <input
             autoComplete={
               mode === "sign-in" ? "current-password" : "new-password"
             }
+            className={input}
             minLength={8}
             name="password"
             required
@@ -110,18 +120,22 @@ export function AccountView() {
           />
         </label>
         {error ? <ErrorNote>{error}</ErrorNote> : null}
-        <div className="dx-account-actions">
+        <div className="mt-tight flex flex-wrap items-center gap-x-item gap-y-tight">
           <DitherButton
-            className="dx-tool"
+            className={tool}
             color="blue"
             disabled={busy}
             type="submit"
             variant="gradient"
           >
-            <Icon size={13} />
+            <Icon className="shrink-0" size={13} />
             {busy ? "one moment…" : text.submit}
           </DitherButton>
-          <button className="dx-account-switch" onClick={toggle} type="button">
+          <button
+            className="type-label text-muted-foreground underline underline-offset-3 transition-colors hover:text-foreground"
+            onClick={toggle}
+            type="button"
+          >
             {text.switch}
           </button>
         </div>

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getRouteApi, Link } from "@tanstack/react-router";
+import { getRouteApi } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
 import {
   type ChangeEvent,
@@ -22,15 +22,24 @@ import {
   queueKey,
 } from "../lib/library-index";
 import { createLibrarySearch, type LibraryEntry } from "../lib/library-search";
-import { getItemMeaning } from "../lib/meaning";
+import { cn } from "../lib/utils";
 import {
   dashboardQueryOptions,
   libraryQueryOptions,
   palaceQueryOptions,
 } from "../offline/queries";
 import { DitherGradient } from "./dither-kit/gradient";
-import { Chip } from "./ui/chip";
-import { Page, PageHeader, Status } from "./ui/layout";
+import { Chip, ChipCount } from "./ui/chip";
+import {
+  headMeta,
+  headRow,
+  Page,
+  PageHeader,
+  Status,
+  statusAction,
+} from "./ui/layout";
+import { progressFill, progressTrack } from "./ui/split-meter";
+import { StatusDot, Tile, tileSkeleton, Wall } from "./ui/tile";
 
 const route = getRouteApi("/_app/library");
 const PAGE = 120;
@@ -51,6 +60,21 @@ const skeletonTiles = Array.from(
   { length: 24 },
   (_, index) => `skeleton-${index}`
 );
+
+// The search field and filter chips over a list; the palace shares them.
+/** Search field and filters, above the results. */
+export const controls = "mb-group grid gap-item";
+export const searchBox =
+  "flex h-13 items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 text-muted-foreground transition-colors focus-within:border-blue focus-within:text-foreground";
+export const searchInput =
+  "h-full min-w-0 flex-1 border-0 bg-transparent type-heading text-foreground outline-none search-cancel:hidden placeholder:type-control placeholder:text-faint-foreground";
+export const searchClear =
+  "grid size-7 place-items-center rounded-md text-muted-foreground hover:bg-popover hover:text-foreground";
+/** Filter groups: chip sets on one line, wrapping, the last pushed to the end. */
+export const filterBar = "flex flex-wrap justify-between gap-tight";
+export const filterSet = "flex flex-wrap gap-x-item gap-y-tight";
+/** A fieldset of chips, without the browser's border and padding. */
+export const filterGroup = "flex min-w-0 flex-wrap gap-tight";
 
 type Kind = (typeof kinds)[number]["id"];
 type StatusId = (typeof statuses)[number]["id"];
@@ -282,7 +306,7 @@ export function LibraryView() {
     results = (
       <Status
         action={
-          <button className="dx-chip" onClick={retry} type="button">
+          <button className={statusAction} onClick={retry} type="button">
             retry
           </button>
         }
@@ -291,13 +315,13 @@ export function LibraryView() {
     );
   } else if (!library.data) {
     results = (
-      <div aria-busy="true" className="dx-wall">
+      <Wall busy>
         {skeletonTiles.map((id) => (
-          <span className="dx-tile dx-tile-skeleton" key={id}>
+          <span className={tileSkeleton} key={id}>
             <DitherGradient cell={2} direction="up" from="grey" opacity={0.5} />
           </span>
         ))}
-      </div>
+      </Wall>
     );
   } else if (items.length) {
     results = (
@@ -314,7 +338,7 @@ export function LibraryView() {
     results = (
       <Status
         action={
-          <button className="dx-chip" onClick={clearAll} type="button">
+          <button className={statusAction} onClick={clearAll} type="button">
             clear search &amp; filters
           </button>
         }
@@ -332,12 +356,13 @@ export function LibraryView() {
         />
       }
     >
-      <div className="dx-lib-controls">
-        <label className="dx-search">
+      <div className={controls}>
+        <label className={searchBox}>
           <Search aria-hidden="true" size={16} />
           <input
             aria-label="Search the library"
             autoComplete="off"
+            className={searchInput}
             placeholder="hanzi, pinyin, meaning, or your clues"
             ref={input}
             spellCheck={false}
@@ -348,13 +373,16 @@ export function LibraryView() {
           {draft ? (
             <button
               aria-label="Clear search"
+              className={searchClear}
               onClick={clearQuery}
               type="button"
             >
               <X size={15} />
             </button>
           ) : (
-            <kbd>/</kbd>
+            <kbd className="rounded-sm border border-border-strong px-1.5 py-px">
+              /
+            </kbd>
           )}
         </label>
         <LibraryFilters
@@ -370,13 +398,19 @@ export function LibraryView() {
 
       {results}
 
-      <p className="dx-lib-credit">
+      <p className="type-label mt-section mb-0 text-center text-faint-foreground leading-wrap">
         definitions adapted from{" "}
-        <a href="https://www.mdbg.net/chinese/dictionary?page=cedict">
+        <a
+          className="underline underline-offset-3"
+          href="https://www.mdbg.net/chinese/dictionary?page=cedict"
+        >
           CC-CEDICT
         </a>{" "}
         ·{" "}
-        <a href="https://creativecommons.org/licenses/by-sa/4.0/">
+        <a
+          className="underline underline-offset-3"
+          href="https://creativecommons.org/licenses/by-sa/4.0/"
+        >
           CC BY-SA 4.0
         </a>
       </p>
@@ -419,10 +453,10 @@ function LibraryFilters({
     [status, update]
   );
   return (
-    <div className="dx-lib-filters">
+    <div className={filterBar}>
       {searching ? null : (
-        <div>
-          <fieldset aria-label="Kind" className="dx-group">
+        <div className={filterSet}>
+          <fieldset aria-label="Kind" className={filterGroup}>
             {kinds.map((entry) => (
               <Chip
                 key={entry.id}
@@ -431,13 +465,13 @@ function LibraryFilters({
                 value={entry.id}
               >
                 {entry.label}
-                <small>
+                <ChipCount>
                   {matches.filter((item) => item.kind === entry.id).length}
-                </small>
+                </ChipCount>
               </Chip>
             ))}
           </fieldset>
-          <fieldset aria-label="Browse by" className="dx-group">
+          <fieldset aria-label="Browse by" className={filterGroup}>
             {groups.map((entry) => (
               <Chip
                 key={entry.id}
@@ -451,7 +485,7 @@ function LibraryFilters({
           </fieldset>
         </div>
       )}
-      <fieldset aria-label="Status" className="dx-group">
+      <fieldset aria-label="Status" className={filterGroup}>
         {statuses.map((entry) => (
           <Chip
             data-status={entry.id}
@@ -460,11 +494,11 @@ function LibraryFilters({
             pressed={status === entry.id}
             value={entry.id}
           >
-            <i aria-hidden="true" />
+            <StatusDot status={entry.id} />
             {entry.label}
-            <small>
+            <ChipCount>
               {pool.filter((item) => item.status === entry.id).length}
-            </small>
+            </ChipCount>
           </Chip>
         ))}
       </fieldset>
@@ -512,16 +546,16 @@ function LibraryResults({
   );
   const more =
     items.length > shown ? (
-      <div className="dx-lib-sentinel" ref={observeSentinel} />
+      <div className="h-px" ref={observeSentinel} />
     ) : null;
   if (searching) {
     return (
       <>
-        <div aria-busy={pending} className="dx-wall">
+        <Wall busy={pending}>
           {items.slice(0, shown).map((item) => (
             <Tile item={item} key={`${item.kind}:${item.id}`} />
           ))}
-        </div>
+        </Wall>
         {more}
       </>
     );
@@ -529,10 +563,17 @@ function LibraryResults({
   let budget = shown;
   return (
     <>
-      <nav aria-label="Jump to section" className="dx-lib-index">
+      {/* Section keys stay pinned while browsing, so any part of the course is one tap away. */}
+      <nav
+        aria-label="Jump to section"
+        className="scrollbar-none sticky top-0 z-2 mb-1.5 flex gap-pair overflow-x-auto bg-background py-tight shadow-hairline"
+      >
         {sections.map((section) => (
           <button
-            data-learned={section.learned > 0}
+            className={cn(
+              "type-control h-7.5 min-w-8.5 shrink-0 rounded-chip border border-transparent px-2.25 tabular-nums transition-colors hover:border-border-strong hover:text-foreground",
+              section.learned > 0 ? "text-foreground" : "text-faint-foreground"
+            )}
             key={section.key}
             onClick={jumpTo}
             type="button"
@@ -575,9 +616,17 @@ function LibrarySectionBlock({
   const id = sectionId(section.key);
   const size = section.entries.length;
   return (
-    <section aria-labelledby={`${id}-title`} className="dx-lib-section" id={id}>
-      <header className="dx-head">
-        <h2 className="dx-lib-section-title" id={`${id}-title`}>
+    <section
+      aria-labelledby={`${id}-title`}
+      className="flex scroll-mt-10 flex-col gap-tight pt-section first-of-type:pt-group"
+      id={id}
+    >
+      {/* Reads like every section head: label, then its count after a dot. */}
+      <header className={cn(headRow, "min-h-0 gap-tight")}>
+        <h2
+          className="type-label m-0 min-w-3.5 shrink-0 whitespace-nowrap text-foreground"
+          id={`${id}-title`}
+        >
           {section.label}
         </h2>
         {progress ? (
@@ -586,7 +635,7 @@ function LibrarySectionBlock({
             aria-valuemax={size}
             aria-valuemin={0}
             aria-valuenow={section.learned}
-            className="dx-progress"
+            className={cn(progressTrack, "max-w-none")}
             role="progressbar"
           >
             <DitherGradient
@@ -596,53 +645,31 @@ function LibrarySectionBlock({
               opacity={0.5}
             />
             <span
-              className="dx-progress-fill"
+              className={progressFill}
               style={{ width: `${(section.learned / size) * 100}%` }}
             >
               <DitherGradient cell={2} direction="left" from="green" />
             </span>
           </div>
         ) : null}
-        <div className="dx-head-meta">
+        <div
+          className={cn(headMeta, progress ? "max-md:ml-auto" : "dot-before")}
+        >
           {progress ? (
             <>
-              <b>{section.learned}</b> / {size}
+              <b className="font-medium text-foreground">{section.learned}</b> /{" "}
+              {size}
             </>
           ) : (
             size
           )}
         </div>
       </header>
-      <div className="dx-wall">
+      <Wall>
         {entries.map((item) => (
           <Tile item={item} key={`${item.kind}:${item.id}`} />
         ))}
-      </div>
+      </Wall>
     </section>
-  );
-}
-
-export function Tile({ item }: { item: LibraryEntry }) {
-  const meaning = getItemMeaning(item);
-  return (
-    <Link
-      aria-label={`${item.hanzi}, ${item.pinyin}: ${meaning.primary}`}
-      className="dx-tile"
-      data-kind={item.kind}
-      data-status={item.status}
-      params={{ kind: item.kind, id: item.id }}
-      to="/library/$kind/$id"
-    >
-      <span className="dx-tile-hanzi font-hanzi" lang="zh-CN">
-        {item.hanzi}
-      </span>
-      <span className="dx-tile-py">{item.pinyin}</span>
-      <span className="dx-tile-en">{meaning.primary}</span>
-      {item.approximate ? (
-        <span className="dx-tile-approx" title="Similar match">
-          ≈
-        </span>
-      ) : null}
-    </Link>
   );
 }
