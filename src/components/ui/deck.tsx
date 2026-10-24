@@ -115,7 +115,6 @@ export function DeckCard({
   suit,
   flipped,
   thrown = null,
-  tint = null,
   ghost = false,
   waiting = false,
   onFlip,
@@ -126,7 +125,6 @@ export function DeckCard({
   suit: CardSuit;
   flipped: boolean;
   thrown?: "left" | "right" | null;
-  tint?: DitherColor | null;
   ghost?: boolean;
   waiting?: boolean;
   onFlip: () => void;
@@ -168,7 +166,7 @@ export function DeckCard({
       </button>
       {/* The answer side's grain is painted with the card; its content comes when it turns. */}
       <div className="dx-deck-face dx-deck-back">
-        <CardGrain color={tint ?? "grey"} />
+        <CardGrain />
         {flipped ? back : null}
       </div>
     </div>

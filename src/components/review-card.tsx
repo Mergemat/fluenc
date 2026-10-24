@@ -6,7 +6,6 @@
 // revealing never moves anything.
 import {
   type CSSProperties,
-  type PointerEvent,
   type ReactNode,
   useCallback,
   useEffect,
@@ -60,24 +59,12 @@ function RatingButton({
   rating,
   after,
   onRate,
-  onTint,
 }: {
   rating: (typeof ratings)[number];
   after: string;
   onRate: (rating: Grade) => void;
-  onTint: (color: DitherColor | null) => void;
 }) {
   const rate = useCallback(() => onRate(rating.value), [onRate, rating.value]);
-  // Only a mouse tints the card: on touch the tap that grades would flash it as it is thrown.
-  const tint = useCallback(
-    (event: PointerEvent) => {
-      if (event.pointerType === "mouse") {
-        onTint(rating.color);
-      }
-    },
-    [onTint, rating.color]
-  );
-  const untint = useCallback(() => onTint(null), [onTint]);
   // The wait sits above its button, so it reads as when the card returns, not as part of the name.
   return (
     <div className="dx-rate-slot">
@@ -86,8 +73,6 @@ function RatingButton({
         className="dx-rate"
         color={rating.color}
         onClick={rate}
-        onPointerEnter={tint}
-        onPointerLeave={untint}
         variant="dotted"
       >
         <span>{rating.label}</span>
@@ -315,7 +300,6 @@ function PileCard({
   revealed,
   side,
   waiting,
-  tint,
   onFlip,
   onGone,
 }: {
@@ -324,7 +308,6 @@ function PileCard({
   side: "left" | "right" | null;
   /** The next card, built and painted under the top one. */
   waiting: boolean;
-  tint: DitherColor | null;
   onFlip: () => void;
   onGone: (key: string) => void;
 }) {
@@ -357,7 +340,6 @@ function PileCard({
       onThrown={gone}
       suit={item.type}
       thrown={side}
-      tint={side || waiting ? null : tint}
       waiting={waiting}
     />
   );
@@ -492,7 +474,6 @@ export function ReviewDeck({
   }
   const [revealedKey, setRevealedKey] = useState<string | null>(null);
   const revealed = activeKey !== null && revealedKey === activeKey;
-  const [tint, setTint] = useState<DitherColor | null>(null);
   const waits = useMemo(() => (active ? waitsFor(active) : null), [active]);
 
   const reveal = useCallback(() => setRevealedKey(activeKey), [activeKey]);
@@ -501,7 +482,6 @@ export function ReviewDeck({
       if (!active) {
         return;
       }
-      setTint(null);
       grade(
         active,
         rating,
@@ -579,7 +559,6 @@ export function ReviewDeck({
               onGone={gone}
               revealed={card.side !== null || revealed}
               side={card.side}
-              tint={tint}
               waiting={card.waiting}
             />
           ))}
@@ -609,7 +588,6 @@ export function ReviewDeck({
               after={waits?.get(rating.value) ?? ""}
               key={rating.value}
               onRate={rate}
-              onTint={setTint}
               rating={rating}
             />
           ))}
