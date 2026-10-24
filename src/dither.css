@@ -2132,7 +2132,7 @@
   width: 100%;
   height: 100%;
 }
-.dx-deck-front .dx-gloss-hanzi {
+.dx-deck-face .dx-gloss-hanzi {
   font-size: min(20cqw, 34cqh);
 }
 .dx-deck-prompt {
@@ -2180,22 +2180,13 @@
   width: 64px;
   height: 64px;
 }
-.dx-deck-index-word {
-  width: auto;
-  height: auto;
-  font-size: 26px;
-  line-height: 1;
-  color: var(--dx-muted);
-}
+/* The lesson's identity block, centred on the card where the front's character stood. Type comes
+   from the lesson classes (.dx-meaning, .dx-alt, .dx-py); only the place is set here. */
 .dx-deck-focus {
   position: absolute;
   top: 50%;
   right: 22px;
   left: 22px;
-  display: grid;
-  gap: 12px;
-  justify-items: center;
-  text-align: center;
   transform: translateY(-50%);
 }
 /* The pinyin stays on the centre line; its play button hangs off the right edge. */
@@ -2209,24 +2200,6 @@
   top: 50%;
   left: calc(100% + var(--dx-space-tight));
   translate: 0 -50%;
-}
-.dx-deck-focus .dx-py {
-  font-size: clamp(44px, 16cqw, 64px);
-}
-.dx-deck-meaning {
-  margin: 0;
-  font: var(--dx-type-display);
-  font-size: clamp(26px, 9cqw, 34px);
-  line-height: 1.1;
-  text-wrap: balance;
-}
-.dx-deck-others {
-  min-height: 1em;
-  margin: 0;
-  font: var(--dx-type-label);
-  line-height: var(--dx-wrap);
-  color: var(--dx-muted);
-  text-wrap: balance;
 }
 .dx-deck-edge {
   --chip-ground: var(--card-face);
@@ -2246,6 +2219,21 @@
   color: var(--dx-muted);
   text-align: center;
 }
+/* A word: its gloss on the centre line, where the front showed it, and its identity under it. */
+.dx-deck-answer-word {
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  justify-items: center;
+  padding: 0 22px;
+}
+.dx-deck-answer-word > .dx-gloss {
+  grid-row: 2;
+}
+.dx-deck-answer-word > .dx-ident {
+  grid-row: 3;
+  align-self: start;
+  margin-top: var(--dx-space-group);
+}
 .dx-deck-answer-sentence {
   display: flex;
   flex-direction: column;
@@ -2260,10 +2248,11 @@
   font-size: 22px;
   color: var(--dx-muted);
 }
+/* A sentence's pinyin, as review always set it. */
 .dx-deck-reading {
   margin: 0;
-  font: var(--dx-type-control);
-  font-size: var(--dx-text-base);
+  font: var(--dx-type-pinyin);
+  font-size: var(--dx-text-xl);
 }
 
 /* The deck run out: face down with a timer, or the empty place. */
@@ -2381,15 +2370,8 @@
   }
   .dx-deck-focus {
     position: static;
-    gap: var(--dx-space-tight);
     padding: 16px 64px 0;
     transform: none;
-  }
-  .dx-deck-focus .dx-py {
-    font-size: 38px;
-  }
-  .dx-deck-meaning {
-    font-size: var(--dx-text-xl);
   }
   .dx-deck-edge {
     --chip-height: 26px;
