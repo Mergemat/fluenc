@@ -569,7 +569,9 @@ export function ReviewDeck({
               key={cardKey(card.item)}
               onFlip={reveal}
               onGone={gone}
-              revealed={card.side !== null || revealed}
+              // A thrown card stays on its answer; the waiting one stays on its front, so it rises
+              // without turning.
+              revealed={card.side !== null || (!card.waiting && revealed)}
               side={card.side}
               waiting={card.waiting}
             />

@@ -274,14 +274,17 @@ test("a grade raises the waiting card before its save lands, and a failed save b
   const waiting = expectDefined(host.querySelector("[data-waiting]"));
   expect(waiting.textContent).toContain("Sentence 1");
   await reveal();
+  // Only the top card turns; the one waiting under it stays on its front.
+  expect(waiting.getAttribute("data-flipped")).toBe("false");
   const good = expectDefined(
     [...host.querySelectorAll("button")].find((candidate) =>
       candidate.textContent?.includes("small pause")
     )
   );
   act(() => good.click());
-  // The same card rises to the top; nothing is built for it.
+  // The same card rises to the top, still on its front; nothing is built or turned.
   expect(topCard()).toBe(waiting);
+  expect(waiting.getAttribute("data-flipped")).toBe("false");
   expect(host.textContent).toContain("1 left");
   // The save starts once the throw is over. This test has no device database, so it fails and
   // the graded card returns.
