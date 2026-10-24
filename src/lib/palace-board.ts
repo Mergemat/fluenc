@@ -1,7 +1,7 @@
 import type { LibraryData, PalaceData } from "./learner-views";
 import type { MovieCoordinates } from "./pinyin";
 import { defaultToneRooms } from "./pinyin";
-import { suggestedProp } from "./props";
+import { propMeaning } from "./props";
 
 export type ActorCategory = MovieCoordinates["actorCategory"];
 interface Usage {
@@ -108,7 +108,7 @@ export function buildPalaceBoard(library: LibraryData, palace: PalaceData) {
       const prop = usageFor(props, part.hanzi, () => ({
         key: part.hanzi,
         name: propNames.get(part.hanzi) ?? "",
-        meaning: suggestedProp(part.hanzi) ?? keywords.get(part.hanzi) ?? null,
+        meaning: propMeaning(part.hanzi) ?? keywords.get(part.hanzi) ?? null,
         ...unused(),
       }));
       count(prop, character.id, started);

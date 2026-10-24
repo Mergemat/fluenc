@@ -3,7 +3,11 @@ import type { Curriculum } from "../data/types";
 
 const { props } = curriculumJson as Curriculum;
 
-/** The database's suggested prop for a component: one reusable object for every movie with it. */
-export function suggestedProp(component: string) {
-  return props[component]?.prop ?? null;
+/** A component's dictionary meaning, cut to its first sense: "city outskirts, suburbs; remote" → "city outskirts, suburbs". */
+export function propMeaning(component: string) {
+  const meaning = props[component]?.meaning;
+  if (!meaning) {
+    return null;
+  }
+  return meaning.split(";")[0].replace(/\s*\([^)]*\)$/, "").trim();
 }
