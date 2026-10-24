@@ -1956,9 +1956,9 @@
 .dx-deck {
   --dx-rate-height: 56px;
   --card-radius: 20px;
-  --card-face: #1a1a1f;
-  --card-edge: #2e2e36;
-  --card-under: #141418;
+  --card-face: #131316;
+  --card-edge: #26262c;
+  --card-under: #0f0f12;
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -1976,15 +1976,17 @@
   min-height: 0;
   container-type: size;
 }
+/* The margin keeps the pile's edges (four cards 6px apart, tilted) clear of the caption. */
 .dx-deck-pile {
   position: relative;
   flex: none;
-  width: min(100cqw, 380px, (100cqh - 64px) * 5 / 7);
+  width: min(100cqw, 380px, (100cqh - 92px) * 5 / 7);
   aspect-ratio: 5 / 7;
+  margin-bottom: 28px;
   perspective: 1600px;
 }
 .dx-deck-pile[data-wide="true"] {
-  width: min(100cqw, 600px, (100cqh - 120px) * 7 / 5);
+  width: min(100cqw, 600px, (100cqh - 148px) * 7 / 5);
   aspect-ratio: 7 / 5;
 }
 .dx-deck-under {
@@ -2044,6 +2046,14 @@
 .dx-deck-card[data-flipped="true"] {
   transform: rotateY(180deg);
 }
+/* A throw starts flipped, with the same transform list as its end, so it never turns back over.
+   It fades the faces, not the card: opacity on the card would flatten the flip and show the
+   front through the back. */
+@keyframes dx-deck-fade-out {
+  to {
+    opacity: 0;
+  }
+}
 .dx-deck-card[data-thrown="left"] {
   animation: dx-deck-throw-left 300ms cubic-bezier(0.5, 0, 0.9, 0.6) forwards;
 }
@@ -2051,14 +2061,18 @@
   animation: dx-deck-throw-right 300ms cubic-bezier(0.5, 0, 0.9, 0.6) forwards;
 }
 @keyframes dx-deck-throw-left {
+  from {
+    transform: translate(0, 0) rotate(0deg) rotateY(180deg);
+  }
   to {
-    opacity: 0;
     transform: translate(-80%, 4%) rotate(-14deg) rotateY(180deg);
   }
 }
 @keyframes dx-deck-throw-right {
+  from {
+    transform: translate(0, 0) rotate(0deg) rotateY(180deg);
+  }
   to {
-    opacity: 0;
     transform: translate(80%, 4%) rotate(14deg) rotateY(180deg);
   }
 }
@@ -2088,6 +2102,9 @@
 }
 .dx-deck-back {
   transform: rotateY(180deg);
+}
+.dx-deck-card[data-thrown] > .dx-deck-face {
+  animation: dx-deck-fade-out 300ms ease-in forwards;
 }
 .dx-deck-suit {
   position: absolute;
@@ -2175,9 +2192,21 @@
   text-align: center;
   transform: translateY(-50%);
 }
-.dx-deck-focus > .dx-sound {
-  justify-content: center;
+/* The pinyin sits on the centre line; the play button hangs off its right edge, unboxed, so it
+   never pushes the pinyin over. */
+.dx-deck-focus > .dx-sound,
+.dx-deck-answer-sentence > .dx-sound {
+  position: relative;
+  display: inline-flex;
   margin: 0;
+}
+.dx-deck-focus > .dx-sound > .dx-audio,
+.dx-deck-answer-sentence > .dx-sound > .dx-audio {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + var(--dx-space-pair));
+  border-color: transparent;
+  translate: 0 -50%;
 }
 .dx-deck-focus .dx-py {
   font-size: clamp(44px, 16cqw, 64px);
@@ -2224,9 +2253,6 @@
   padding: 24px;
   text-align: center;
 }
-.dx-deck-answer-sentence > .dx-sound {
-  margin: 0;
-}
 .dx-deck-sentence-small {
   margin: 0;
   font-size: 22px;
@@ -2242,7 +2268,7 @@
   gap: var(--dx-space-tight);
 }
 .dx-deck-slot[data-state="down"] {
-  background: #15151a;
+  background: #111114;
 }
 .dx-deck-slot[data-state="down"]::before {
   position: absolute;

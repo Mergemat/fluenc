@@ -21,7 +21,7 @@ export function CardGrain({ color = "grey" }: { color?: DitherColor }) {
       direction="up"
       from={color}
       key={color}
-      opacity={color === "grey" ? 0.2 : 0.28}
+      opacity={color === "grey" ? 0.12 : 0.18}
     />
   );
 }
@@ -57,7 +57,7 @@ function Under({ count }: { count: number }) {
             { "--layer": layer + 1, "--tilt": `${tilt}deg` } as CSSProperties
           }
         >
-          <DitherGradient cell={3} density={0.1} from="grey" opacity={0.4} />
+          <DitherGradient cell={3} density={0.1} from="grey" opacity={0.3} />
         </span>
       ))}
     </>
