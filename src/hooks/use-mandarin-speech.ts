@@ -5,9 +5,62 @@ import {
   getRecordedPinyinPath,
 } from "../lib/pinyin-audio";
 import { getPronunciationAudio } from "../server/audio";
+import type { PronunciationInput } from "../server/audio.contract";
 
 const audioSourceCache = new Map<string, string>();
 const AUDIO_CACHE_VERSION = 8;
+// Generated speech is kept on the device: which recording each text has, and the recording. A
+// replay, even days later or offline, then needs neither a server call nor a download.
+const SPEECH_URLS_KEY = `fluenc-speech-urls-v${AUDIO_CACHE_VERSION}`;
+const SPEECH_CACHE = `fluenc-speech-v${AUDIO_CACHE_VERSION}`;
+
+function readSpeechUrls(): Record<string, string> {
+  try {
+    return JSON.parse(localStorage.getItem(SPEECH_URLS_KEY) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
+async function speechUrl(pronunciation: PronunciationInput) {
+  const key = `${pronunciation.text}:${pronunciation.pinyin}`;
+  const known = readSpeechUrls()[key];
+  if (known) {
+    return known;
+  }
+  const { audioUrl } = await getPronunciationAudio({ data: pronunciation });
+  try {
+    localStorage.setItem(
+      SPEECH_URLS_KEY,
+      JSON.stringify({ ...readSpeechUrls(), [key]: audioUrl })
+    );
+  } catch {
+    // Storage is full or blocked: the next visit asks the server again.
+  }
+  return audioUrl;
+}
+
+/** A playable source for generated speech, from the device's copy when it has one. */
+async function generatedSpeech(pronunciation: PronunciationInput) {
+  const url = await speechUrl(pronunciation);
+  if (!("caches" in window)) {
+    return url;
+  }
+  try {
+    const cache = await caches.open(SPEECH_CACHE);
+    let response = await cache.match(url);
+    if (!response) {
+      response = await fetch(url);
+      if (!response.ok) {
+        return url;
+      }
+      await cache.put(url, response.clone());
+    }
+    return URL.createObjectURL(await response.blob());
+  } catch {
+    return url;
+  }
+}
 
 export function useMandarinSpeech() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -40,12 +93,9 @@ export function useMandarinSpeech() {
             ? (getRecordedPinyinPath(pinyin) ?? "")
             : "";
         if (!source) {
-          const pronunciation = getNeutralToneExample(text, pinyin) ?? {
-            text,
-            pinyin,
-          };
-          const result = await getPronunciationAudio({ data: pronunciation });
-          source = result.audioUrl;
+          source = await generatedSpeech(
+            getNeutralToneExample(text, pinyin) ?? { text, pinyin }
+          );
         }
         audioSourceCache.set(cacheKey, source);
       }
