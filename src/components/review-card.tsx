@@ -39,8 +39,9 @@ const ratings: {
 ];
 
 const RATING_KEY = /^[1-4]$/;
-// Long enough to see the card leave; the save waits for it.
-const THROW_MS = 300;
+// Long enough to see the card leave, short enough not to wait on it; the save follows it.
+// Matches the throw animation in dither.css.
+const THROW_MS = 160;
 
 type CharacterReview = Extract<ReviewItem, { type: "character" }>;
 type Clue = ReturnType<typeof lessonClues>[number];
