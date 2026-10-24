@@ -29,7 +29,7 @@ test("single characters share a memory across vocabulary meanings of the same pr
 });
 
 test("another pronunciation remains a separate reading lesson", () => {
-  for (const hanzi of ["干", "待", "长"]) {
+  for (const hanzi of ["喂", "待", "教"]) {
     const id = wordId(hanzi);
     expect(characterForWord(id)).toBeUndefined();
     expect(studyIdentity("word", id)).toEqual({ itemType: "word", itemId: id });

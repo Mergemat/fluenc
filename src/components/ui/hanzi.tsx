@@ -18,14 +18,16 @@ import { DitherGradient } from "../dither-kit/gradient";
 import { PixelLoader } from "./dither";
 import { partColor, partPixelColor } from "./part-colors";
 
+// Stroke outlines use a 1024-unit box whose y axis points up from -124 to 900. This flips them
+// into the SVG's 1024 box with a 55-unit margin.
+const STROKE_SCALE = (1024 - 2 * 55) / 1024;
+const STROKE_TRANSFORM = `translate(55, ${55 + 900 * STROKE_SCALE}) scale(${STROKE_SCALE}, ${-STROKE_SCALE})`;
+
 export function useStrokes(hanzi: string) {
   return useQuery({
     queryKey: ["character-strokes", hanzi],
     queryFn: async () => {
-      const [{ default: HanziWriter }, response] = await Promise.all([
-        import("hanzi-writer"),
-        fetch(`/hanzi/${hanzi}.json`),
-      ]);
+      const response = await fetch(`/hanzi/${hanzi}.json`);
       if (!response.ok) {
         throw new Error("Character strokes unavailable");
       }
@@ -35,10 +37,7 @@ export function useStrokes(hanzi: string) {
         medians: [number, number][][];
         owners: string[];
       };
-      return {
-        ...data,
-        transform: HanziWriter.getScalingTransform(1024, 1024, 55).transform,
-      };
+      return { ...data, transform: STROKE_TRANSFORM };
     },
     staleTime: Number.POSITIVE_INFINITY,
   });

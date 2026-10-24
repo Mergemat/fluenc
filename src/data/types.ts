@@ -7,43 +7,64 @@ export function isStudyItemType(
 }
 
 export interface Character {
+  /** A short second cue shown beside the keyword, or null. */
+  also: string | null;
   /** Authored glyph assembly guidance, never source review or replacement history. */
   componentNote: string | null;
   componentStructure: "atomic" | "compound";
+  /** The props the character is taught from, in writing order. Independent of stroke files. */
   components: string[];
-  dictionaryMeanings: string[];
   frequencyRank: number;
   hanzi: string;
   id: string;
   keyword: string;
+  /** Its place in the default teaching order, from frequency and usage. */
+  order: number;
   pinyin: string;
+  radical: string;
+  /** Other readings in modern use. */
+  readings: { pinyin: string; meanings: string[] }[];
+  /** Senses of the taught reading, most useful first. */
+  senses: string[];
+  strokes: number;
   unlocks: number;
+  /** Reading sentences that use it, plus the course words it spells. */
+  usage: number;
 }
 
 export interface Word {
+  also: string | null;
   characterIds: string[];
-  dictionaryMeanings: string[];
   hanzi: string;
   /** A course word's number, or the spelling of a word the learner added. */
   id: number | string;
   meaning: string;
+  /** Its place in the default teaching order, from frequency and usage. */
+  order: number;
   pinyin: string;
   rank: number;
+  senses: string[];
   /** One curriculum syllable per character, or null when the reading does not split cleanly. */
   syllables: string[] | null;
+  /** Reading sentences that use it. */
+  usage: number;
+}
+
+/** A component's suggested prop: a reusable object for every movie that has this part. */
+export interface Prop {
+  meaning: string;
+  prop: string;
+  strokes: number;
+  variantOf: string | null;
 }
 
 export interface Curriculum {
   characters: Character[];
+  props: Record<string, Prop>;
   sources: {
-    words: string;
-    supplementaryWords: string;
     characters: string;
-    decompositionReviews: string;
-    componentNotes: string;
-    keywordReviews: string;
-    dictionary: string;
-    wordReviews: string;
+    words: string;
+    components: string;
   };
   version: string;
   words: Word[];

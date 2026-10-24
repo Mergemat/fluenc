@@ -8,17 +8,15 @@ type Word = LibraryData["words"][number];
 const character = (
   entry: Pick<
     Character,
-    | "id"
-    | "hanzi"
-    | "pinyin"
-    | "keyword"
-    | "dictionaryMeanings"
-    | "rank"
-    | "status"
+    "id" | "hanzi" | "pinyin" | "keyword" | "senses" | "rank" | "status"
   >,
   components = [entry.hanzi]
 ): Character => ({
   ...entry,
+  also: null,
+  strokes: 1,
+  radical: entry.hanzi,
+  readings: [],
   movie: getMovieCoordinates(entry.pinyin),
   components: components.map((hanzi) => ({ hanzi, count: 1 })),
   structure: "atomic",
@@ -27,17 +25,12 @@ const character = (
 const word = (
   entry: Pick<
     Word,
-    | "id"
-    | "hanzi"
-    | "pinyin"
-    | "meaning"
-    | "dictionaryMeanings"
-    | "rank"
-    | "status"
+    "id" | "hanzi" | "pinyin" | "meaning" | "senses" | "rank" | "status"
   >,
   livingLink = ""
 ): Word => ({
   ...entry,
+  also: null,
   syllables: null,
   characterParts: [],
   livingLink,
@@ -50,7 +43,7 @@ const library: LibraryData = {
       hanzi: "你",
       pinyin: "nǐ",
       keyword: "you",
-      dictionaryMeanings: [],
+      senses: [],
       rank: 1,
       status: "review",
     }),
@@ -59,7 +52,7 @@ const library: LibraryData = {
       hanzi: "女",
       pinyin: "nǚ",
       keyword: "female",
-      dictionaryMeanings: ["woman"],
+      senses: ["woman"],
       rank: 2,
       status: "learning",
     }),
@@ -69,7 +62,7 @@ const library: LibraryData = {
         hanzi: "好",
         pinyin: "hǎo",
         keyword: "good",
-        dictionaryMeanings: [],
+        senses: [],
         rank: 3,
         status: "new",
       },
@@ -82,7 +75,7 @@ const library: LibraryData = {
       hanzi: "你好",
       pinyin: "nǐ hǎo",
       meaning: "hello",
-      dictionaryMeanings: ["greeting"],
+      senses: ["greeting"],
       rank: 1,
       status: "review",
     }),
@@ -92,7 +85,7 @@ const library: LibraryData = {
         hanzi: "朋友",
         pinyin: "péngyou",
         meaning: "friend",
-        dictionaryMeanings: ["companion"],
+        senses: ["companion"],
         rank: 2,
         status: "new",
       },

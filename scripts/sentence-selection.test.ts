@@ -2,8 +2,11 @@ import { expect, test } from "bun:test";
 import curriculumJson from "../src/data/curriculum.generated.json";
 import authored from "../src/data/sentences.authored.json";
 import type { Curriculum } from "../src/data/types";
-import { findSentenceConflicts } from "./sentence-diversity";
-import { type ReviewedSentences, selectSentences } from "./sentence-selection";
+import {
+  findSentenceConflicts,
+  type ReviewedSentences,
+  selectSentences,
+} from "./sentence-selection";
 
 const curriculum = curriculumJson as Curriculum;
 const he = {
