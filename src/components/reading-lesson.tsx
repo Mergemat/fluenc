@@ -97,11 +97,13 @@ export function ReadingLesson({
                 <p className="dx-deck-sentence-small font-hanzi" lang="zh-CN">
                   {item.hanzi}
                 </p>
-                <div className="dx-sound">
-                  <span className="dx-deck-reading">{item.pinyin}</span>
-                  <AudioButton pinyin={item.pinyin} text={item.hanzi} />
-                </div>
+                <p className="dx-deck-reading">{item.pinyin}</p>
                 <h2 className="dx-deck-meaning">{item.meaning}</h2>
+                <AudioButton
+                  label="listen"
+                  pinyin={item.pinyin}
+                  text={item.hanzi}
+                />
               </div>
             }
             flipped={revealed}

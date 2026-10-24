@@ -204,21 +204,19 @@ function Focus({ item }: { item: Exclude<ReviewItem, { type: "sentence" }> }) {
   ].slice(0, 3);
   return (
     <div className="dx-deck-focus">
-      <div className="dx-sound">
-        {item.type === "character" ? (
-          <MoviePinyin
-            actorKey={item.movie.actorKey}
-            finalKey={item.movie.finalKey}
-            pinyin={item.pinyin}
-            tone={item.movie.tone}
-          />
-        ) : (
-          <span className="dx-py dx-py-plain">{item.pinyin}</span>
-        )}
-        <AudioButton pinyin={item.pinyin} text={item.hanzi} />
-      </div>
+      {item.type === "character" ? (
+        <MoviePinyin
+          actorKey={item.movie.actorKey}
+          finalKey={item.movie.finalKey}
+          pinyin={item.pinyin}
+          tone={item.movie.tone}
+        />
+      ) : (
+        <span className="dx-py dx-py-plain">{item.pinyin}</span>
+      )}
       <h2 className="dx-deck-meaning">{meaning.primary}</h2>
       <p className="dx-deck-others">{others.join(" · ") || " "}</p>
+      <AudioButton label="listen" pinyin={item.pinyin} text={item.hanzi} />
     </div>
   );
 }
@@ -271,10 +269,8 @@ function CardAnswer({
         <p className="dx-deck-sentence font-hanzi" lang="zh-CN">
           {item.hanzi}
         </p>
-        <div className="dx-sound">
-          <span className="dx-deck-reading">{item.pinyin}</span>
-          <AudioButton pinyin={item.pinyin} text={item.hanzi} />
-        </div>
+        <p className="dx-deck-reading">{item.pinyin}</p>
+        <AudioButton label="listen" pinyin={item.pinyin} text={item.hanzi} />
       </div>
     );
   }
