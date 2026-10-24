@@ -123,7 +123,7 @@ function Under({ count }: { count: number }) {
   );
 }
 
-/** Sizes the pile to real card proportions, as large as the room allows, with a caption under it. */
+/** Sizes the pile to real card proportions, as large as the room allows, over its caption if any. */
 export function DeckTable({
   caption,
   children,
@@ -134,9 +134,11 @@ export function DeckTable({
   return (
     <div className="@container-size flex min-h-0 flex-1 flex-col items-center justify-center gap-2">
       {children}
-      <div className="type-label m-0 min-h-lh text-faint-foreground">
-        {caption ?? " "}
-      </div>
+      {caption ? (
+        <div className="type-label m-0 min-h-lh text-faint-foreground">
+          {caption}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -144,7 +146,7 @@ export function DeckTable({
 /**
  * A pile: `under` cards beneath whatever lies on top. Wide piles hold sentences. A playing card's
  * proportions where there is room; on a short screen it keeps its width and gets shorter. The
- * margin clears the pile's edges (four cards 6px apart) above the caption.
+ * margin clears the pile's edges (four cards 6px apart).
  */
 export function DeckPile({
   under,

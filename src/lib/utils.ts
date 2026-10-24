@@ -13,7 +13,7 @@ const twMerge = extendTailwindMerge<"type-role">({
         "title",
         "gloss",
         "gloss-entry",
-        "gloss-card",
+        "word-card",
         "sentence",
         "score",
         "timer",

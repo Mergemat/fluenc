@@ -107,7 +107,6 @@
   /* Fluid: as large as the screen or the card allows. */
   --text-gloss: clamp(64px, min(22vw, 17dvh), 160px);
   --text-gloss-entry: clamp(64px, 18vw, 120px);
-  --text-gloss-card: min(20cqw, 34cqh);
   --text-sentence: clamp(30px, 8cqw, 52px);
   --text-score: clamp(44px, 9vw, 96px);
   --text-timer: clamp(44px, 16cqw, 64px);
@@ -177,9 +176,9 @@
   --spacing-safe-header: calc(env(safe-area-inset-top) + 14px);
   --spacing-safe-tabbar: calc(4px + env(safe-area-inset-bottom));
   --spacing-safe-toast: calc(env(safe-area-inset-bottom) + 92px);
-  /* The review deck: the most a pile is tall in its table, clear of its edges and the caption
-     (a wide pile also of the sentence's room); and the space between a glossed word's columns. */
-  --spacing-pile: calc(100cqh - 48px);
+  /* The review deck: the most a pile is tall in its table, clear of its edges (a wide pile also
+     of its caption and the sentence's room); and the space between a glossed word's columns. */
+  --spacing-pile: calc(100cqh - 24px);
   --spacing-pile-wide: calc(100cqh - 104px);
   --spacing-gloss: clamp(10px, 3.5vw, 32px);
 
@@ -441,6 +440,11 @@
   /* The font glyph standing in for a stroke glyph, matched to its outline. */
   --text-glyph-ghost: calc(
     min(100cqw, 100cqh, var(--glyph-max, 360px)) *
+    914 / 1024
+  );
+  /* A word's characters on a card: a lone character's size, shrunk only to fit the word across. */
+  --text-word-card: calc(
+    min(100cqw / var(--chars, 1), 100cqh, var(--glyph-max, 360px)) *
     914 / 1024
   );
   --animate-reel: reel var(--ms) linear both;

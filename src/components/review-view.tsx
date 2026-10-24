@@ -44,7 +44,6 @@ export function ReviewView({ data }: { data: DashboardData }) {
 
   return (
     <section className={deckPage}>
-      <PageHeader title="review" />
       <ReviewDeck
         done={
           <ReviewDone
@@ -110,21 +109,24 @@ function ReviewDone({
   if (waiting) {
     // The dashboard refetches when the first card is due, which deals the deck back in.
     return (
-      <div className={deck} data-state="waiting" role="status">
-        <DeckTable caption="back after a short break">
-          <DeckPile under={coming - 1}>
-            <DeckSlot state="down">
-              <b className={slotFigure("text-timer tabular-nums")}>
-                {countdown(Date.parse(nextLearningAt ?? "") - now)}
-              </b>
-              <small className={slotNote}>
-                {coming} {coming === 1 ? "card" : "cards"}
-              </small>
-            </DeckSlot>
-          </DeckPile>
-        </DeckTable>
-        <footer className={deckActions()} />
-      </div>
+      <>
+        <PageHeader meta="back after a short break" title="review" />
+        <div className={deck} data-state="waiting" role="status">
+          <DeckTable>
+            <DeckPile under={coming - 1}>
+              <DeckSlot state="down">
+                <b className={slotFigure("text-timer tabular-nums")}>
+                  {countdown(Date.parse(nextLearningAt ?? "") - now)}
+                </b>
+                <small className={slotNote}>
+                  {coming} {coming === 1 ? "card" : "cards"}
+                </small>
+              </DeckSlot>
+            </DeckPile>
+          </DeckTable>
+          <footer className={deckActions()} />
+        </div>
+      </>
     );
   }
 
@@ -144,44 +146,49 @@ function ReviewDone({
     );
   }
   return (
-    <div className={deck} data-state={state}>
-      <DeckTable>
-        <DeckPile under={0}>
-          <DeckSlot state="empty">
-            {state === "finished" ? (
-              <>
-                <b className={verdict}>done</b>
-                <small className={slotNote}>
-                  next · {nextReviews(data, now) ?? "tomorrow"}
-                </small>
-              </>
-            ) : (
-              <>
-                <b
-                  className={slotFigure(
-                    "text-balance text-center text-verdict-long"
-                  )}
-                >
-                  start with a lesson
-                </b>
-                <small className={slotNote}>reviews keep what you learn</small>
-              </>
-            )}
-          </DeckSlot>
-        </DeckPile>
-      </DeckTable>
-      <footer className={deckActions()}>
-        <DitherButton
-          className={cn(action, deckAction, "h-14")}
-          color="blue"
-          onClick={next}
-          variant="gradient"
-        >
-          {label}
-          <kbd className={actionKey}>↵</kbd>
-        </DitherButton>
-      </footer>
-    </div>
+    <>
+      <PageHeader title="review" />
+      <div className={deck} data-state={state}>
+        <DeckTable>
+          <DeckPile under={0}>
+            <DeckSlot state="empty">
+              {state === "finished" ? (
+                <>
+                  <b className={verdict}>done</b>
+                  <small className={slotNote}>
+                    next · {nextReviews(data, now) ?? "tomorrow"}
+                  </small>
+                </>
+              ) : (
+                <>
+                  <b
+                    className={slotFigure(
+                      "text-balance text-center text-verdict-long"
+                    )}
+                  >
+                    start with a lesson
+                  </b>
+                  <small className={slotNote}>
+                    reviews keep what you learn
+                  </small>
+                </>
+              )}
+            </DeckSlot>
+          </DeckPile>
+        </DeckTable>
+        <footer className={deckActions()}>
+          <DitherButton
+            className={cn(action, deckAction, "h-14")}
+            color="blue"
+            onClick={next}
+            variant="gradient"
+          >
+            {label}
+            <kbd className={actionKey}>↵</kbd>
+          </DitherButton>
+        </footer>
+      </div>
+    </>
   );
 }
 

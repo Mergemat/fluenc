@@ -49,6 +49,7 @@ import {
   MoviePinyin,
   pinyinText,
 } from "./ui/hanzi";
+import { PageHeader } from "./ui/layout";
 import { partColor } from "./ui/part-colors";
 
 const ratings: {
@@ -197,7 +198,7 @@ function SceneChips({ clues, parts }: { clues: Clue[]; parts: PartPointer }) {
 const propCodes = (clues: Clue[]) =>
   clues.filter((clue) => clue.kind === "prop").map((clue) => clue.code);
 
-/** What is asked: the character, the word glossed, or the sentence's meaning. */
+/** What is asked: the character, the word, or the sentence's meaning. */
 function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
   if (item.type === "character") {
     return (
@@ -208,14 +209,13 @@ function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
   }
   if (item.type === "word") {
     return (
-      <WordGloss
-        className="relative"
-        glosses={item.characterParts.map((part) => part.meaning)}
-        hanzi={item.hanzi}
-        hanziClassName="text-gloss-card"
-        revealed={false}
-        syllables={item.syllables ?? null}
-      />
+      <p
+        className="glyph-max-75 relative m-0 whitespace-nowrap font-hanzi text-word-card leading-none"
+        lang="zh-CN"
+        style={{ "--chars": Array.from(item.hanzi).length } as CSSProperties}
+      >
+        {item.hanzi}
+      </p>
     );
   }
   return (
@@ -231,14 +231,14 @@ function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
 const focusPinyin = "text-2xl studio:text-3xl -translate-y-[0.08em]";
 
 /** Where an answer's corner, centre and edge sit: a card's inset, smaller on a short card. */
-const answerIndex =
-  "absolute top-6 left-6 card-short:top-4 card-short:left-4 card-short:size-11";
+const answerIndex = "absolute top-6 left-6 card-short:top-4 card-short:left-4";
 const answerEdge =
   "absolute right-6 bottom-6 left-6 border-deck-edge border-t pt-4 card-short:static card-short:mx-4 card-short:mt-auto card-short:mb-4 card-short:pt-2";
 
 /**
  * A character's or word's identity, as in its lesson: pinyin with its play button, the meaning,
- * then its other meanings. Centred where the front showed the character or word.
+ * then its other meanings. Centred where the front showed the character or word; on a short card,
+ * where that centre would meet the chips, centred in the room above them.
  */
 function Focus({ item }: { item: Exclude<ReviewItem, { type: "sentence" }> }) {
   const meaning = getItemMeaning(item);
@@ -252,7 +252,7 @@ function Focus({ item }: { item: Exclude<ReviewItem, { type: "sentence" }> }) {
     <div
       className={cn(
         ident,
-        "card-short:translate-none card-short:static absolute top-1/2 right-6 left-6 -translate-y-1/2 gap-2 card-short:px-16 card-short:pt-4"
+        "card-short:translate-none card-short:static absolute top-1/2 right-6 left-6 card-short:flex-1 -translate-y-1/2 card-short:content-center gap-2 card-short:px-16 card-short:pt-4"
       )}
     >
       <div className="inline-flex items-center gap-2">
@@ -297,7 +297,7 @@ function CharacterAnswer({
   return (
     <div className={cardAnswer} data-answer>
       {/* Every part in its colour, until one is pointed at. */}
-      <div className={cn(glyphBox, answerIndex, "size-16")}>
+      <div className={cn(glyphBox, answerIndex, "card-short:size-11 size-16")}>
         <HanziGlyph
           hanzi={item.hanzi}
           highlighted={parts.highlighted}
@@ -349,7 +349,10 @@ function CardAnswer({
     <div className={cardAnswer} data-answer>
       {/* A word in the corner, where a character's lit glyph sits. */}
       <span
-        className={cn(answerIndex, "font-hanzi text-3xl leading-none")}
+        className={cn(
+          answerIndex,
+          "whitespace-nowrap font-hanzi text-3xl leading-none"
+        )}
         lang="zh-CN"
       >
         {item.hanzi}
@@ -529,7 +532,8 @@ function useGrading(onRestore: (item: ReviewItem) => void) {
 }
 
 /**
- * The review deck. `done` shows once nothing is left to answer, saving or flying off.
+ * The review deck under its page header, which counts what is left. `done` shows once nothing is
+ * left to answer, saving or flying off, and brings its own header.
  */
 export function ReviewDeck({
   queue: due,
@@ -633,86 +637,87 @@ export function ReviewDeck({
     ...leaving.map((card) => ({ ...card, waiting: false })),
   ];
   return (
-    <div
-      className={deck}
-      data-revealed={revealed}
-      data-type={active?.type ?? "empty"}
-    >
-      <DeckTable
-        caption={
+    <>
+      <PageHeader
+        meta={
           active ? (
-            <>
-              <b className="font-medium text-muted-foreground">
-                {queue.length}
-              </b>{" "}
-              left
-            </>
+            <span>
+              <b className="font-medium text-foreground">{queue.length}</b> left
+            </span>
           ) : null
         }
+        title="review"
+      />
+      <div
+        className={deck}
+        data-revealed={revealed}
+        data-type={active?.type ?? "empty"}
       >
-        <DeckPile under={queue.length - 1}>
-          {cards.map((card) => (
-            <PileCard
-              item={card.item}
-              key={cardKey(card.item)}
-              onFlip={reveal}
-              onGone={gone}
-              // A thrown card stays on its answer; the waiting one stays on its front, so it rises
-              // without turning.
-              revealed={card.side !== null || (!card.waiting && revealed)}
-              side={card.side}
-              waiting={card.waiting}
-            />
-          ))}
-        </DeckPile>
-      </DeckTable>
+        <DeckTable>
+          <DeckPile under={queue.length - 1}>
+            {cards.map((card) => (
+              <PileCard
+                item={card.item}
+                key={cardKey(card.item)}
+                onFlip={reveal}
+                onGone={gone}
+                // A thrown card stays on its answer; the waiting one stays on its front, so it rises
+                // without turning.
+                revealed={card.side !== null || (!card.waiting && revealed)}
+                side={card.side}
+                waiting={card.waiting}
+              />
+            ))}
+          </DeckPile>
+        </DeckTable>
 
-      <footer className={deckActions()}>
-        <DitherButton
-          aria-hidden={revealed || !active}
-          className={cn(
-            action,
-            deckAction,
-            "h-14",
-            (revealed || !active) && "invisible"
-          )}
-          color="blue"
-          inert={revealed || !active}
-          onClick={reveal}
-          variant="gradient"
-        >
-          <span>show answer</span>
-          <kbd className={actionKey}>space</kbd>
-        </DitherButton>
-        <fieldset
-          aria-hidden={!revealed}
-          aria-label="How well did you recall it?"
-          className={cn(
-            deckAction,
-            "grid min-w-0 grid-cols-4 gap-2",
-            !revealed && "invisible"
-          )}
-          inert={!revealed}
-        >
-          {ratings.map((rating) => (
-            <RatingButton
-              after={waits?.get(rating.value) ?? ""}
-              key={rating.value}
-              onRate={rate}
-              rating={rating}
-            />
-          ))}
-        </fieldset>
-      </footer>
-      {failed ? (
-        <p
-          className="type-label m-0 text-center text-red leading-wrap"
-          role="alert"
-        >
-          could not save this review — try again
-        </p>
-      ) : null}
-    </div>
+        <footer className={deckActions()}>
+          <DitherButton
+            aria-hidden={revealed || !active}
+            className={cn(
+              action,
+              deckAction,
+              "h-14",
+              (revealed || !active) && "invisible"
+            )}
+            color="blue"
+            inert={revealed || !active}
+            onClick={reveal}
+            variant="gradient"
+          >
+            <span>show answer</span>
+            <kbd className={actionKey}>space</kbd>
+          </DitherButton>
+          <fieldset
+            aria-hidden={!revealed}
+            aria-label="How well did you recall it?"
+            className={cn(
+              deckAction,
+              "grid min-w-0 grid-cols-4 gap-2",
+              !revealed && "invisible"
+            )}
+            inert={!revealed}
+          >
+            {ratings.map((rating) => (
+              <RatingButton
+                after={waits?.get(rating.value) ?? ""}
+                key={rating.value}
+                onRate={rate}
+                rating={rating}
+              />
+            ))}
+          </fieldset>
+        </footer>
+        {failed ? (
+          <p
+            className="type-label m-0 text-center text-red leading-wrap"
+            role="alert"
+          >
+            could not save this review — try again
+          </p>
+        ) : null}
+      </div>
+    </>
   );
 }
 
