@@ -91,14 +91,17 @@ const button = (label: string) =>
     candidate.textContent?.includes(label)
   );
 
+const takes = () => host.querySelector(".dx-takes")?.getAttribute("aria-label");
+
 test("a sentence joins review only after it has been shadowed three times", async () => {
   expect(button("add to review")).toBeUndefined();
-  await act(() => expectDefined(button("check meaning")).click());
+  await act(() => expectDefined(button("show meaning")).click());
 
   const shadowOnce = async (rep: number) => {
     expect(button("add to review")).toBeUndefined();
+    expect(takes()).toBe(`Repeated ${rep} of 5 times`);
     await act(async () => {
-      expectDefined(button(`listen & repeat · ${rep}/5`)).click();
+      expectDefined(button("listen & repeat")).click();
       await Promise.resolve();
     });
   };
@@ -108,5 +111,5 @@ test("a sentence joins review only after it has been shadowed three times", asyn
 
   expect(spoken).toEqual(["你好。", "你好。", "你好。"]);
   expect(button("add to review")).toBeDefined();
-  expect(button("listen & repeat · 3/5")).toBeDefined();
+  expect(takes()).toBe("Repeated 3 of 5 times");
 });

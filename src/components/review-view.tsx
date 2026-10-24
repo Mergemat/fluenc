@@ -1,66 +1,13 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useState,
-} from "react";
-import { Rating } from "ts-fsrs";
+import { useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect, useEffectEvent, useState } from "react";
 import type { DashboardData } from "../lib/learner-views";
 import { isLearning, nextReviews } from "../lib/review-schedule";
 import { DitherButton } from "./dither-kit/button";
-import { DitherGradient } from "./dither-kit/gradient";
-import { type Graded, ReviewCard } from "./review-card";
-import { Empty, PageHeader, SectionHead } from "./ui/layout";
+import { ReviewCard } from "./review-card";
+import { DeckPile, DeckSlot, DeckTable } from "./ui/deck";
+import { PageHeader } from "./ui/layout";
 
 type DoneState = "waiting" | "finished" | "empty";
-
-const doneCopy: Record<
-  DoneState,
-  { crumb: string; mark: string; title: string; action: string }
-> = {
-  waiting: {
-    crumb: "short break",
-    mark: "等",
-    title: "a short break",
-    action: "",
-  },
-  finished: {
-    crumb: "done for today",
-    mark: "休",
-    title: "reviews finished",
-    action: "learn new characters",
-  },
-  empty: {
-    crumb: "nothing yet",
-    mark: "始",
-    title: "start with a lesson",
-    action: "start your first lesson",
-  },
-};
-
-function doneDetail(state: DoneState, learning: number) {
-  if (state === "waiting") {
-    return `${learning} ${learning === 1 ? "card still needs" : "cards still need"} practice — they come back here by themselves`;
-  }
-  return state === "finished"
-    ? "spend the rest on new characters, then reading"
-    : "learn a character or word first — reviews keep what you already understand";
-}
-
-/** The one thing worth knowing once the queue is empty: when cards come back, and how many. */
-function doneNext(
-  data: DashboardData,
-  waitingUntil: string | null,
-  now: number
-): [string, string] | null {
-  if (waitingUntil) {
-    return ["back in", countdown(Date.parse(waitingUntil) - now)];
-  }
-  const next = nextReviews(data, now);
-  return next ? ["next reviews", next] : null;
-}
 
 export function ReviewView({ data }: { data: DashboardData }) {
   const [selected, setSelected] = useState(() => data.reviewQueue[0]);
@@ -79,11 +26,6 @@ export function ReviewView({ data }: { data: DashboardData }) {
   ) {
     setSelected(active);
   }
-  // The session's high-water mark drives the progress bar as the queue drains.
-  const [sessionSize, setSessionSize] = useState(data.reviewQueue.length);
-  if (data.reviewQueue.length > sessionSize) {
-    setSessionSize(data.reviewQueue.length);
-  }
 
   const learning = data.scheduledQueue.filter((item) =>
     isLearning(item.card.state)
@@ -93,16 +35,6 @@ export function ReviewView({ data }: { data: DashboardData }) {
     null
   );
   const hasCards = data.reviewQueue.length + data.scheduledQueue.length > 0;
-  // This visit's grades, latest per card, for the summary once the queue is empty.
-  const [graded, setGraded] = useState<ReadonlyMap<string, Graded>>(
-    () => new Map()
-  );
-  const onGraded = useCallback(
-    (entry: Graded) =>
-      setGraded((previous) => new Map(previous).set(entry.key, entry)),
-    []
-  );
-  const done = sessionSize - data.reviewQueue.length;
 
   let state: DoneState = "empty";
   if (nextLearningAt) {
@@ -112,60 +44,18 @@ export function ReviewView({ data }: { data: DashboardData }) {
   }
 
   return (
-    <section className="dx-review">
-      <PageHeader
-        meta={
-          active ? (
-            <>
-              <b>{data.reviewQueue.length}</b> ready
-              {learning.length ? ` · ${learning.length} learning` : ""}
-            </>
-          ) : (
-            doneCopy[state].crumb
-          )
-        }
-        title="review"
-      >
-        <div
-          aria-label="Session progress"
-          aria-valuemax={sessionSize}
-          aria-valuemin={0}
-          aria-valuenow={done}
-          className="dx-progress"
-          role="progressbar"
-        >
-          <DitherGradient
-            cell={2}
-            direction="right"
-            from="grey"
-            opacity={0.5}
-          />
-          <span
-            className="dx-progress-fill"
-            style={{
-              width: `${sessionSize ? (done / sessionSize) * 100 : 100}%`,
-            }}
-          >
-            <DitherGradient
-              cell={2}
-              direction="left"
-              from={active ? "blue" : "green"}
-            />
-          </span>
-        </div>
-      </PageHeader>
-
+    <section className="dx-deck-page">
+      <PageHeader title="review" />
       {active ? (
         <ReviewCard
           item={active}
           key={`${active.type}:${active.id}:${active.reps}`}
-          onGraded={onGraded}
+          remaining={data.reviewQueue.length}
         />
       ) : (
         <ReviewDone
+          coming={learning.length}
           data={data}
-          graded={[...graded.values()]}
-          learning={learning.length}
           nextLearningAt={nextLearningAt}
           state={state}
         />
@@ -174,18 +64,19 @@ export function ReviewView({ data }: { data: DashboardData }) {
   );
 }
 
-/** What to do when no card is due: a short break with a live countdown, or the next step. */
+/**
+ * The deck is empty, and that answers one question: are cards coming back after a break (face
+ * down, with a timer), or is review done for now (when it fills again)? No recap.
+ */
 function ReviewDone({
   state,
   data,
-  graded,
-  learning,
+  coming,
   nextLearningAt,
 }: {
-  state: "waiting" | "finished" | "empty";
+  state: DoneState;
   data: DashboardData;
-  graded: Graded[];
-  learning: number;
+  coming: number;
   nextLearningAt: string | null;
 }) {
   const navigate = useNavigate();
@@ -220,104 +111,74 @@ function ReviewDone({
     return () => window.removeEventListener("keydown", onKey);
   }, [waiting]);
 
-  const copy = doneCopy[state];
-  const nextUp = doneNext(data, waiting ? nextLearningAt : null, now);
-  const nextLine = nextUp ? (
-    <p className="dx-done-next">
-      {nextUp[0]} <b>{nextUp[1]}</b>
-    </p>
-  ) : null;
+  if (waiting) {
+    // The dashboard refetches when the first card is due, which deals the deck back in.
+    return (
+      <div className="dx-deck" data-state="waiting" role="status">
+        <DeckTable caption="back after a short break">
+          <DeckPile under={coming - 1}>
+            <DeckSlot state="down">
+              <b className="dx-deck-timer">
+                {countdown(Date.parse(nextLearningAt ?? "") - now)}
+              </b>
+              <small>
+                {coming} {coming === 1 ? "card" : "cards"}
+              </small>
+            </DeckSlot>
+          </DeckPile>
+        </DeckTable>
+        <footer className="dx-deck-actions" />
+      </div>
+    );
+  }
+
   const [lesson] = data.buildQueue;
-  const action =
-    state === "finished" && lesson ? (
-      <>
+  let action = <span>start your first lesson</span>;
+  if (state === "finished") {
+    action = lesson ? (
+      <span>
         learn{" "}
         <b className="font-hanzi" lang="zh-CN">
           {lesson.hanzi}
         </b>{" "}
         next
-      </>
+      </span>
     ) : (
-      copy.action
+      <span>learn new characters</span>
     );
-
+  }
   return (
-    <div
-      className="dx-done"
-      data-state={state}
-      role={state === "waiting" ? "status" : undefined}
-    >
-      {graded.length ? (
-        <Recap graded={graded}>{nextLine}</Recap>
-      ) : (
-        <Empty
-          detail={doneDetail(state, learning)}
-          mark={copy.mark}
-          title={copy.title}
-          tone={state === "waiting" ? "orange" : "green"}
+    <div className="dx-deck" data-state={state}>
+      <DeckTable>
+        <DeckPile under={0}>
+          <DeckSlot state="empty">
+            {state === "finished" ? (
+              <>
+                <b className="dx-deck-verdict">done</b>
+                <small>next · {nextReviews(data, now) ?? "tomorrow"}</small>
+              </>
+            ) : (
+              <>
+                <b className="dx-deck-verdict dx-deck-verdict-long">
+                  start with a lesson
+                </b>
+                <small>reviews keep what you learn</small>
+              </>
+            )}
+          </DeckSlot>
+        </DeckPile>
+      </DeckTable>
+      <footer className="dx-deck-actions">
+        <DitherButton
+          className="dx-action"
+          color="blue"
+          onClick={next}
+          variant="gradient"
         >
-          {nextLine}
-        </Empty>
-      )}
-      {state === "waiting" ? null : (
-        <footer className="dx-done-actions">
-          <DitherButton
-            className="dx-action"
-            color="blue"
-            onClick={next}
-            variant="gradient"
-          >
-            <span>{action}</span>
-            <kbd>↵</kbd>
-          </DitherButton>
-          {state === "finished" && data.getQueue.length ? (
-            <Link className="dx-chip" to="/reading">
-              read sentences · {data.getQueue.length}
-            </Link>
-          ) : null}
-        </footer>
-      )}
-    </div>
-  );
-}
-
-/** What this visit reviewed: a count, the cards that slipped and when they return. */
-function Recap({
-  graded,
-  children,
-}: {
-  graded: Graded[];
-  children: ReactNode;
-}) {
-  const slipped = graded.filter(
-    (entry) => entry.rating === Rating.Again || entry.rating === Rating.Hard
-  );
-  return (
-    <div className="dx-recap">
-      <h2>{graded.length} reviewed</h2>
-      {slipped.length ? (
-        <>
-          <SectionHead label="look at these again" meta={slipped.length} />
-          <ul className="dx-recap-slipped">
-            {slipped.map((entry) => (
-              <li key={entry.key}>
-                <span className="font-hanzi" lang="zh-CN">
-                  {entry.hanzi}
-                  <i className="dx-recap-bar">
-                    <DitherGradient
-                      cell={2}
-                      direction="right"
-                      from={entry.rating === Rating.Again ? "red" : "orange"}
-                    />
-                  </i>
-                </span>
-                <small>{entry.after}</small>
-              </li>
-            ))}
-          </ul>
-        </>
-      ) : null}
-      {children}
+          {action}
+          <kbd>↵</kbd>
+        </DitherButton>
+      </footer>
     </div>
   );
 }

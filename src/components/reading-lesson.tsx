@@ -1,13 +1,20 @@
-// A new sentence, read for meaning on the same card as reviews: the sentence is the prompt, its
-// sound and meaning wait in the answer slot. Then it is shadowed (heard and said aloud a few
-// times) before it joins Review, where it is recalled from English.
-import { useCallback, useEffect, useEffectEvent, useState } from "react";
+// A new sentence, read for meaning on a card like review's: the sentence is the front, its sound
+// and meaning the back. Then it is shadowed (heard and said aloud a few times, each time laying
+// down one small card) before it joins Review, where it is recalled from English.
+import {
+  type CSSProperties,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useState,
+} from "react";
 import { useMandarinSpeech } from "../hooks/use-mandarin-speech";
 import type { DashboardData } from "../lib/learner-views";
 import { saveEnrollment } from "../offline/progress";
 import { useProgressMutation } from "../offline/use-progress-mutation";
 import { DitherButton } from "./dither-kit/button";
-import { AnswerMask } from "./review-card";
+import { DitherGradient } from "./dither-kit/gradient";
+import { DeckCard, DeckPile, DeckTable } from "./ui/deck";
 import { AudioButton } from "./ui/hanzi";
 import { ErrorNote } from "./ui/layout";
 
@@ -17,17 +24,21 @@ type ReadingItem = DashboardData["getQueue"][number];
 export const SHADOW_TARGET = 5;
 export const SHADOW_MINIMUM = 3;
 
-function actionLabel(revealed: boolean, reps: number, playing: boolean) {
+function actionLabel(revealed: boolean, playing: boolean) {
   if (!revealed) {
-    return "check meaning";
+    return "show meaning";
   }
-  if (playing) {
-    return "say it with the audio";
-  }
-  return `listen & repeat · ${reps}/${SHADOW_TARGET}`;
+  return playing ? "say it with the audio" : "listen & repeat";
 }
 
-export function ReadingLesson({ item }: { item: ReadingItem }) {
+export function ReadingLesson({
+  item,
+  remaining = 1,
+}: {
+  item: ReadingItem;
+  /** Sentences left to read, this one included. */
+  remaining?: number;
+}) {
   const [revealed, setRevealed] = useState(false);
   const [reps, setReps] = useState(0);
   const { speak, status } = useMandarinSpeech();
@@ -77,28 +88,34 @@ export function ReadingLesson({ item }: { item: ReadingItem }) {
   }, []);
 
   return (
-    <div className="dx-card" data-revealed={revealed} data-type="sentence">
-      <div className="dx-card-stage">
-        <div className="dx-sentence-prompt">
-          <p className="dx-sentence-cue">
-            {revealed
-              ? "shadow it: listen, then say it aloud"
-              : "read it for meaning"}
-          </p>
-          <p className="dx-sentence font-hanzi" lang="zh-CN">
-            {item.hanzi}
-          </p>
-          <AudioButton label="listen" pinyin={item.pinyin} text={item.hanzi} />
-        </div>
-        <div className="dx-answer">
-          <AnswerMask revealed={revealed}>
-            <p className="dx-word-reading">{item.pinyin}</p>
-            <h2 className="dx-meaning">{item.meaning}</h2>
-            <ShadowPips reps={reps} />
-          </AnswerMask>
-        </div>
-      </div>
-      <footer className="dx-card-actions dx-shadow-actions">
+    <div className="dx-deck" data-revealed={revealed} data-type="sentence">
+      <DeckTable caption={<ShadowTakes playing={playing} reps={reps} />}>
+        <DeckPile under={remaining - 1} wide>
+          <DeckCard
+            back={
+              <div className="dx-deck-answer dx-deck-answer-sentence">
+                <p className="dx-deck-sentence-small font-hanzi" lang="zh-CN">
+                  {item.hanzi}
+                </p>
+                <div className="dx-sound">
+                  <span className="dx-deck-reading">{item.pinyin}</span>
+                  <AudioButton pinyin={item.pinyin} text={item.hanzi} />
+                </div>
+                <h2 className="dx-deck-meaning">{item.meaning}</h2>
+              </div>
+            }
+            flipped={revealed}
+            front={
+              <p className="dx-deck-sentence font-hanzi" lang="zh-CN">
+                {item.hanzi}
+              </p>
+            }
+            onFlip={reveal}
+            suit="sentence"
+          />
+        </DeckPile>
+      </DeckTable>
+      <footer className="dx-deck-actions dx-deck-actions-pair">
         <DitherButton
           className="dx-action"
           color="blue"
@@ -106,7 +123,7 @@ export function ReadingLesson({ item }: { item: ReadingItem }) {
           onClick={revealed ? shadow : reveal}
           variant={revealed && shadowed ? "dotted" : "gradient"}
         >
-          <span>{actionLabel(revealed, reps, playing)}</span>
+          <span>{actionLabel(revealed, playing)}</span>
           <kbd>space</kbd>
         </DitherButton>
         {revealed && shadowed ? (
@@ -129,18 +146,41 @@ export function ReadingLesson({ item }: { item: ReadingItem }) {
   );
 }
 
-const pipSlots = Array.from({ length: SHADOW_TARGET }, (_, slot) => slot);
+const takeSlots = Array.from({ length: SHADOW_TARGET }, (_, slot) => slot);
 
-export function ShadowPips({ reps }: { reps: number }) {
+/** One small card per time the sentence was said aloud; the one being said fills blue. */
+export function ShadowTakes({
+  reps,
+  playing,
+}: {
+  reps: number;
+  playing: boolean;
+}) {
   return (
     <span
       aria-label={`Repeated ${reps} of ${SHADOW_TARGET} times`}
-      className="dx-shadow-pips"
+      className="dx-takes"
       role="img"
     >
-      {pipSlots.map((slot) => (
-        <i data-done={slot < reps} key={slot} />
-      ))}
+      {takeSlots.map((slot) => {
+        const live = playing && slot === reps;
+        return (
+          <i
+            data-done={slot < reps}
+            data-live={live}
+            key={slot}
+            style={{ "--i": slot - 2 } as CSSProperties}
+          >
+            {slot < reps || live ? (
+              <DitherGradient
+                cell={2}
+                direction="up"
+                from={live ? "blue" : "green"}
+              />
+            ) : null}
+          </i>
+        );
+      })}
     </span>
   );
 }

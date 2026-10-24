@@ -808,8 +808,7 @@
     --dx-glyph: min(44dvh, 360px);
   }
 }
-.dx-studio,
-.dx-review {
+.dx-studio {
   --glyph-max: var(--dx-glyph);
 }
 .dx-glyph-box {
@@ -1758,24 +1757,6 @@
 }
 
 /* ── Review ──────────────────────────────────────── */
-.dx-review {
-  --study-gap: var(--dx-space-item);
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: var(--study-gap);
-  width: 100%;
-  max-width: calc(var(--dx-page) + 2 * var(--dx-gutter));
-  height: 100%;
-  padding: var(--dx-page-top) var(--dx-gutter) var(--dx-space-group);
-  margin: 0 auto;
-}
-.dx-review > :not(.dx-head) {
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 760px;
-  margin-inline: auto;
-}
 .dx-progress {
   position: relative;
   flex: 1;
@@ -1792,30 +1773,6 @@
   inset: 0 auto 0 0;
   overflow: hidden;
   transition: width 300ms ease-out;
-}
-.dx-card {
-  --dx-rate-height: 56px;
-  display: grid;
-  flex: 1;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: 16px;
-  min-height: 0;
-}
-/* Every study card has the same two places: the prompt, the character's size, and the answer,
-   everything below it. A character, a word or a sentence centres in the first, so review and read
-   line up top to top and bottom to bottom. A prompt or answer that needs more takes it. */
-.dx-card-stage {
-  display: grid;
-  grid-template-rows: minmax(min-content, var(--dx-glyph)) minmax(
-      min-content,
-      1fr
-    );
-  gap: var(--dx-space-item);
-  align-items: center;
-  min-height: 0;
-}
-.dx-card-stage > :is(.dx-glyph-box, .dx-answer) {
-  align-self: stretch;
 }
 /* Word prompt: interlinear gloss. Syllables and keywords hold their space before reveal. */
 .dx-gloss {
@@ -1872,102 +1829,12 @@
   opacity: 0;
   translate: 0 -6px;
 }
-/* Sentences: the cue, then the line itself (or its meaning, when recalling it). */
-.dx-sentence-prompt {
-  display: grid;
-  flex-shrink: 0;
-  gap: var(--dx-space-item);
-  justify-items: center;
-  max-width: 100%;
-  text-align: center;
-}
-.dx-sentence-cue {
-  margin: 0;
-  font: var(--dx-type-label);
-  color: var(--dx-muted);
-}
-.dx-sentence-meaning {
-  max-width: 24ch;
-  margin: 0;
-  font: var(--dx-type-display);
-  letter-spacing: -0.025em;
-}
-.dx-sentence {
-  margin: 0;
-  font-size: clamp(30px, 6vw, 48px);
-  line-height: 1.3;
-  overflow-wrap: anywhere;
-}
-.dx-answer-real > .dx-sentence {
-  font-size: clamp(26px, 5vw, 36px);
-}
-/* A card on a scrolling page (reading) keeps review's column. */
-/* Read ends its action row where learn and review do. */
-.dx-page:has(> .dx-page-body > .dx-card) {
-  padding-bottom: var(--dx-space-group);
-}
-.dx-page-body > .dx-card {
-  width: 100%;
-  max-width: 760px;
-  margin-inline: auto;
-}
-.dx-word-reading {
-  margin: 0;
-  font: var(--dx-type-pinyin);
-  font-size: var(--dx-text-xl);
-}
-.dx-answer {
-  position: relative;
-  display: grid;
-  width: 100%;
-}
-.dx-answer > * {
-  grid-area: 1 / 1;
-}
-/* The answer in three steps: the meaning with its "also" line (tight), the sound (an item
-   below), and the clues as their own group. It is laid out before the reveal too, so revealing
-   it moves nothing. */
-.dx-answer-real {
-  display: grid;
-  gap: 0;
-  align-content: center;
-  justify-items: center;
-  text-align: center;
-}
-/* Before the reveal the answer is unseen in place, under one dither haze rising from the bottom. */
-.dx-answer-real[aria-hidden="true"] {
-  visibility: hidden;
-}
-.dx-answer-veil {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  border-radius: var(--dx-radius);
-}
-.dx-answer-real > * + * {
-  margin-top: var(--dx-space-item);
-}
-.dx-answer-real > .dx-meaning + :is(.dx-alt, .dx-link) {
-  margin-top: var(--dx-space-tight);
-}
-.dx-answer-real .dx-sound {
-  position: relative;
-}
-/* Keep the pinyin itself centred; the audio button hangs off its right edge. */
-.dx-answer-real .dx-sound > .dx-audio {
-  position: absolute;
-  left: calc(100% + var(--dx-space-tight));
-}
 .dx-audio-labeled {
   display: inline-flex;
   gap: 8px;
   width: auto;
   padding: 0 12px 0 10px;
   font: var(--dx-type-control);
-}
-.dx-answer-real .dx-meaning {
-  font-size: var(--dx-text-2xl);
 }
 .dx-scene-chips {
   display: flex;
@@ -1978,9 +1845,6 @@
   margin: var(--dx-space-pair) 0 0;
   list-style: none;
 }
-.dx-answer-real > .dx-scene-chips {
-  margin-top: var(--dx-space-group);
-}
 .dx-scene-chips > li {
   --k: var(--dx-faint);
   display: inline-flex;
@@ -1989,7 +1853,7 @@
   height: 30px;
   padding: 0 10px 0 8px;
   font: var(--dx-type-body);
-  background: var(--dx-surface);
+  background: var(--chip-ground, var(--dx-surface));
   border: 1px solid var(--dx-line);
   border-radius: 7px;
 }
@@ -2014,60 +1878,6 @@
   font-family: var(--font-hanzi-props);
   font-size: 18px;
   font-weight: 400;
-}
-.dx-link {
-  max-width: 46ch;
-  margin: 0;
-  font: var(--dx-type-body);
-  color: var(--dx-muted);
-}
-/* Every study card keeps room for review's grades (a wait line over the buttons), so the answer
-   above ends on the same line on every page. */
-.dx-card-actions {
-  display: grid;
-  min-height: calc(
-    var(--dx-text-2xs) +
-    var(--dx-space-tight) +
-    var(--dx-rate-height)
-  );
-}
-/* The button and the grades share one place; both sit on its bottom edge, where every study
-   page keeps its button. */
-.dx-card-actions > * {
-  grid-area: 1 / 1;
-  align-self: end;
-}
-.dx-card-actions > [inert] {
-  visibility: hidden;
-}
-/* Shadowing: the replay and the next step sit side by side once both are available. */
-.dx-shadow-actions {
-  grid-auto-columns: minmax(0, 1fr);
-  grid-auto-flow: column;
-  gap: 8px;
-}
-.dx-shadow-actions > * {
-  grid-area: auto;
-}
-.dx-shadow-pips {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  margin: 4px 0 0;
-}
-/* Shadowing starts after the reveal. */
-.dx-card:not([data-revealed="true"]) .dx-shadow-pips {
-  visibility: hidden;
-}
-.dx-shadow-pips > i {
-  width: 18px;
-  height: 6px;
-  background: var(--dx-line);
-  border-radius: 2px;
-  transition: background 160ms;
-}
-.dx-shadow-pips > i[data-done="true"] {
-  background: var(--dx-green);
 }
 .dx-ratings {
   display: grid;
@@ -2123,52 +1933,420 @@
   top: 5px;
   right: 7px;
 }
-.dx-done {
-  display: grid;
-  flex: 1;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: 16px;
-  min-height: 0;
-}
-.dx-done > .dx-empty {
-  min-height: 0;
-  padding: 0;
-}
-.dx-empty > .dx-done-next {
-  margin: var(--dx-space-group) 0 0;
-  font: var(--dx-type-control);
-  color: var(--dx-muted);
-}
-.dx-done-next > b {
-  margin-left: 4px;
-  font: var(--dx-type-display);
-  font-size: var(--dx-text-xl);
-  font-variant-numeric: tabular-nums;
-  color: var(--dx-fg);
-}
-.dx-done[data-state="waiting"] .dx-done-next > b {
-  color: var(--dx-orange);
-}
-.dx-done-actions {
-  display: grid;
-  gap: 8px;
-  justify-items: center;
-}
-.dx-done-actions > .dx-chip,
 .dx-status > .dx-chip {
   height: 36px;
   padding: 0 14px;
 }
-.dx-review-error {
+
+/* The page: a header, then a deck that fills the rest without scrolling. */
+.dx-deck-page {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dx-space-item);
+  width: 100%;
+  max-width: calc(var(--dx-page) + 2 * var(--dx-gutter));
+  height: 100%;
+  padding: var(--dx-page-top) var(--dx-gutter) var(--dx-space-group);
+  margin: 0 auto;
+}
+.dx-deck-page > .dx-empty {
+  flex: 1;
+}
+.dx-deck {
+  --dx-rate-height: 56px;
+  --card-radius: 20px;
+  --card-face: #1a1a1f;
+  --card-edge: #2e2e36;
+  --card-under: #141418;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--dx-space-item);
+  min-height: 0;
+}
+/* The table sizes the pile: real card proportions, as large as the room allows. */
+.dx-deck-table {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  container-type: size;
+}
+.dx-deck-pile {
+  position: relative;
+  flex: none;
+  width: min(100cqw, 380px, (100cqh - 64px) * 5 / 7);
+  aspect-ratio: 5 / 7;
+  perspective: 1600px;
+}
+.dx-deck-pile[data-wide="true"] {
+  width: min(100cqw, 600px, (100cqh - 120px) * 7 / 5);
+  aspect-ratio: 7 / 5;
+}
+.dx-deck-under {
+  position: absolute;
+  inset: 0;
+  z-index: calc(4 - var(--layer));
+  overflow: hidden;
+  background: var(--card-under);
+  border: 1px solid var(--card-edge);
+  border-radius: var(--card-radius);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.5);
+  opacity: calc(1 - var(--layer) * 0.16);
+  transform: translateY(calc(var(--layer) * 6px)) rotate(var(--tilt));
+  transform-origin: 50% 100%;
+}
+.dx-deck-left {
+  min-height: 1em;
+  margin: 0;
+  font: var(--dx-type-label);
+  color: var(--dx-faint);
+}
+.dx-deck-left b {
+  font-weight: 500;
+  color: var(--dx-muted);
+}
+
+/* The top card: dealt off the pile, flipped to its answer, thrown aside when graded. */
+.dx-deck-card {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  transform-style: preserve-3d;
+  transition: transform 640ms cubic-bezier(0.34, 1.25, 0.64, 1);
+  /* Backwards only: a held filter would flatten the 3D flip. */
+  animation: dx-deck-deal 420ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+@keyframes dx-deck-deal {
+  from {
+    filter: brightness(0.6);
+    transform: translateY(6px) rotate(-1.4deg);
+  }
+}
+@media (hover: hover) {
+  .dx-deck-card:not([data-flipped="true"]):hover {
+    transform: translateY(-4px);
+  }
+}
+.dx-deck-front {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.dx-deck-front:focus-visible {
+  outline: none;
+  border-color: var(--dx-blue);
+}
+.dx-deck-card[data-flipped="true"] {
+  transform: rotateY(180deg);
+}
+.dx-deck-card[data-thrown="left"] {
+  animation: dx-deck-throw-left 300ms cubic-bezier(0.5, 0, 0.9, 0.6) forwards;
+}
+.dx-deck-card[data-thrown="right"] {
+  animation: dx-deck-throw-right 300ms cubic-bezier(0.5, 0, 0.9, 0.6) forwards;
+}
+@keyframes dx-deck-throw-left {
+  to {
+    opacity: 0;
+    transform: translate(-80%, 4%) rotate(-14deg) rotateY(180deg);
+  }
+}
+@keyframes dx-deck-throw-right {
+  to {
+    opacity: 0;
+    transform: translate(80%, 4%) rotate(14deg) rotateY(180deg);
+  }
+}
+.dx-deck-face {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 24px;
+  container-type: size;
+  overflow: hidden;
+  background: var(--card-face);
+  border: 1px solid var(--card-edge);
+  border-radius: var(--card-radius);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 30px 60px -24px rgb(0 0 0 / 0.85);
+  backface-visibility: hidden;
+}
+/* Content sits above the card's grain. */
+.dx-deck-face > :not(.dx-deck-grain, .dx-deck-suit, .dx-deck-answer) {
+  position: relative;
+}
+.dx-deck-back {
+  transform: rotateY(180deg);
+}
+.dx-deck-suit {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--dx-faint);
+}
+.dx-deck-suit-end {
+  top: auto;
+  right: 16px;
+  bottom: 14px;
+  left: auto;
+  transform: rotate(180deg);
+}
+
+/* Fronts: what is asked. */
+.dx-deck-glyph {
+  --glyph-max: 300px;
+  width: 100%;
+  height: 100%;
+}
+.dx-deck-front .dx-gloss-hanzi {
+  font-size: min(20cqw, 34cqh);
+}
+.dx-deck-prompt {
+  display: grid;
+  gap: var(--dx-space-item);
+  justify-items: center;
+  text-align: center;
+}
+.dx-deck-cue {
+  margin: 0;
+  font: var(--dx-type-label);
+  color: var(--dx-muted);
+}
+.dx-deck-question {
+  margin: 0;
+  font: var(--dx-type-display);
+  text-wrap: balance;
+}
+.dx-deck-sentence {
+  margin: 0;
+  font-size: clamp(30px, 8cqw, 52px);
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Backs: the focus sits on the card's centre, where the front's character stood. */
+.dx-deck-answer {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+  animation: dx-deck-fade 300ms 220ms both;
+}
+@keyframes dx-deck-fade {
+  from {
+    opacity: 0;
+  }
+}
+.dx-deck-index {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 64px;
+  height: 64px;
+}
+.dx-deck-index-word {
+  width: auto;
+  height: auto;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--dx-muted);
+}
+.dx-deck-focus {
+  position: absolute;
+  top: 50%;
+  right: 22px;
+  left: 22px;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+  transform: translateY(-50%);
+}
+.dx-deck-focus > .dx-sound {
+  justify-content: center;
+  margin: 0;
+}
+.dx-deck-focus .dx-py {
+  font-size: clamp(44px, 16cqw, 64px);
+}
+.dx-deck-meaning {
+  margin: 0;
+  font: var(--dx-type-display);
+  font-size: clamp(26px, 9cqw, 34px);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.dx-deck-others {
+  min-height: 1em;
+  margin: 0;
+  font: var(--dx-type-label);
+  line-height: var(--dx-wrap);
+  color: var(--dx-muted);
+  text-wrap: balance;
+}
+.dx-deck-edge {
+  --chip-ground: var(--card-face);
+  position: absolute;
+  right: 22px;
+  bottom: 20px;
+  left: 22px;
+  padding-top: 14px;
+  border-top: 1px solid var(--card-edge);
+}
+.dx-deck-edge .dx-scene-chips {
+  margin: 0;
+}
+.dx-deck-link {
+  margin: 0;
+  font: var(--dx-type-body);
+  color: var(--dx-muted);
+  text-align: center;
+}
+.dx-deck-answer-sentence {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dx-space-item);
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+.dx-deck-answer-sentence > .dx-sound {
+  margin: 0;
+}
+.dx-deck-sentence-small {
+  margin: 0;
+  font-size: 22px;
+  color: var(--dx-muted);
+}
+.dx-deck-reading {
+  font: var(--dx-type-control);
+  font-size: var(--dx-text-base);
+}
+
+/* The deck run out: face down with a timer, or the empty place. */
+.dx-deck-slot {
+  gap: var(--dx-space-tight);
+}
+.dx-deck-slot[data-state="down"] {
+  background: #15151a;
+}
+.dx-deck-slot[data-state="down"]::before {
+  position: absolute;
+  inset: 12px;
+  pointer-events: none;
+  content: "";
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 12px;
+}
+.dx-deck-slot[data-state="empty"] {
+  background: transparent;
+  border: 1.5px dashed var(--dx-line-strong);
+  box-shadow: none;
+}
+.dx-deck-slot > small {
+  font: var(--dx-type-label);
+  color: var(--dx-muted);
+}
+.dx-deck-timer {
+  font: var(--dx-type-display);
+  font-size: clamp(44px, 16cqw, 64px);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.dx-deck-verdict {
+  font: var(--dx-type-display);
+  font-size: clamp(40px, 14cqw, 56px);
+  line-height: 1;
+  text-align: center;
+}
+.dx-deck-verdict-long {
+  font-size: clamp(26px, 9cqw, 34px);
+  text-wrap: balance;
+}
+
+/* Shadowing: one small card per time said aloud. */
+.dx-takes {
+  display: inline-flex;
+  gap: 10px;
+  vertical-align: middle;
+}
+.dx-deck:not([data-revealed="true"]) .dx-takes {
+  opacity: 0.35;
+}
+.dx-takes > i {
+  position: relative;
+  width: 28px;
+  height: 40px;
+  overflow: hidden;
+  background: var(--card-face);
+  border: 1px solid var(--card-edge);
+  border-radius: 6px;
+  transform: rotate(calc(var(--i) * 5deg));
+  transition: transform 360ms cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.dx-takes > i:is([data-done="true"], [data-live="true"]) {
+  border-color: transparent;
+  transform: rotate(0) translateY(-6px);
+}
+
+/* The button and the grades share one place, tall enough for a wait line over the grades. */
+.dx-deck-actions {
+  display: grid;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 560px;
+  min-height: calc(
+    var(--dx-text-2xs) +
+    var(--dx-space-tight) +
+    var(--dx-rate-height)
+  );
+  margin-inline: auto;
+}
+.dx-deck-actions > * {
+  grid-area: 1 / 1;
+  align-self: end;
+}
+.dx-deck-actions > [inert] {
+  visibility: hidden;
+}
+.dx-deck-actions .dx-action {
+  height: var(--dx-rate-height);
+}
+.dx-deck-actions-pair {
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: var(--dx-space-tight);
+}
+.dx-deck-actions-pair > * {
+  grid-area: auto;
+}
+.dx-deck-error {
   margin: 0;
   font: var(--dx-type-label);
   line-height: var(--dx-wrap);
   color: var(--dx-red);
   text-align: center;
 }
-@media (max-height: 700px) {
-  .dx-card-stage {
-    gap: var(--dx-space-tight);
+@media (prefers-reduced-motion: reduce) {
+  .dx-deck-card,
+  .dx-deck-answer,
+  .dx-takes > i {
+    transition: none;
+    animation: none;
   }
 }
 
@@ -3366,70 +3544,6 @@ a.dx-pal-row:hover {
 .dx-scene-chips > li:has(> button[aria-pressed="true"]),
 .dx-scene-chips > li:has(> button:hover) {
   border-color: var(--part);
-}
-
-/* End of a review: how many, the cards that slipped and when they return. */
-.dx-recap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 0;
-  text-align: center;
-}
-.dx-recap > h2:not(.dx-section-head) {
-  margin: 0;
-  font: var(--dx-type-display);
-  font-size: 40px;
-  letter-spacing: -0.025em;
-}
-.dx-recap > .dx-section-head.dx-label {
-  width: min(440px, 100%);
-  margin: var(--dx-space-group) 0 var(--dx-space-tight);
-}
-.dx-recap-slipped {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--dx-space-item);
-  justify-content: center;
-  max-width: 560px;
-  max-height: 180px;
-  padding: 0;
-  margin: 0;
-  overflow: hidden;
-  list-style: none;
-}
-.dx-recap-slipped > li {
-  display: grid;
-  gap: var(--dx-space-tight);
-  justify-items: center;
-}
-.dx-recap-slipped > li > span {
-  position: relative;
-  box-sizing: border-box;
-  display: grid;
-  place-items: center;
-  min-width: 56px;
-  height: 60px;
-  padding: 0 4px 10px;
-  font-size: 30px;
-  line-height: 1;
-}
-.dx-recap-bar {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 4px;
-}
-.dx-recap-slipped > li > small {
-  font: var(--dx-type-label);
-  color: var(--dx-muted);
-}
-.dx-recap > .dx-done-next {
-  margin: var(--dx-space-group) 0 0;
-  font: var(--dx-type-control);
-  color: var(--dx-muted);
 }
 
 /* ── Welcome ─────────────────────────────────────── */

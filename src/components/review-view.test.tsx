@@ -75,6 +75,8 @@ afterAll(async () => {
   }
 });
 
+const NEXT_REVIEWS = /next · \S/;
+
 interface Course {
   catalog: Catalog;
   now: string;
@@ -165,15 +167,21 @@ function rate(
   };
 }
 
-test("a last missed card waits and returns concealed instead of falsely completing the reviews", async () => {
+/** The answer side is only filled in once the card has been flipped. */
+const answerShown = () => host.querySelector(".dx-deck-back .dx-deck-answer");
+
+test("a last missed card waits face down and returns unflipped instead of falsely completing the reviews", async () => {
   let data = fixture();
   await show(data, "miss");
+  expect(answerShown()).toBeNull();
   await reveal();
-  expect(host.querySelector(".dx-answer-real")?.closest("[inert]")).toBeNull();
+  expect(answerShown()).not.toBeNull();
   data = rate(data, "s0", Rating.Again);
   await show(data, "miss");
-  expect(host.textContent).toContain("1 card still needs practice");
-  expect(host.textContent).not.toContain("reviews finished");
+  expect(host.querySelector('[data-state="waiting"]')?.textContent).toContain(
+    "1 card"
+  );
+  expect(host.querySelector(".dx-deck-verdict")).toBeNull();
   expect(host.textContent).not.toContain("learn new characters");
   data = {
     ...data,
@@ -181,9 +189,7 @@ test("a last missed card waits and returns concealed instead of falsely completi
     now: "2026-09-23T02:01:00.000Z",
   };
   await show(data, "miss");
-  expect(
-    host.querySelector(".dx-answer-real")?.closest("[inert]")
-  ).not.toBeNull();
+  expect(answerShown()).toBeNull();
   expect(host.textContent).toContain("show answer");
 });
 
@@ -201,24 +207,21 @@ async function rateEach(course: Course, ids: string[]): Promise<Course> {
 test("all overdue cards remain in one session beyond twenty reviews", async () => {
   let data = fixture(26);
   await show(data, "all-due");
-  expect(host.textContent).toContain("26 ready");
+  expect(host.textContent).toContain("26 left");
   data = await rateEach(
     data,
     Array.from({ length: 20 }, (_, index) => `s${index}`)
   );
-  expect(host.textContent).toContain("6 ready");
+  expect(host.textContent).toContain("6 left");
   expect(host.textContent).toContain("Sentence 20");
-  expect(host.textContent).not.toContain("reviews finished");
+  expect(host.querySelector(".dx-deck-verdict")).toBeNull();
   for (let index = 20; index < 26; index += 1) {
     data = rate(data, `s${index}`, Rating.Easy);
   }
   await show(data, "all-due");
-  expect(host.textContent).toContain("reviews finished");
+  expect(host.querySelector(".dx-deck-verdict")?.textContent).toBe("done");
   expect(host.textContent).toContain("learn new characters");
-  // Every sentence is already in reviews, so there is nothing new to read.
-  expect(dashboard(data).getQueue).toHaveLength(0);
-  expect(host.querySelector('a[href="/reading"]')).toBeNull();
-  expect(host.querySelector(".dx-card")).toBeNull();
+  expect(host.querySelector(".dx-deck-card")).toBeNull();
 });
 
 test("a learning step becoming due does not replace the currently revealed card", async () => {
@@ -233,42 +236,28 @@ test("a learning step becoming due does not replace the currently revealed card"
   ]);
   await show(data, "stable");
   expect(host.textContent).toContain("Sentence 1");
-  expect(host.querySelector(".dx-answer-real")?.closest("[inert]")).toBeNull();
+  expect(answerShown()).not.toBeNull();
   data = rate(data, "s1", Rating.Easy, "2026-09-23T02:01:00.000Z");
   await show(data, "stable");
   expect(host.textContent).toContain("Sentence 0");
-  expect(
-    host.querySelector(".dx-answer-real")?.closest("[inert]")
-  ).not.toBeNull();
+  expect(answerShown()).toBeNull();
 });
 
 test("no introduced material leads to learning rather than an invented review session", async () => {
   await show(fixture(0), "empty");
   expect(host.textContent).toContain("start with a lesson");
   expect(host.textContent).toContain("start your first lesson");
-  expect(host.querySelector(".dx-card")).toBeNull();
+  expect(host.querySelector(".dx-deck-card")).toBeNull();
 });
 
-test("a card graded hard is listed at the end with the wait its button showed", async () => {
+test("a finished review says when the next reviews come, not which cards were reviewed", async () => {
   let data = fixture();
-  await show(data, "recap");
+  await show(data, "finished");
   await reveal();
-  const hard = expectDefined(
-    [...host.querySelectorAll("button")].find((candidate) =>
-      candidate.textContent?.includes("with effort")
-    )
-  );
-  const wait = expectDefined(
-    hard.closest(".dx-rate-slot")?.querySelector("em")?.textContent
-  );
-  await act(() => hard.click());
-  data = rate(data, "s0", Rating.Hard);
-  await show(data, "recap");
-  expect(host.querySelector(".dx-card")).toBeNull();
-  const recap = expectDefined(host.querySelector(".dx-recap"));
-  expect(recap.textContent).toContain("1 reviewed");
-  expect(recap.textContent).toContain("look at these again");
-  expect(recap.querySelector(".dx-recap-slipped")?.textContent).toBe(
-    `你好。${wait}`
-  );
+  data = rate(data, "s0", Rating.Easy);
+  await show(data, "finished");
+  const slot = expectDefined(host.querySelector('[data-state="finished"]'));
+  expect(slot.querySelector(".dx-deck-verdict")?.textContent).toBe("done");
+  expect(slot.textContent).toMatch(NEXT_REVIEWS);
+  expect(slot.textContent).not.toContain("你好");
 });
