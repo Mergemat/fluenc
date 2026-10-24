@@ -93,18 +93,39 @@ function excluded<T extends SQLiteTable>(
   ) as Record<keyof T["$inferInsert"], SQL>;
 }
 
+const noChanges: LearnerPatch = {
+  cards: {},
+  actors: {},
+  sets: {},
+  rooms: {},
+  props: {},
+  livingLinks: {},
+  focus: [],
+  removedFocus: [],
+};
+
+const readHead = (reader: Reader, learnerId: string) =>
+  reader
+    .select({ seq: max(events.seq) })
+    .from(events)
+    .where(eq(events.learnerId, learnerId));
+
 /**
  * Rows changed after `cursor`, with the cursor that covers them; a null cursor reads everything.
  * One batch, so the rows and the cursor are read from the same moment.
  */
 export async function readPatch(learnerId: string, cursor: number | null) {
+  // Most syncs are a device checking in with nothing new: one indexed read answers them.
+  if (cursor !== null) {
+    const [head] = await readHead(db, learnerId);
+    if ((head?.seq ?? 0) === cursor) {
+      return { cursor, patch: noChanges };
+    }
+  }
   const since = cursor ?? -1;
   const [head, items, actors, sets, rooms, props, links, focus] =
     await db.batch([
-      db
-        .select({ seq: max(events.seq) })
-        .from(events)
-        .where(eq(events.learnerId, learnerId)),
+      readHead(db, learnerId),
       db
         .select()
         .from(learnerItems)
@@ -222,49 +243,58 @@ function targetCardKey(operation: ProgressOperation) {
   return cardKey(target.itemType, target.itemId);
 }
 
-/** Just the rows a set of changes reads: the cards they touch, and focus for the catalog. */
+/** Just the rows a set of changes reads: the cards they touch, and focus when they use it. */
 async function readTargets(
   reader: Reader,
   learnerId: string,
   operations: ProgressOperation[]
 ): Promise<LearnerState> {
-  const keys = [
+  const targets = [
     ...new Set(
       operations.flatMap((operation) => targetCardKey(operation) ?? [])
     ),
-  ];
+  ].flatMap((key) => parseCardKey(key) ?? []);
   // One statement at a time: a transaction runs them in order anyway.
-  const items = keys.length
+  const items = targets.length
     ? await reader
         .select()
         .from(learnerItems)
         .where(
           and(
             eq(learnerItems.learnerId, learnerId),
-            inArray(
-              sql`${learnerItems.itemType} || ':' || ${learnerItems.itemId}`,
-              keys
-            )
+            // A row value, so each card is one primary key lookup rather than a scan.
+            sql`(${learnerItems.itemType}, ${learnerItems.itemId}) in (values ${sql.join(
+              targets.map(({ type, id }) => sql`(${type}, ${id})`),
+              sql`, `
+            )})`
           )
         )
     : [];
-  const focus = await reader
-    .select()
-    .from(focusEntries)
-    .where(
-      and(eq(focusEntries.learnerId, learnerId), isNull(focusEntries.removedAt))
-    )
-    .orderBy(asc(focusEntries.addedAt));
-  return {
-    ...emptyLearnerState,
-    cards: Object.fromEntries(
-      items.map((item) => [
-        cardKey(item.itemType, item.itemId),
-        cardSnapshot(item),
-      ])
-    ),
-    focus: focus.map(focusEntry),
-  };
+  const cards = Object.fromEntries(
+    items.map((item) => [
+      cardKey(item.itemType, item.itemId),
+      cardSnapshot(item),
+    ])
+  );
+  // Focus changes edit the list, and it adds to the catalog that decides what an enroll may add.
+  // A late card replays its stored enrolls, so it needs the catalog too. Reviews need neither.
+  const usesFocus =
+    operations.some(
+      (operation) => operation.kind === "enroll" || operation.kind === "focus"
+    ) || lateCards({ ...emptyLearnerState, cards }, operations).size > 0;
+  const focus = usesFocus
+    ? await reader
+        .select()
+        .from(focusEntries)
+        .where(
+          and(
+            eq(focusEntries.learnerId, learnerId),
+            isNull(focusEntries.removedAt)
+          )
+        )
+        .orderBy(asc(focusEntries.addedAt))
+    : [];
+  return { ...emptyLearnerState, cards, focus: focus.map(focusEntry) };
 }
 
 /** Word ids studied as each character, so a character's events can be found by item id. */

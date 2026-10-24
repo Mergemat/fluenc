@@ -21,7 +21,8 @@ export const learners = sqliteTable("learners", {
 
 /**
  * The `seq` of the last change written to a row. A device sends the highest `seq` it has seen and
- * gets back only the rows changed since.
+ * gets back only the rows changed since. Each table indexes it by learner, so a sync reads just
+ * those rows: Turso bills every row a query scans, not the rows it returns.
  */
 const version = () => integer("version").notNull().default(0);
 
@@ -60,6 +61,7 @@ export const learnerItems = sqliteTable(
   (table) => [
     primaryKey({ columns: [table.learnerId, table.itemType, table.itemId] }),
     index("learner_items_due_idx").on(table.learnerId, table.due),
+    index("learner_items_version_idx").on(table.learnerId, table.version),
   ]
 );
 
@@ -83,7 +85,14 @@ export const events = sqliteTable(
       .notNull()
       .default(sql`(unixepoch() * 1000)`),
   },
-  (table) => [index("events_learner_seq_idx").on(table.learnerId, table.seq)]
+  (table) => [
+    index("events_learner_seq_idx").on(table.learnerId, table.seq),
+    // Rebuilding a card that got a late change finds its events by item.
+    index("events_learner_item_idx").on(
+      table.learnerId,
+      sql`json_extract(${table.data}, '$.itemId')`
+    ),
+  ]
 );
 
 export const palaceActors = sqliteTable(
@@ -97,7 +106,10 @@ export const palaceActors = sqliteTable(
     changedAt: changedAt(),
     version: version(),
   },
-  (table) => [primaryKey({ columns: [table.learnerId, table.actorKey] })]
+  (table) => [
+    primaryKey({ columns: [table.learnerId, table.actorKey] }),
+    index("palace_actors_version_idx").on(table.learnerId, table.version),
+  ]
 );
 
 export const palaceSets = sqliteTable(
@@ -111,7 +123,10 @@ export const palaceSets = sqliteTable(
     changedAt: changedAt(),
     version: version(),
   },
-  (table) => [primaryKey({ columns: [table.learnerId, table.finalKey] })]
+  (table) => [
+    primaryKey({ columns: [table.learnerId, table.finalKey] }),
+    index("palace_sets_version_idx").on(table.learnerId, table.version),
+  ]
 );
 
 export const toneRooms = sqliteTable(
@@ -125,7 +140,10 @@ export const toneRooms = sqliteTable(
     changedAt: changedAt(),
     version: version(),
   },
-  (table) => [primaryKey({ columns: [table.learnerId, table.tone] })]
+  (table) => [
+    primaryKey({ columns: [table.learnerId, table.tone] }),
+    index("tone_rooms_version_idx").on(table.learnerId, table.version),
+  ]
 );
 
 export const componentProps = sqliteTable(
@@ -139,7 +157,10 @@ export const componentProps = sqliteTable(
     changedAt: changedAt(),
     version: version(),
   },
-  (table) => [primaryKey({ columns: [table.learnerId, table.component] })]
+  (table) => [
+    primaryKey({ columns: [table.learnerId, table.component] }),
+    index("component_props_version_idx").on(table.learnerId, table.version),
+  ]
 );
 
 export const mnemonics = sqliteTable(
@@ -159,6 +180,7 @@ export const mnemonics = sqliteTable(
   },
   (table) => [
     primaryKey({ columns: [table.learnerId, table.itemType, table.itemId] }),
+    index("mnemonics_version_idx").on(table.learnerId, table.version),
   ]
 );
 
@@ -181,6 +203,7 @@ export const focusEntries = sqliteTable(
   },
   (table) => [
     primaryKey({ columns: [table.learnerId, table.kind, table.hanzi] }),
+    index("focus_entries_version_idx").on(table.learnerId, table.version),
   ]
 );
 

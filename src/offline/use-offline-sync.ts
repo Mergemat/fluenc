@@ -10,8 +10,9 @@ import {
   syncNow,
 } from "./sync";
 
-// Changes from other devices arrive this often while fluenc is open.
-const PULL_INTERVAL = 60_000;
+// Changes from other devices arrive this often while fluenc is open. Each pull is a server call;
+// coming back to fluenc and every save sync straight away, so this only covers a screen left open.
+const PULL_INTERVAL = 5 * 60_000;
 const RETRY_DELAYS = [5000, 15_000, 60_000];
 
 export function useOfflineSync() {

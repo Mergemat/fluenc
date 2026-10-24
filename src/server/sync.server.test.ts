@@ -73,6 +73,7 @@ test("two devices see each other's progress through incremental patches", async 
 
   // Nothing new, nothing sent.
   const quiet = await readPatch(learner, next.cursor);
+  expect(quiet.cursor).toBe(next.cursor);
   expect(quiet.patch.cards).toEqual({});
 });
 
@@ -110,6 +111,49 @@ test("a review that arrives late is scheduled as if it had arrived in order", as
   expect(next.patch.cards["sentence:s01"]).toEqual(
     inOrder.cards["sentence:s01"]
   );
+});
+
+test("a late review of the learner's own word keeps its card", async () => {
+  const learner = "learner-own-word";
+  // Not a course word, so only focus puts it in the learner's catalog.
+  const word = { itemType: "word", itemId: "马马" } as const;
+  const reviewWord = (reviewedAt: string) =>
+    change(
+      {
+        kind: "review",
+        data: { ...word, rating: 3, durationMs: 0, reviewedAt },
+      },
+      reviewedAt
+    );
+  await writeOperations(learner, [
+    change({
+      kind: "focus",
+      data: {
+        add: [
+          {
+            kind: "word",
+            hanzi: "马马",
+            pinyin: "mǎmǎ",
+            meaning: "horses",
+            label: "own",
+            addedAt: "2026-10-01T08:00:00.000Z",
+          },
+        ],
+      },
+    }),
+    change(
+      {
+        kind: "enroll",
+        data: { ...word, enrolledAt: "2026-10-01T08:00:00.000Z" },
+      },
+      "2026-10-01T08:00:00.000Z"
+    ),
+    reviewWord("2026-10-02T08:00:00.000Z"),
+    reviewWord("2026-10-11T08:00:00.000Z"),
+  ]);
+  // Rebuilding the card replays its enroll, which needs the catalog with focus in it.
+  await writeOperations(learner, [reviewWord("2026-10-06T08:00:00.000Z")]);
+  expect((await readLearnerState(learner)).cards["word:马马"]?.reps).toBe(3);
 });
 
 test("an earlier enroll that arrives late sets when the card was introduced", async () => {
