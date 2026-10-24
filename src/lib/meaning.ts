@@ -1,22 +1,8 @@
-import secondaryMeanings from "../data/secondary-meanings.reviewed.json";
-
 type MeaningItem = ({ keyword: string } | { meaning: string }) & {
-  dictionaryMeanings: readonly string[];
-  hanzi: string;
-  pinyin: string;
+  also: string | null;
+  senses: readonly string[];
 };
 
-const secondaryByReading = new Map(
-  secondaryMeanings.map((entry) => [`${entry.hanzi}:${entry.pinyin}`, entry])
-);
-
-// These whole entries describe the dictionary, spelling, pronunciation or classifiers
-// for a noun. A definition such as "classifier for books" is still a real sense of 本.
-// Inline labels stay intact: deleting parentheses can change a sense's meaning.
-const DICTIONARY_METADATA =
-  /^(?:CL:|(?:also|Taiwan|Beijing|colloquial) pr\. |also written |(?:(?:old|euphemistic) )?variant of |same as |opposite: |Kangxi radical )/i;
-const RADICAL_DESCRIPTION =
-  /radical in Chinese characters \(Kangxi radical \d+\)$/;
 const INFINITIVE = /^to\s+/;
 const TERMINAL_PUNCTUATION = /[.!?…]+$/;
 const WHITESPACE = /\s+/g;
@@ -31,34 +17,21 @@ function meaningKey(meaning: string) {
     .trim();
 }
 
+/** The keyword or meaning, its short second cue, and the other senses, each said once. */
 export function getItemMeaning(item: MeaningItem) {
   const primary = "keyword" in item ? item.keyword : item.meaning;
   const primaryKey = meaningKey(primary);
+  const also =
+    item.also && meaningKey(item.also) !== primaryKey ? item.also : null;
   const seen = new Set([primaryKey]);
-  const alternatives = item.dictionaryMeanings.filter((meaning) => {
+  const alternatives = item.senses.filter((meaning) => {
     const key = meaningKey(meaning);
-    if (
-      !key ||
-      seen.has(key) ||
-      DICTIONARY_METADATA.test(meaning.trim()) ||
-      RADICAL_DESCRIPTION.test(meaning)
-    ) {
+    if (!key || seen.has(key)) {
       return false;
     }
     seen.add(key);
     return true;
   });
-
-  // Short teaching cues are editorial decisions, not the first short dictionary
-  // fragment. Require both the reviewed reading and its exact evidence on this item;
-  // cross-references and another pronunciation cannot supply an alternate cue.
-  const reviewed = secondaryByReading.get(`${item.hanzi}:${item.pinyin}`);
-  const also =
-    reviewed &&
-    item.dictionaryMeanings.includes(reviewed.sourceSense) &&
-    meaningKey(reviewed.meaning) !== primaryKey
-      ? reviewed.meaning
-      : null;
 
   return {
     primary,

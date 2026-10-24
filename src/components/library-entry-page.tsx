@@ -179,6 +179,18 @@ function CharacterEntry({
             <AudioButton pinyin={item.pinyin} text={item.hanzi} />
           </div>
           <Senses meanings={meaning.alternatives} />
+          <p className="dx-entry-facts">
+            {item.strokes} strokes · radical{" "}
+            <span className="font-hanzi" lang="zh-CN">
+              {item.radical}
+            </span>
+            {item.readings.map((reading) => (
+              <span key={reading.pinyin}>
+                {" "}
+                · also {reading.pinyin}, {reading.meanings[0]}
+              </span>
+            ))}
+          </p>
           <DitherButton
             aria-pressed={xray}
             className="dx-tool"

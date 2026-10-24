@@ -1,212 +1,226 @@
-import { parse } from "csv-parse/sync";
-import keywordReviews from "../src/data/character-keywords.reviewed.json";
-import componentNotes from "../src/data/component-notes.authored.json";
-
-import dictionarySource from "../src/data/dictionary.source.json";
-import reviewedJson from "../src/data/reviewed-compositions.json";
-import wordReviews from "../src/data/word-meanings.reviewed.json";
-import supplement from "../src/data/words.supplement.json";
+import characterJson from "../src/data/hanzi/characters.json";
+import componentJson from "../src/data/hanzi/components.json";
+import wordJson from "../src/data/hanzi/words.json";
+import authoredSentences from "../src/data/sentences.authored.json";
+import reviewedSentences from "../src/data/sentences.reviewed.json";
+import { directCharacters } from "../src/lib/character-props";
 import { characterWordEquivalences } from "../src/lib/character-word-equivalence";
-import { resolveComponentNotes } from "../src/lib/component-notes";
-import { resolveCharacterKeywords } from "../src/lib/curriculum-readings";
 import {
-  findHanziComposition,
-  type HanziIndex,
-  type ReviewedComposition,
-} from "../src/lib/hanzi";
-import { resolveWordMeanings } from "../src/lib/word-meanings";
-import { wordSyllables } from "../src/lib/word-syllables";
+  characterSchema,
+  componentSchema,
+  databaseProblems,
+  isTaught,
+  wordSchema,
+} from "../src/lib/hanzi-db";
+import { learningOrder } from "../src/lib/learning-order";
+import { remapStrokeOwners } from "../src/lib/stroke-owners";
+import { selectSentences } from "./sentence-selection";
 
-const WORDS_URL =
-  "https://adsonant.com/word-frequency-lists/Adsonant-1000-most-common-chinese-words.csv";
-const CHARACTERS_URL =
-  "https://raw.githubusercontent.com/skishore/makemeahanzi/master/dictionary.txt";
+const characters = characterSchema.array().parse(characterJson);
+const words = wordSchema.array().parse(wordJson);
+const components = componentSchema.array().parse(componentJson);
 
-interface CsvWord {
-  rank: string;
-  word: string;
-}
-
-interface DictionaryEntry {
-  character: string;
-  decomposition: string;
-  radical: string;
-}
-
-const [wordsResponse, charactersResponse] = await Promise.all([
-  fetch(WORDS_URL),
-  fetch(CHARACTERS_URL),
-]);
-
-if (!(wordsResponse.ok && charactersResponse.ok)) {
+const problems = databaseProblems(characters, words, components);
+if (problems.length) {
   throw new Error(
-    `Curriculum download failed: words=${wordsResponse.status}, characters=${charactersResponse.status}`
+    `The character database has ${problems.length} problems:\n${problems.join("\n")}`
   );
 }
 
-const records = parse(await wordsResponse.text(), {
-  bom: true,
-  columns: true,
-  skip_empty_lines: true,
-}) as CsvWord[];
-
-const dictionary = new Map<string, DictionaryEntry>();
-const dictionaryLines = (await charactersResponse.text()).split("\n");
-for (const line of dictionaryLines) {
-  if (!line.trim()) {
-    continue;
-  }
-  const entry = JSON.parse(line) as DictionaryEntry;
-  dictionary.set(entry.character, entry);
-}
-
-const hanziIndex = Object.fromEntries(
-  [...dictionary.values()].map((entry) => [
-    entry.character,
-    [entry.radical, entry.decomposition],
-  ])
-) as HanziIndex;
-const reviewed = new Map(
-  (reviewedJson as ReviewedComposition[]).map((entry) => [
-    entry.character,
-    entry,
-  ])
+// Usage: how often the reading corpus (every sentence, not only those the course selects) uses
+// an entry, plus, for a character, how many course words it spells.
+const corpus = [...authoredSentences, ...reviewedSentences.sentences].map(
+  (sentence) => sentence.hanzi
 );
+const sentencesWith = (text: string) =>
+  corpus.filter((sentence) => sentence.includes(text)).length;
 
-const HANZI = /[\p{Script=Han}\u2e80-\u2eff\u31c0-\u31ef]/u;
-const isHanzi = (value: string) => HANZI.test(value);
-const splitHanzi = (value: string) => Array.from(value).filter(isHanzi);
-
-const uniqueRecords = [
-  ...records
-    .reduce((items, record) => {
-      if (!items.has(record.word)) {
-        items.set(record.word, record);
-      }
-      return items;
-    }, new Map<string, CsvWord>())
-    .values(),
-];
-
-const listedWords = uniqueRecords.map((record) => ({
-  id: Number(record.rank),
-  rank: Number(record.rank),
-  hanzi: record.word,
-}));
-// Supplementary words follow the frequency list, which lacks basics such as 四 and 汉语.
-const lastRank = Math.max(...listedWords.map((word) => word.rank));
-const listed = new Set(listedWords.map((word) => word.hanzi));
-const frequencyWords = [
-  ...listedWords,
-  ...supplement.words.map((hanzi, index) => {
-    if (listed.has(hanzi)) {
-      throw new Error(`Supplementary word is already listed: ${hanzi}`);
-    }
-    const rank = lastRank + index + 1;
-    return { id: rank, rank, hanzi };
-  }),
-];
-const words = resolveWordMeanings(
-  frequencyWords,
-  wordReviews,
-  dictionarySource.entries
-).map((word) => ({
-  ...word,
-  characterIds: [...new Set(splitHanzi(word.hanzi))],
-  // Precomputed so the app never ships pinyin-pro's dictionary to split a reading.
-  syllables: wordSyllables(word.hanzi, word.pinyin),
+const taught = words.filter(isTaught);
+const wordOrder = learningOrder(
+  taught.map((word) => ({ rank: word.id, usage: sentencesWith(word.hanzi) }))
+);
+const courseWords = taught.map((word, index) => ({
+  id: word.id,
+  rank: word.id,
+  order: wordOrder[index] ?? 0,
+  usage: sentencesWith(word.hanzi),
+  hanzi: word.hanzi,
+  pinyin: word.pinyin,
+  syllables: word.syllables,
+  meaning: word.meaning,
+  senses: word.meanings,
+  also: word.also,
+  characterIds: [...new Set(Array.from(word.hanzi))],
 }));
 
-const stats = new Map<string, { rank: number; unlocks: number }>();
-for (const word of words) {
+const spelled = new Map<string, { rank: number; unlocks: number }>();
+for (const word of courseWords) {
   for (const hanzi of word.characterIds) {
-    const current = stats.get(hanzi);
-    stats.set(hanzi, {
+    const current = spelled.get(hanzi);
+    spelled.set(hanzi, {
       rank: Math.min(current?.rank ?? Number.POSITIVE_INFINITY, word.rank),
       unlocks: (current?.unlocks ?? 0) + 1,
     });
   }
 }
+const characterStats = characters.map((character) => {
+  const stats = spelled.get(character.hanzi);
+  if (!stats) {
+    throw new Error(`No course word uses ${character.hanzi}`);
+  }
+  return {
+    rank: stats.rank,
+    unlocks: stats.unlocks,
+    usage: sentencesWith(character.hanzi) + stats.unlocks,
+  };
+});
+const characterOrder = learningOrder(characterStats);
+const courseCharacters = characters
+  .map((character, index) => {
+    const stats = characterStats[index];
+    if (!stats) {
+      throw new Error(`Missing stats: ${character.hanzi}`);
+    }
+    return {
+      id: character.hanzi,
+      hanzi: character.hanzi,
+      pinyin: character.pinyin,
+      keyword: character.keyword,
+      senses: character.meanings,
+      also: character.also,
+      readings: character.readings,
+      strokes: character.strokes,
+      radical: character.radical,
+      components: character.components,
+      componentStructure: character.structure,
+      componentNote: character.note,
+      frequencyRank: stats.rank,
+      unlocks: stats.unlocks,
+      usage: stats.usage,
+      order: characterOrder[index] ?? 0,
+    };
+  })
+  .sort((left, right) => left.order - right.order);
 
-const compositions = new Map(
-  [...stats.keys()].map((hanzi) => [
-    hanzi,
-    findHanziComposition(hanziIndex, hanzi, reviewed.get(hanzi)),
-  ])
+const used = new Set(
+  courseCharacters
+    .filter((character) => character.componentStructure === "compound")
+    .flatMap((character) => character.components)
 );
-const incomplete = [...compositions]
-  .filter(([, composition]) => !composition)
-  .map(([hanzi]) => hanzi);
-if (incomplete.length) {
+const props = Object.fromEntries(
+  components
+    .filter((component) => used.has(component.hanzi))
+    .map((component) => [
+      component.hanzi,
+      {
+        prop: component.prop,
+        meaning: component.meaning,
+        variantOf: component.variantOf,
+        strokes: component.strokes,
+      },
+    ])
+);
+
+const curriculum = {
+  version: "2026-10-24.1",
+  sources: {
+    characters: "src/data/hanzi/characters.json",
+    words: "src/data/hanzi/words.json",
+    components: "src/data/hanzi/components.json",
+  },
+  words: courseWords,
+  characters: courseCharacters,
+  props,
+};
+
+// Each stored stroke goes to the prop that draws it. Stroke paths and medians are the vendored
+// Arphic outlines in public/hanzi and never change; only `owners` follows the decomposition.
+const STROKE_NOTICE =
+  "Fluenc: added the teaching prop that draws each stroke; stroke paths and medians unchanged. Graphics copyright Arphic Technology Co., Ltd.; Arphic Public License, /licenses/ARPHICPL.TXT.";
+
+interface Shape {
+  medians: number[][][];
+  owners: string[];
+  strokes: string[];
+}
+
+const strokesOf = (part: string) =>
+  props[part]?.strokes ??
+  courseCharacters.find((character) => character.hanzi === part)?.strokes;
+
+const shapes = await Promise.all(
+  courseCharacters.map(async (character) => {
+    const file = Bun.file(`public/hanzi/${character.hanzi}.json`);
+    return (await file.exists()) ? ((await file.json()) as Shape) : null;
+  })
+);
+const undecided: string[] = [];
+const strokeWrites: Promise<number>[] = [];
+for (const [index, character] of courseCharacters.entries()) {
+  const shape = shapes[index];
+  if (!shape) {
+    undecided.push(`${character.hanzi} (no stroke file)`);
+    continue;
+  }
+  const parts = directCharacters.has(character.hanzi)
+    ? [character.hanzi]
+    : character.components;
+  const owners = remapStrokeOwners(shape.owners, parts, strokesOf);
+  if (!owners) {
+    undecided.push(
+      `${character.hanzi}: [${shape.owners.join(" ")}] → ${parts.join(" ")}`
+    );
+  } else if (owners.join() !== shape.owners.join()) {
+    strokeWrites.push(
+      Bun.write(
+        `public/hanzi/${character.hanzi}.json`,
+        `${JSON.stringify({ _notice: STROKE_NOTICE, strokes: shape.strokes, medians: shape.medians, owners })}\n`
+      )
+    );
+  }
+}
+if (undecided.length) {
   throw new Error(
-    `Incomplete decompositions (${incomplete.length}): ${incomplete.join(" ")}. Review these before generating the curriculum.`
+    `Set "owners" by hand in public/hanzi for ${undecided.length} characters:\n${undecided.join("\n")}`
   );
 }
 
-const keywords = resolveCharacterKeywords(
-  [...stats.keys()],
-  keywordReviews,
-  dictionarySource.entries
+const sentences = selectSentences(
+  curriculum,
+  authoredSentences,
+  reviewedSentences
 );
-const learnerNotes = resolveComponentNotes(compositions, componentNotes);
-
-const characters = [...stats.entries()]
-  .map(([hanzi, characterStats]) => {
-    const keyword = keywords.get(hanzi);
-    const composition = compositions.get(hanzi);
-    if (!(keyword && composition)) {
-      throw new Error(`Missing keyword or composition: ${hanzi}`);
-    }
-
-    return {
-      id: hanzi,
-      hanzi,
-      ...keyword,
-      components: composition.components,
-      componentStructure: composition.structure,
-      componentNote: learnerNotes.get(hanzi) ?? null,
-      frequencyRank: characterStats.rank,
-      unlocks: characterStats.unlocks,
-    };
-  })
-  .sort(
-    (left, right) =>
-      left.frequencyRank - right.frequencyRank ||
-      right.unlocks - left.unlocks ||
-      left.hanzi.localeCompare(right.hanzi)
-  );
-
-const curriculum = {
-  version: "2026-10-23.1",
-  sources: {
-    words: WORDS_URL,
-    supplementaryWords: "src/data/words.supplement.json",
-    characters: CHARACTERS_URL,
-    decompositionReviews: "src/data/reviewed-compositions.json",
-    componentNotes: "src/data/component-notes.authored.json",
-    keywordReviews: "src/data/character-keywords.reviewed.json",
-    dictionary: dictionarySource.url,
-    wordReviews: "src/data/word-meanings.reviewed.json",
-  },
-  words,
-  characters,
-};
 
 await Promise.all([
+  ...strokeWrites,
   Bun.write(
     new URL("../src/data/character-words.generated.json", import.meta.url),
-    `${JSON.stringify(characterWordEquivalences(characters, words))}\n`
+    `${JSON.stringify(characterWordEquivalences(courseCharacters, courseWords))}\n`
   ),
   Bun.write(
     new URL("../src/data/curriculum.generated.json", import.meta.url),
     `${JSON.stringify(curriculum)}\n`
   ),
   Bun.write(
-    new URL("../src/data/hanzi-index.generated.json", import.meta.url),
-    `${JSON.stringify(hanziIndex)}\n`
+    new URL("../src/data/sentences.generated.json", import.meta.url),
+    `${JSON.stringify({
+      version: "reviewed-v1",
+      sources: {
+        sentences:
+          "https://downloads.tatoeba.org/exports/per_language/cmn/cmn_sentences.tsv.bz2",
+        translations:
+          "https://downloads.tatoeba.org/exports/per_language/eng/eng_sentences.tsv.bz2",
+        links:
+          "https://downloads.tatoeba.org/exports/per_language/cmn/cmn-eng_links.tsv.bz2",
+        license: "https://creativecommons.org/licenses/by/2.0/fr/",
+        attribution: "Tatoeba contributors",
+        reviewed: "src/data/sentences.reviewed.json",
+      },
+      sentences,
+    })}\n`
   ),
 ]);
 
 console.log(
-  `Synced ${words.length} words, ${characters.length} curriculum characters, and ${dictionary.size} Hanzi decompositions.`
+  `Synced ${courseWords.length} words, ${courseCharacters.length} characters, ${Object.keys(props).length} props, ${sentences.length} sentences and ${strokeWrites.length} changed stroke files.`
 );

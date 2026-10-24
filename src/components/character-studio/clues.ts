@@ -1,5 +1,5 @@
 import { directCharacters } from "../../lib/character-props";
-import { componentMeanings } from "../../lib/component-meanings";
+import { suggestedProp } from "../../lib/props";
 import { getToneDetail } from "../../lib/tones";
 import { characterCues } from "./cues";
 import type { CharacterItem, Cue } from "./types";
@@ -52,7 +52,7 @@ export function lessonClues(
       cue.kind === "prop" ? item.movie.components[partIndex] : null;
     const meaning =
       cue.kind === "prop"
-        ? (component?.character?.keyword ?? componentMeanings[cue.code] ?? null)
+        ? (suggestedProp(cue.code) ?? component?.character?.keyword ?? null)
         : null;
     return {
       ...cue,

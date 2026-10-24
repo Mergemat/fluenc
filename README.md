@@ -4,7 +4,7 @@ A Mandarin study app for reading Chinese characters, built on the Hanzi Movie Me
 
 ![Fluenc's today, review, learn and library screens](.github/screenshot.png)
 
-It covers about 1,000 of the most common spoken words and the 750 characters they use. Each part is its own activity, done whenever you like:
+It covers about 1,000 of the most common spoken words and the 726 characters they use. Each part is its own activity, done whenever you like:
 
 - **Lessons** teach the next character or word whose parts you already know. You build a Hanzi Movie for each character from your actors, sets and props.
 - **Review** shows everything due, scheduled with [FSRS](https://github.com/open-spaced-repetition/ts-fsrs).
@@ -36,7 +36,7 @@ Everything else in `.env` is optional, and `.env.example` explains each variable
 - **Spoken audio.** `ELEVENLABS_API_KEY` and `ELEVENLABS_VOICE_ID` turn on audio for words and sentences. Single characters always play from the bundled recordings. Only signed-in users can request generated audio.
 - **Audio cache.** `BLOB_READ_WRITE_TOKEN` stores generated audio in Vercel Blob, so each text is generated once. Vercel sets it in production.
 - **Reminders.** `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` and `CRON_SECRET` turn on daily review reminders. See [Reminders](#reminders).
-- **Scripts.** `FLUENC_EMAIL` sets the account that `bun run focus` and `bun run claim` use.
+- **Scripts.** `FLUENC_EMAIL` sets the account that `bun run focus` uses.
 
 VS Code suggests the Biome and Tailwind extensions and formats on save.
 
@@ -54,12 +54,10 @@ VS Code suggests the Biome and Tailwind extensions and formats on save.
 | `bun run db:seed` / `db:reset` | Add the demo account, or start the local database over |
 | `bun run db:generate` / `db:migrate` | Create a migration after changing `src/db/schema.ts`, or apply migrations |
 | `bun run focus` | Add, list or remove focus words and sentences for an account |
-| `bun run claim` | Move progress saved before accounts existed onto an account |
-| `bun run data:sync` | Rebuild the curriculum from the reviewed data in `src/data` |
-| `bun run data:sentences` | Rebuild the reading sentences |
-| `bun run data:strokes` / `data:font` | Rebuild stroke data and the hanzi font |
+| `bun run data:sync` | Check the character database in `src/data/hanzi`, then rebuild the curriculum, reading sentences and stroke owners from it |
+| `bun run data:font` | Rebuild the hanzi font |
 
-`src/data/README.md` explains where the curriculum comes from and how to change it.
+`src/data/README.md` explains the character database, the teaching order and how to change them.
 
 ### Focus
 

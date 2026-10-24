@@ -1,48 +1,10 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import source from "../src/data/character-strokes.source.json";
 import curriculum from "../src/data/curriculum.generated.json";
-import reviewed from "../src/data/reviewed-compositions.json";
-import { sentences } from "../src/data/sentences";
 
-const characters = new Set(
-  curriculum.characters.flatMap((character) => [
-    character.hanzi,
-    ...character.components,
-  ])
-);
-for (const entry of reviewed) {
-  for (const character of [entry.character, ...entry.components]) {
-    characters.add(character);
-  }
-}
-for (const sentence of sentences) {
-  for (const character of Array.from(sentence.hanzi)) {
-    if (/\p{Script=Han}/u.test(character)) {
-      characters.add(character);
-    }
-  }
-}
-
-const response = await fetch(
-  source.dictionary.replace("dictionary.txt", "graphics.txt")
-);
-if (!response.ok) {
-  throw new Error(`Could not load glyph source: ${response.status}`);
-}
-const graphics = new Map(
-  (await response.text())
-    .trim()
-    .split("\n")
-    .map((line) => {
-      const entry = JSON.parse(line) as {
-        character: string;
-        strokes: string[];
-      };
-      return [entry.character, entry.strokes];
-    })
-);
+// Every glyph comes from the vendored stroke files in public/hanzi: a course character from its
+// own file, a component from the strokes it draws in a course character.
 const lessonShapes = new Map(
   await Promise.all(
     curriculum.characters.map(
@@ -57,23 +19,33 @@ const lessonShapes = new Map(
     )
   )
 );
-const glyphs = [...characters]
+const components = new Set(
+  curriculum.characters.flatMap((character) => character.components)
+);
+const glyphs = [...new Set([...lessonShapes.keys(), ...components])]
   .sort((a, b) => (a.codePointAt(0) ?? 0) - (b.codePointAt(0) ?? 0))
   .map((character) => {
-    const strokes =
-      lessonShapes.get(character)?.strokes ?? graphics.get(character);
+    const strokes = lessonShapes.get(character)?.strokes;
     if (strokes) {
       return { character, strokes, normalize: false };
     }
-    // A standalone component uses the same outlines as its one occurrence in a lesson.
-    const parent = curriculum.characters.find(
-      (entry) =>
-        entry.components.filter((part) => part === character).length === 1
-    );
-    const shape = parent && lessonShapes.get(parent.hanzi);
-    const parts = shape?.strokes.filter(
-      (_, index) => shape.owners[index] === character
-    );
+    // The occurrence with the fewest strokes overall is the least crowded drawing of the part.
+    const parts = curriculum.characters
+      .filter((entry) => entry.components.includes(character))
+      .map((entry) => {
+        const shape = lessonShapes.get(entry.hanzi);
+        return {
+          size: shape?.strokes.length ?? 0,
+          strokes:
+            shape?.strokes.filter(
+              (_, index) => shape.owners[index] === character
+            ) ?? [],
+          repeated:
+            entry.components.filter((part) => part === character).length > 1,
+        };
+      })
+      .filter((part) => part.strokes.length && !part.repeated)
+      .sort((left, right) => left.size - right.size)[0]?.strokes;
     if (!parts?.length) {
       throw new Error(`No glyph outlines for ${character}`);
     }

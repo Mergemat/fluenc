@@ -47,7 +47,10 @@ function resolveFocusWords(
           hanzi: entry.hanzi,
           pinyin: entry.pinyin,
           meaning: entry.meaning,
-          dictionaryMeanings: [],
+          senses: [],
+          also: null,
+          order: lastRank + ownWords.size + 1,
+          usage: 0,
           characterIds: Array.from(entry.hanzi),
           syllables: entry.syllables ?? null,
         });

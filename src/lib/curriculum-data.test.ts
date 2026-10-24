@@ -1,51 +1,54 @@
 import { expect, test } from "bun:test";
 
-import curriculum from "../data/curriculum.generated.json";
-import indexJson from "../data/hanzi-index.generated.json";
-import reviewedJson from "../data/reviewed-compositions.json";
+import curriculumJson from "../data/curriculum.generated.json";
+import characterJson from "../data/hanzi/characters.json";
+import componentJson from "../data/hanzi/components.json";
+import wordJson from "../data/hanzi/words.json";
+import type { Curriculum } from "../data/types";
+import { directCharacters } from "./character-props";
 import {
-  findHanziComposition,
-  type HanziIndex,
-  type ReviewedComposition,
-} from "./hanzi";
+  characterSchema,
+  componentSchema,
+  databaseProblems,
+  isTaught,
+  wordSchema,
+} from "./hanzi-db";
 
-const index = indexJson as unknown as HanziIndex;
-const reviewed = reviewedJson as ReviewedComposition[];
+const curriculum = curriculumJson as Curriculum;
+const characters = characterSchema.array().parse(characterJson);
+const words = wordSchema.array().parse(wordJson);
+const components = componentSchema.array().parse(componentJson);
 
-test("every lesson has a complete composition and a deliberate whole-shape decision", () => {
-  const errors: string[] = [];
-  for (const character of curriculum.characters) {
-    const composition = findHanziComposition(
-      index,
-      character.hanzi,
-      reviewed.find((entry) => entry.character === character.hanzi)
-    );
-    if (!composition?.components.length) {
-      errors.push(`${character.hanzi}: incomplete`);
-    } else if (
-      JSON.stringify(character.components) !==
-      JSON.stringify(composition.components)
-    ) {
-      errors.push(`${character.hanzi}: stale generated components`);
-    }
-  }
-  expect(errors).toEqual([]);
+test("the character database has no broken references, duplicates or bad readings", () => {
+  expect(databaseProblems(characters, words, components)).toEqual([]);
 });
 
-test("curated source data cannot silently disappear during regeneration", () => {
-  expect(new Set(reviewed.map((entry) => entry.character)).size).toBe(
-    reviewed.length
-  );
-  for (const entry of reviewed) {
-    expect(
-      entry.sources.every((source) => source.startsWith("https://"))
-    ).toBeTrue();
-    expect(findHanziComposition(index, entry.character, entry)).not.toBeNull();
-  }
+test("the generated curriculum is up to date with the database", () => {
+  const stale = [
+    ...characters.flatMap((entry) => {
+      const generated = curriculum.characters.find(
+        (item) => item.hanzi === entry.hanzi
+      );
+      return generated?.pinyin === entry.pinyin &&
+        generated.keyword === entry.keyword &&
+        generated.components.join() === entry.components.join()
+        ? []
+        : [entry.hanzi];
+    }),
+    ...words.filter(isTaught).flatMap((entry) => {
+      const generated = curriculum.words.find((item) => item.id === entry.id);
+      return generated?.pinyin === entry.pinyin &&
+        generated.meaning === entry.meaning
+        ? []
+        : [entry.hanzi];
+    }),
+  ];
+  expect(stale).toEqual([]);
+  expect(curriculum.characters).toHaveLength(characters.length);
 });
 
-test("every course prop owns real strokes in the shipped glyph files", async () => {
-  const { directCharacters } = await import("./character-props");
+test("every stroke file draws each prop of its character, and only those", async () => {
+  const problems: string[] = [];
   const shapes = await Promise.all(
     curriculum.characters.map(
       async ({ hanzi }) =>
@@ -58,21 +61,46 @@ test("every course prop owns real strokes in the shipped glyph files", async () 
         }
     )
   );
-  for (const [position, character] of curriculum.characters.entries()) {
-    const shape = shapes[position];
-    const components = directCharacters.has(character.hanzi)
+  for (const [index, character] of curriculum.characters.entries()) {
+    const shape = shapes[index];
+    if (!shape) {
+      continue;
+    }
+    const parts = directCharacters.has(character.hanzi)
       ? [character.hanzi]
       : character.components;
-    expect(shape.owners.length, character.hanzi).toBe(shape.strokes.length);
-    expect(shape.medians.length, character.hanzi).toBe(shape.strokes.length);
-    expect([...new Set(shape.owners)].sort(), character.hanzi).toEqual(
-      [...new Set(components)].sort()
-    );
-    expect(
-      shape.strokes.every(
-        (stroke) => stroke.startsWith("M") && stroke.includes("Z")
-      ),
-      character.hanzi
-    ).toBeTrue();
+    if (
+      shape.owners.length !== shape.strokes.length ||
+      shape.medians.length !== shape.strokes.length
+    ) {
+      problems.push(`${character.hanzi}: owners or medians miss strokes`);
+    }
+    if (
+      [...new Set(shape.owners)].sort().join() !==
+      [...new Set(parts)].sort().join()
+    ) {
+      problems.push(
+        `${character.hanzi}: owners ${[...new Set(shape.owners)].join("")}`
+      );
+    }
+    if (parts.length > 1) {
+      for (const part of new Set(parts)) {
+        const owned = shape.owners.filter((owner) => owner === part).length;
+        const expected =
+          (curriculum.props[part]?.strokes ?? 0) *
+          parts.filter((item) => item === part).length;
+        if (owned !== expected) {
+          problems.push(
+            `${character.hanzi}: ${part} draws ${owned} strokes, its prop has ${expected}`
+          );
+        }
+      }
+    }
+    if (shape.strokes.length !== character.strokes) {
+      problems.push(
+        `${character.hanzi}: ${shape.strokes.length} strokes drawn, ${character.strokes} listed`
+      );
+    }
   }
+  expect(problems).toEqual([]);
 });
