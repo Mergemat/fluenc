@@ -2739,6 +2739,13 @@
   font: inherit;
   color: var(--dx-blue);
 }
+.dx-entry-facts {
+  max-width: 46ch;
+  margin: 0;
+  font: var(--dx-type-control);
+  color: var(--dx-faint);
+  text-align: center;
+}
 .dx-entry-section {
   display: grid;
   gap: var(--dx-space-tight);

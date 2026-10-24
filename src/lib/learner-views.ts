@@ -32,6 +32,9 @@ const starterCharacterIds = [
   "吗",
 ];
 
+/** How many places in the teaching order one unnamed prop costs a character. */
+const MISSING_PROP_PLACES = 8;
+
 function characterStudyItem(
   character: Character,
   state: LearnerState,
@@ -52,7 +55,8 @@ function characterStudyItem(
     hanzi: character.hanzi,
     pinyin: character.pinyin,
     keyword: character.keyword,
-    dictionaryMeanings: character.dictionaryMeanings,
+    senses: character.senses,
+    also: character.also,
     rank: character.frequencyRank,
     unlocks: character.unlocks,
     movie: {
@@ -103,8 +107,10 @@ function wordStudyItem(word: Word, state: LearnerState, catalog: Catalog) {
     hanzi: word.hanzi,
     pinyin: word.pinyin,
     meaning: word.meaning,
-    dictionaryMeanings: word.dictionaryMeanings,
+    senses: word.senses,
+    also: word.also,
     rank: word.rank,
+    order: word.order,
     characterIds: word.characterIds,
     syllables: word.syllables,
     characterParts: characterParts(word, catalog).map(({ hanzi, meaning }) => ({
@@ -285,7 +291,7 @@ export function deriveDashboard(
     .sort(
       (left, right) =>
         focusPlace(cardKey("word", left.id)) -
-        focusPlace(cardKey("word", right.id))
+          focusPlace(cardKey("word", right.id)) || left.order - right.order
     );
   const lockedWords = unintroducedWords.filter((item) => !wordReady(item));
   const nextWordParts = nextWordCharacters(lockedWords, introducedCharacters);
@@ -324,8 +330,13 @@ export function deriveDashboard(
           }
           return leftStarter - rightStarter;
         }
+        // Each prop the learner still has to name sets a character back a few places, so known
+        // props pay off without burying the characters the course needs most.
         return (
-          leftMissing - rightMissing || left.frequencyRank - right.frequencyRank
+          left.order +
+            leftMissing * MISSING_PROP_PLACES -
+            (right.order + rightMissing * MISSING_PROP_PLACES) ||
+          left.order - right.order
         );
       }
     )
@@ -425,7 +436,11 @@ export function deriveLibrary(
       hanzi: character.hanzi,
       pinyin: character.pinyin,
       keyword: character.keyword,
-      dictionaryMeanings: character.dictionaryMeanings,
+      senses: character.senses,
+      also: character.also,
+      strokes: character.strokes,
+      radical: character.radical,
+      readings: character.readings,
       rank: character.frequencyRank,
       status: characterStatus(character.id) ?? ("new" as const),
       movie: getMovieCoordinates(character.pinyin),
@@ -445,7 +460,8 @@ export function deriveLibrary(
         hanzi: word.hanzi,
         pinyin: word.pinyin,
         meaning: word.meaning,
-        dictionaryMeanings: word.dictionaryMeanings,
+        senses: word.senses,
+        also: word.also,
         rank: word.rank,
         syllables: word.syllables,
         characterParts: characterParts(word, catalog),
