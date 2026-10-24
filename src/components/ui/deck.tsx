@@ -20,7 +20,6 @@ export function CardGrain({ color = "grey" }: { color?: DitherColor }) {
       className="dx-deck-grain"
       direction="up"
       from={color}
-      key={color}
       opacity={color === "grey" ? 0.12 : 0.18}
     />
   );

@@ -4,6 +4,7 @@
 // button and the grades share one slot, so revealing never moves anything.
 import {
   type CSSProperties,
+  type PointerEvent,
   useCallback,
   useEffect,
   useEffectEvent,
@@ -72,7 +73,15 @@ function RatingButton({
   onTint: (color: DitherColor | null) => void;
 }) {
   const rate = useCallback(() => onRate(rating.value), [onRate, rating.value]);
-  const tint = useCallback(() => onTint(rating.color), [onTint, rating.color]);
+  // Only a mouse tints the card: on touch the tap that grades would flash it as it is thrown.
+  const tint = useCallback(
+    (event: PointerEvent) => {
+      if (event.pointerType === "mouse") {
+        onTint(rating.color);
+      }
+    },
+    [onTint, rating.color]
+  );
   const untint = useCallback(() => onTint(null), [onTint]);
   // The wait sits above its button, so it reads as when the card returns, not as part of the name.
   return (
