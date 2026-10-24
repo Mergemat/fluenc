@@ -2042,9 +2042,11 @@
     rotate: -1.4deg;
   }
 }
-/* The next card, waiting just under the top one where the pile's first edge sits. */
+/* The next card, built and painted but unseen under the top one, so nothing shows through while
+   the top card turns; it appears as it rises. The pile's plain edges stand in for it. */
 .dx-deck-card[data-waiting="true"] {
   z-index: 4;
+  visibility: hidden;
   rotate: -1.4deg;
   translate: 0 6px;
   animation: none;

@@ -562,7 +562,7 @@ export function ReviewDeck({
           ) : null
         }
       >
-        <DeckPile under={queue.length - (waitingNext ? 2 : 1)}>
+        <DeckPile under={queue.length - 1}>
           {cards.map((card) => (
             <PileCard
               item={card.item}
