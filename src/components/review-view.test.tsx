@@ -290,7 +290,7 @@ test("a grade raises the waiting card before its save lands, and a failed save b
   // The save starts once the throw is over. This test has no device database, so it fails and
   // the graded card returns.
   await act(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 500));
   });
   expect(host.textContent).toContain("could not save this review");
   expect(topCard()?.textContent).toContain("Sentence 0");

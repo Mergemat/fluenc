@@ -392,8 +392,8 @@ const throwSide = (rating: Grade) => (rating <= Rating.Hard ? "left" : "right");
 // A thrown card goes when its throw ends; this only clears it where no animation runs.
 const THROWN_FALLBACK_MS = 600;
 // A save recomputes the whole dashboard, and the card after next paints its dither, so both wait
-// until the throw and the rise (180ms) are over.
-const SETTLE_MS = 200;
+// until the throw (360ms) is over.
+const SETTLE_MS = 380;
 
 /** One card on the pile: the one being answered, the next one under it, or one flying off. */
 function PileCard({

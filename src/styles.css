@@ -291,9 +291,9 @@
   --animate-writing-paint: writing-paint 260ms ease-out both;
   --animate-writing-start: writing-start 1.2s ease-in-out infinite;
   --animate-deal: deal 180ms var(--ease-card) backwards;
-  --animate-throw-left: throw-left 180ms var(--ease-card) forwards;
-  --animate-throw-right: throw-right 180ms var(--ease-card) forwards;
-  --animate-fade-out: fade-out 180ms ease-out forwards;
+  --animate-throw-left: throw-left 360ms var(--ease-card) forwards;
+  --animate-throw-right: throw-right 360ms var(--ease-card) forwards;
+  --animate-fade-out: fade-out 360ms ease-out forwards;
   --animate-answer: fade-in 200ms 120ms ease-out both;
   --animate-rise: rise 400ms ease-out both;
   /* ── Colour ─────────────────────────────────────────────────────────────── */
