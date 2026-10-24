@@ -98,7 +98,7 @@ export function ReadingLesson({
                   {item.hanzi}
                 </p>
                 <p className="dx-deck-reading">{item.pinyin}</p>
-                <h2 className="dx-deck-meaning">{item.meaning}</h2>
+                <h2 className="dx-meaning">{item.meaning}</h2>
                 <AudioButton
                   label="listen"
                   pinyin={item.pinyin}

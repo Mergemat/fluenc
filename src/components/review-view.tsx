@@ -3,30 +3,13 @@ import { useCallback, useEffect, useEffectEvent, useState } from "react";
 import type { DashboardData } from "../lib/learner-views";
 import { isLearning, nextReviews } from "../lib/review-schedule";
 import { DitherButton } from "./dither-kit/button";
-import { ReviewCard } from "./review-card";
+import { ReviewDeck } from "./review-card";
 import { DeckPile, DeckSlot, DeckTable } from "./ui/deck";
 import { PageHeader } from "./ui/layout";
 
 type DoneState = "waiting" | "finished" | "empty";
 
 export function ReviewView({ data }: { data: DashboardData }) {
-  const [selected, setSelected] = useState(() => data.reviewQueue[0]);
-  // A learning step becoming due must not replace the card being answered.
-  const active =
-    data.reviewQueue.find(
-      (item) =>
-        item.type === selected?.type &&
-        item.id === selected.id &&
-        item.reps === selected.reps
-    ) ?? data.reviewQueue[0];
-  if (
-    active?.type !== selected?.type ||
-    active?.id !== selected?.id ||
-    active?.reps !== selected?.reps
-  ) {
-    setSelected(active);
-  }
-
   const learning = data.scheduledQueue.filter((item) =>
     isLearning(item.card.state)
   );
@@ -46,20 +29,17 @@ export function ReviewView({ data }: { data: DashboardData }) {
   return (
     <section className="dx-deck-page">
       <PageHeader title="review" />
-      {active ? (
-        <ReviewCard
-          item={active}
-          key={`${active.type}:${active.id}:${active.reps}`}
-          remaining={data.reviewQueue.length}
-        />
-      ) : (
-        <ReviewDone
-          coming={learning.length}
-          data={data}
-          nextLearningAt={nextLearningAt}
-          state={state}
-        />
-      )}
+      <ReviewDeck
+        done={
+          <ReviewDone
+            coming={learning.length}
+            data={data}
+            nextLearningAt={nextLearningAt}
+            state={state}
+          />
+        }
+        queue={data.reviewQueue}
+      />
     </section>
   );
 }

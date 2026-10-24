@@ -167,8 +167,12 @@ function rate(
   };
 }
 
-/** The answer side is only filled in once the card has been flipped. */
-const answerShown = () => host.querySelector(".dx-deck-back .dx-deck-answer");
+/** The card being answered: not the next one waiting under it, not one flying off. */
+const topCard = () =>
+  host.querySelector(".dx-deck-card:not([data-waiting]):not([data-ghost])");
+/** The top card's answer side is only filled in once it has been flipped. */
+const answerShown = () =>
+  topCard()?.querySelector(".dx-deck-back .dx-deck-answer");
 
 test("a last missed card waits face down and returns unflipped instead of falsely completing the reviews", async () => {
   let data = fixture();
@@ -213,7 +217,7 @@ test("all overdue cards remain in one session beyond twenty reviews", async () =
     Array.from({ length: 20 }, (_, index) => `s${index}`)
   );
   expect(host.textContent).toContain("6 left");
-  expect(host.textContent).toContain("Sentence 20");
+  expect(topCard()?.textContent).toContain("Sentence 20");
   expect(host.querySelector(".dx-deck-verdict")).toBeNull();
   for (let index = 20; index < 26; index += 1) {
     data = rate(data, `s${index}`, Rating.Easy);
@@ -227,7 +231,7 @@ test("all overdue cards remain in one session beyond twenty reviews", async () =
 test("a learning step becoming due does not replace the currently revealed card", async () => {
   let data = rate(fixture(2), "s0", Rating.Again);
   await show(data, "stable");
-  expect(host.textContent).toContain("Sentence 1");
+  expect(topCard()?.textContent).toContain("Sentence 1");
   await reveal();
   data = { ...data, now: "2026-09-23T02:01:00.000Z" };
   expect(dashboard(data).reviewQueue.map((item) => item.id)).toEqual([
@@ -235,11 +239,11 @@ test("a learning step becoming due does not replace the currently revealed card"
     "s1",
   ]);
   await show(data, "stable");
-  expect(host.textContent).toContain("Sentence 1");
+  expect(topCard()?.textContent).toContain("Sentence 1");
   expect(answerShown()).not.toBeNull();
   data = rate(data, "s1", Rating.Easy, "2026-09-23T02:01:00.000Z");
   await show(data, "stable");
-  expect(host.textContent).toContain("Sentence 0");
+  expect(topCard()?.textContent).toContain("Sentence 0");
   expect(answerShown()).toBeNull();
 });
 
@@ -260,4 +264,34 @@ test("a finished review says when the next reviews come, not which cards were re
   expect(slot.querySelector(".dx-deck-verdict")?.textContent).toBe("done");
   expect(slot.textContent).toMatch(NEXT_REVIEWS);
   expect(slot.textContent).not.toContain("你好");
+});
+
+test("a grade raises the waiting card before its save lands, and a failed save brings the card back", async () => {
+  const data = fixture(2);
+  await show(data, "optimistic");
+  expect(topCard()?.textContent).toContain("Sentence 0");
+  // The next card is already built under the top one.
+  const waiting = expectDefined(host.querySelector("[data-waiting]"));
+  expect(waiting.textContent).toContain("Sentence 1");
+  await reveal();
+  // Only the top card turns; the one waiting under it stays on its front.
+  expect(waiting.getAttribute("data-flipped")).toBe("false");
+  const good = expectDefined(
+    [...host.querySelectorAll("button")].find((candidate) =>
+      candidate.textContent?.includes("small pause")
+    )
+  );
+  act(() => good.click());
+  // The same card rises to the top, still on its front; nothing is built or turned.
+  expect(topCard()).toBe(waiting);
+  expect(waiting.getAttribute("data-flipped")).toBe("false");
+  expect(host.textContent).toContain("1 left");
+  // The save starts once the throw is over. This test has no device database, so it fails and
+  // the graded card returns.
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+  });
+  expect(host.textContent).toContain("could not save this review");
+  expect(topCard()?.textContent).toContain("Sentence 0");
+  expect(host.textContent).toContain("2 left");
 });

@@ -1870,6 +1870,10 @@
 .dx-scene-chips > li[data-kind="prop"] {
   --k: var(--part);
 }
+/* A word's own characters: the character itself, in the text colour. */
+.dx-scene-chips > li[data-kind="character"] {
+  --k: var(--dx-fg);
+}
 .dx-scene-chips b {
   font: var(--dx-type-code);
   font-size: var(--dx-text-md);
@@ -1957,6 +1961,8 @@
 .dx-deck {
   --dx-rate-height: 56px;
   --card-radius: 20px;
+  /* One inset for everything on a card's face: corner, centre block and edge. */
+  --card-inset: var(--dx-space-group);
   --card-face: #131316;
   --card-edge: #26262c;
   --card-under: #0f0f12;
@@ -1971,27 +1977,26 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--dx-space-tight);
   align-items: center;
   justify-content: center;
   min-height: 0;
   container-type: size;
 }
 /* A playing card's proportions where there is room; on a short screen it keeps its width and
-   gets shorter. The margin keeps the pile's edges (four cards 6px apart, tilted) clear of the
-   caption. */
+   gets shorter. The margin clears the pile's edges (four cards 6px apart) above the caption. */
 .dx-deck-pile {
   --card-width: min(100cqw, 380px);
   position: relative;
   flex: none;
   width: var(--card-width);
-  height: min(var(--card-width) * 7 / 5, 100cqh - 64px);
-  margin-bottom: 28px;
+  height: min(var(--card-width) * 7 / 5, 100cqh - 48px);
+  margin-bottom: var(--dx-space-group);
   perspective: 1600px;
 }
 .dx-deck-pile[data-wide="true"] {
   --card-width: min(100cqw, 600px);
-  height: min(var(--card-width) * 5 / 7, 100cqh - 120px);
+  height: min(var(--card-width) * 5 / 7, 100cqh - 104px);
 }
 .dx-deck-under {
   position: absolute;
@@ -2023,15 +2028,28 @@
   inset: 0;
   z-index: 5;
   transform-style: preserve-3d;
-  transition: transform 360ms cubic-bezier(0.3, 1.15, 0.6, 1);
-  /* Backwards only: a held filter would flatten the 3D flip. */
-  animation: dx-deck-deal 420ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  /* The flip turns `transform`; rising off the pile moves `translate` and `rotate`, faster. */
+  transition:
+    transform 360ms cubic-bezier(0.3, 1.15, 0.6, 1),
+    translate 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    rotate 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: dx-deck-deal 180ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
+/* Position only: a filter here would flatten the card for a moment and show its back. */
 @keyframes dx-deck-deal {
   from {
-    filter: brightness(0.6);
-    transform: translateY(6px) rotate(-1.4deg);
+    translate: 0 6px;
+    rotate: -1.4deg;
   }
+}
+/* The next card, built and painted but unseen under the top one, so nothing shows through while
+   the top card turns; it appears as it rises. The pile's plain edges stand in for it. */
+.dx-deck-card[data-waiting="true"] {
+  z-index: 4;
+  visibility: hidden;
+  rotate: -1.4deg;
+  translate: 0 6px;
+  animation: none;
 }
 @media (hover: hover) {
   .dx-deck-card:not([data-flipped="true"]):hover {
@@ -2050,6 +2068,11 @@
 .dx-deck-card[data-flipped="true"] {
   transform: rotateY(180deg);
 }
+/* A thrown copy flies over the card dealt in under it and takes no input. */
+.dx-deck-card[data-ghost="true"] {
+  z-index: 6;
+  pointer-events: none;
+}
 /* A throw starts flipped, with the same transform list as its end, so it never turns back over.
    It fades the faces, not the card: opacity on the card would flatten the flip and show the
    front through the back. */
@@ -2059,10 +2082,10 @@
   }
 }
 .dx-deck-card[data-thrown="left"] {
-  animation: dx-deck-throw-left 300ms cubic-bezier(0.5, 0, 0.9, 0.6) forwards;
+  animation: dx-deck-throw-left 180ms cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
 }
 .dx-deck-card[data-thrown="right"] {
-  animation: dx-deck-throw-right 300ms cubic-bezier(0.5, 0, 0.9, 0.6) forwards;
+  animation: dx-deck-throw-right 180ms cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
 }
 @keyframes dx-deck-throw-left {
   from {
@@ -2108,7 +2131,7 @@
   transform: rotateY(180deg);
 }
 .dx-deck-card[data-thrown] > .dx-deck-face {
-  animation: dx-deck-fade-out 300ms ease-in forwards;
+  animation: dx-deck-fade-out 180ms linear forwards;
 }
 .dx-deck-suit {
   position: absolute;
@@ -2132,7 +2155,7 @@
   width: 100%;
   height: 100%;
 }
-.dx-deck-front .dx-gloss-hanzi {
+.dx-deck-face .dx-gloss-hanzi {
   font-size: min(20cqw, 34cqh);
 }
 .dx-deck-prompt {
@@ -2175,27 +2198,19 @@
 }
 .dx-deck-index {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: var(--card-inset);
+  left: var(--card-inset);
   width: 64px;
   height: 64px;
 }
-.dx-deck-index-word {
-  width: auto;
-  height: auto;
-  font-size: 26px;
-  line-height: 1;
-  color: var(--dx-muted);
-}
+/* The lesson's identity block, centred on the card where the front's character stood. Type comes
+   from the lesson classes (.dx-meaning, .dx-alt, .dx-py); only the place is set here. */
 .dx-deck-focus {
   position: absolute;
   top: 50%;
-  right: 22px;
-  left: 22px;
-  display: grid;
-  gap: 12px;
-  justify-items: center;
-  text-align: center;
+  right: var(--card-inset);
+  left: var(--card-inset);
+  gap: var(--dx-space-tight);
   transform: translateY(-50%);
 }
 /* The pinyin stays on the centre line; its play button hangs off the right edge. */
@@ -2210,35 +2225,27 @@
   left: calc(100% + var(--dx-space-tight));
   translate: 0 -50%;
 }
-.dx-deck-focus .dx-py {
-  font-size: clamp(44px, 16cqw, 64px);
-}
-.dx-deck-meaning {
-  margin: 0;
-  font: var(--dx-type-display);
-  font-size: clamp(26px, 9cqw, 34px);
-  line-height: 1.1;
-  text-wrap: balance;
-}
-.dx-deck-others {
-  min-height: 1em;
-  margin: 0;
-  font: var(--dx-type-label);
-  line-height: var(--dx-wrap);
-  color: var(--dx-muted);
-  text-wrap: balance;
-}
 .dx-deck-edge {
   --chip-ground: var(--card-face);
   position: absolute;
-  right: 22px;
-  bottom: 20px;
-  left: 22px;
-  padding-top: 14px;
+  right: var(--card-inset);
+  bottom: var(--card-inset);
+  left: var(--card-inset);
+  padding-top: var(--dx-space-item);
   border-top: 1px solid var(--card-edge);
 }
 .dx-deck-edge .dx-scene-chips {
   margin: 0;
+}
+.dx-deck-edge > .dx-deck-link + .dx-scene-chips {
+  margin-top: var(--dx-space-tight);
+}
+/* A word in the corner, where a character's lit glyph sits. */
+.dx-deck-index-word {
+  width: auto;
+  height: auto;
+  font-size: 28px;
+  line-height: 1;
 }
 .dx-deck-link {
   margin: 0;
@@ -2260,10 +2267,11 @@
   font-size: 22px;
   color: var(--dx-muted);
 }
+/* A sentence's pinyin, as review always set it. */
 .dx-deck-reading {
   margin: 0;
-  font: var(--dx-type-control);
-  font-size: var(--dx-text-base);
+  font: var(--dx-type-pinyin);
+  font-size: var(--dx-text-xl);
 }
 
 /* The deck run out: face down with a timer, or the empty place. */
@@ -2373,30 +2381,24 @@
 /* A short card (a small phone): the answer flows top to bottom instead of floating on the centre,
    at a smaller size, so the chips never cover it. */
 @container (max-height: 460px) {
+  .dx-deck-answer {
+    --card-inset: var(--dx-space-item);
+  }
   .dx-deck-index {
-    top: 12px;
-    left: 12px;
     width: 44px;
     height: 44px;
   }
   .dx-deck-focus {
     position: static;
-    gap: var(--dx-space-tight);
-    padding: 16px 64px 0;
+    padding: var(--card-inset) 64px 0;
     transform: none;
-  }
-  .dx-deck-focus .dx-py {
-    font-size: 38px;
-  }
-  .dx-deck-meaning {
-    font-size: var(--dx-text-xl);
   }
   .dx-deck-edge {
     --chip-height: 26px;
     --chip-size: var(--dx-text-sm);
     position: static;
-    padding-top: 10px;
-    margin: auto 16px 14px;
+    padding-top: var(--dx-space-tight);
+    margin: auto var(--card-inset) var(--card-inset);
   }
 }
 @media (prefers-reduced-motion: reduce) {
