@@ -26,7 +26,6 @@
     "setup": "bun scripts/setup.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
-    "ui:check": "bun scripts/ui-check/index.ts",
     "verify": "bun run check && bun run typecheck && bun test && bun run build"
   },
   "dependencies": {
@@ -72,7 +71,6 @@
     "drizzle-kit": "^0.31.11",
     "fake-indexeddb": "^6.2.5",
     "happy-dom": "^20.14.5",
-    "playwright-core": "1.63.0",
     "react-doctor": "^0.9.17",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",

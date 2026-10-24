@@ -50,7 +50,6 @@ VS Code suggests the Biome and Tailwind extensions and formats on save.
 | `bun run check` / `bun run fix` | Lint, or lint and fix, with Ultracite (Biome) |
 | `bun run typecheck` | Type-check |
 | `bun test` | Run the tests |
-| `bun run ui:check` | Compare every screen with `main`, element by element and pixel by pixel (see below) |
 | `bun run build` / `bun run preview` | Build the app and its service worker, then serve that build |
 | `bun run db:seed` / `db:reset` | Add the demo account, or start the local database over |
 | `bun run db:generate` / `db:migrate` | Create a migration after changing `src/db/schema.ts`, or apply migrations |
@@ -59,10 +58,6 @@ VS Code suggests the Biome and Tailwind extensions and formats on save.
 | `bun run data:font` | Rebuild the hanzi font |
 
 `src/data/README.md` explains the character database, the teaching order and how to change them.
-
-### UI check
-
-`bun run ui:check` runs `main` and the working tree side by side, each on its own copy of a seeded local database, with the browser clock frozen. For each scenario in `scripts/ui-check/scenarios.ts` and each screen size, it compares the computed style and box of every element, then the pixels, and writes a report to `.cache/ui-check/report`. `--only <name>` and `--viewport <name>` narrow it down, `--base <ref>` compares with another commit. `--serve` keeps both apps running so `--attach` runs reuse them. It never touches the database in `.env`.
 
 ### Focus
 
