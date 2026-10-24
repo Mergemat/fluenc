@@ -1,4 +1,4 @@
-// Every route sits in the pull-to-refresh scroller. Study routes (/lessons, /review) get a stage
+// Every route sits in the pull-to-refresh scroller. Study routes (/lessons, /review, /reading) get a stage
 // exactly the scroller's height, so they never scroll. Older pages use the shared colour tokens.
 // Desktop gets a sidebar (navigation, course progress, profile, settings) so pages keep the full height;
 // tablets get a top bar and phones a tab bar.
@@ -105,7 +105,9 @@ export function AppShell({
 }) {
   const due = data.reviewQueue.length;
   const fixed =
-    pathname.startsWith("/lessons") || pathname.startsWith("/review");
+    pathname.startsWith("/lessons") ||
+    pathname.startsWith("/review") ||
+    pathname.startsWith("/reading");
   // Study routes get a stage exactly the scroller's height; other pages scroll as usual.
   const page = fixed ? <div className="dx-stage">{children}</div> : children;
   // dither-kit paints its canvases in effects, so server HTML has none of them. Hold the shell
