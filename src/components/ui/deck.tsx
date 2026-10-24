@@ -17,7 +17,10 @@ const TILTS = [-1.4, 1.1, -0.7, 0.5];
 const suits = { character: "字", word: "词", sentence: "句" } as const;
 export type CardSuit = keyof typeof suits;
 
-/** The card's own dither: a faint grain at the bottom edge, gone by the top. */
+/**
+ * The card's own dither: a faint grain at the bottom edge, gone by the top. A review card paints
+ * it while it still waits under the top card, so it is there before the card ever moves.
+ */
 export function CardGrain({ color = "grey" }: { color?: DitherColor }) {
   return (
     <DitherGradient
@@ -84,33 +87,29 @@ export function DeckTable({
   );
 }
 
-/**
- * A pile: `under` cards beneath whatever lies on top, and `over` it the cards still flying off.
- * Wide piles hold sentences.
- */
+/** A pile: `under` cards beneath whatever lies on top. Wide piles hold sentences. */
 export function DeckPile({
   under,
   wide = false,
-  over = null,
   children,
 }: {
   under: number;
   wide?: boolean;
-  over?: ReactNode;
   children?: ReactNode;
 }) {
   return (
     <div className="dx-deck-pile" data-wide={wide}>
       <Under count={under} />
       {children}
-      {over}
     </div>
   );
 }
 
 /**
- * The top card: a prompt face and an answer face. The prompt face is the button that flips it;
- * `thrown` sends the card off the pile to that side. A `ghost` is a copy only to be seen leaving.
+ * A card on the pile: a prompt face and an answer face. The prompt face is the button that flips
+ * it; `thrown` sends it off the pile to that side, and a thrown card (`ghost`) takes no input.
+ * `waiting` holds the next card just under the top one, built and painted, so it can rise into
+ * place without anything being drawn while it moves.
  */
 export function DeckCard({
   suit,
@@ -118,6 +117,7 @@ export function DeckCard({
   thrown = null,
   tint = null,
   ghost = false,
+  waiting = false,
   onFlip,
   onThrown,
   front,
@@ -128,6 +128,7 @@ export function DeckCard({
   thrown?: "left" | "right" | null;
   tint?: DitherColor | null;
   ghost?: boolean;
+  waiting?: boolean;
   onFlip: () => void;
   /** Called once a throw has carried the card off. */
   onThrown?: () => void;
@@ -145,12 +146,13 @@ export function DeckCard({
   );
   return (
     <div
-      aria-hidden={ghost || undefined}
+      aria-hidden={ghost || waiting || undefined}
       className="dx-deck-card"
       data-flipped={flipped}
       data-ghost={ghost || undefined}
       data-thrown={thrown ?? undefined}
-      inert={ghost || undefined}
+      data-waiting={waiting || undefined}
+      inert={ghost || waiting || undefined}
       onAnimationEnd={thrownEnd}
     >
       <button
@@ -164,6 +166,7 @@ export function DeckCard({
         <Suit suit={suit} />
         {front}
       </button>
+      {/* The answer side's grain is painted with the card; its content comes when it turns. */}
       <div className="dx-deck-face dx-deck-back">
         <CardGrain color={tint ?? "grey"} />
         {flipped ? back : null}

@@ -2023,15 +2023,26 @@
   inset: 0;
   z-index: 5;
   transform-style: preserve-3d;
-  transition: transform 360ms cubic-bezier(0.3, 1.15, 0.6, 1);
-  /* Backwards only: a held filter would flatten the 3D flip. */
+  /* The flip turns `transform`; rising off the pile moves `translate` and `rotate`, faster. */
+  transition:
+    transform 360ms cubic-bezier(0.3, 1.15, 0.6, 1),
+    translate 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    rotate 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
   animation: dx-deck-deal 180ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
+/* Position only: a filter here would flatten the card for a moment and show its back. */
 @keyframes dx-deck-deal {
   from {
-    filter: brightness(0.6);
-    transform: translateY(6px) rotate(-1.4deg);
+    translate: 0 6px;
+    rotate: -1.4deg;
   }
+}
+/* The next card, waiting just under the top one where the pile's first edge sits. */
+.dx-deck-card[data-waiting="true"] {
+  z-index: 4;
+  rotate: -1.4deg;
+  translate: 0 6px;
+  animation: none;
 }
 @media (hover: hover) {
   .dx-deck-card:not([data-flipped="true"]):hover {
