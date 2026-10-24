@@ -344,13 +344,16 @@ export function TodayView({ data }: { data: DashboardData }) {
   }, []);
 
   return (
-    <Page>
-      <PageHeader
-        // The app shell renders with `ssr: false`, so this date never meets a server render.
-        // react-doctor-disable-next-line react-doctor/no-locale-format-in-render, react-doctor/rendering-hydration-mismatch-time
-        meta={dateFormat.format(new Date()).toLowerCase()}
-        title="today"
-      />
+    <Page
+      head={
+        <PageHeader
+          // The app shell renders with `ssr: false`, so this date never meets a server render.
+          // react-doctor-disable-next-line react-doctor/no-locale-format-in-render, react-doctor/rendering-hydration-mismatch-time
+          meta={dateFormat.format(new Date()).toLowerCase()}
+          title="today"
+        />
+      }
+    >
       <div className="dx-today">
         <NextUp data={data} lead={lead} />
         <LaterToday data={data} lead={lead} />

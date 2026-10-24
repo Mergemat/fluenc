@@ -44,35 +44,38 @@ export function LibraryEntryPage({
   const back = from === "palace" ? "palace" : "library";
 
   return (
-    <Page>
-      <PageHeader
-        heading={false}
-        meta={
-          <span className="dx-entry-status" data-status={item.status}>
-            <i aria-hidden="true" />
-            {statusLabel[item.status]}
-          </span>
-        }
-        title={
-          <>
-            {canGoBack ? (
-              <button onClick={goBack} type="button">
-                <ArrowLeft size={14} />
-                {back}
-              </button>
-            ) : (
-              <Link to={from === "palace" ? "/profile/palace" : "/library"}>
-                <ArrowLeft size={14} />
-                {back}
-              </Link>
-            )}
-            <span aria-hidden="true">/</span>
-            <span className="font-hanzi" lang="zh-CN">
-              {item.hanzi}
+    <Page
+      head={
+        <PageHeader
+          heading={false}
+          meta={
+            <span className="dx-entry-status" data-status={item.status}>
+              <i aria-hidden="true" />
+              {statusLabel[item.status]}
             </span>
-          </>
-        }
-      />
+          }
+          title={
+            <>
+              {canGoBack ? (
+                <button onClick={goBack} type="button">
+                  <ArrowLeft size={14} />
+                  {back}
+                </button>
+              ) : (
+                <Link to={from === "palace" ? "/profile/palace" : "/library"}>
+                  <ArrowLeft size={14} />
+                  {back}
+                </Link>
+              )}
+              <span aria-hidden="true">/</span>
+              <span className="font-hanzi" lang="zh-CN">
+                {item.hanzi}
+              </span>
+            </>
+          }
+        />
+      }
+    >
       {item.kind === "characters" ? (
         <CharacterEntry
           item={item}

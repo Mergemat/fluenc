@@ -529,11 +529,18 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  gap: var(--dx-section);
   width: 100%;
   max-width: calc(var(--dx-page) + 2 * var(--dx-gutter));
   min-height: 100%;
   padding: var(--dx-page-top) var(--dx-gutter) var(--dx-space-section);
   margin: 0 auto;
+}
+.dx-page-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
 }
 /* The line beside a page title never shrinks to a stub; long meta gives way first. */
 .dx-head > .dx-rule {
@@ -546,7 +553,6 @@
   align-items: center;
   min-width: 0;
   min-height: 32px;
-  margin-bottom: var(--dx-section);
 }
 .dx-head-title {
   display: inline-flex;
@@ -600,7 +606,7 @@
   text-overflow: ellipsis;
 }
 /* A page with nothing else on it centres its empty state or status in the space left. */
-.dx-page > :is(.dx-empty, .dx-status) {
+.dx-page-body > :is(.dx-empty, .dx-status) {
   flex: 1;
 }
 /* Nothing here yet, or all done: a dithered tile, a title and one line of detail. */
@@ -905,12 +911,6 @@
 .dx-tone > circle {
   stroke: none;
 }
-.dx-py-tone {
-  width: 24px;
-  height: 18px;
-  margin-left: 10px;
-  color: var(--dx-green);
-}
 .dx-code > .dx-tone {
   width: 26px;
   height: 20px;
@@ -995,7 +995,8 @@
   box-sizing: border-box;
   display: grid;
   grid-template-areas: "head" "read" "clues" "actions";
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  /* The prompt takes only its own height, like review's; what's left falls above the actions. */
+  grid-template-rows: auto minmax(0, max-content) auto minmax(0, 1fr);
   grid-template-columns: minmax(0, 1fr);
   gap: var(--study-gap);
   width: 100%;
@@ -1013,11 +1014,8 @@
 .dx-studio h1 {
   margin: 0;
 }
-/* Title row to content is the same on every page; here the container's gap is part of it. */
-.dx-studio > .dx-head,
-.dx-review > .dx-head {
+.dx-studio > .dx-head {
   grid-area: head;
-  margin-bottom: calc(var(--dx-section) - var(--study-gap));
 }
 .dx-read {
   display: flex;
@@ -1362,6 +1360,7 @@
   display: flex;
   grid-area: actions;
   gap: var(--dx-space-tight);
+  align-self: end;
   justify-self: center;
   width: 100%;
   max-width: 760px;
@@ -1443,6 +1442,10 @@
   .dx-studio {
     --study-gap: var(--dx-space-tight);
     gap: var(--study-gap);
+  }
+  /* The character area sizes itself from its container, so its row is the character's size. */
+  .dx-studio:has(> .dx-read-character) {
+    grid-template-rows: auto minmax(0, var(--dx-glyph)) auto minmax(0, 1fr);
   }
   .dx-meaning {
     font-size: 28px;
@@ -1841,11 +1844,6 @@
   letter-spacing: -0.02em;
   white-space: nowrap;
 }
-.dx-gloss-py > .dx-tone {
-  width: 18px;
-  height: 13px;
-  color: var(--dx-green);
-}
 .dx-gloss-en {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -1905,10 +1903,10 @@
 }
 /* A card on a scrolling page (reading) keeps review's column. */
 /* Read ends its action row where learn and review do. */
-.dx-page:has(> .dx-card) {
+.dx-page:has(> .dx-page-body > .dx-card) {
   padding-bottom: var(--dx-space-group);
 }
-.dx-page > .dx-card {
+.dx-page-body > .dx-card {
   width: 100%;
   max-width: 760px;
   margin-inline: auto;
@@ -2611,6 +2609,9 @@
   border-color: var(--dx-line-strong);
 }
 .dx-lib-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dx-space-tight);
   padding-top: var(--dx-space-section);
   scroll-margin-top: 40px;
 }
@@ -2618,7 +2619,6 @@
 .dx-lib-section > .dx-head {
   gap: var(--dx-space-tight);
   min-height: 0;
-  margin-bottom: var(--dx-space-tight);
 }
 .dx-lib-section > .dx-head:not(:has(.dx-progress)) > .dx-head-meta {
   margin-left: 0;
@@ -3308,11 +3308,6 @@ a.dx-pal-row:hover {
 .dx-later-title .dx-py {
   font: var(--dx-type-control);
   line-height: 1;
-}
-.dx-later-title .dx-py-tone {
-  width: 14px;
-  height: 10px;
-  margin-left: var(--dx-space-pair);
 }
 .dx-later-quiet {
   font: var(--dx-type-body);

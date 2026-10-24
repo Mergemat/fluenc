@@ -6,12 +6,14 @@ export function ReadingView({ data }: { data: DashboardData }) {
   const [sentence] = data.getQueue;
 
   return (
-    <Page>
-      <PageHeader
-        meta={sentence ? `${data.getQueue.length} sentences` : "nothing yet"}
-        title="read"
-      />
-
+    <Page
+      head={
+        <PageHeader
+          meta={sentence ? `${data.getQueue.length} sentences` : "nothing yet"}
+          title="read"
+        />
+      }
+    >
       {sentence ? (
         <ReadingLesson item={sentence} key={sentence.id} />
       ) : (

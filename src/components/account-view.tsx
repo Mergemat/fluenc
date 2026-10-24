@@ -67,8 +67,7 @@ export function AccountView() {
 
   if (status.learner && status.signedIn) {
     return (
-      <Page>
-        <PageHeader title="account" />
+      <Page head={<PageHeader title="account" />}>
         <p className="dx-account-note">
           signed in as <b className="dx-account-name">{status.learner.email}</b>
           . <Link to="/settings">back to settings</Link>
@@ -80,8 +79,7 @@ export function AccountView() {
   const text = copy[mode];
   const Icon = mode === "sign-in" ? LogIn : UserPlus;
   return (
-    <Page>
-      <PageHeader title={text.title} />
+    <Page head={<PageHeader title={text.title} />}>
       <form className="dx-account" onSubmit={submit}>
         <p className="dx-account-note">
           sync progress between your devices. what you learned here joins the

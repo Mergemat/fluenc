@@ -149,20 +149,23 @@ export function PalaceView() {
   };
 
   return (
-    <Page>
-      <PageHeader
-        meta={rows.length ? `${named}/${rows.length} named` : undefined}
-        title={
-          <>
-            <Link to="/profile">
-              <ArrowLeft size={14} />
-              profile
-            </Link>
-            <span aria-hidden="true">/</span>
-            palace
-          </>
-        }
-      />
+    <Page
+      head={
+        <PageHeader
+          meta={rows.length ? `${named}/${rows.length} named` : undefined}
+          title={
+            <>
+              <Link to="/profile">
+                <ArrowLeft size={14} />
+                profile
+              </Link>
+              <span aria-hidden="true">/</span>
+              palace
+            </>
+          }
+        />
+      }
+    >
       <div className="dx-lib-controls">
         <label className="dx-search">
           <Search aria-hidden="true" size={16} />

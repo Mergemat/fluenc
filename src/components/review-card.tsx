@@ -13,7 +13,6 @@ import { type Grade, Rating } from "ts-fsrs";
 import { toCard } from "../lib/learner-state";
 import type { ReviewItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
-import { getMovieCoordinates } from "../lib/pinyin";
 import { previewDue, waitLabel } from "../lib/review-schedule";
 import { saveReview } from "../offline/progress";
 import { useProgressMutation } from "../offline/use-progress-mutation";
@@ -22,7 +21,7 @@ import { lessonClues } from "./character-studio/clues";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import type { DitherColor } from "./dither-kit/palette";
-import { AudioButton, HanziGlyph, MoviePinyin, ToneContour } from "./ui/hanzi";
+import { AudioButton, HanziGlyph, MoviePinyin } from "./ui/hanzi";
 import { partColor } from "./ui/part-colors";
 
 const ratings: {
@@ -471,14 +470,7 @@ export function WordGloss({
       {columns.map(({ char, position, syllable, gloss }) => (
         <div className="dx-gloss-col" key={position}>
           <span aria-hidden={!revealed} className="dx-gloss-py" lang="zh-Latn">
-            {syllable ? (
-              <>
-                {syllable}
-                <ToneContour tone={getMovieCoordinates(syllable).tone} />
-              </>
-            ) : (
-              " "
-            )}
+            {syllable || " "}
           </span>
           <span className="dx-gloss-hanzi font-hanzi">{char}</span>
           <span aria-hidden={!revealed} className="dx-gloss-en" lang="en">

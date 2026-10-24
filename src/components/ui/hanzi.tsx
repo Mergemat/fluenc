@@ -248,7 +248,6 @@ export function MoviePinyin({
           {set}
         </span>
       ) : null}
-      <ToneContour className="dx-py-tone" tone={tone} />
     </span>
   );
 }

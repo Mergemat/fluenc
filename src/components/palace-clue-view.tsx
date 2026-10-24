@@ -149,8 +149,11 @@ export function PalaceClueView({
   const kindText = clueKindText(kind, row);
 
   return (
-    <Page>
-      <ClueHeader code={row.code} kind={kind} named={Boolean(row.name)} />
+    <Page
+      head={
+        <ClueHeader code={row.code} kind={kind} named={Boolean(row.name)} />
+      }
+    >
       <header
         className="dx-clue-hero"
         data-kind={kind}

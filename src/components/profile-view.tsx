@@ -92,15 +92,17 @@ export function ProfileView() {
 
   if (!profile.data) {
     return (
-      <Page>
-        <PageHeader title="profile" />
+      <Page head={<PageHeader title="profile" />}>
         <Status loading title="opening your profile" />
       </Page>
     );
   }
   return (
-    <Page>
-      <PageHeader meta={<Link to="/settings">{who}</Link>} title="profile" />
+    <Page
+      head={
+        <PageHeader meta={<Link to="/settings">{who}</Link>} title="profile" />
+      }
+    >
       <Profile data={profile.data} />
     </Page>
   );

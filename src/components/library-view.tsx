@@ -324,11 +324,14 @@ export function LibraryView() {
   }
 
   return (
-    <Page>
-      <PageHeader
-        meta={library.data ? `${learned} learned · ${total}` : undefined}
-        title="library"
-      />
+    <Page
+      head={
+        <PageHeader
+          meta={library.data ? `${learned} learned · ${total}` : undefined}
+          title="library"
+        />
+      }
+    >
       <div className="dx-lib-controls">
         <label className="dx-search">
           <Search aria-hidden="true" size={16} />

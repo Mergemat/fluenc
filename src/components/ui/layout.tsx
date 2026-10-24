@@ -6,8 +6,20 @@ import { DitherGradient } from "../dither-kit/gradient";
 import type { PixelColor } from "../dither-kit/pixel";
 import { PixelLoader, Rule } from "./dither";
 
-export function Page({ children }: { children: ReactNode }) {
-  return <section className="dx-page">{children}</section>;
+/** The header sits apart from the body; inside the body, content spaces itself. */
+export function Page({
+  head,
+  children,
+}: {
+  head?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <section className="dx-page">
+      {head}
+      <div className="dx-page-body">{children}</div>
+    </section>
+  );
 }
 
 /**

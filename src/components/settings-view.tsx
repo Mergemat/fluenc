@@ -65,8 +65,7 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
   const [updateTone, updateText] = updateStates[update.status];
 
   return (
-    <Page>
-      <PageHeader title="settings" />
+    <Page head={<PageHeader title="settings" />}>
       <div className="dx-set">
         <SectionHead className="dx-set-group" label="account" />
         <AccountSettings />
