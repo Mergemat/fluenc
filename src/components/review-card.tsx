@@ -226,8 +226,9 @@ function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
   );
 }
 
-// Pinyin set as a lesson sets it.
-const focusPinyin = "text-2xl studio:text-3xl";
+// Pinyin set as a lesson sets it. Geist Mono centres its line box on capitals; pinyin is
+// lowercase, so it rises by the gap to sit level with its play button.
+const focusPinyin = "text-2xl studio:text-3xl -translate-y-[0.08em]";
 
 /** Where an answer's corner, centre and edge sit: a card's inset, smaller on a short card. */
 const answerIndex =
@@ -254,8 +255,7 @@ function Focus({ item }: { item: Exclude<ReviewItem, { type: "sentence" }> }) {
         "card-short:translate-none card-short:static absolute top-1/2 right-6 left-6 -translate-y-1/2 gap-2 card-short:px-16 card-short:pt-4"
       )}
     >
-      {/* The pinyin stays on the centre line; its play button hangs off the right edge. */}
-      <div className="relative inline-flex items-center gap-2">
+      <div className="inline-flex items-center gap-2">
         {item.type === "character" ? (
           <MoviePinyin
             actorKey={item.movie.actorKey}
@@ -269,18 +269,14 @@ function Focus({ item }: { item: Exclude<ReviewItem, { type: "sentence" }> }) {
             {item.pinyin}
           </span>
         )}
-        <AudioButton
-          className="absolute top-1/2 left-full ml-2 -translate-y-1/2"
-          pinyin={item.pinyin}
-          text={item.hanzi}
-        />
+        <AudioButton pinyin={item.pinyin} text={item.hanzi} />
       </div>
       <h2 className={cardMeaning}>{meaning.primary}</h2>
       <p
         // Below the side-by-side layout it may wrap to two lines; on a short phone it gives way.
         className={cn(
           altText,
-          "max-studio:short:hidden max-studio:h-auto max-studio:max-h-8 max-studio:whitespace-normal"
+          "max-studio:short:hidden max-studio:h-auto max-studio:max-h-10 max-studio:whitespace-normal"
         )}
       >
         {others.length ? `also ${others.join(" · ")}` : " "}

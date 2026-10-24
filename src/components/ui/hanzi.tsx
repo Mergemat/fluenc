@@ -64,7 +64,7 @@ export const ident =
   "grid max-w-full shrink-0 justify-items-center gap-1 text-center";
 export const meaningText = "m-0 type-display text-2xl tracking-tight";
 export const altText =
-  "m-0 h-4 max-w-full truncate type-label text-muted-foreground leading-4";
+  "m-0 h-5 max-w-full truncate type-body text-muted-foreground text-sm leading-5";
 export const soundRow = "mt-2 flex items-center gap-2";
 
 const ghostState = {
