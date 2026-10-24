@@ -6,12 +6,27 @@ import type { Workbox } from "workbox-window";
 
 const UPDATE_TOAST = "app-update";
 
+/** Reload, switching to a waiting version first so the reload brings it in. */
+export async function reloadApp() {
+  const waiting = (await navigator.serviceWorker?.getRegistration())?.waiting;
+  if (!waiting) {
+    window.location.reload();
+    return;
+  }
+  navigator.serviceWorker.addEventListener(
+    "controllerchange",
+    () => window.location.reload(),
+    { once: true }
+  );
+  waiting.postMessage({ type: "SKIP_WAITING" });
+}
+
 /**
  * New versions install in the background and wait; a toast offers to switch, so a reload only
  * ever happens when the learner asks for it.
  */
 export function useAppUpdate() {
-  const [waiting, setWaiting] = useState<Workbox | null>(null);
+  const [waiting, setWaiting] = useState(false);
   const queryClient = useQueryClient();
   // A lesson can hold a half-written Hanzi Movie; it is not saved until the lesson is done.
   const drafting = useLocation({
@@ -26,7 +41,7 @@ export function useAppUpdate() {
     let worker: Workbox | null = null;
     const onWaiting = () => {
       if (active) {
-        setWaiting(worker);
+        setWaiting(true);
       }
     };
     // The browser only checks on navigation, which an open app rarely does.
@@ -74,12 +89,7 @@ export function useAppUpdate() {
             event.preventDefault();
             return;
           }
-          navigator.serviceWorker.addEventListener(
-            "controllerchange",
-            () => window.location.reload(),
-            { once: true }
-          );
-          waiting.messageSkipWaiting();
+          reloadApp().catch(() => undefined);
         },
       },
     });

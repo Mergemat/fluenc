@@ -9,7 +9,7 @@ import {
   useSyncExternalStore,
 } from "react";
 
-import { syncNow } from "../offline/sync";
+import { reloadApp } from "../updates/use-app-update";
 import {
   IonContent,
   IonRefresher,
@@ -74,12 +74,10 @@ export function AppScroll({
     if (!pull.current.refresh) {
       return;
     }
-    // Give the released spinner time to settle before it reports back.
+    // Give the released spinner time to settle; it keeps spinning until the page reloads.
     refreshTimer.current = setTimeout(() => {
       pull.current.refresh = false;
-      syncNow()
-        .catch(() => undefined)
-        .finally(() => refresher.current?.complete());
+      reloadApp().catch(() => refresher.current?.complete());
     }, 450);
   }, []);
   const refresh = useCallback(
@@ -134,7 +132,8 @@ export function AppScroll({
       scrollY
     >
       <IonRefresher
-        disabled={!standalone || pending}
+        // A reload would lose a lesson's half-written Hanzi Movie.
+        disabled={!standalone || pending || pathname.startsWith("/lessons")}
         onIonRefresh={refresh}
         ref={refresher}
         slot="fixed"
