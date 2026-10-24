@@ -19,9 +19,7 @@ export function Page({
   children: ReactNode;
 }) {
   return (
-    <section
-      className={cn(pageFrame, "flex min-h-full flex-col gap-group pb-section")}
-    >
+    <section className={cn(pageFrame, "flex min-h-full flex-col gap-6 pb-12")}>
       {head}
       <div className="flex min-w-0 flex-1 flex-col">{children}</div>
     </section>
@@ -41,10 +39,10 @@ export function CrumbSlash() {
 }
 
 /** One row of a header: title, rule and meta, centred on one line. */
-export const headRow = "flex min-h-8 min-w-0 shrink-0 items-center gap-item";
+export const headRow = "flex min-h-8 min-w-0 shrink-0 items-center gap-4";
 /** Mono meta at a header's end. */
 export const headMeta =
-  "flex shrink-0 items-center gap-tight whitespace-nowrap type-label text-muted-foreground tabular-nums";
+  "flex shrink-0 items-center gap-2 whitespace-nowrap type-label text-muted-foreground tabular-nums";
 
 /**
  * Pixel title, a rule (or whatever stands in for it, like a progress bar) and mono meta on the
@@ -64,7 +62,7 @@ export function PageHeader({
   const Title = heading ? "h1" : "p";
   return (
     <header className={headRow}>
-      <Title className="type-title m-0 inline-flex shrink-0 items-center gap-tight whitespace-nowrap text-foreground">
+      <Title className="type-title m-0 inline-flex shrink-0 items-center gap-2 whitespace-nowrap text-foreground">
         {title}
       </Title>
       {children ?? <Rule className="min-w-10" />}
@@ -79,7 +77,7 @@ const tones = { todo: "text-orange", done: "text-green" } as const;
 
 /** A mono label row: what section heads, kickers and small captions are set in. */
 export const label =
-  "flex h-4 items-center gap-tight type-label text-muted-foreground";
+  "flex h-4 items-center gap-2 type-label text-muted-foreground";
 
 /**
  * Names a group of content: a mono label with its meta beside it. Space does the grouping, so
@@ -103,7 +101,7 @@ export function SectionHead({
     <h2
       className={cn(
         label,
-        "mb-tight h-auto self-stretch whitespace-nowrap",
+        "mb-2 h-auto self-stretch whitespace-nowrap",
         className
       )}
     >
@@ -112,7 +110,7 @@ export function SectionHead({
         <span className={cn("dot-before", tone && tones[tone])}>{meta}</span>
       )}
       {children ? (
-        <span className="ml-auto flex items-center gap-tight">{children}</span>
+        <span className="ml-auto flex items-center gap-2">{children}</span>
       ) : null}
     </h2>
   );
@@ -133,14 +131,14 @@ export function Empty({
   children?: ReactNode;
 }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-item py-page text-center">
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16 text-center">
       <span
         aria-hidden="true"
-        className="relative mb-2 grid size-23 place-items-center overflow-hidden rounded-4xl border border-border"
+        className="relative mb-2 grid size-24 place-items-center overflow-hidden rounded-2xl border border-border"
       >
         <DitherGradient cell={2} direction="up" from={tone} opacity={0.55} />
         <span
-          className="relative font-hanzi text-56 text-foreground leading-none"
+          className="relative font-hanzi text-6xl text-foreground leading-none"
           lang="zh-CN"
         >
           {mark}
@@ -157,7 +155,7 @@ export function Empty({
 
 /** A quiet bordered button or link: secondary actions, ways out. */
 export const chip =
-  "inline-flex h-7 items-center gap-1.75 rounded-chip border border-border px-2.5 type-control text-muted-foreground transition-colors hover:not-disabled:border-border-strong hover:not-disabled:text-foreground";
+  "inline-flex h-7 items-center gap-2 rounded-md border border-border px-2.5 type-control text-muted-foreground transition-colors hover:not-disabled:border-border-strong hover:not-disabled:text-foreground";
 
 /** The way out of a status line: a chip, a size up. */
 export const statusAction = cn(chip, "h-9 px-3.5");
@@ -174,7 +172,7 @@ export function Status({
 }) {
   return (
     <div
-      className="grid min-h-50 flex-1 place-content-center justify-items-center gap-item py-section text-center text-muted-foreground"
+      className="grid min-h-52 flex-1 place-content-center justify-items-center gap-4 py-12 text-center text-muted-foreground"
       role={loading ? "status" : undefined}
     >
       {loading ? <PixelLoader label={title} size={5} /> : null}

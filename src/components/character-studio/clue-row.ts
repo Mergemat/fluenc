@@ -37,17 +37,17 @@ interface RowState {
 }
 
 /** A highlighted row is rounded like every other surface, and the lines touching it give way. */
-const highlight = "rounded-xl bg-kind/9";
+const highlight = "rounded-lg bg-kind/9";
 
 export function clueRow({ lit, lined, dense, editable, marker }: RowState) {
   return cn(
-    "group/row relative grid h-13.5 content-center gap-x-1 pr-3.5 transition-colors",
-    "max-studio:items-center max-studio:gap-x-tight",
+    "group/row relative grid h-14 content-center gap-x-1 pr-3.5 transition-colors",
+    "max-studio:items-center max-studio:gap-x-2",
     dense
-      ? "inset-shadow-rule-side grid-cols-clue-dense max-studio:h-13 max-studio:grid-cols-clue-dense-phone"
-      : "grid-cols-clue max-studio:h-12 max-studio:short:h-10.5 max-studio:grid-cols-clue-line",
+      ? "inset-shadow-rule-side grid-cols-clue-dense max-studio:h-14 max-studio:grid-cols-clue-dense-phone"
+      : "grid-cols-clue max-studio:h-12 max-studio:short:h-11 max-studio:grid-cols-clue-line",
     lined && !dense && "inset-shadow-rule",
-    editable && "cursor-text focus-within:rounded-xl focus-within:bg-kind/9",
+    editable && "cursor-text focus-within:rounded-lg focus-within:bg-kind/9",
     lit && highlight,
     marker &&
       "before:absolute before:inset-y-3 before:left-0 before:w-0.5 before:rounded-r-xs before:bg-kind",
@@ -70,7 +70,7 @@ export function clueCode({
     kind === "prop" &&
       cn(
         "font-hanzi-props font-normal",
-        dense ? "text-2xl" : "text-3xl max-studio:short:text-24"
+        dense ? "text-2xl" : "text-3xl max-studio:short:text-2xl"
       ),
     kind === "link" && "grid place-items-center",
     editable && "group-focus-within/row:text-shadow-glow",
@@ -79,7 +79,7 @@ export function clueCode({
 }
 
 /** A tone room's contour, at the code's size. */
-export const clueTone = "h-5 w-6.5";
+export const clueTone = "h-5 w-7";
 
 /** A repeated component's count beside its code. */
 export const clueCount = "ml-px align-super type-label font-semibold";
@@ -90,7 +90,7 @@ export function clueRole(dense?: boolean) {
     "type-label col-start-2 min-w-0 truncate text-muted-foreground leading-3.5",
     dense
       ? "max-studio:row-start-1"
-      : "max-studio:col-start-3 max-studio:row-start-1 max-studio:max-w-25 max-studio:text-right"
+      : "max-studio:col-start-3 max-studio:row-start-1 max-studio:max-w-24 max-studio:text-right"
   );
 }
 
@@ -101,10 +101,8 @@ export function clueName({
   editable,
 }: { empty: boolean } & Pick<RowState, "dense" | "editable">) {
   return cn(
-    "type-heading col-start-2 h-6.5 w-full min-w-0 text-foreground",
-    dense
-      ? "max-studio:row-start-2 max-studio:h-5.5"
-      : "max-studio:row-start-1",
+    "type-heading col-start-2 h-7 w-full min-w-0 text-foreground",
+    dense ? "max-studio:row-start-2 max-studio:h-6" : "max-studio:row-start-1",
     editable
       ? cn(
           "text-ellipsis rounded-none border-transparent border-b bg-transparent p-0 outline-none transition-colors focus-visible:outline-none",

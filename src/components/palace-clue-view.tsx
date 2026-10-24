@@ -68,7 +68,7 @@ function ClueHeader({
     <PageHeader
       heading={false}
       meta={
-        <span className="inline-flex items-center gap-1.75">
+        <span className="inline-flex items-center gap-2">
           <StatusDot status={named ? "review" : "new"} />
           {named ? "named" : "open"}
         </span>
@@ -161,14 +161,14 @@ export function PalaceClueView({
       head={<ClueHeader cue={row.cue} kind={kind} named={Boolean(row.name)} />}
     >
       <header
-        className="flex items-center gap-group py-tight"
+        className="flex items-center gap-6 py-2"
         data-kind={kind}
         style={kindStyle(row)}
       >
         <span
           className={cn(
-            "type-code grid h-24 min-w-24 shrink-0 place-items-center rounded-4xl border border-kind/45 px-3 text-34 text-kind max-xs:h-19 max-xs:min-w-19 max-xs:text-2xl",
-            props && "font-hanzi-props font-normal text-60 max-xs:text-46"
+            "type-code grid h-24 min-w-24 shrink-0 place-items-center rounded-2xl border border-kind/45 px-3 text-4xl text-kind max-xs:h-20 max-xs:min-w-20 max-xs:text-2xl",
+            props && "font-hanzi-props font-normal text-6xl max-xs:text-5xl"
           )}
           lang={props ? "zh-CN" : undefined}
         >
@@ -196,7 +196,7 @@ export function PalaceClueView({
           it gets its name in the lesson of its first character
         </p>
       )}
-      <section aria-label="Characters" className="mt-section grid gap-tight">
+      <section aria-label="Characters" className="mt-12 grid gap-2">
         <SectionHead
           className="mb-0"
           label="in characters"

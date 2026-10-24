@@ -194,7 +194,7 @@ function ClueRow({
 function UsageList({ usage }: { usage: ReturnType<typeof useUsage> }) {
   if (usage.pending) {
     return (
-      <span className="relative h-3 w-full max-w-70 animate-pulse overflow-hidden rounded-xs">
+      <span className="relative h-3 w-full max-w-72 animate-pulse overflow-hidden rounded-xs">
         <DitherGradient cell={2} direction="right" from="grey" opacity={0.6} />
       </span>
     );
@@ -217,7 +217,7 @@ function UsageList({ usage }: { usage: ReturnType<typeof useUsage> }) {
     <ul className="grid list-none">
       {usage.data?.words.map((word) => (
         <li
-          className="type-body flex min-w-0 items-baseline gap-tight whitespace-nowrap text-muted-foreground leading-8"
+          className="type-body flex min-w-0 items-baseline gap-2 whitespace-nowrap text-muted-foreground leading-8"
           key={word.id}
           title={
             word.unknown
@@ -284,7 +284,7 @@ function UsageWords({
         aria-controls={panel}
         aria-expanded={open}
         aria-label={`Words with ${hanzi}`}
-        className="type-label inline-flex h-7 items-center gap-1.5 rounded-lg border border-border bg-background pr-2.25 pl-2.5 text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground aria-expanded:border-border-strong aria-expanded:text-foreground"
+        className="type-label inline-flex h-7 items-center gap-1.5 rounded-md border border-border bg-background pr-2.5 pl-2.5 text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground aria-expanded:border-border-strong aria-expanded:text-foreground"
         onClick={toggle}
         type="button"
       >
@@ -296,7 +296,7 @@ function UsageWords({
         <section
           aria-busy={usage.pending}
           aria-label={`Words with ${hanzi}`}
-          className="absolute top-full right-0 mt-1.5 box-border min-w-55 max-w-panel animate-enter rounded-xl border border-border-strong bg-popover px-3.5 py-2 shadow-popover"
+          className="absolute top-full right-0 mt-1.5 box-border min-w-56 max-w-panel animate-enter rounded-lg border border-border-strong bg-popover px-3.5 py-2 shadow-popover"
           id={panel}
         >
           <UsageList usage={usage} />
@@ -568,11 +568,11 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
       >
         {/* Stacked when tall, side by side when wide for its height: whichever gives the bigger
             glyph. */}
-        <div className="flex h-full read-wide:flex-row flex-col items-center justify-center gap-tight studio:gap-group read-wide:max-studio:gap-item">
+        <div className="flex h-full read-wide:flex-row flex-col items-center justify-center gap-2 studio:gap-6 read-wide:max-studio:gap-4">
           <div
             className={cn(
               glyphBox,
-              "read-wide:h-full read-wide:grow-0 studio:grow-0 studio:basis-glyph read-wide:max-studio:basis-31/50"
+              "read-wide:h-full read-wide:grow-0 studio:grow-0 studio:basis-glyph read-wide:max-studio:basis-32/50"
             )}
           >
             <HanziGlyph
@@ -651,7 +651,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
         {noteOpen && item.movie.componentNote ? (
           <div
             aria-label="How the parts fit"
-            className="absolute inset-x-0 top-6 z-5 animate-enter rounded-xl border border-border-strong bg-popover py-3 pr-10 pl-3.5 shadow-popover"
+            className="absolute inset-x-0 top-6 z-5 animate-enter rounded-lg border border-border-strong bg-popover py-3 pr-10 pl-3.5 shadow-popover"
             role="note"
           >
             <p className="type-body text-foreground">
@@ -659,7 +659,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
             </p>
             <button
               aria-label="Close shape note"
-              className="absolute top-2.25 right-2.25 grid size-6 place-items-center text-muted-foreground"
+              className="absolute top-2.5 right-2.5 grid size-6 place-items-center text-muted-foreground"
               onClick={closeNote}
               type="button"
             >

@@ -61,7 +61,7 @@ function ActivityGraph({ weeks }: { weeks: ActivityDay[][] }) {
             const starts =
               index > 0 && month !== weeks[index - 1]?.[0]?.date.getMonth();
             return (
-              <span className="w-4.5 flex-none max-xs:w-3.5" key={week[0]?.key}>
+              <span className="w-5 flex-none max-xs:w-3.5" key={week[0]?.key}>
                 {starts && week[0]
                   ? monthFormat.format(week[0].date).toLowerCase()
                   : null}
@@ -69,14 +69,14 @@ function ActivityGraph({ weeks }: { weeks: ActivityDay[][] }) {
             );
           })}
         </div>
-        <div className="flex gap-0.75">
+        <div className="flex gap-1">
           {weeks.map((week) => (
-            <div className="grid gap-0.75" key={week[0]?.key}>
+            <div className="grid gap-1" key={week[0]?.key}>
               {week.map((day) => (
                 <i
                   className={cn(
                     dayCell,
-                    "size-3.75 max-xs:size-2.75",
+                    "size-4 max-xs:size-3",
                     day.future && "invisible"
                   )}
                   key={day.key}
@@ -133,12 +133,12 @@ function Profile({ data }: { data: ProfileData }) {
   }, [introductions, tracks, today]);
   return (
     <>
-      <div className="grid grid-cols-3 gap-item">
+      <div className="grid grid-cols-3 gap-4">
         {tracks.map((track, index) => {
           const count = added[index] ?? 0;
           return (
-            <p className="m-0 grid min-w-0 gap-pair" key={track.id}>
-              <b className="type-display text-foreground text-score tabular-nums leading-score tracking-tighter">
+            <p className="m-0 grid min-w-0 gap-1" key={track.id}>
+              <b className="type-display text-foreground text-score tabular-nums leading-none tracking-tighter">
                 {track.learned + track.learning}
               </b>
               <span className="type-heading text-foreground">
@@ -156,10 +156,10 @@ function Profile({ data }: { data: ProfileData }) {
           );
         })}
       </div>
-      <SectionHead className="mt-section" label="activity">
+      <SectionHead className="mt-12" label="activity">
         <span
           aria-hidden="true"
-          className="type-micro inline-flex items-center gap-0.75 text-faint-foreground"
+          className="type-micro inline-flex items-center gap-1 text-faint-foreground"
         >
           less
           {keyDensities.map((density) => (
@@ -171,7 +171,7 @@ function Profile({ data }: { data: ProfileData }) {
         </span>
       </SectionHead>
       <ActivityGraph weeks={weeks} />
-      <p className="type-control mt-item mb-section flex flex-wrap gap-x-group gap-y-tight text-muted-foreground">
+      <p className="type-control mt-4 mb-12 flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
         <span>
           <b className={num}>{streaks.current}</b> day streak
         </span>
@@ -183,7 +183,7 @@ function Profile({ data }: { data: ProfileData }) {
         </span>
       </p>
       <Link
-        className="type-control flex min-h-14 items-center justify-between gap-item py-3 text-faint-foreground tabular-nums hover:text-muted-foreground"
+        className="type-control flex min-h-14 items-center justify-between gap-4 py-3 text-faint-foreground tabular-nums hover:text-muted-foreground"
         to="/profile/palace"
       >
         <span className="type-heading text-foreground">memory palace</span>

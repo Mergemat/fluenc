@@ -37,6 +37,7 @@
 
 /* Tailwind's defaults go; only the tokens below exist. A block of its own, so it always comes first. */
 @theme {
+  --spacing: initial;
   --color-*: initial;
   --font-*: initial;
   --text-*: initial;
@@ -98,21 +99,11 @@
   --text-title: 22px;
   --text-2xl: 26px;
   --text-3xl: 30px;
-  /* Hanzi and hero figures are sized where they are used, from these. */
-  --text-15: 15px;
-  --text-18: 18px;
-  --text-19: 19px;
-  --text-24: 24px;
-  --text-28: 28px;
-  --text-32: 32px;
-  --text-34: 34px;
-  --text-38: 38px;
-  --text-40: 40px;
-  --text-46: 46px;
-  --text-56: 56px;
-  --text-60: 60px;
-  --text-80: 80px;
-  --text-96: 96px;
+  /* Display: hanzi and hero figures. */
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+  --text-6xl: 60px;
+  --text-7xl: 96px;
   /* Fluid: as large as the screen or the card allows. */
   --text-gloss: clamp(64px, min(22vw, 17dvh), 160px);
   --text-gloss-entry: clamp(64px, 18vw, 120px);
@@ -122,12 +113,8 @@
   --text-timer: clamp(44px, 16cqw, 64px);
   --text-verdict: clamp(40px, 14cqw, 56px);
   --text-verdict-long: clamp(26px, 9cqw, 34px);
-  --leading-score: 0.95;
-  --leading-glyph: 1.05;
-  --leading-display: 1.15;
-  --leading-snug: 1.2;
-  --leading-tight: 1.25;
-  --leading-heading: 1.3;
+  --leading-tight: 1.2;
+  --leading-snug: 1.3;
   /* Interface text that wraps. */
   --leading-wrap: 1.45;
   --leading-body: 1.55;
@@ -137,15 +124,43 @@
   --tracking-wide: 0.04em;
 
   /* ── Space ──────────────────────────────────────────────────────────────── */
-  /* Six steps, each clearly bigger than the last, so space alone shows what belongs together.
-     Layout gaps use these; the inside of a control and the study screens, fitted to the
-     viewport, keep their own measures from the numeric scale. */
-  --spacing-pair: 4px;
-  --spacing-tight: 8px;
-  --spacing-item: 16px;
-  --spacing-group: 24px;
-  --spacing-section: 48px;
-  --spacing-page: 64px;
+  /* A 4px grid, the steps shadcn/ui and Tailwind's classic scale use: `p-4` is 16px. Nothing off
+     the grid compiles. Layout gaps keep to 1, 2, 4, 6, 12 and 16, each clearly bigger than the
+     last, so space alone shows what belongs together. */
+  --spacing-0: 0px;
+  --spacing-0\.5: 2px;
+  --spacing-1: 4px;
+  --spacing-1\.5: 6px;
+  --spacing-2: 8px;
+  --spacing-2\.5: 10px;
+  --spacing-3: 12px;
+  --spacing-3\.5: 14px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-7: 28px;
+  --spacing-8: 32px;
+  --spacing-9: 36px;
+  --spacing-10: 40px;
+  --spacing-11: 44px;
+  --spacing-12: 48px;
+  --spacing-14: 56px;
+  --spacing-16: 64px;
+  --spacing-20: 80px;
+  --spacing-24: 96px;
+  --spacing-28: 112px;
+  --spacing-32: 128px;
+  --spacing-36: 144px;
+  --spacing-40: 160px;
+  --spacing-44: 176px;
+  --spacing-48: 192px;
+  --spacing-52: 208px;
+  --spacing-56: 224px;
+  --spacing-60: 240px;
+  --spacing-64: 256px;
+  --spacing-72: 288px;
+  --spacing-80: 320px;
+  --spacing-96: 384px;
   /* The page frame: one gutter and top for every page, so headers line up from page to page. */
   --spacing-gutter: 16px;
   --spacing-page-top: 12px;
@@ -226,19 +241,15 @@
   /* Desktop: a sidebar beside the page. */
   --grid-template-columns-shell: 216px minmax(0, 1fr);
   --grid-template-rows-shell: minmax(0, 1fr);
-  --radius-hairline: 1px;
+  /* shadcn/ui's scale, all from one radius. */
   --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-chip: 7px;
-  --radius-lg: 8px;
-  --radius-nav: 9px;
-  /* The radius: buttons, rows, panels. */
-  --radius-xl: 10px;
-  --radius-2xl: 12px;
-  --radius-3xl: 14px;
-  --radius-4xl: 18px;
-  --radius-card: 20px;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
   --shadow-popover: 0 18px 40px -18px rgb(0 0 0 / 0.6);
   --shadow-modal: 0 30px 80px -30px rgb(0 0 0 / 0.6);
   --shadow-deck:
@@ -456,14 +467,14 @@
   font-family: var(--font-sans);
   font-size: var(--text-3xl);
   font-weight: 500;
-  line-height: var(--leading-display);
+  line-height: var(--leading-tight);
   @apply type-reset;
 }
 @utility type-heading {
   font-family: var(--font-sans);
   font-size: var(--text-lg);
   font-weight: 500;
-  line-height: var(--leading-heading);
+  line-height: var(--leading-snug);
   @apply type-reset;
 }
 @utility type-body {
@@ -550,6 +561,8 @@
 /* ── Base ─────────────────────────────────────────────────────────────────── */
 @layer base {
   :root {
+    /* The radius every other radius is worked out from, as in shadcn/ui. */
+    --radius: 10px;
     /* Ionic's scroller and the document it styles take the app's colours. */
     --ion-background-color: var(--color-background);
     --ion-text-color: var(--color-foreground);
@@ -662,7 +675,7 @@
 /* Meta after a label, set off by a dot that is decoration, not text. */
 @utility dot-before {
   &::before {
-    margin-right: var(--spacing-tight);
+    margin-right: var(--spacing-2);
     color: var(--color-faint-foreground);
     content: "·";
   }

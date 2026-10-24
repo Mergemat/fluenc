@@ -56,10 +56,10 @@ const plural = (count: number, one: string, many: string) =>
 // Next up: the page's one raised surface. It reaches into the gutter by its padding on wide
 // screens, so its text lines up with the page title; on a phone it sits inside the gutters.
 const nextCard =
-  "flex flex-col gap-item rounded-3xl bg-card p-group max-md:p-5 md:-ml-group";
-const nextHero = "flex min-w-0 items-end gap-group";
-const nextGlyph = "flex-none font-hanzi text-96 leading-none max-md:text-80";
-const nextWhat = "m-0 grid min-w-0 gap-tight pb-tight";
+  "flex flex-col gap-4 rounded-xl bg-card p-6 max-md:p-5 md:-ml-6";
+const nextHero = "flex min-w-0 items-end gap-6";
+const nextGlyph = "flex-none font-hanzi text-7xl leading-none max-md:text-7xl";
+const nextWhat = "m-0 grid min-w-0 gap-2 pb-2";
 const nextPinyin = "type-control text-lg text-muted-foreground leading-none";
 
 function NextHead({ meta }: { meta?: string }) {
@@ -71,7 +71,7 @@ function Primary({ to, label }: { to: Lead; label: string }) {
   const go = useCallback(() => navigate({ to }), [navigate, to]);
   return (
     <DitherButton
-      className={cn(action, "mt-tight short:max-studio:h-11")}
+      className={cn(action, "mt-2 short:max-studio:h-11")}
       color="blue"
       onClick={go}
       variant="gradient"
@@ -98,7 +98,7 @@ function ReviewNext({ data }: { data: DashboardData }) {
           </span>
         ) : null}
         <p className={nextWhat}>
-          <b className="trim-cap type-display text-40 tabular-nums leading-none tracking-snug">
+          <b className="trim-cap type-display text-4xl tabular-nums leading-none tracking-snug">
             {due}
           </b>
           <span className="type-body text-muted-foreground leading-none">
@@ -110,7 +110,7 @@ function ReviewNext({ data }: { data: DashboardData }) {
       {rest.length ? (
         <ol
           aria-label="Cards after it"
-          className="m-0 flex list-none gap-item overflow-x-clip whitespace-nowrap p-0 text-muted-foreground text-xl leading-none"
+          className="m-0 flex list-none gap-4 overflow-x-clip whitespace-nowrap p-0 text-muted-foreground text-xl leading-none"
           lang="zh-CN"
         >
           {rest.map((item) => (
@@ -172,7 +172,7 @@ function ReadingNext({
     <section aria-label="Next up" className={nextCard}>
       <NextHead meta={`read · ${plural(count, "sentence", "sentences")}`} />
       <p
-        className="m-0 font-hanzi text-28 leading-heading tracking-wide"
+        className="m-0 font-hanzi text-3xl leading-snug tracking-wide"
         lang="zh-CN"
       >
         {sentence.hanzi}
@@ -225,20 +225,20 @@ function Later({
     <li className="not-first:inset-shadow-hairline">
       <Link
         aria-label={name}
-        className="relative -mx-tight flex items-center gap-item rounded-xl px-tight py-3 ring-card transition hover:bg-card hover:ring-1"
+        className="relative -mx-2 flex items-center gap-4 rounded-lg px-2 py-3 ring-card transition hover:bg-card hover:ring-1"
         to={to}
       >
         <span
           aria-hidden="true"
-          className="w-10 flex-none text-center font-hanzi text-28 text-muted-foreground leading-none"
+          className="w-10 flex-none text-center font-hanzi text-3xl text-muted-foreground leading-none"
         >
           {lead}
         </span>
-        <span className="grid min-w-0 flex-1 gap-tight">
+        <span className="grid min-w-0 flex-1 gap-2">
           <span className="type-label truncate text-muted-foreground">
             {label}
           </span>
-          <span className="type-heading flex min-w-0 items-baseline gap-tight overflow-hidden whitespace-nowrap leading-none">
+          <span className="type-heading flex min-w-0 items-baseline gap-2 overflow-hidden whitespace-nowrap leading-none">
             {children}
           </span>
         </span>
@@ -316,7 +316,7 @@ function LaterToday({
             to="/reading"
           >
             <span
-              className="truncate font-hanzi text-18 tracking-wide"
+              className="truncate font-hanzi text-xl tracking-wide"
               lang="zh-CN"
             >
               {sentence.hanzi}
@@ -336,12 +336,12 @@ function LaterToday({
           <span className="flex gap-1.5">
             {(week?.days ?? []).map((day, index) => (
               <span
-                className="type-micro grid justify-items-center gap-pair text-faint-foreground"
+                className="type-micro grid justify-items-center gap-1 text-faint-foreground"
                 key={day.key}
               >
                 <i
                   className={cn(
-                    "relative size-5.5 overflow-hidden rounded-sm",
+                    "relative size-6 overflow-hidden rounded-sm",
                     day.key === week?.today
                       ? "inset-ring inset-ring-blue"
                       : "bg-popover"
@@ -406,7 +406,7 @@ export function TodayView({ data }: { data: DashboardData }) {
         />
       }
     >
-      <div className="grid grid-cols-1 items-start gap-section md:grid-cols-today">
+      <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-today">
         <NextUp data={data} lead={lead} />
         <LaterToday data={data} lead={lead} />
       </div>

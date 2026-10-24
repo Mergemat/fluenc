@@ -147,7 +147,7 @@ export function WordLesson({ item }: { item: WordItem }) {
         aria-label="Word"
         className={cn(
           studioRead,
-          "flex flex-col items-center justify-center gap-group studio:gap-item"
+          "flex flex-col items-center justify-center gap-6 studio:gap-4"
         )}
       >
         <WordGloss

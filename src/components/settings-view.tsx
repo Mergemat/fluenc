@@ -81,7 +81,7 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
 
   return (
     <Page head={<PageHeader title="settings" />}>
-      <div className="grid gap-section">
+      <div className="grid gap-12">
         <Group label="account">
           <AccountSettings />
         </Group>
@@ -113,7 +113,7 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
             {offline.status === "downloading" && percentage !== null ? (
               <span
                 aria-hidden="true"
-                className={cn(progressTrack, "w-30 max-w-none flex-none")}
+                className={cn(progressTrack, "w-32 max-w-none flex-none")}
               >
                 <DitherGradient
                   cell={2}

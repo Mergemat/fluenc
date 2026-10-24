@@ -36,9 +36,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         className={cn(
           // Centred on the page, not the window, beside the desktop sidebar.
-          "type-control pointer-events-none fixed bottom-safe-toast left-1/2 z-60 flex -translate-x-1/2 items-center gap-tight whitespace-nowrap rounded-xl border border-border-strong bg-popover px-3.5 py-2.25 text-foreground leading-wrap shadow-toast transition duration-200 md:bottom-7 lg:ml-27",
+          "type-control pointer-events-none fixed bottom-safe-toast left-1/2 z-60 flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-lg border border-border-strong bg-popover px-3.5 py-2.5 text-foreground leading-wrap shadow-toast transition duration-200 md:bottom-7 lg:ml-28",
           // A mark before the message, like the hanzi just added, in green.
-          "*:first:not-last:font-normal *:first:not-last:text-18 *:first:not-last:text-green",
+          "*:first:not-last:font-normal *:first:not-last:text-green *:first:not-last:text-xl",
           visible ? "opacity-100" : "translate-y-2 opacity-0"
         )}
         role="status"

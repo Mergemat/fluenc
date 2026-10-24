@@ -94,7 +94,7 @@ function StrokePips({
   return (
     <span
       aria-hidden="true"
-      className="flex min-h-2.5 max-w-writing flex-wrap justify-center gap-1.25"
+      className="flex min-h-2.5 max-w-writing flex-wrap justify-center gap-1.5"
     >
       {pips.map((pip) => (
         <i
@@ -117,7 +117,7 @@ function StrokePips({
 }
 
 const partLine =
-  "flex h-5.5 items-baseline gap-tight type-control text-muted-foreground leading-5.5";
+  "flex h-6 items-baseline gap-2 type-control text-muted-foreground leading-6";
 
 /** Which prop the next stroke belongs to, in that prop's colour. */
 function NextPart({
@@ -141,7 +141,7 @@ function NextPart({
       style={{ "--part": partColor(index) } as CSSProperties}
     >
       <b
-        className="font-hanzi-props font-normal text-18 text-part"
+        className="font-hanzi-props font-normal text-part text-xl"
         lang="zh-CN"
       >
         {part.code}
@@ -376,8 +376,8 @@ export function WritingModal({
       className="m-auto max-h-none max-w-none animate-enter overflow-visible border-0 bg-transparent p-0 text-inherit backdrop:bg-background/82 backdrop:backdrop-blur-sm"
       ref={dialog}
     >
-      <section className="box-border grid w-writing-frame justify-items-center gap-item rounded-4xl border border-border-strong bg-card px-3.5 pt-2.5 pb-4 shadow-modal">
-        <header className="type-label flex w-full items-center gap-tight text-muted-foreground">
+      <section className="box-border grid w-writing-frame justify-items-center gap-4 rounded-2xl border border-border-strong bg-card px-3.5 pt-2.5 pb-4 shadow-modal">
+        <header className="type-label flex w-full items-center gap-2 text-muted-foreground">
           <span className="flex-1">
             write{" "}
             <b className="font-hanzi font-normal text-foreground text-lg">
@@ -389,7 +389,7 @@ export function WritingModal({
           </span>
           <button
             aria-label="Close"
-            className="grid size-8 place-items-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
+            className="grid size-8 place-items-center rounded-md border border-border text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground"
             onClick={close}
             type="button"
           >
@@ -398,7 +398,7 @@ export function WritingModal({
         </header>
         <div
           className={cn(
-            "relative grid size-writing touch-none select-none overflow-hidden rounded-3xl border border-border bg-background transition-colors duration-200 *:col-start-1 *:row-start-1",
+            "relative grid size-writing touch-none select-none overflow-hidden rounded-xl border border-border bg-background transition-colors duration-200 *:col-start-1 *:row-start-1",
             done && "border-green"
           )}
         >

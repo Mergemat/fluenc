@@ -4,7 +4,7 @@ import { DitherGradient } from "../dither-kit/gradient";
 
 /** A thin dithered bar; its fills are `progressFill` spans with a width. */
 export const progressTrack =
-  "relative h-1.5 max-w-70 flex-1 overflow-hidden rounded-xs";
+  "relative h-1.5 max-w-72 flex-1 overflow-hidden rounded-xs";
 export const progressFill =
   "absolute inset-y-0 left-0 overflow-hidden transition-all duration-300 ease-out";
 

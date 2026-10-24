@@ -51,15 +51,15 @@ export const shell =
 
 /** Fluenc's name beside its mark. */
 export const brand =
-  "flex items-center gap-2.5 font-mono font-semibold text-19 text-foreground leading-none tracking-snug type-reset lg:h-8 lg:px-2.5";
+  "flex items-center gap-2.5 font-mono font-semibold text-xl text-foreground leading-none tracking-snug type-reset lg:h-8 lg:px-2.5";
 
 /** A square bordered icon link; on desktop the corner links become sidebar rows. */
 export const iconButton =
-  "grid size-8 place-items-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground max-md:ml-auto max-md:size-7.5";
+  "grid size-8 place-items-center rounded-md border border-border text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground max-md:ml-auto max-md:size-8";
 
 /** The due-review count on the review tab. */
 const badge =
-  "box-border h-4 min-w-4.5 rounded-sm bg-primary px-1 text-center type-micro text-primary-foreground leading-4";
+  "box-border h-4 min-w-5 rounded-sm bg-primary px-1 text-center type-micro text-primary-foreground leading-4";
 
 /** How far through the course the learner is, learned and learning; shown in the desktop sidebar. */
 function CourseProgress() {
@@ -70,11 +70,11 @@ function CourseProgress() {
   return (
     <Link
       aria-label="Course progress"
-      className="group/course mt-auto hidden gap-item border-border border-t px-3 py-3.5 lg:grid"
+      className="group/course mt-auto hidden gap-4 border-border border-t px-3 py-3.5 lg:grid"
       to="/profile"
     >
       {meters?.map((meter) => (
-        <div className="grid gap-tight" key={meter.id}>
+        <div className="grid gap-2" key={meter.id}>
           <p className="type-label m-0 flex items-baseline justify-between text-muted-foreground group-hover/course:text-foreground">
             <span>{meter.label}</span>
             <b className="font-medium text-foreground tabular-nums">
@@ -162,19 +162,19 @@ export function AppShell({
           <PixelLoader label="Opening Fluenc" size={5} />
         </span>
       )}
-      <header className="relative flex h-15 shrink-0 items-center gap-group px-7 group-data-booting/shell:invisible max-md:h-11.5 max-md:pr-3.5 max-md:pl-4 lg:h-auto lg:min-h-0 lg:flex-col lg:items-stretch lg:gap-0 lg:border-border lg:border-r lg:px-3 lg:pt-5 lg:pb-4">
+      <header className="relative flex h-16 shrink-0 items-center gap-6 px-7 group-data-booting/shell:invisible max-md:h-12 max-md:pr-3.5 max-md:pl-4 lg:h-auto lg:min-h-0 lg:flex-col lg:items-stretch lg:gap-0 lg:border-border lg:border-r lg:px-3 lg:pt-5 lg:pb-4">
         <Link aria-label="Fluenc home" className={brand} to="/today">
           <BrandMark />
           <span>fluenc</span>
         </Link>
         <nav
           aria-label="Main"
-          className="ml-auto flex gap-tight max-md:hidden lg:m-0 lg:mt-group lg:flex-col lg:gap-0.5"
+          className="ml-auto flex gap-2 max-md:hidden lg:m-0 lg:mt-6 lg:flex-col lg:gap-0.5"
         >
           {navigation.map((item) => (
             <Link
               activeProps={{ "aria-current": "page" }}
-              className="type-control relative isolate inline-flex h-7.5 items-center gap-1.75 overflow-hidden rounded-lg border border-border current:border-blue px-3 current:text-foreground text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground lg:h-9.5 lg:rounded-nav lg:border-transparent lg:text-md lg:hover:not-current:border-transparent lg:hover:not-current:bg-card"
+              className="type-control relative isolate inline-flex h-8 items-center gap-2 overflow-hidden rounded-md border border-border current:border-blue px-3 current:text-foreground text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground lg:h-10 lg:rounded-lg lg:border-transparent lg:text-md lg:hover:not-current:border-transparent lg:hover:not-current:bg-card"
               key={item.to}
               to={item.to}
             >
@@ -188,7 +188,7 @@ export function AppShell({
                       opacity={0.45}
                     />
                   ) : null}
-                  <span className="relative inline-flex gap-1.75 lg:flex-1 lg:items-center lg:gap-3">
+                  <span className="relative inline-flex gap-2 lg:flex-1 lg:items-center lg:gap-3">
                     <item.icon
                       aria-hidden="true"
                       className="hidden lg:block"
@@ -213,7 +213,7 @@ export function AppShell({
             className={cn(
               iconButton,
               "relative isolate overflow-hidden current:border-blue current:text-foreground",
-              "lg:type-control lg:flex lg:h-9.5 lg:w-auto lg:justify-start lg:gap-3 lg:rounded-nav lg:border-transparent lg:px-3 lg:text-md lg:hover:not-current:border-transparent lg:hover:not-current:bg-card",
+              "lg:type-control lg:flex lg:h-10 lg:w-auto lg:justify-start lg:gap-3 lg:rounded-lg lg:border-transparent lg:px-3 lg:text-md lg:hover:not-current:border-transparent lg:hover:not-current:bg-card",
               index > 0 && "max-md:-ml-3"
             )}
             key={item.to}
@@ -252,7 +252,7 @@ export function AppShell({
         {navigation.map((item) => (
           <Link
             activeProps={{ "aria-current": "page" }}
-            className="type-micro relative flex min-w-0 flex-1 flex-col items-center gap-1.25 overflow-hidden rounded-xl pt-1.5 pb-1 current:text-foreground text-muted-foreground transition-colors"
+            className="type-micro relative flex min-w-0 flex-1 flex-col items-center gap-1.5 overflow-hidden rounded-lg pt-1.5 pb-1 current:text-foreground text-muted-foreground transition-colors"
             key={item.to}
             to={item.to}
           >
@@ -266,12 +266,10 @@ export function AppShell({
                     opacity={0.35}
                   />
                 ) : null}
-                <span className="relative grid h-6 w-10 place-items-center rounded-chip">
+                <span className="relative grid h-6 w-10 place-items-center rounded-md">
                   <item.icon size={17} strokeWidth={1.75} />
                   {item.to === "/review" && due ? (
-                    <b className={cn(badge, "absolute -top-1 left-6.5")}>
-                      {due}
-                    </b>
+                    <b className={cn(badge, "absolute -top-1 left-7")}>{due}</b>
                   ) : null}
                 </span>
                 <span className="relative">{item.label}</span>

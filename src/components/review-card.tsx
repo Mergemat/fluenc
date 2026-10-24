@@ -80,7 +80,7 @@ function waitsFor(item: ReviewItem) {
 // Quieter dots than an action's. The names hold one line across the row, even where a note wraps
 // to two: the kit's content fills the button and starts at a fixed line.
 const rateButton =
-  "h-14 rounded-xl p-0 focus-visible:outline-solid *:first:opacity-45 *:last:absolute *:last:inset-0 *:last:grid *:last:content-start *:last:justify-center *:last:justify-items-center *:last:gap-pair *:last:pt-3.25";
+  "h-14 rounded-lg p-0 focus-visible:outline-solid *:first:opacity-45 *:last:absolute *:last:inset-0 *:last:grid *:last:content-start *:last:justify-center *:last:justify-items-center *:last:gap-1 *:last:pt-3.5";
 
 function RatingButton({
   rating,
@@ -94,7 +94,7 @@ function RatingButton({
   const rate = useCallback(() => onRate(rating.value), [onRate, rating.value]);
   // The wait sits above its button, so it reads as when the card returns, not as part of the name.
   return (
-    <div className="grid min-w-0 gap-tight">
+    <div className="grid min-w-0 gap-2">
       <em className="type-micro text-center text-muted-foreground tabular-nums">
         {after}
       </em>
@@ -105,10 +105,10 @@ function RatingButton({
         variant="dotted"
       >
         <span className="type-action">{rating.label}</span>
-        <small className="type-micro text-balance px-1 text-center leading-snug opacity-80">
+        <small className="type-micro text-balance px-1 text-center leading-tight opacity-80">
           {rating.note}
         </small>
-        <kbd className="absolute top-1.25 right-1.75">{rating.value}</kbd>
+        <kbd className="absolute top-1.5 right-2">{rating.value}</kbd>
       </DitherButton>
     </div>
   );
@@ -128,7 +128,7 @@ function PropChip({ clue, parts }: { clue: Clue; parts: PartPointer }) {
   return (
     <button
       aria-pressed={parts.highlighted === clue.code}
-      className="inline-flex h-full items-center gap-1.75"
+      className="inline-flex h-full items-center gap-2"
       onClick={select}
       onPointerEnter={enter}
       onPointerLeave={leave}
@@ -143,15 +143,15 @@ function PropChip({ clue, parts }: { clue: Clue; parts: PartPointer }) {
 }
 
 /** A row of chips along a card's bottom edge; smaller on a short card. */
-const sceneChips = "m-0 flex list-none flex-wrap justify-center gap-tight p-0";
+const sceneChips = "m-0 flex list-none flex-wrap justify-center gap-2 p-0";
 const sceneChip =
-  "inline-flex h-7.5 items-center gap-1.75 rounded-chip border border-border bg-deck pr-2.5 pl-2 type-body text-base card-short:h-6.5 card-short:text-sm";
+  "inline-flex h-8 items-center gap-2 rounded-md border border-border bg-deck pr-2.5 pl-2 type-body text-base card-short:h-7 card-short:text-sm";
 /** A tone contour as a chip's code. */
-const chipTone = "h-3.25 w-4.5 align-middle";
+const chipTone = "h-3.5 w-5 align-middle";
 /** A chip's code, in its kind's colour. */
 const chipCode = "type-code text-md";
 /** A code that is a character. */
-const chipHanzi = "font-hanzi-props text-18 font-normal";
+const chipHanzi = "font-hanzi-props text-xl font-normal";
 const kindColors: Record<Clue["kind"], string> = {
   actor: "text-blue",
   set: "text-purple",
@@ -219,7 +219,7 @@ function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
     );
   }
   return (
-    <div className="relative grid justify-items-center gap-item text-center">
+    <div className="relative grid justify-items-center gap-4 text-center">
       <p className="type-label m-0 text-muted-foreground">say it in mandarin</p>
       <p className="type-display m-0 text-balance">{item.meaning}</p>
     </div>
@@ -227,13 +227,13 @@ function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
 }
 
 // Pinyin set as a lesson sets it.
-const focusPinyin = "text-24 studio:text-3xl";
+const focusPinyin = "text-2xl studio:text-3xl";
 
 /** Where an answer's corner, centre and edge sit: a card's inset, smaller on a short card. */
 const answerIndex =
-  "absolute top-group left-group card-short:top-item card-short:left-item card-short:size-11";
+  "absolute top-6 left-6 card-short:top-4 card-short:left-4 card-short:size-11";
 const answerEdge =
-  "absolute right-group bottom-group left-group border-deck-edge border-t pt-item card-short:static card-short:mx-item card-short:mt-auto card-short:mb-item card-short:pt-tight";
+  "absolute right-6 bottom-6 left-6 border-deck-edge border-t pt-4 card-short:static card-short:mx-4 card-short:mt-auto card-short:mb-4 card-short:pt-2";
 
 /**
  * A character's or word's identity, as in its lesson: pinyin with its play button, the meaning,
@@ -251,11 +251,11 @@ function Focus({ item }: { item: Exclude<ReviewItem, { type: "sentence" }> }) {
     <div
       className={cn(
         ident,
-        "card-short:translate-none card-short:static absolute top-1/2 right-group left-group -translate-y-1/2 gap-tight card-short:px-16 card-short:pt-item"
+        "card-short:translate-none card-short:static absolute top-1/2 right-6 left-6 -translate-y-1/2 gap-2 card-short:px-16 card-short:pt-4"
       )}
     >
       {/* The pinyin stays on the centre line; its play button hangs off the right edge. */}
-      <div className="relative inline-flex items-center gap-tight">
+      <div className="relative inline-flex items-center gap-2">
         {item.type === "character" ? (
           <MoviePinyin
             actorKey={item.movie.actorKey}
@@ -270,7 +270,7 @@ function Focus({ item }: { item: Exclude<ReviewItem, { type: "sentence" }> }) {
           </span>
         )}
         <AudioButton
-          className="absolute top-1/2 left-full ml-tight -translate-y-1/2"
+          className="absolute top-1/2 left-full ml-2 -translate-y-1/2"
           pinyin={item.pinyin}
           text={item.hanzi}
         />
@@ -280,7 +280,7 @@ function Focus({ item }: { item: Exclude<ReviewItem, { type: "sentence" }> }) {
         // Below the side-by-side layout it may wrap to two lines; on a short phone it gives way.
         className={cn(
           altText,
-          "max-studio:short:hidden max-studio:h-auto max-studio:max-h-7.5 max-studio:whitespace-normal"
+          "max-studio:short:hidden max-studio:h-auto max-studio:max-h-8 max-studio:whitespace-normal"
         )}
       >
         {others.length ? `also ${others.join(" · ")}` : " "}
@@ -353,7 +353,7 @@ function CardAnswer({
     <div className={cardAnswer} data-answer>
       {/* A word in the corner, where a character's lit glyph sits. */}
       <span
-        className={cn(answerIndex, "font-hanzi text-28 leading-none")}
+        className={cn(answerIndex, "font-hanzi text-3xl leading-none")}
         lang="zh-CN"
       >
         {item.hanzi}
@@ -365,7 +365,7 @@ function CardAnswer({
             {item.livingLink}
           </p>
         ) : null}
-        <ul className={cn(sceneChips, item.livingLink && "mt-tight")}>
+        <ul className={cn(sceneChips, item.livingLink && "mt-2")}>
           {made.map((part) => (
             <li className={sceneChip} key={part.position}>
               <b
@@ -693,7 +693,7 @@ export function ReviewDeck({
           aria-label="How well did you recall it?"
           className={cn(
             deckAction,
-            "grid min-w-0 grid-cols-4 gap-tight",
+            "grid min-w-0 grid-cols-4 gap-2",
             !revealed && "invisible"
           )}
           inert={!revealed}
@@ -751,14 +751,14 @@ export function WordGloss({
     >
       {columns.map(({ char, position, syllable, gloss }) => (
         <div
-          className="grid min-w-0 content-start justify-items-center gap-pair"
+          className="grid min-w-0 content-start justify-items-center gap-1"
           key={position}
         >
           {/* Syllables and keywords hold their space before the reveal. */}
           <span
             aria-hidden={!revealed}
             className={cn(
-              "type-pinyin inline-flex h-6.5 items-center gap-pair whitespace-nowrap text-xl tracking-snug transition duration-200 ease-out",
+              "type-pinyin inline-flex h-7 items-center gap-1 whitespace-nowrap text-xl tracking-snug transition duration-200 ease-out",
               !revealed && "translate-y-1.5 opacity-0"
             )}
             lang="zh-Latn"
@@ -770,7 +770,7 @@ export function WordGloss({
             className={cn(
               "font-hanzi text-gloss",
               hanziClassName,
-              "leading-glyph"
+              "leading-none"
             )}
           >
             {char}
@@ -778,7 +778,7 @@ export function WordGloss({
           <span
             aria-hidden={!revealed}
             className={cn(
-              "type-body line-clamp-2 min-h-4.5 max-w-31.5 text-center text-muted-foreground leading-tight transition duration-200 ease-out",
+              "type-body line-clamp-2 min-h-5 max-w-32 text-center text-muted-foreground leading-tight transition duration-200 ease-out",
               !revealed && "-translate-y-1.5 opacity-0"
             )}
             lang="en"

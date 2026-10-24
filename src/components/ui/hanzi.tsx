@@ -61,11 +61,11 @@ export const glyphBox =
 
 /** A character's meaning, its other meanings, and its sound row, as lessons and cards show them. */
 export const ident =
-  "grid max-w-full shrink-0 justify-items-center gap-pair text-center";
+  "grid max-w-full shrink-0 justify-items-center gap-1 text-center";
 export const meaningText = "m-0 type-display text-2xl tracking-tight";
 export const altText =
-  "m-0 h-3.75 max-w-full truncate type-label text-muted-foreground leading-3.75";
-export const soundRow = "mt-tight flex items-center gap-tight";
+  "m-0 h-4 max-w-full truncate type-label text-muted-foreground leading-4";
+export const soundRow = "mt-2 flex items-center gap-2";
 
 const ghostState = {
   loading: "animate-pulse text-faint-foreground",
@@ -350,7 +350,7 @@ export function ToneContour({
   );
 }
 
-const audioBars = ["h-1.25", "h-3", "h-2", "h-1"];
+const audioBars = ["h-1.5", "h-3", "h-2", "h-1"];
 
 export function AudioButton({
   text,
@@ -373,7 +373,7 @@ export function AudioButton({
     <button
       aria-label={`Play ${text}`}
       className={cn(
-        "grid size-8 shrink-0 place-items-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground disabled:cursor-progress disabled:opacity-100",
+        "grid size-8 shrink-0 place-items-center rounded-md border border-border text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground disabled:cursor-progress disabled:opacity-100",
         label && "type-control inline-flex w-auto gap-2 pr-3 pl-2.5",
         speaking &&
           "border-blue/50 text-blue hover:border-blue/50 hover:text-blue",
@@ -392,7 +392,7 @@ export function AudioButton({
           {audioBars.map((height, bar) => (
             <i
               className={cn(
-                "w-0.5 rounded-hairline bg-current",
+                "w-0.5 rounded-xs bg-current",
                 height,
                 speaking && "animate-eq"
               )}
@@ -470,7 +470,7 @@ export function useUsage(hanzi: string, alsoKnown = noExtraKnown) {
 export function UsageHanzi({ chars }: { chars: UsageWord["chars"] }) {
   return (
     <span
-      className="whitespace-nowrap font-hanzi text-18 leading-none"
+      className="whitespace-nowrap font-hanzi text-xl leading-none"
       lang="zh-CN"
     >
       {chars.map((entry) => (

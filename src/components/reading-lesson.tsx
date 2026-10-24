@@ -189,7 +189,7 @@ export function ShadowTakes({
         return (
           <i
             className={cn(
-              "relative h-10 w-7 overflow-hidden rounded-md border bg-deck transition-transform duration-360 ease-settle motion-reduce:transition-none",
+              "relative h-10 w-7 overflow-hidden rounded-sm border bg-deck transition-transform duration-360 ease-settle motion-reduce:transition-none",
               laid ? "border-transparent" : "border-deck-edge"
             )}
             key={slot}

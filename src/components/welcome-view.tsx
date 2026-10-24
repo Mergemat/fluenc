@@ -38,7 +38,7 @@ const kindColors: Record<Part, string> = {
 const soundStates = (part: Part): Record<PartState, string> => ({
   todo: "text-faint-foreground",
   done: kindColors[part],
-  now: cn(kindColors[part], "-translate-y-0.75 text-shadow-glow-lg"),
+  now: cn(kindColors[part], "-translate-y-1 text-shadow-glow-lg"),
 });
 
 /** The small line under a code or a name. */
@@ -55,7 +55,7 @@ function partState(part: Part, slide: number): PartState {
 
 function Subject({ slide }: { slide: number }) {
   return (
-    <div className="flex min-h-0 flex-1 flex-col items-center gap-tight">
+    <div className="flex min-h-0 flex-1 flex-col items-center gap-2">
       <div className={cn(glyphBox, "glyph-max-50")}>
         <HanziGlyph hanzi="好" parts={parts} xray={slide >= 4} />
       </div>
@@ -73,7 +73,7 @@ function Subject({ slide }: { slide: number }) {
           [
             ["actor", "h"],
             ["set", "ǎo"],
-            ["room", <ToneContour className="h-5 w-6.5" key="tone" tone={3} />],
+            ["room", <ToneContour className="h-5 w-7" key="tone" tone={3} />],
           ] as const
         ).map(([part, text]) => (
           <span
@@ -95,7 +95,7 @@ function Subject({ slide }: { slide: number }) {
 /** Story segments: seen ones full, the current one filling over the slide's time. */
 function Reel({ slide, total }: { slide: number; total: number }) {
   return (
-    <span aria-hidden="true" className="flex min-w-10 flex-1 gap-0.75">
+    <span aria-hidden="true" className="flex min-w-10 flex-1 gap-1">
       {Array.from({ length: total }, (_, index) => {
         let state: PartState = "todo";
         if (index < slide) {
@@ -140,7 +140,7 @@ function Actors() {
       {actorKinds.map((kind) => (
         <span
           className={cn(
-            "grid gap-1.5 rounded-xl border px-3 py-2.5",
+            "grid gap-1.5 rounded-lg border px-3 py-2.5",
             kind.lit ? "border-blue/50 bg-blue/10" : "border-border"
           )}
           key={kind.label}
@@ -159,7 +159,7 @@ function Actors() {
 
 function Place() {
   return (
-    <div className="type-heading flex items-center gap-item rounded-xl border border-purple/50 bg-purple/10 px-4 py-3.5">
+    <div className="type-heading flex items-center gap-4 rounded-lg border border-purple/50 bg-purple/10 px-4 py-3.5">
       <b className="type-code text-purple text-xl">-ao</b>
       <span aria-hidden="true" className="text-faint-foreground">
         →
@@ -178,14 +178,14 @@ function Rooms() {
       {[1, 2, 3, 4, 5].map((tone) => (
         <li
           className={cn(
-            "type-label grid justify-items-center gap-tight rounded-xl border px-0.5 pt-3 pb-2.5 text-center leading-wrap",
+            "type-label grid justify-items-center gap-2 rounded-lg border px-0.5 pt-3 pb-2.5 text-center leading-wrap",
             tone === 3
               ? "border-green/50 bg-green/12 text-foreground"
               : "border-border text-muted-foreground"
           )}
           key={tone}
         >
-          <ToneContour className="h-4 w-5.5 text-green" tone={tone} />
+          <ToneContour className="h-4 w-6 text-green" tone={tone} />
           <span>{defaultToneRooms[tone]}</span>
         </li>
       ))}
@@ -202,7 +202,7 @@ function Props() {
         { code: "子", prop: "a hook", how: "by look" },
       ].map((prop, index) => (
         <span
-          className="type-heading flex items-center gap-3 rounded-xl border border-part/50 px-3 py-2.5"
+          className="type-heading flex items-center gap-3 rounded-lg border border-part/50 px-3 py-2.5"
           key={prop.code}
           style={{ "--part": partColor(index) } as CSSProperties}
         >
@@ -283,7 +283,7 @@ const slides: {
     title: (
       <>
         <b className={cn(code, kindColors.room)}>
-          <ToneContour className="h-5.5 w-7.5" tone={3} />
+          <ToneContour className="h-6 w-8" tone={3} />
         </b>{" "}
         is a room in that place
       </>
@@ -347,13 +347,13 @@ export function WelcomeView({
   const { kicker, title, line, visual } = slides[slide];
   return (
     <div className={shell}>
-      <div className="flex h-13 shrink-0 items-center border-border border-b px-gutter">
+      <div className="flex h-14 shrink-0 items-center border-border border-b px-gutter">
         <span className={brand}>
           <BrandMark />
           fluenc
         </span>
       </div>
-      <main className="mx-auto box-border flex min-h-0 w-full max-w-welcome flex-1 flex-col gap-item px-gutter pt-page-top pb-group">
+      <main className="mx-auto box-border flex min-h-0 w-full max-w-welcome flex-1 flex-col gap-4 px-gutter pt-page-top pb-6">
         <PageHeader
           meta={
             <button
@@ -372,7 +372,7 @@ export function WelcomeView({
         {/* Tapping the slide skips ahead, as in stories; Enter and the button do the same. */}
         {/* biome-ignore lint/a11y: a pointer shortcut; the button and Enter are the accessible path */}
         <div
-          className="grid min-h-82.5 welcome-short:min-h-72.5 shrink-0 animate-rise content-start gap-tight"
+          className="grid min-h-80 welcome-short:min-h-72 shrink-0 animate-rise content-start gap-2"
           key={slide}
           onClick={last ? undefined : next}
         >
@@ -381,15 +381,12 @@ export function WelcomeView({
             {title}
           </h1>
           <p className="type-body text-pretty text-muted-foreground">{line}</p>
-          {visual ? <div className="mt-tight">{visual}</div> : null}
+          {visual ? <div className="mt-2">{visual}</div> : null}
         </div>
-        <footer className="flex shrink-0 gap-tight">
+        <footer className="flex shrink-0 gap-2">
           {slide > 0 ? (
             <button
-              className={cn(
-                chip,
-                "h-12.5 rounded-xl px-4 short:max-studio:h-11"
-              )}
+              className={cn(chip, "h-12 rounded-lg px-4 short:max-studio:h-11")}
               onClick={back}
               type="button"
             >

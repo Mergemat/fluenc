@@ -20,7 +20,7 @@ export function StatusDot({ status }: { status: Status }) {
   return (
     <i
       aria-hidden="true"
-      className={cn("size-1.75 rounded-xs", dotColors[status])}
+      className={cn("size-2 rounded-xs", dotColors[status])}
     />
   );
 }
@@ -61,7 +61,7 @@ const tileStatus: Record<Status, string> = {
 /** The frame of a tile; `TileGlyph` and the lines under it go inside. */
 export function tileClass(kind: LibraryEntry["kind"], status: Status) {
   return cn(
-    "relative grid min-h-28 content-center justify-items-center gap-0.75 overflow-hidden rounded-xl px-2 py-2.5 text-center transition hover:bg-card max-xs:min-h-24.5",
+    "relative grid min-h-28 content-center justify-items-center gap-1 overflow-hidden rounded-lg px-2 py-2.5 text-center transition hover:bg-card max-xs:min-h-24",
     "after:absolute after:top-2 after:right-2 after:size-1.5 after:rounded-xs",
     kind === "words" && "col-span-2 group-not-has-data-character/wall:col-auto",
     tileStatus[status]
@@ -78,10 +78,10 @@ export function TileGlyph({
   return (
     <span
       className={cn(
-        "whitespace-nowrap font-hanzi max-xs:text-32",
-        kind === "words" ? "text-32" : "text-38",
+        "whitespace-nowrap font-hanzi max-xs:text-3xl",
+        kind === "words" ? "text-3xl" : "text-4xl",
         // After the size: tailwind-merge drops a leading that comes before one.
-        "leading-display"
+        "leading-tight"
       )}
       lang="zh-CN"
     >
@@ -92,7 +92,7 @@ export function TileGlyph({
 
 /** A placeholder while the library loads. */
 export const tileSkeleton =
-  "relative min-h-28 animate-pulse overflow-hidden rounded-xl max-xs:min-h-24.5";
+  "relative min-h-28 animate-pulse overflow-hidden rounded-lg max-xs:min-h-24";
 
 export function Tile({ item }: { item: LibraryEntry }) {
   const meaning = getItemMeaning(item);
@@ -115,7 +115,7 @@ export function Tile({ item }: { item: LibraryEntry }) {
       </span>
       {item.approximate ? (
         <span
-          className="type-label absolute top-1.25 left-2 text-faint-foreground"
+          className="type-label absolute top-1.5 left-2 text-faint-foreground"
           title="Similar match"
         >
           ≈

@@ -16,10 +16,10 @@ export type CardSuit = keyof typeof suits;
 
 /** The page: a header, then a deck that fills the rest without scrolling. */
 export const deckPage =
-  "mx-auto flex h-full w-full max-w-frame flex-col gap-item px-gutter pt-page-top pb-group";
+  "mx-auto flex h-full w-full max-w-frame flex-col gap-4 px-gutter pt-page-top pb-6";
 
 /** A deck: the table with its pile, then the actions under it. */
-export const deck = "flex min-h-0 flex-1 flex-col gap-item";
+export const deck = "flex min-h-0 flex-1 flex-col gap-4";
 
 /**
  * The button and the grades share one place, tall enough for a wait line over the grades. Each
@@ -27,8 +27,8 @@ export const deck = "flex min-h-0 flex-1 flex-col gap-item";
  */
 export function deckActions(pair = false) {
   return cn(
-    "mx-auto grid min-h-18.5 w-full max-w-deck shrink-0",
-    pair && "auto-cols-fr grid-flow-col gap-tight"
+    "mx-auto grid min-h-20 w-full max-w-deck shrink-0",
+    pair && "auto-cols-fr grid-flow-col gap-2"
   );
 }
 export const deckAction = "col-start-1 row-start-1 self-end";
@@ -47,7 +47,7 @@ export const cardAnswer =
 /** A sentence's answer, stacked on the centre. */
 export const sentenceAnswer = cn(
   cardAnswer,
-  "items-center justify-center gap-item p-6 text-center"
+  "items-center justify-center gap-4 p-6 text-center"
 );
 /** A sentence on a card's face, as large as the card allows. */
 export const cardSentence =
@@ -55,11 +55,11 @@ export const cardSentence =
 /** A sentence's pinyin, as review always set it. */
 export const cardReading = "m-0 type-pinyin text-xl";
 /** The meaning on an answer, set as a lesson sets it. */
-export const cardMeaning = cn(meaningText, "studio:text-32 text-28");
+export const cardMeaning = cn(meaningText, "studio:text-3xl text-3xl");
 
 /** A card's face: the front, the back, or a card lying on the table. */
 const face =
-  "absolute inset-0 z-5 flex flex-col items-center justify-center overflow-hidden rounded-card border border-deck-edge bg-deck px-6 py-7 shadow-deck backface-hidden @container-size";
+  "absolute inset-0 z-5 flex flex-col items-center justify-center overflow-hidden rounded-2xl border border-deck-edge bg-deck px-6 py-7 shadow-deck backface-hidden @container-size";
 
 /**
  * The card's own dither: a faint grain at the bottom edge, gone by the top. A review card paints
@@ -77,7 +77,7 @@ export function CardGrain({ color = "grey" }: { color?: DitherColor }) {
 }
 
 const suitMark =
-  "absolute font-hanzi text-15 text-faint-foreground leading-none";
+  "absolute font-hanzi text-lg text-faint-foreground leading-none";
 
 /** Corner marks, like a playing card's: what kind of card this is. */
 function Suit({ suit }: { suit: CardSuit }) {
@@ -107,7 +107,7 @@ function Under({ count }: { count: number }) {
         return (
           <span
             aria-hidden="true"
-            className="absolute inset-0 origin-bottom overflow-hidden rounded-card border border-deck-edge bg-deck-under shadow-deck-under"
+            className="absolute inset-0 origin-bottom overflow-hidden rounded-2xl border border-deck-edge bg-deck-under shadow-deck-under"
             key={tilt}
             style={{
               zIndex: 4 - layer,
@@ -132,7 +132,7 @@ export function DeckTable({
   children: ReactNode;
 }) {
   return (
-    <div className="@container-size flex min-h-0 flex-1 flex-col items-center justify-center gap-tight">
+    <div className="@container-size flex min-h-0 flex-1 flex-col items-center justify-center gap-2">
       {children}
       <div className="type-label m-0 min-h-lh text-faint-foreground">
         {caption ?? " "}
@@ -158,10 +158,10 @@ export function DeckPile({
   return (
     <div
       className={cn(
-        "perspective-deck relative mb-group w-full flex-none",
+        "perspective-deck relative mb-6 w-full flex-none",
         wide
-          ? "aspect-7/5 max-h-pile-wide max-w-150"
-          : "aspect-5/7 max-h-pile max-w-95"
+          ? "aspect-7/5 max-h-pile-wide max-w-xl"
+          : "aspect-5/7 max-h-pile max-w-96"
       )}
     >
       <Under count={under} />
@@ -270,9 +270,9 @@ export function DeckSlot({
     <div
       className={cn(
         face,
-        "gap-tight",
+        "gap-2",
         state === "down"
-          ? "bg-card before:pointer-events-none before:absolute before:inset-3 before:rounded-2xl before:border before:border-foreground/8"
+          ? "bg-card before:pointer-events-none before:absolute before:inset-3 before:rounded-xl before:border before:border-foreground/8"
           : "border-border-strong border-dashed bg-transparent shadow-none"
       )}
     >

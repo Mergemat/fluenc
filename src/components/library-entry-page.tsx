@@ -44,12 +44,11 @@ import { StatusDot, Tile, TileGlyph, tileClass, Wall } from "./ui/tile";
 
 /** The character or gloss beside its definition; stacked and centred on phones. */
 const hero =
-  "grid justify-items-center gap-group pb-group text-center hero:grid-cols-entry hero:items-center hero:justify-items-start hero:gap-section hero:text-left";
-const definition =
-  "grid justify-items-center gap-tight hero:justify-items-start";
+  "grid justify-items-center gap-6 pb-6 text-center hero:grid-cols-entry hero:items-center hero:justify-items-start hero:gap-12 hero:text-left";
+const definition = "grid justify-items-center gap-2 hero:justify-items-start";
 const entryMeaning = cn(meaningText, "text-3xl");
 const entrySound = cn(soundRow, "mt-0");
-const section = "mt-section grid gap-tight";
+const section = "mt-12 grid gap-2";
 const emptyNote = "type-control text-faint-foreground leading-wrap";
 
 const statusLabel = {
@@ -77,7 +76,7 @@ export function LibraryEntryPage({
         <PageHeader
           heading={false}
           meta={
-            <span className="inline-flex items-center gap-1.75">
+            <span className="inline-flex items-center gap-2">
               <StatusDot status={item.status} />
               {statusLabel[item.status]}
             </span>
@@ -189,7 +188,7 @@ function CharacterEntry({
   return (
     <>
       <header className={hero}>
-        <div className="h-entry-glyph w-full max-w-75">
+        <div className="h-entry-glyph w-full max-w-72">
           <div className={cn(glyphBox, "h-full")}>
             <HanziGlyph
               hanzi={item.hanzi}
@@ -418,7 +417,7 @@ function Senses({ meanings }: { meanings: string[] }) {
   }
   const hidden = meanings.length - 3;
   return (
-    <ol className="type-body grid max-w-measure list-inside list-decimal gap-pair text-muted-foreground marker:text-faint-foreground">
+    <ol className="type-body grid max-w-measure list-inside list-decimal gap-1 text-muted-foreground marker:text-faint-foreground">
       {(open ? meanings : meanings.slice(0, 3)).map((meaning) => (
         <li className="only:list-none" key={meaning}>
           {meaning}

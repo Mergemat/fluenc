@@ -33,7 +33,7 @@ export function Chip<T extends string>({
     <button
       aria-pressed={pressed}
       className={cn(
-        "type-control relative isolate inline-flex h-8 items-center overflow-hidden rounded-lg border border-border px-2.75 text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground aria-pressed:border-blue aria-pressed:text-foreground",
+        "type-control relative isolate inline-flex h-8 items-center overflow-hidden rounded-md border border-border px-3 text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground aria-pressed:border-blue aria-pressed:text-foreground",
         className
       )}
       onClick={onSelect ? select : onClick}
@@ -43,7 +43,7 @@ export function Chip<T extends string>({
       {pressed ? (
         <DitherGradient cell={2} direction="up" from="blue" opacity={0.45} />
       ) : null}
-      <span className="relative inline-flex items-center gap-1.75">
+      <span className="relative inline-flex items-center gap-2">
         {children}
       </span>
     </button>

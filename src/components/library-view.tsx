@@ -63,18 +63,18 @@ const skeletonTiles = Array.from(
 
 // The search field and filter chips over a list; the palace shares them.
 /** Search field and filters, above the results. */
-export const controls = "mb-group grid gap-item";
+export const controls = "mb-6 grid gap-4";
 export const searchBox =
-  "flex h-13 items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 text-muted-foreground transition-colors focus-within:border-blue focus-within:text-foreground";
+  "flex h-14 items-center gap-2.5 rounded-lg border border-border bg-card px-3.5 text-muted-foreground transition-colors focus-within:border-blue focus-within:text-foreground";
 export const searchInput =
   "h-full min-w-0 flex-1 border-0 bg-transparent type-heading text-foreground outline-none search-cancel:hidden placeholder:type-control placeholder:text-faint-foreground";
 export const searchClear =
-  "grid size-7 place-items-center rounded-md text-muted-foreground hover:bg-popover hover:text-foreground";
+  "grid size-7 place-items-center rounded-sm text-muted-foreground hover:bg-popover hover:text-foreground";
 /** Filter groups: chip sets on one line, wrapping, the last pushed to the end. */
-export const filterBar = "flex flex-wrap justify-between gap-tight";
-export const filterSet = "flex flex-wrap gap-x-item gap-y-tight";
+export const filterBar = "flex flex-wrap justify-between gap-2";
+export const filterSet = "flex flex-wrap gap-x-4 gap-y-2";
 /** A fieldset of chips, without the browser's border and padding. */
-export const filterGroup = "flex min-w-0 flex-wrap gap-tight";
+export const filterGroup = "flex min-w-0 flex-wrap gap-2";
 
 type Kind = (typeof kinds)[number]["id"];
 type StatusId = (typeof statuses)[number]["id"];
@@ -398,7 +398,7 @@ export function LibraryView() {
 
       {results}
 
-      <p className="type-label mt-section mb-0 text-center text-faint-foreground leading-wrap">
+      <p className="type-label mt-12 mb-0 text-center text-faint-foreground leading-wrap">
         definitions adapted from{" "}
         <a
           className="underline underline-offset-3"
@@ -566,12 +566,12 @@ function LibraryResults({
       {/* Section keys stay pinned while browsing, so any part of the course is one tap away. */}
       <nav
         aria-label="Jump to section"
-        className="scrollbar-none sticky top-0 z-2 mb-1.5 flex gap-pair overflow-x-auto bg-background py-tight shadow-hairline"
+        className="scrollbar-none sticky top-0 z-2 mb-1.5 flex gap-1 overflow-x-auto bg-background py-2 shadow-hairline"
       >
         {sections.map((section) => (
           <button
             className={cn(
-              "type-control h-7.5 min-w-8.5 shrink-0 rounded-chip border border-transparent px-2.25 tabular-nums transition-colors hover:border-border-strong hover:text-foreground",
+              "type-control h-8 min-w-9 shrink-0 rounded-md border border-transparent px-2.5 tabular-nums transition-colors hover:border-border-strong hover:text-foreground",
               section.learned > 0 ? "text-foreground" : "text-faint-foreground"
             )}
             key={section.key}
@@ -618,11 +618,11 @@ function LibrarySectionBlock({
   return (
     <section
       aria-labelledby={`${id}-title`}
-      className="flex scroll-mt-10 flex-col gap-tight pt-section first-of-type:pt-group"
+      className="flex scroll-mt-10 flex-col gap-2 pt-12 first-of-type:pt-6"
       id={id}
     >
       {/* Reads like every section head: label, then its count after a dot. */}
-      <header className={cn(headRow, "min-h-0 gap-tight")}>
+      <header className={cn(headRow, "min-h-0 gap-2")}>
         <h2
           className="type-label m-0 min-w-3.5 shrink-0 whitespace-nowrap text-foreground"
           id={`${id}-title`}

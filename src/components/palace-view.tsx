@@ -55,7 +55,7 @@ type Show = "all" | "named" | "open";
 /** A palace row; every row after the first has a divider above it. */
 const rowClass = (first: boolean) =>
   cn(
-    "relative grid min-h-13.5 grid-cols-clue-row items-center gap-item overflow-hidden py-1.5 pr-3.5 pl-2 text-muted-foreground transition-colors max-xs:grid-cols-clue-row-xs max-xs:gap-tight",
+    "relative grid min-h-14 grid-cols-clue-row items-center gap-4 overflow-hidden py-1.5 pr-3.5 pl-2 text-muted-foreground transition-colors max-xs:grid-cols-clue-row-xs max-xs:gap-2",
     !first && "inset-shadow-hairline"
   );
 
@@ -167,7 +167,7 @@ export function PalaceView() {
           <div key={`${entry.kind}:${entry.key}`}>
             {entry.group && entry.group !== shown[index - 1]?.group ? (
               <SectionHead
-                className={index ? "mt-section" : undefined}
+                className={index ? "mt-12" : undefined}
                 label={entry.group}
               />
             ) : null}
@@ -278,7 +278,7 @@ function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
     <Link
       className={cn(
         rowClass(first),
-        "follows-hover:inset-shadow-none hover:inset-shadow-none hover:rounded-xl hover:bg-popover"
+        "follows-hover:inset-shadow-none hover:inset-shadow-none hover:rounded-lg hover:bg-popover"
       )}
       data-kind={row.kind}
       data-open={open}
@@ -289,14 +289,14 @@ function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
       <span
         className={cn(
           "type-code justify-self-center whitespace-nowrap text-kind",
-          props && "font-hanzi-props font-normal text-28",
+          props && "font-hanzi-props font-normal text-3xl",
           open && "opacity-55"
         )}
         lang={props ? "zh-CN" : undefined}
       >
-        <ClueCode clue={row.cue} toneClassName="h-5 w-6.5" />
+        <ClueCode clue={row.cue} toneClassName="h-5 w-7" />
       </span>
-      <span className="grid min-w-0 gap-pair">
+      <span className="grid min-w-0 gap-1">
         <span
           className={cn(
             "min-w-0 truncate",
@@ -323,7 +323,7 @@ function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
       {row.started ? (
         // Under the code, clear of the divider below the row.
         <span
-          className="absolute bottom-tight left-0 h-0.5 overflow-hidden"
+          className="absolute bottom-2 left-0 h-0.5 overflow-hidden"
           style={{ width: `${(row.started / row.characters) * 100}%` }}
         >
           <DitherGradient cell={2} direction="left" from="green" />

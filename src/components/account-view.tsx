@@ -12,10 +12,10 @@ import { useToast } from "./ui/toast";
 type Mode = "sign-in" | "sign-up";
 
 const note = "m-0 max-w-measure type-body text-muted-foreground";
-const field = "grid gap-tight";
+const field = "grid gap-2";
 const fieldLabel = "type-label text-muted-foreground";
 const input =
-  "h-12 rounded-xl border border-border bg-card px-3.5 type-heading text-foreground transition-colors focus:border-blue";
+  "h-12 rounded-lg border border-border bg-card px-3.5 type-heading text-foreground transition-colors focus:border-blue";
 
 const copy: Record<Mode, { title: string; submit: string; switch: string }> = {
   "sign-in": {
@@ -88,7 +88,7 @@ export function AccountView() {
   const Icon = mode === "sign-in" ? LogIn : UserPlus;
   return (
     <Page head={<PageHeader title={text.title} />}>
-      <form className="grid max-w-form gap-item" onSubmit={submit}>
+      <form className="grid max-w-form gap-4" onSubmit={submit}>
         <p className={note}>
           sync progress between your devices. what you learned here joins the
           account.
@@ -120,7 +120,7 @@ export function AccountView() {
           />
         </label>
         {error ? <ErrorNote>{error}</ErrorNote> : null}
-        <div className="mt-tight flex flex-wrap items-center gap-x-item gap-y-tight">
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
           <DitherButton
             className={tool}
             color="blue"

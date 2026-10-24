@@ -34,19 +34,19 @@ export function SettingRow({
   return (
     <section
       aria-labelledby={id}
-      className="grid grid-cols-setting items-center gap-x-item gap-y-tight border-border not-last:border-b py-3 sm:grid-cols-setting-wide"
+      className="grid grid-cols-setting items-center gap-x-4 gap-y-2 border-border not-last:border-b py-3 sm:grid-cols-setting-wide"
     >
       <div className="col-start-1 row-start-1 min-w-0">
         <h2 className="type-heading m-0" id={id}>
           {title}
         </h2>
-        <p className="type-label mt-pair mb-0 text-muted-foreground leading-wrap">
+        <p className="type-label mt-1 mb-0 text-muted-foreground leading-wrap">
           {note}
         </p>
       </div>
       <p
         className={cn(
-          "type-control col-span-2 row-start-2 m-0 flex items-baseline gap-tight leading-wrap sm:col-span-1 sm:col-start-2 sm:row-start-1",
+          "type-control col-span-2 row-start-2 m-0 flex items-baseline gap-2 leading-wrap sm:col-span-1 sm:col-start-2 sm:row-start-1",
           tone === "idle" ? "text-muted-foreground" : "text-foreground"
         )}
         role="status"
@@ -54,14 +54,14 @@ export function SettingRow({
         <i
           aria-hidden="true"
           className={cn(
-            "size-1.75 shrink-0 -translate-y-px rounded-xs",
+            "size-2 shrink-0 -translate-y-px rounded-xs",
             dots[tone]
           )}
         />
         <span>{status}</span>
       </p>
       {children ? (
-        <div className="col-start-2 row-start-1 flex items-center justify-end gap-tight sm:col-start-3">
+        <div className="col-start-2 row-start-1 flex items-center justify-end gap-2 sm:col-start-3">
           {children}
         </div>
       ) : null}
