@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
+import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppAccountRouteImport } from './routes/_app.account'
 import { Route as AppLessonsRouteImport } from './routes/_app.lessons'
@@ -31,6 +32,11 @@ import { Route as AppProfilePalaceKindKeyRouteImport } from './routes/_app.profi
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -126,6 +132,7 @@ const AppProfilePalaceKindKeyRoute = AppProfilePalaceKindKeyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/welcome': typeof WelcomeRoute
   '/account': typeof AppAccountRoute
   '/lessons': typeof AppLessonsRoute
   '/library': typeof AppLibraryRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByFullPath {
   '/profile/palace/$kind/$key': typeof AppProfilePalaceKindKeyRoute
 }
 export interface FileRoutesByTo {
+  '/welcome': typeof WelcomeRoute
   '/account': typeof AppAccountRoute
   '/lessons': typeof AppLessonsRoute
   '/library': typeof AppLibraryRoute
@@ -167,6 +175,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
+  '/welcome': typeof WelcomeRoute
   '/_app/account': typeof AppAccountRoute
   '/_app/lessons': typeof AppLessonsRoute
   '/_app/library': typeof AppLibraryRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/welcome'
     | '/account'
     | '/lessons'
     | '/library'
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/profile/palace/$kind/$key'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/welcome'
     | '/account'
     | '/lessons'
     | '/library'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_app'
+    | '/welcome'
     | '/_app/account'
     | '/_app/lessons'
     | '/_app/library'
@@ -252,6 +264,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
+  WelcomeRoute: typeof WelcomeRoute
   ApiPushRoute: typeof ApiPushRoute
   ApiReviewReminderRoute: typeof ApiReviewReminderRoute
   ApiSyncRoute: typeof ApiSyncRoute
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -434,6 +454,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
+  WelcomeRoute: WelcomeRoute,
   ApiPushRoute: ApiPushRoute,
   ApiReviewReminderRoute: ApiReviewReminderRoute,
   ApiSyncRoute: ApiSyncRoute,

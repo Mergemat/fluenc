@@ -1,4 +1,5 @@
-import { RefreshCw } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Play, RefreshCw } from "lucide-react";
 
 import type {
   DownloadStatus,
@@ -71,6 +72,19 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
         <AccountSettings />
         <SectionHead className="dx-set-group" label="reminders" />
         <NotificationSettings />
+        <SectionHead className="dx-set-group" label="the method" />
+        <SettingRow
+          id="welcome-heading"
+          note="how a character becomes a short movie"
+          status="about a minute"
+          title="welcome reel"
+          tone="idle"
+        >
+          <Link className="dx-chip" to="/welcome">
+            <Play size={13} />
+            watch again
+          </Link>
+        </SettingRow>
         <SectionHead className="dx-set-group" label="this device" />
         <SettingRow
           id="offline-heading"

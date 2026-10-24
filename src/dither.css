@@ -3431,3 +3431,308 @@ a.dx-pal-row:hover {
   font: var(--dx-type-control);
   color: var(--dx-muted);
 }
+
+/* ── Welcome ─────────────────────────────────────── */
+/* The first-run reel: 好 and hǎo on top, a slide under them, never scrolling. No sidebar, so the
+   desktop shell's grid gives way to one column. */
+.dx-welcome {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.dx-welcome p,
+.dx-welcome h1 {
+  margin: 0;
+}
+.dx-welcome [data-k="actor"] {
+  --k: var(--dx-blue);
+}
+.dx-welcome [data-k="set"] {
+  --k: var(--dx-purple);
+}
+.dx-welcome [data-k="room"] {
+  --k: var(--dx-green);
+}
+.dx-welcome-top {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 52px;
+  padding: 0 var(--dx-gutter);
+  border-bottom: 1px solid var(--dx-line);
+}
+.dx-welcome-frame {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--dx-space-item);
+  width: 100%;
+  max-width: calc(480px + 2 * var(--dx-gutter));
+  min-height: 0;
+  padding: var(--dx-page-top) var(--dx-gutter) var(--dx-space-group);
+  margin: 0 auto;
+}
+.dx-welcome-skip {
+  font: var(--dx-type-control);
+  color: var(--dx-muted);
+}
+.dx-welcome-skip:hover {
+  color: var(--dx-fg);
+}
+/* Story segments; the current one fills over the slide's time. */
+.dx-welcome-reel {
+  display: flex;
+  flex: 1;
+  gap: 3px;
+  min-width: 40px;
+}
+.dx-welcome-seg {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  overflow: hidden;
+  background: var(--dx-line);
+  border-radius: 2px;
+}
+.dx-welcome-seg-fill {
+  position: absolute;
+  inset: 0;
+}
+.dx-welcome-seg[data-state="now"] > .dx-welcome-seg-fill {
+  animation: dx-welcome-fill var(--ms) linear both;
+}
+@keyframes dx-welcome-fill {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+/* 好 and hǎo: the part being explained glows, the ones shown keep their colour. */
+.dx-welcome-subject {
+  display: grid;
+  flex: 1;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--dx-space-tight);
+  justify-items: center;
+  min-height: 0;
+}
+.dx-welcome-subject > .dx-glyph-box {
+  --glyph-max: 200px;
+}
+.dx-welcome-py {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: var(--dx-type-pinyin);
+  font-size: var(--dx-text-3xl);
+  transition: opacity 500ms;
+}
+.dx-welcome-py[data-shown="false"] {
+  opacity: 0;
+}
+.dx-welcome-sound {
+  color: var(--dx-faint);
+  transition:
+    color 400ms,
+    text-shadow 400ms,
+    transform 400ms;
+}
+.dx-welcome-sound[data-k="room"] {
+  margin-left: 12px;
+}
+.dx-welcome-py .dx-tone {
+  width: 26px;
+  height: 20px;
+}
+.dx-welcome-sound[data-state="done"] {
+  color: var(--k);
+}
+.dx-welcome-sound[data-state="now"] {
+  color: var(--k);
+  text-shadow: 0 0 18px var(--k);
+  transform: translateY(-3px);
+}
+/* The slide keeps one height, so 好 holds still from slide to slide. */
+.dx-welcome-slide {
+  display: grid;
+  flex-shrink: 0;
+  gap: var(--dx-space-tight);
+  align-content: start;
+  min-height: 330px;
+  animation: dx-welcome-rise 400ms ease-out both;
+}
+@keyframes dx-welcome-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.dx-welcome-slide > .dx-label {
+  color: var(--dx-muted);
+}
+.dx-welcome-slide > h1 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.3em;
+  align-items: center;
+  font: var(--dx-type-display);
+  font-size: var(--dx-text-2xl);
+  letter-spacing: -0.02em;
+}
+.dx-welcome-code {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--dx-mono);
+  font-weight: 700;
+  color: var(--k);
+}
+.dx-welcome-slide > h1 .dx-tone {
+  width: 30px;
+  height: 22px;
+}
+.dx-welcome-line {
+  font: var(--dx-type-body);
+  color: var(--dx-muted);
+  text-wrap: pretty;
+}
+.dx-welcome-visual {
+  margin-top: var(--dx-space-tight);
+}
+/* The small line under a code or a name. */
+.dx-welcome-note {
+  display: block;
+  font: var(--dx-type-label);
+  color: var(--dx-muted);
+}
+.dx-welcome-place .dx-welcome-note {
+  margin-bottom: 4px;
+}
+/* Four kinds of actors; the one h- belongs to is lit. */
+.dx-welcome-kinds {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+.dx-welcome-kind {
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--dx-line);
+  border-radius: var(--dx-radius);
+}
+.dx-welcome-kind-codes {
+  font: var(--dx-type-code);
+  font-size: var(--dx-text-base);
+  color: var(--dx-blue);
+  white-space: pre;
+}
+.dx-welcome-kind[data-lit="true"] {
+  background: color-mix(in srgb, var(--dx-blue) 10%, transparent);
+  border-color: color-mix(in srgb, var(--dx-blue) 50%, transparent);
+}
+.dx-welcome-kind[data-lit="true"] > .dx-welcome-note {
+  color: var(--dx-fg);
+}
+/* A final linked to a place. */
+.dx-welcome-place {
+  display: flex;
+  gap: var(--dx-space-item);
+  align-items: center;
+  padding: 14px 16px;
+  font: var(--dx-type-heading);
+  background: color-mix(in srgb, var(--dx-purple) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--dx-purple) 50%, transparent);
+  border-radius: var(--dx-radius);
+}
+.dx-welcome-place-code {
+  font: var(--dx-type-code);
+  font-size: var(--dx-text-xl);
+  color: var(--dx-purple);
+}
+.dx-welcome-place > [aria-hidden="true"] {
+  color: var(--dx-faint);
+}
+/* The five rooms; the dipping tone's is lit. */
+.dx-welcome-rooms {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.dx-welcome-rooms > li {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 12px 2px 10px;
+  font: var(--dx-type-label);
+  line-height: var(--dx-wrap);
+  color: var(--dx-muted);
+  text-align: center;
+  border: 1px solid var(--dx-line);
+  border-radius: var(--dx-radius);
+}
+.dx-welcome-room-tone {
+  width: 22px;
+  height: 16px;
+  color: var(--dx-green);
+}
+.dx-welcome-rooms > [data-lit="true"] {
+  color: var(--dx-fg);
+  background: color-mix(in srgb, var(--dx-green) 12%, transparent);
+  border-color: color-mix(in srgb, var(--dx-green) 50%, transparent);
+}
+/* The props, side by side as they sit in 好. */
+.dx-welcome-props {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+.dx-welcome-prop {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  font: var(--dx-type-heading);
+  border: 1px solid color-mix(in srgb, var(--part) 50%, transparent);
+  border-radius: var(--dx-radius);
+}
+.dx-welcome-prop-code {
+  font-family: var(--font-hanzi-props);
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--part);
+}
+/* The script: the scene in one go, each clue in its colour. */
+.dx-welcome-script {
+  font: var(--dx-type-heading);
+  line-height: 1.55;
+  color: var(--dx-muted);
+  text-wrap: pretty;
+}
+.dx-welcome-clue {
+  font-weight: 600;
+  color: var(--k, var(--dx-fg));
+}
+.dx-welcome-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--dx-space-tight);
+}
+.dx-welcome-actions > .dx-chip {
+  height: 50px;
+  padding: 0 16px;
+  border-radius: var(--dx-radius);
+}
+@media (max-height: 700px) {
+  .dx-welcome-slide {
+    min-height: 290px;
+  }
+  .dx-welcome-slide > h1 {
+    font-size: var(--dx-text-xl);
+  }
+}

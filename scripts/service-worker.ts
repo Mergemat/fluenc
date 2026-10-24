@@ -55,7 +55,7 @@ self.addEventListener("notificationclick", (event) => {
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL("/offline.html"), {
     allowlist: [
-      /^\/(?:review|lessons|reading|listen|library|profile|settings|account)?\/?(?:\?.*)?$/,
+      /^\/(?:review|lessons|reading|listen|library|profile|settings|account|welcome)?\/?(?:\?.*)?$/,
       /^\/library\/(?:characters|words)\/[^/?]+\/?(?:\?.*)?$/,
       /^\/profile\/palace\/?(?:\?.*)?$/,
       // The palace's old address, which redirects to the profile.
