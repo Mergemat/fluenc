@@ -22,12 +22,12 @@ export const deckPage =
 export const deck = "flex min-h-0 flex-1 flex-col gap-4";
 
 /**
- * The button and the grades share one place, tall enough for a wait line over the grades. Each
- * child stacks into it with `deckAction`; a pair sits side by side instead.
+ * The button and the grades share one place, as tall as a button. Each child stacks into it with
+ * `deckAction`; a pair sits side by side instead.
  */
 export function deckActions(pair = false) {
   return cn(
-    "mx-auto grid min-h-20 w-full max-w-deck shrink-0",
+    "mx-auto grid min-h-14 w-full max-w-deck shrink-0",
     pair && "auto-cols-fr grid-flow-col gap-2"
   );
 }

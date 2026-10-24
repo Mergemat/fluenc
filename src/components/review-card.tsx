@@ -94,9 +94,10 @@ function RatingButton({
 }) {
   const rate = useCallback(() => onRate(rating.value), [onRate, rating.value]);
   // The wait sits above its button, so it reads as when the card returns, not as part of the name.
+  // It hangs in the gap over the actions, so the deck keeps no row for it while the answer is hidden.
   return (
-    <div className="grid min-w-0 gap-2">
-      <em className="type-micro text-center text-muted-foreground tabular-nums">
+    <div className="relative grid min-w-0">
+      <em className="type-micro absolute inset-x-0 bottom-full mb-2 text-center text-muted-foreground tabular-nums">
         {after}
       </em>
       <DitherButton
