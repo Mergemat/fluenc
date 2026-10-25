@@ -296,7 +296,7 @@ function UsageWords({
         <section
           aria-busy={usage.pending}
           aria-label={`Words with ${hanzi}`}
-          className="absolute top-full right-0 mt-1.5 box-border min-w-56 max-w-panel animate-enter rounded-lg border border-border-strong bg-popover px-3.5 py-2 shadow-popover"
+          className="absolute top-full right-0 mt-1.5 box-border min-w-56 max-w-panel origin-top-right animate-enter rounded-lg border border-border-strong bg-popover px-3.5 py-2 shadow-popover"
           id={panel}
         >
           <UsageList usage={usage} />
@@ -650,7 +650,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
         {noteOpen && item.movie.componentNote ? (
           <div
             aria-label="How the parts fit"
-            className="absolute inset-x-0 top-6 z-5 animate-enter rounded-lg border border-border-strong bg-popover py-3 pr-10 pl-3.5 shadow-popover"
+            className="absolute inset-x-0 top-6 z-5 origin-top animate-enter rounded-lg border border-border-strong bg-popover py-3 pr-10 pl-3.5 shadow-popover"
             role="note"
           >
             <p className="type-body text-foreground">

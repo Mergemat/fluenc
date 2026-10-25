@@ -274,7 +274,8 @@
   /* ── Motion ─────────────────────────────────────────────────────────────── */
   --default-transition-duration: 150ms;
   --default-transition-timing-function: ease;
-  --ease-out: ease-out;
+  /* Stronger than the built-in ease-out, which barely moves in its first frames. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in: ease-in;
   --ease-in-out: ease-in-out;
   /* No overshoot: a flip that swings past its face and back warps the character in perspective. */
@@ -286,19 +287,21 @@
   --perspective-deck: 2400px;
   --animate-pulse: pulse 1.1s ease-in-out infinite;
   --animate-pulse-fast: pulse 1s ease-in-out infinite;
-  --animate-enter: enter 0.16s ease-out;
+  --animate-enter: enter 160ms var(--ease-out);
+  --animate-fade-in: fade-in 160ms var(--ease-out);
   --animate-pixel: pixel 0.8s steps(1) infinite;
   --animate-eq: eq 0.5s ease-in-out infinite alternate;
   --animate-writing-hint: writing-hint 1.4s ease-in-out infinite;
-  --animate-writing-paint: writing-paint 260ms ease-out both;
+  --animate-writing-paint: writing-paint 260ms var(--ease-out) both;
   --animate-writing-start: writing-start 1.2s ease-in-out infinite;
   --animate-deal: deal 180ms var(--ease-card) backwards;
   --animate-throw-left: throw-left 300ms var(--ease-throw) forwards;
   --animate-throw-right: throw-right 300ms var(--ease-throw) forwards;
   /* Holds until the throw is nearly over, so the card is seen leaving, not dissolving. */
   --animate-fade-out: fade-out 300ms cubic-bezier(0.7, 0, 0.84, 0) forwards;
-  --animate-answer: fade-in 200ms 120ms ease-out both;
-  --animate-rise: rise 400ms ease-out both;
+  /* No delay: the answer side stays hidden until it turns toward you. */
+  --animate-answer: fade-in 150ms var(--ease-out) both;
+  --animate-rise: rise 300ms var(--ease-out) both;
   /* ── Colour ─────────────────────────────────────────────────────────────── */
 
   /* ── Type ───────────────────────────────────────────────────────────────── */
@@ -315,6 +318,7 @@
   @keyframes enter {
     from {
       opacity: 0;
+      scale: 0.97;
     }
   }
   @keyframes fade-in {
@@ -635,7 +639,15 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
+  /* Blinks, pulses and fills move nothing, and stopped, a loader no longer says it's loading. */
+  *:not(
+    .animate-pixel,
+    .animate-pulse,
+    .animate-pulse-fast,
+    .animate-reel,
+    .animate-writing-hint,
+    .animate-writing-start
+  ),
   *::before,
   *::after {
     scroll-behavior: auto !important;
@@ -690,7 +702,7 @@
    faster. */
 @utility transition-card {
   transition:
-    transform 360ms var(--ease-card),
+    transform 280ms var(--ease-card),
     translate 180ms var(--ease-card),
     rotate 180ms var(--ease-card);
 }

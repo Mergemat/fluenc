@@ -36,6 +36,16 @@ const FLAT_DENSITY: Record<Exclude<ButtonVariant, "gradient">, number> = {
   solid: 0.75,
 };
 
+// The glow's time constant: what a 0.16 step per frame gave on a 60Hz screen.
+const GLOW_MS = 96;
+
+/** The glow `elapsedMs` closer to `target`, by time rather than by frame, so 120Hz isn't faster. */
+export const glowToward = (
+  intensity: number,
+  target: number,
+  elapsedMs: number
+) => intensity + (target - intensity) * (1 - Math.exp(-elapsedMs / GLOW_MS));
+
 const rowDensity = (variant: ButtonVariant, y: number, rows: number) =>
   variant === "gradient"
     ? 0.25 + 0.75 * ((y + 0.5) / rows)
@@ -137,19 +147,20 @@ export function DitherButton({
     let target = 0;
     let hovered = false;
     let raf = 0;
+    let last = 0;
 
     const paint = () =>
       paintButton(ctx, bloomCtx, cols, rows, state, intensity);
 
-    const tick = () => {
-      const d = target - intensity;
-      if (Math.abs(d) < 0.01) {
+    const tick = (now: number) => {
+      if (Math.abs(target - intensity) < 0.01) {
         intensity = target;
         paint();
         raf = 0;
         return;
       }
-      intensity += d * 0.16;
+      intensity = glowToward(intensity, target, Math.max(0, now - last));
+      last = now;
       paint();
       raf = requestAnimationFrame(tick);
     };
@@ -161,6 +172,7 @@ export function DitherButton({
         intensity = t;
         paint();
       } else if (!raf) {
+        last = performance.now();
         raf = requestAnimationFrame(tick);
       }
     };

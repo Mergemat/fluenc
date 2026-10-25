@@ -64,7 +64,7 @@ function Subject({ slide }: { slide: number }) {
         aria-hidden={slide === 0}
         aria-label="hǎo"
         className={cn(
-          "type-pinyin flex shrink-0 items-center justify-center text-3xl transition-opacity duration-500",
+          "type-pinyin flex shrink-0 items-center justify-center text-3xl transition-opacity duration-300 ease-out",
           slide === 0 && "opacity-0"
         )}
         role="img"
@@ -78,7 +78,7 @@ function Subject({ slide }: { slide: number }) {
         ).map(([part, text]) => (
           <span
             className={cn(
-              "transition-glow duration-400",
+              "transition-glow duration-300 ease-out",
               part === "room" && "ml-3",
               soundStates(part)[partState(part, slide)]
             )}

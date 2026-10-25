@@ -373,7 +373,7 @@ export function WritingModal({
   return (
     <dialog
       aria-label={`Write ${hanzi}`}
-      className="m-auto max-h-none max-w-none animate-enter overflow-visible border-0 bg-transparent p-0 text-inherit backdrop:bg-background/82 backdrop:backdrop-blur-sm"
+      className="m-auto max-h-none max-w-none animate-enter overflow-visible border-0 bg-transparent p-0 text-inherit backdrop:animate-fade-in backdrop:bg-background/82 backdrop:backdrop-blur-sm"
       ref={dialog}
     >
       <section className="box-border grid w-writing-frame justify-items-center gap-4 rounded-2xl border border-border-strong bg-card px-3.5 pt-2.5 pb-4 shadow-modal">

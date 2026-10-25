@@ -2,11 +2,13 @@
 import { cn } from "../../lib/utils";
 import { DitherGradient } from "../dither-kit/gradient";
 
-/** A thin dithered bar; its fills are `progressFill` spans with a width. */
+/**
+ * A thin dithered bar; its fills are `progressFill` spans with a width. A fill doesn't animate: a
+ * width in motion resizes its dither, which repaints every frame.
+ */
 export const progressTrack =
   "relative h-1.5 max-w-72 flex-1 overflow-hidden rounded-xs";
-export const progressFill =
-  "absolute inset-y-0 left-0 overflow-hidden transition-all duration-300 ease-out";
+export const progressFill = "absolute inset-y-0 left-0 overflow-hidden";
 
 const percent = (part: number, total: number) =>
   total ? `${(part / total) * 100}%` : "0%";
