@@ -93,4 +93,4 @@ On the Vercel Hobby plan the job can run any time within that hour, and Vercel d
 
 ## License
 
-The code is [MIT](LICENSE). The dictionary data, sentences, stroke graphics, fonts and syllable recordings have their own licenses, listed in [THIRD_PARTY.md](THIRD_PARTY.md). The syllable recordings are licensed for non-commercial use only.
+The code is [GPL-3.0-or-later](LICENSE). The dictionary data, sentences, stroke graphics, fonts and syllable recordings have their own licenses, listed in [THIRD_PARTY.md](THIRD_PARTY.md). The syllable recordings are licensed for non-commercial use only.

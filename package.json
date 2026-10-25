@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git+https://github.com/Mergemat/fluenc.git"
   },
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "type": "module",
   "scripts": {
     "build": "bun scripts/build.ts",

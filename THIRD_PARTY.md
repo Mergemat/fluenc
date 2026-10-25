@@ -1,6 +1,6 @@
 # Third-party material
 
-Fluenc's source code is MIT licensed. The data, fonts and recordings below keep their own licenses. Keep their attribution and license when you redistribute them.
+Fluenc's source code is GPL-3.0-or-later licensed. The data, fonts and recordings below keep their own licenses. Keep their attribution and license when you redistribute them.
 
 | Material | Where | Source | License |
 | --- | --- | --- | --- |
