@@ -532,6 +532,15 @@ function useGrading(onRestore: (item: ReviewItem) => void) {
   return { graded, leaving, failed, settled, grade, gone };
 }
 
+/** Opening review with nothing due shows its end still; finishing a deck here lets it arrive. */
+function useWorked(hasCard: boolean) {
+  const [worked, setWorked] = useState(hasCard);
+  if (hasCard && !worked) {
+    setWorked(true);
+  }
+  return worked;
+}
+
 /**
  * The review deck under its page header, which counts what is left. `done` shows once nothing is
  * left to answer, saving or flying off, and brings its own header.
@@ -565,11 +574,7 @@ export function ReviewDeck({
   ) {
     setSelected(active);
   }
-  // Opening review with nothing due shows its end still; finishing a deck here lets it arrive.
-  const [worked, setWorked] = useState(() => due.length > 0);
-  if (active && !worked) {
-    setWorked(true);
-  }
+  const worked = useWorked(active !== undefined);
   const activeKey = active ? cardKey(active) : null;
 
   // Per top card: when it showed (for the review's duration), whether it is turned, its waits.

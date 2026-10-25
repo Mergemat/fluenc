@@ -42,20 +42,23 @@ export function ReviewView({ data }: { data: DashboardData }) {
     state = "finished";
   }
 
+  const coming = learning.length;
+  const done = useCallback(
+    (arrived: boolean) => (
+      <ReviewDone
+        arrived={arrived}
+        coming={coming}
+        data={data}
+        nextLearningAt={nextLearningAt}
+        state={state}
+      />
+    ),
+    [coming, data, nextLearningAt, state]
+  );
+
   return (
     <section className={deckPage}>
-      <ReviewDeck
-        done={(arrived) => (
-          <ReviewDone
-            arrived={arrived}
-            coming={learning.length}
-            data={data}
-            nextLearningAt={nextLearningAt}
-            state={state}
-          />
-        )}
-        queue={data.reviewQueue}
-      />
+      <ReviewDeck done={done} queue={data.reviewQueue} />
     </section>
   );
 }
