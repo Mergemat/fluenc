@@ -45,14 +45,15 @@ export function ReviewView({ data }: { data: DashboardData }) {
   return (
     <section className={deckPage}>
       <ReviewDeck
-        done={
+        done={(arrived) => (
           <ReviewDone
+            arrived={arrived}
             coming={learning.length}
             data={data}
             nextLearningAt={nextLearningAt}
             state={state}
           />
-        }
+        )}
         queue={data.reviewQueue}
       />
     </section>
@@ -68,11 +69,14 @@ function ReviewDone({
   data,
   coming,
   nextLearningAt,
+  arrived,
 }: {
   state: DoneState;
   data: DashboardData;
   coming: number;
   nextLearningAt: string | null;
+  /** The last card of a deck just left, so the slot settles in rather than standing there. */
+  arrived: boolean;
 }) {
   const navigate = useNavigate();
   const waiting = state === "waiting";
@@ -114,7 +118,7 @@ function ReviewDone({
         <div className={deck} data-state="waiting" role="status">
           <DeckTable>
             <DeckPile under={coming - 1}>
-              <DeckSlot state="down">
+              <DeckSlot arrive={arrived} state="down">
                 <b className={slotFigure("text-timer tabular-nums")}>
                   {countdown(Date.parse(nextLearningAt ?? "") - now)}
                 </b>
@@ -151,10 +155,10 @@ function ReviewDone({
       <div className={deck} data-state={state}>
         <DeckTable>
           <DeckPile under={0}>
-            <DeckSlot state="empty">
+            <DeckSlot arrive={arrived} state="empty">
               {state === "finished" ? (
                 <>
-                  <b className={verdict}>done</b>
+                  <b className={cn(verdict, arrived && "animate-rise")}>done</b>
                   <small className={slotNote}>
                     next · {nextReviews(data, now) ?? "tomorrow"}
                   </small>

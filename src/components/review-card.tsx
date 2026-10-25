@@ -541,7 +541,8 @@ export function ReviewDeck({
   done,
 }: {
   queue: ReviewItem[];
-  done: ReactNode;
+  /** Told whether this visit worked a deck to its end, so only that arrives with motion. */
+  done: (arrived: boolean) => ReactNode;
 }) {
   const [selected, setSelected] = useState(() => due[0]);
   // A card whose save failed comes back to the top, where its error is.
@@ -563,6 +564,11 @@ export function ReviewDeck({
     active?.reps !== selected?.reps
   ) {
     setSelected(active);
+  }
+  // Opening review with nothing due shows its end still; finishing a deck here lets it arrive.
+  const [worked, setWorked] = useState(() => due.length > 0);
+  if (active && !worked) {
+    setWorked(true);
   }
   const activeKey = active ? cardKey(active) : null;
 
@@ -624,7 +630,7 @@ export function ReviewDeck({
 
   const saving = queue.length < due.length;
   if (!(active || saving || leaving.length)) {
-    return done;
+    return done(worked);
   }
 
   // The next card waits built under the top one, so it rises into place without being drawn; the

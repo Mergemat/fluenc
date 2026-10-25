@@ -1,0 +1,1752 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>fluenc · motion audit</title>
+    <style>
+    :root {
+      --s: 1;
+      --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+      --ease-card: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-throw: cubic-bezier(0.33, 1, 0.68, 1);
+      --ease-settle: cubic-bezier(0.34, 1.4, 0.64, 1);
+      --fade-hold: cubic-bezier(0.7, 0, 0.84, 0);
+      --bg: #0b0b0d;
+      --app-fg: #ececef;
+      --app-muted: #9696a0;
+      --app-faint: #5a5a63;
+      --app-border: #232328;
+      --app-border-strong: #34343c;
+      --app-popover: #18181c;
+      --deck: #131316;
+      --deck-edge: #26262c;
+      --deck-under: #0f0f12;
+      --blue: rgb(53 143 243);
+      --green: rgb(40 210 110);
+      --red: rgb(240 70 70);
+      --orange: rgb(255 150 50);
+      --purple: rgb(150 110 255);
+    }
+    body.slow {
+      --s: 5;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: var(--font-sans, system-ui);
+      line-height: 1.5;
+    }
+    .page {
+      display: grid;
+      gap: 28px;
+      padding-bottom: 24px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -0.01em;
+    }
+    h2 {
+      margin: 8px 0 -12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+    p {
+      margin: 0;
+    }
+    code {
+      font-family: var(--font-mono, ui-monospace);
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    .lede {
+      margin-top: 6px;
+      color: var(--muted-foreground);
+    }
+
+    .bar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 0;
+      background: var(--background);
+      border-bottom: 1px solid var(--border);
+    }
+    .toggle {
+      padding: 4px 12px;
+      font: inherit;
+      font-size: 13px;
+      color: var(--foreground);
+      cursor: pointer;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+    }
+    .toggle[aria-pressed="true"] {
+      color: var(--primary-foreground);
+      background: var(--primary);
+      border-color: transparent;
+    }
+    .bar small {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    .item {
+      display: grid;
+      gap: 10px;
+    }
+    .head {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .num {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-surface-foreground, var(--foreground));
+      background: var(--accent-surface, var(--muted));
+      border-radius: 6px;
+    }
+    .tag {
+      padding: 1px 8px;
+      font-size: 11px;
+      color: var(--muted-foreground);
+      white-space: nowrap;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+    }
+    .tag.fix {
+      color: var(--warning, #f0a040);
+      background: var(--warning-surface, #3a2a10);
+      border-color: transparent;
+    }
+    .tag.add {
+      color: var(--accent, #58a6ff);
+      background: var(--accent-surface, #10243a);
+      border-color: transparent;
+    }
+    .tag.keep {
+      color: var(--success, #2c6);
+      background: color-mix(in srgb, var(--success, #2c6) 16%, transparent);
+      border-color: transparent;
+    }
+    .take {
+      max-width: 64ch;
+    }
+    .why {
+      max-width: 64ch;
+      font-size: 14px;
+      color: var(--muted-foreground);
+    }
+
+    .pair {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 520px) {
+      .pair {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .stage {
+      position: relative;
+      display: grid;
+      place-items: center;
+      height: 210px;
+      padding: 16px;
+      margin: 0;
+      overflow: hidden;
+      color: var(--app-fg);
+      cursor: pointer;
+      background: var(--bg);
+      border: 1px solid var(--app-border);
+      border-radius: var(--radius, 10px);
+    }
+    .stage.tall {
+      height: 240px;
+    }
+    .stage figcaption {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      z-index: 10;
+      font-size: 11px;
+      color: var(--app-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .stage.after figcaption {
+      color: var(--green);
+    }
+    .stage .spec {
+      position: absolute;
+      right: 12px;
+      bottom: 10px;
+      left: 12px;
+      z-index: 10;
+      font-family: var(--font-mono, ui-monospace);
+      font-size: 11px;
+      color: var(--app-faint);
+    }
+
+    /* ── primer ── */
+    .primer {
+      display: grid;
+      gap: 10px;
+      padding: 16px;
+      color: var(--app-fg);
+      cursor: pointer;
+      background: var(--bg);
+      border: 1px solid var(--app-border);
+      border-radius: var(--radius, 10px);
+    }
+    .racer {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+    .racer .label {
+      font-size: 13px;
+    }
+    .racer .label small {
+      display: block;
+      font-size: 12px;
+      color: var(--app-muted);
+    }
+    .track {
+      position: relative;
+      height: 14px;
+      overflow: hidden;
+      background: #141418;
+      border-radius: 7px;
+    }
+    .runner {
+      position: absolute;
+      inset: 0;
+      transform: translateX(calc(-100% + 14px));
+    }
+    .runner::after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 14px;
+      height: 14px;
+      content: "";
+      background: currentColor;
+      border-radius: 50%;
+    }
+    .curve {
+      width: 52px;
+      height: 52px;
+      overflow: visible;
+    }
+    .curve .axis {
+      fill: none;
+      stroke: #2a2a30;
+      stroke-width: 1.5;
+    }
+    .curve .line {
+      fill: none;
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+    .run .runner {
+      animation: race calc(900ms * var(--s)) var(--e) both;
+    }
+    @keyframes race {
+      to {
+        transform: translateX(0);
+      }
+    }
+
+    /* ── cards ── */
+    .pile {
+      position: relative;
+      width: 96px;
+      height: 134px;
+      perspective: 900px;
+    }
+    .card,
+    .under,
+    .slot {
+      position: absolute;
+      inset: 0;
+      background: var(--deck);
+      border: 1px solid var(--deck-edge);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgb(0 0 0 / 0.45);
+    }
+    .under {
+      background: var(--deck-under);
+      opacity: 0.84;
+      transform: translateY(6px) rotate(-1.4deg);
+    }
+    .under.u2 {
+      opacity: 0.68;
+      transform: translateY(12px) rotate(1.1deg);
+    }
+    .face {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      gap: 2px;
+      place-items: center;
+      align-content: center;
+      background: var(--deck);
+      background-image: linear-gradient(
+        to top,
+        rgb(255 255 255 / 0.05),
+        transparent 60%
+      );
+      border: 1px solid var(--deck-edge);
+      border-radius: 12px;
+      backface-visibility: hidden;
+    }
+    .face.back {
+      transform: rotateY(180deg);
+    }
+    .hz {
+      font-family: "PingFang SC", "Noto Sans SC", serif;
+      font-size: 44px;
+      line-height: 1;
+    }
+    .py {
+      font-size: 15px;
+      color: var(--app-fg);
+    }
+    .mean {
+      font-size: 12px;
+      color: var(--app-muted);
+    }
+    .card3d {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+    }
+    .slot {
+      display: grid;
+      gap: 2px;
+      place-items: center;
+      align-content: center;
+      background: transparent;
+      border: 1px dashed var(--app-border-strong);
+      box-shadow: none;
+    }
+    .slot b {
+      font-size: 22px;
+      font-weight: 600;
+    }
+    .slot small {
+      font-size: 10px;
+      color: var(--app-muted);
+    }
+
+    @keyframes flip {
+      from {
+        transform: rotateY(0);
+      }
+      to {
+        transform: rotateY(180deg);
+      }
+    }
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+      }
+    }
+    @keyframes fade-out {
+      to {
+        opacity: 0;
+      }
+    }
+    @keyframes snap-in {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+    @keyframes snap-out {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+    @keyframes deal {
+      from {
+        translate: 0 6px;
+        rotate: -1.4deg;
+      }
+    }
+    @keyframes throw-right {
+      from {
+        transform: translate(0, 0) rotate(0);
+      }
+      to {
+        transform: translate(120%, 4%) rotate(14deg);
+      }
+    }
+    @keyframes throw-left {
+      from {
+        transform: translate(0, 0) rotate(0);
+      }
+      to {
+        transform: translate(-120%, 4%) rotate(-14deg);
+      }
+    }
+    @keyframes enter {
+      from {
+        opacity: 0;
+        scale: 0.97;
+      }
+    }
+    @keyframes rise6 {
+      from {
+        opacity: 0;
+        translate: 0 6px;
+      }
+    }
+    @keyframes hide {
+      to {
+        visibility: hidden;
+      }
+    }
+    @keyframes show {
+      from {
+        visibility: hidden;
+      }
+      to {
+        visibility: visible;
+      }
+    }
+
+    /* flip (keep) */
+    .run .flip .card3d {
+      animation: flip calc(280ms * var(--s)) var(--ease-card)
+        calc(450ms * var(--s)) both;
+    }
+    .run .flip .back .content {
+      animation: fade-in calc(150ms * var(--s)) var(--ease-out)
+        calc(450ms * var(--s)) both;
+    }
+
+    /* throw + rise (keep) */
+    .run .throw .top {
+      animation: throw-right calc(300ms * var(--s)) var(--ease-throw)
+        calc(450ms * var(--s)) both;
+    }
+    .run.left .throw .top {
+      animation-name: throw-left;
+    }
+    .run .throw .top .face {
+      animation: fade-out calc(300ms * var(--s)) var(--fade-hold)
+        calc(450ms * var(--s)) both;
+    }
+    .run .throw .next {
+      animation: deal calc(180ms * var(--s)) var(--ease-card)
+        calc(450ms * var(--s)) both;
+    }
+    .throw .top {
+      z-index: 3;
+    }
+    .throw .next {
+      z-index: 2;
+    }
+
+    /* reduced motion (finding 1) */
+    .rm .front {
+      z-index: 2;
+    }
+    .run .rm .front {
+      animation: snap-out 1ms steps(1, end) calc(600ms * var(--s)) both;
+    }
+    .run .before .rm .back .content {
+      animation: snap-in 1ms steps(1, end) calc(600ms * var(--s)) both;
+    }
+    .run .after .rm .back .content {
+      animation: fade-in calc(150ms * var(--s)) ease calc(600ms * var(--s)) both;
+    }
+    .rm .back {
+      transform: none;
+    }
+
+    /* done (finding 3) */
+    .done .top {
+      z-index: 3;
+    }
+    .run .done .top {
+      animation: throw-right calc(300ms * var(--s)) var(--ease-throw)
+        calc(450ms * var(--s)) both;
+    }
+    .run .done .top .face {
+      animation: fade-out calc(300ms * var(--s)) var(--fade-hold)
+        calc(450ms * var(--s)) both;
+    }
+    .run .before .done .slot {
+      animation: snap-in 1ms steps(1, end) calc(750ms * var(--s)) both;
+    }
+    .run .after .done .slot {
+      animation: enter calc(200ms * var(--s)) var(--ease-out)
+        calc(750ms * var(--s)) both;
+    }
+    .run .after .done .slot b {
+      animation: rise6 calc(240ms * var(--s)) var(--ease-out)
+        calc(790ms * var(--s)) both;
+    }
+
+    /* press (finding 2) */
+    .grades {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      width: 100%;
+      max-width: 300px;
+    }
+    .btn {
+      font: inherit;
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      height: 54px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      align-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      text-shadow: 0 1px 2px rgb(0 0 0 / 0.55);
+      background:
+        radial-gradient(circle, var(--c) 1.1px, transparent 1.4px) 0 0 / 4px 4px,
+        color-mix(in srgb, var(--c) 18%, #0d0d10);
+      transition: filter calc(100ms * var(--s)) var(--ease-out);
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .btn small {
+      font-size: 9px;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+    .btn:hover {
+      filter: brightness(1.25);
+    }
+    .btn:active {
+      filter: brightness(1.6);
+    }
+    .after .btn {
+      transition:
+        filter calc(100ms * var(--s)) var(--ease-out),
+        scale calc(160ms * var(--s)) var(--ease-out);
+    }
+    .after .btn:active {
+      scale: 0.97;
+    }
+    @keyframes tap-glow {
+      25%,
+      65% {
+        filter: brightness(1.6);
+      }
+    }
+    @keyframes tap-squeeze {
+      25%,
+      65% {
+        filter: brightness(1.6);
+        scale: 0.97;
+      }
+    }
+    .run .before .btn.auto {
+      animation: tap-glow calc(520ms * var(--s)) var(--ease-out)
+        calc(400ms * var(--s));
+    }
+    .run .after .btn.auto {
+      animation: tap-squeeze calc(520ms * var(--s)) var(--ease-out)
+        calc(400ms * var(--s));
+    }
+
+    /* two curves (finding 4) */
+    .racers {
+      display: grid;
+      gap: 12px;
+      width: 100%;
+    }
+    .racers .row {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 10px;
+      align-items: center;
+      font-family: var(--font-mono, ui-monospace);
+      font-size: 11px;
+      color: var(--app-muted);
+    }
+    .run .racers .runner {
+      animation: race calc(600ms * var(--s)) var(--e) calc(300ms * var(--s))
+        both;
+    }
+
+    /* popover (keep) */
+    .pop-wrap {
+      position: absolute;
+      top: 40px;
+      right: 18px;
+      display: grid;
+      gap: 6px;
+      justify-items: end;
+    }
+    .chipbtn {
+      padding: 3px 9px;
+      font-size: 12px;
+      color: var(--app-fg);
+      background: var(--bg);
+      border: 1px solid var(--app-border-strong);
+      border-radius: 6px;
+    }
+    .popover {
+      width: 170px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--app-muted);
+      background: var(--app-popover);
+      border: 1px solid var(--app-border-strong);
+      border-radius: 9px;
+      box-shadow: 0 12px 32px rgb(0 0 0 / 0.5);
+      opacity: 0;
+      transform-origin: top right;
+    }
+    .popover b {
+      font-weight: 500;
+      color: var(--app-fg);
+    }
+    .run .popover {
+      opacity: 1;
+      animation:
+        enter calc(160ms * var(--s)) var(--ease-out) calc(450ms * var(--s)) both,
+        hide 1ms steps(1, end) calc(1900ms * var(--s)) forwards;
+    }
+
+    /* dialog (keep) */
+    .backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: rgb(11 11 13 / 0.82);
+      opacity: 0;
+      backdrop-filter: blur(4px);
+    }
+    .dialog {
+      z-index: 6;
+      display: grid;
+      place-items: center;
+      width: 130px;
+      height: 140px;
+      font-size: 12px;
+      color: var(--app-muted);
+      background: #111114;
+      border: 1px solid var(--app-border-strong);
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgb(0 0 0 / 0.6);
+      opacity: 0;
+    }
+    .behind {
+      position: absolute;
+      inset: 40px 24px 40px;
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+    .behind i {
+      height: 10px;
+      background: #18181c;
+      border-radius: 4px;
+    }
+    .run .backdrop {
+      opacity: 1;
+      animation: fade-in calc(160ms * var(--s)) var(--ease-out)
+        calc(450ms * var(--s)) both;
+    }
+    .run .dialog {
+      opacity: 1;
+      animation: enter calc(160ms * var(--s)) var(--ease-out)
+        calc(450ms * var(--s)) both;
+    }
+
+    /* strokes (keep) */
+    .strokes {
+      width: 130px;
+      height: 130px;
+      background: var(--bg);
+      border: 1px solid var(--app-border);
+      border-radius: 12px;
+    }
+    .strokes .grid {
+      stroke: #1b1b20;
+      stroke-width: 1;
+      stroke-dasharray: 3 3;
+    }
+    .strokes .ghost {
+      fill: none;
+      stroke: var(--app-border);
+      stroke-width: 12;
+      stroke-linecap: round;
+    }
+    .strokes .paint {
+      fill: none;
+      stroke: var(--blue);
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke-dasharray: 1 2;
+      stroke-dashoffset: 1;
+    }
+    .strokes .miss {
+      fill: none;
+      stroke: var(--red);
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+    .strokes .missg {
+      visibility: hidden;
+    }
+    @keyframes paint {
+      from {
+        stroke-dashoffset: 1;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+    .run .strokes .paint {
+      animation: paint calc(260ms * var(--s)) var(--ease-out)
+        calc(450ms * var(--s)) both;
+    }
+    .run .strokes .missg {
+      animation: show 1ms steps(1, end) calc(1200ms * var(--s)) both;
+    }
+    .run .strokes .miss {
+      animation: fade-out calc(400ms * var(--s)) ease-in calc(1320ms * var(--s))
+        both;
+    }
+
+    /* shadow takes (keep) */
+    .takes {
+      display: flex;
+      gap: 10px;
+    }
+    .take-card {
+      width: 28px;
+      height: 40px;
+      background: var(--deck);
+      border: 1px solid var(--deck-edge);
+      border-radius: 4px;
+      transform: rotate(var(--r));
+    }
+    @keyframes lay {
+      to {
+        transform: rotate(0) translateY(-6px);
+        border-color: transparent;
+        background:
+          radial-gradient(circle, var(--green) 0.9px, transparent 1.2px) 0 0 /
+          3px 3px,
+          #0f1a14;
+      }
+    }
+    .run .take-card {
+      animation: lay calc(360ms * var(--s)) var(--ease-settle)
+        calc(var(--d) * var(--s)) both;
+    }
+
+    /* gloss (keep) */
+    .gloss {
+      display: flex;
+      gap: 26px;
+    }
+    .gloss > div {
+      display: grid;
+      gap: 4px;
+      justify-items: center;
+    }
+    .gloss .p {
+      font-size: 16px;
+      opacity: 0;
+      translate: 0 6px;
+    }
+    .gloss .g {
+      font-size: 12px;
+      color: var(--app-muted);
+      opacity: 0;
+      translate: 0 -6px;
+    }
+    .gloss .hz {
+      font-size: 40px;
+    }
+    @keyframes settle {
+      to {
+        opacity: 1;
+        translate: 0 0;
+      }
+    }
+    .run .gloss .p,
+    .run .gloss .g {
+      animation: settle calc(200ms * var(--s)) var(--ease-out)
+        calc(500ms * var(--s)) both;
+    }
+
+    /* welcome (keep) */
+    .welcome {
+      display: grid;
+      gap: 22px;
+      justify-items: center;
+      width: 100%;
+      max-width: 260px;
+    }
+    .sound {
+      display: flex;
+      gap: 2px;
+      font-size: 28px;
+    }
+    .sound span {
+      color: var(--app-faint);
+    }
+    @keyframes lit {
+      to {
+        color: var(--blue);
+        translate: 0 -4px;
+        text-shadow: 0 0 18px var(--blue);
+      }
+    }
+    .run .sound .now {
+      animation: lit calc(300ms * var(--s)) var(--ease-out)
+        calc(300ms * var(--s)) both;
+    }
+    .reel {
+      display: flex;
+      gap: 4px;
+      width: 100%;
+    }
+    .reel i {
+      position: relative;
+      flex: 1;
+      height: 6px;
+      overflow: hidden;
+      background: var(--app-border);
+      border-radius: 2px;
+    }
+    .reel i.done::after,
+    .reel i.now::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      background:
+        radial-gradient(circle, var(--blue) 0.9px, transparent 1.2px) 0 0 / 2px
+        2px,
+        rgb(53 143 243 / 0.45);
+    }
+    .reel i.now::after {
+      clip-path: inset(0 100% 0 0);
+    }
+    @keyframes reel {
+      to {
+        clip-path: inset(0 0 0 0);
+      }
+    }
+    .run .reel i.now::after {
+      animation: reel calc(2400ms * var(--s)) linear calc(300ms * var(--s)) both;
+    }
+
+    /* loaders (keep) */
+    .loaders {
+      display: flex;
+      gap: 48px;
+      align-items: center;
+    }
+    .pixel {
+      display: inline-grid;
+      grid-template-columns: repeat(3, 7px);
+      gap: 2px;
+      color: var(--app-fg);
+    }
+    .pixel i {
+      width: 7px;
+      height: 7px;
+      background: currentColor;
+      animation: pix calc(0.8s * var(--s)) steps(1) infinite;
+    }
+    @keyframes pix {
+      0%,
+      45% {
+        opacity: 1;
+      }
+      46%,
+      100% {
+        opacity: 0.15;
+      }
+    }
+    .eq {
+      display: flex;
+      gap: 3px;
+      align-items: center;
+      height: 26px;
+      color: var(--blue);
+    }
+    .eq i {
+      width: 4px;
+      height: 22px;
+      background: currentColor;
+      border-radius: 2px;
+      animation: eq calc(0.5s * var(--s)) ease-in-out infinite alternate;
+    }
+    .eq i:nth-child(even) {
+      animation-delay: calc(-0.25s * var(--s));
+    }
+    @keyframes eq {
+      to {
+        transform: scaleY(0.35);
+      }
+    }
+    .loaders figure {
+      display: grid;
+      gap: 10px;
+      justify-items: center;
+      margin: 0;
+      font-size: 11px;
+      color: var(--app-muted);
+    }
+
+    /* hover lift (keep) */
+    @keyframes lift {
+      20%,
+      70% {
+        translate: 0 -4px;
+      }
+    }
+    .run .hover .top {
+      animation: lift calc(1500ms * var(--s)) var(--ease-card)
+        calc(300ms * var(--s));
+    }
+    .hover .card {
+      cursor: default;
+    }
+    @media (hover: hover) {
+      .hover .top {
+        transition: translate calc(180ms * var(--s)) var(--ease-card);
+      }
+      .hover .top:hover {
+        translate: 0 -4px;
+      }
+    }
+
+    /* instant list */
+    .instant {
+      display: grid;
+      gap: 8px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    .instant li {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .instant li::before {
+      font-size: 13px;
+      content: "⚡";
+    }
+    .instant li span {
+      color: var(--muted-foreground);
+    }
+    .end {
+      padding: 14px 16px;
+      font-size: 14px;
+      color: var(--card-foreground);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius, 10px);
+    }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <h1>fluenc motion audit</h1>
+        <p class="lede">
+          Your motion is already in good shape. There are 4 small changes and 10
+          animations to leave alone. Each box replays while it's on screen; tap
+          a box to replay it.
+        </p>
+      </header>
+
+      <div class="bar">
+        <button aria-pressed="false" class="toggle" id="slow" type="button">
+          🐢 slow motion ×5
+        </button>
+        <small>commit cb31f35 · tap any box to replay</small>
+      </div>
+
+      <!-- ─────────────── primer ─────────────── -->
+      <section class="item" data-loop="1800">
+        <div class="head"><h3>How to read a curve, in 5 seconds</h3></div>
+        <p class="why">
+          All three dots take the same time. The only difference is
+          <b>when</b> they move. UI should jump right away and then settle.
+        </p>
+        <div class="primer stage-like">
+          <div class="racer">
+            <svg
+              class="curve"
+              data-color="#f04646"
+              data-curve="0.42,0,1,1"
+            ></svg>
+            <div>
+              <div class="label">
+                ease-in <small>starts slow, feels laggy. Avoid in UI.</small>
+              </div>
+              <div class="track">
+                <div
+                  class="runner"
+                  style="--e: ease-in; color: var(--red)"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div class="racer">
+            <svg
+              class="curve"
+              data-color="#28d26e"
+              data-curve="0.23,1,0.32,1"
+            ></svg>
+            <div>
+              <div class="label">
+                ease-out (yours)
+                <small
+                  >starts fast, feels instant. Right for things
+                  appearing.</small
+                >
+              </div>
+              <div class="track">
+                <div
+                  class="runner"
+                  style="--e: var(--ease-out); color: var(--green)"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div class="racer">
+            <svg class="curve" data-color="#9696a0" data-curve="0,0,1,1"></svg>
+            <div>
+              <div class="label">
+                linear
+                <small>robotic. Only for timers and progress bars.</small>
+              </div>
+              <div class="track">
+                <div
+                  class="runner"
+                  style="--e: linear; color: var(--app-muted)"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <h2>Worth changing</h2>
+
+      <!-- 1 reduced motion -->
+      <section class="item" data-loop="1800">
+        <div class="head">
+          <span class="num">1</span>
+          <h3>Reduce Motion removes too much</h3>
+          <span class="tag fix">worth doing</span
+          ><span class="tag">every card, for those users</span>
+        </div>
+        <p class="take">
+          If someone turns on <i>Reduce Motion</i> on their phone, the app stops
+          <b>every</b> animation, including soft fades that don't move anything.
+          So the answer snaps in like a glitch.
+        </p>
+        <p class="why">
+          Reduce Motion means "don't move things around", not "no fades". Keep
+          fades and color changes; drop slides, flips, throws and scales.
+        </p>
+        <div class="pair">
+          <figure class="stage before">
+            <figcaption>now · Reduce Motion on</figcaption>
+            <div class="pile rm">
+              <i class="under"></i>
+              <div class="face front"><span class="hz">好</span></div>
+              <div class="face back">
+                <div
+                  class="content"
+                  style="display:grid;justify-items:center;gap:2px"
+                >
+                  <span class="hz">好</span><span class="py">hǎo</span
+                  ><span class="mean">good</span>
+                </div>
+              </div>
+            </div>
+            <span class="spec">answer appears in 0ms</span>
+          </figure>
+          <figure class="stage after">
+            <figcaption>after · Reduce Motion on</figcaption>
+            <div class="pile rm">
+              <i class="under"></i>
+              <div class="face front"><span class="hz">好</span></div>
+              <div class="face back">
+                <div
+                  class="content"
+                  style="display:grid;justify-items:center;gap:2px"
+                >
+                  <span class="hz">好</span><span class="py">hǎo</span
+                  ><span class="mean">good</span>
+                </div>
+              </div>
+            </div>
+            <span class="spec">no flip, answer fades in 150ms</span>
+          </figure>
+        </div>
+        <p class="why">
+          Turn on slow motion to see the difference. The same fix covers the
+          words popover, the write dialog, the pinyin reveal and the lesson dim.<br><code
+            >src/styles.css:641</code
+          >
+          stops everything · <code>src/components/ui/deck.tsx:46</code> turns
+          off a fade that only changes opacity
+        </p>
+      </section>
+
+      <!-- 2 press -->
+      <section class="item" data-loop="1800">
+        <div class="head">
+          <span class="num">2</span>
+          <h3>Buttons light up but don't press</h3>
+          <span class="tag fix">small polish</span
+          ><span class="tag">hundreds of taps a day</span>
+        </div>
+        <p class="take">
+          You tap the grade buttons more than anything else in the app. Right
+          now they only get brighter. On a phone that feels like tapping glass.
+          A 3% squeeze makes them feel like real buttons.
+        </p>
+        <div class="pair">
+          <figure class="stage before">
+            <figcaption>now · press and hold one</figcaption>
+            <div class="grades">
+              <button class="btn" style="--c: var(--red)">
+                again<small>missed</small>
+              </button>
+              <button class="btn" style="--c: var(--orange)">
+                hard<small>effort</small>
+              </button>
+              <button class="btn auto" style="--c: var(--blue)">
+                good<small>pause</small>
+              </button>
+              <button class="btn" style="--c: var(--green)">
+                easy<small>instant</small>
+              </button>
+            </div>
+            <span class="spec">glow only</span>
+          </figure>
+          <figure class="stage after">
+            <figcaption>after · press and hold one</figcaption>
+            <div class="grades">
+              <button class="btn" style="--c: var(--red)">
+                again<small>missed</small>
+              </button>
+              <button class="btn" style="--c: var(--orange)">
+                hard<small>effort</small>
+              </button>
+              <button class="btn auto" style="--c: var(--blue)">
+                good<small>pause</small>
+              </button>
+              <button class="btn" style="--c: var(--green)">
+                easy<small>instant</small>
+              </button>
+            </div>
+            <span class="spec">glow + scale 0.97 · 160ms ease-out</span>
+          </figure>
+        </div>
+        <p class="why">
+          One change in the shared button gives every action button the same
+          press. The glow stays as it is.<br>
+          <code>src/components/dither-kit/button.tsx:232</code>
+        </p>
+      </section>
+
+      <!-- 3 done -->
+      <section class="item" data-loop="2200">
+        <div class="head">
+          <span class="num">3</span>
+          <h3>"done" just blinks on</h3>
+          <span class="tag add">nice to have</span
+          ><span class="tag">once a day</span>
+        </div>
+        <p class="take">
+          Finishing your reviews is the one moment a day that deserves a small
+          beat. Right now the last card flies off and "done" just appears.
+        </p>
+        <div class="pair">
+          <figure class="stage before tall">
+            <figcaption>now</figcaption>
+            <div class="pile done">
+              <div class="slot"><b>done</b><small>next · tomorrow</small></div>
+              <div class="card top">
+                <div class="face">
+                  <span class="py">hǎo</span><span class="mean">good</span>
+                </div>
+              </div>
+            </div>
+            <span class="spec">slot appears in 0ms</span>
+          </figure>
+          <figure class="stage after tall">
+            <figcaption>after</figcaption>
+            <div class="pile done">
+              <div class="slot"><b>done</b><small>next · tomorrow</small></div>
+              <div class="card top">
+                <div class="face">
+                  <span class="py">hǎo</span><span class="mean">good</span>
+                </div>
+              </div>
+            </div>
+            <span class="spec">slot settles 200ms · "done" rises 6px</span>
+          </figure>
+        </div>
+        <p class="why">
+          No confetti and no recap. Just an arrival.<br>
+          <code>src/components/review-view.tsx:149</code>
+        </p>
+      </section>
+
+      <!-- 4 duplicate curve -->
+      <section class="item" data-loop="1400">
+        <div class="head">
+          <span class="num">4</span>
+          <h3>Two names for one curve</h3>
+          <span class="tag fix">cleanup</span
+          ><span class="tag">no visible change</span>
+        </div>
+        <p class="take">
+          <code>--ease-card</code>
+          and <code>--ease-out</code> are practically the same curve. Can you
+          tell the dots apart? Keep one name.
+        </p>
+        <div class="pair">
+          <figure class="stage before">
+            <figcaption>now · two tokens</figcaption>
+            <div class="racers">
+              <div class="row">
+                <span>--ease-out</span>
+                <div class="track">
+                  <div
+                    class="runner"
+                    style="--e: var(--ease-out); color: var(--green)"
+                  ></div>
+                </div>
+              </div>
+              <div class="row">
+                <span>--ease-card</span>
+                <div class="track">
+                  <div
+                    class="runner"
+                    style="--e: var(--ease-card); color: var(--blue)"
+                  ></div>
+                </div>
+              </div>
+              <div class="row">
+                <span></span
+                ><svg
+                  class="curve"
+                  data-color="#28d26e|#358ff3"
+                  data-curve="0.23,1,0.32,1|0.22,1,0.36,1"
+                  style="width:64px;height:64px"
+                ></svg>
+              </div>
+            </div>
+            <span class="spec">0.23,1,0.32,1 vs 0.22,1,0.36,1</span>
+          </figure>
+          <figure class="stage after">
+            <figcaption>after · one token</figcaption>
+            <div class="racers">
+              <div class="row">
+                <span>--ease-out</span>
+                <div class="track">
+                  <div
+                    class="runner"
+                    style="--e: var(--ease-out); color: var(--green)"
+                  ></div>
+                </div>
+              </div>
+              <div class="row">
+                <span></span
+                ><svg
+                  class="curve"
+                  data-color="#28d26e"
+                  data-curve="0.23,1,0.32,1"
+                  style="width:64px;height:64px"
+                ></svg>
+              </div>
+            </div>
+            <span class="spec">the flip keeps its "no overshoot" note</span>
+          </figure>
+        </div>
+        <p class="why"><code>src/styles.css:278</code> and <code>:282</code></p>
+      </section>
+
+      <h2>Leave as is</h2>
+
+      <!-- K throw + rise -->
+      <section class="item" data-alternate data-loop="1600">
+        <div class="head">
+          <span class="num">✓</span>
+          <h3>Grade: card is thrown, the next one rises</h3>
+          <span class="tag keep">keep</span><span class="tag">every card</span>
+        </div>
+        <p class="take">
+          Misses fly left and recalls fly right, so you can see your grade. The
+          next card is usable immediately because the flying card ignores taps.
+          The motion never slows you down.
+        </p>
+        <div class="pair">
+          <figure class="stage tall">
+            <figcaption>current</figcaption>
+            <div class="pile throw">
+              <i class="under u2"></i><i class="under"></i>
+              <div class="card next">
+                <div class="face"><span class="hz">谢</span></div>
+              </div>
+              <div class="card top">
+                <div class="face">
+                  <span class="py">hǎo</span><span class="mean">good</span>
+                </div>
+              </div>
+            </div>
+            <span class="spec">throw 300ms · next rises 6px + tilt, 180ms</span>
+          </figure>
+          <div class="why" style="align-self:center">
+            The fade holds until late, so you see the card <i>leave</i> instead
+            of dissolving. That's on purpose and documented in the code.<br><br>
+            <code>src/components/ui/deck.tsx:37</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- K flip -->
+      <section class="item" data-loop="1600">
+        <div class="head">
+          <span class="num">✓</span>
+          <h3>Flip to the answer</h3>
+          <span class="tag keep">keep</span><span class="tag">every card</span>
+        </div>
+        <p class="take">
+          It turns in depth with no bounce, so the character never warps. 1–4
+          work while it's still turning.
+        </p>
+        <div class="pair">
+          <figure class="stage tall">
+            <figcaption>current</figcaption>
+            <div class="pile flip">
+              <i class="under u2"></i><i class="under"></i>
+              <div class="card3d">
+                <div class="face"><span class="hz">好</span></div>
+                <div class="face back">
+                  <div
+                    class="content"
+                    style="display:grid;justify-items:center;gap:2px"
+                  >
+                    <span class="hz">好</span><span class="py">hǎo</span
+                    ><span class="mean">good</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="spec">turn 280ms · answer fades 150ms</span>
+          </figure>
+          <div class="why" style="align-self:center">
+            The rule says keyboard-driven actions shouldn't animate. This is the
+            exception because nothing waits on it.<br><br>
+            <code>src/styles.css:703</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- K popover -->
+      <section class="item" data-loop="2400">
+        <div class="head">
+          <span class="num">✓</span>
+          <h3>Popovers grow from their button</h3>
+          <span class="tag keep">keep</span><span class="tag">sometimes</span>
+        </div>
+        <p class="take">
+          "words" and "shape" grow out of the corner they belong to, and closing
+          is instant. Both are right.
+        </p>
+        <div class="pair">
+          <figure class="stage">
+            <figcaption>current</figcaption>
+            <div class="pop-wrap">
+              <span class="chipbtn">words 3 ▾</span>
+              <div class="popover">
+                <b>你好</b>
+                hello<br><b>好看</b>
+                pretty<br><b>好吃</b>
+                tasty
+              </div>
+            </div>
+            <span class="spec">from 97% + fade, 160ms, top-right corner</span>
+          </figure>
+          <div class="why" style="align-self:center">
+            <code>src/components/character-lesson.tsx:299</code><br>
+            <code>:653</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- K dialog -->
+      <section class="item" data-loop="1800">
+        <div class="head">
+          <span class="num">✓</span>
+          <h3>Write dialog</h3>
+          <span class="tag keep">keep</span><span class="tag">sometimes</span>
+        </div>
+        <p class="take">
+          A dialog sits in the center, so it grows from the center. The
+          background dims and blurs at the same time.
+        </p>
+        <div class="pair">
+          <figure class="stage">
+            <figcaption>current</figcaption>
+            <div class="behind">
+              <i></i><i style="width:70%"></i><i style="width:85%"></i
+              ><i style="width:50%"></i>
+            </div>
+            <div class="backdrop"></div>
+            <div class="dialog">write 好</div>
+            <span class="spec">97% → 100% + fade, 160ms</span>
+          </figure>
+          <div class="why" style="align-self:center">
+            <code>src/components/writing-modal.tsx:376</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- K strokes -->
+      <section class="item" data-loop="2400">
+        <div class="head">
+          <span class="num">✓</span>
+          <h3>Strokes: paint on a hit, red on a miss</h3>
+          <span class="tag keep">keep</span
+          ><span class="tag">while writing</span>
+        </div>
+        <p class="take">
+          A right stroke paints itself in. A wrong one turns red, stays a
+          moment, then drops away. That's the one place a slow start is right:
+          you need time to see the mistake.
+        </p>
+        <div class="pair">
+          <figure class="stage">
+            <figcaption>current</figcaption>
+            <svg class="strokes" viewBox="0 0 100 100">
+              <line class="grid" x1="50" x2="50" y1="0" y2="100" />
+              <line class="grid" x1="0" x2="100" y1="50" y2="50" />
+              <path class="ghost" d="M22 50 L78 50" />
+              <path class="paint" d="M22 50 L78 50" pathLength="1" />
+              <g class="missg"><path class="miss" d="M30 30 Q52 40 74 72" /></g>
+            </svg>
+            <span class="spec">paint 260ms · miss holds, then fades 400ms</span>
+          </figure>
+          <div class="why" style="align-self:center">
+            <code>src/components/writing-modal.tsx:206</code><br>
+            <code>:426</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- K takes -->
+      <section class="item" data-loop="2600">
+        <div class="head">
+          <span class="num">✓</span>
+          <h3>Shadowing takes</h3>
+          <span class="tag keep">keep</span
+          ><span class="tag">a few per reading</span>
+        </div>
+        <p class="take">
+          This is the only bouncy thing in the app, and it earns it. Each repeat
+          lays a card down with a little overshoot, like a small reward.
+        </p>
+        <div class="pair">
+          <figure class="stage">
+            <figcaption>current</figcaption>
+            <div class="takes">
+              <i class="take-card" style="--r:-10deg; --d:400ms"></i
+              ><i class="take-card" style="--r:-5deg; --d:800ms"></i
+              ><i class="take-card" style="--r:0deg; --d:1200ms"></i
+              ><i class="take-card" style="--r:5deg"></i
+              ><i class="take-card" style="--r:10deg"></i>
+            </div>
+            <span class="spec">360ms with overshoot</span>
+          </figure>
+          <div class="why" style="align-self:center">
+            <code>src/components/reading-lesson.tsx:192</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- K gloss -->
+      <section class="item" data-loop="1600">
+        <div class="head">
+          <span class="num">✓</span>
+          <h3>Pinyin and meaning reveal</h3>
+          <span class="tag keep">keep</span
+          ><span class="tag">every word card</span>
+        </div>
+        <p class="take">
+          Pinyin and meaning slide out from the character: pinyin moves up,
+          meaning moves down. Their space is held before the reveal, so nothing
+          jumps.
+        </p>
+        <div class="pair">
+          <figure class="stage">
+            <figcaption>current</figcaption>
+            <div class="gloss">
+              <div>
+                <span class="p">nǐ</span><span class="hz">你</span
+                ><span class="g">you</span>
+              </div>
+              <div>
+                <span class="p">hǎo</span><span class="hz">好</span
+                ><span class="g">good</span>
+              </div>
+            </div>
+            <span class="spec">6px + fade, 200ms ease-out</span>
+          </figure>
+          <div class="why" style="align-self:center">
+            <code>src/components/review-card.tsx:763</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- K welcome -->
+      <section class="item" data-loop="3200">
+        <div class="head">
+          <span class="num">✓</span>
+          <h3>Welcome reel</h3>
+          <span class="tag keep">keep</span><span class="tag">once</span>
+        </div>
+        <p class="take">
+          The story bar fills at a steady speed, because it's a timer. The sound
+          being explained lifts and glows. First run is allowed to be slower and
+          show off.
+        </p>
+        <div class="pair">
+          <figure class="stage">
+            <figcaption>current · bar shortened from 8s</figcaption>
+            <div class="welcome">
+              <div class="sound"><span class="now">h</span><span>ǎo</span></div>
+              <div class="reel">
+                <i class="done"></i><i class="now"></i><i></i><i></i><i></i>
+              </div>
+            </div>
+            <span class="spec">reel linear · glow + lift 4px, 300ms</span>
+          </figure>
+          <div class="why" style="align-self:center">
+            <code>src/components/welcome-view.tsx:81</code><br><code>:116</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- K loaders -->
+      <section class="item">
+        <div class="head">
+          <span class="num">✓</span>
+          <h3>Loader and speaker bars</h3>
+          <span class="tag keep">keep</span>
+        </div>
+        <p class="take">
+          These keep running under Reduce Motion, which is right. A frozen
+          loader no longer says "loading".
+        </p>
+        <div class="pair">
+          <figure class="stage">
+            <figcaption>current</figcaption>
+            <div class="loaders">
+              <figure>
+                <span class="pixel"
+                  ><i style="animation-delay:0ms"></i
+                  ><i style="animation-delay:calc(450ms*var(--s))"></i
+                  ><i style="animation-delay:calc(180ms*var(--s))"></i
+                  ><i style="animation-delay:calc(630ms*var(--s))"></i
+                  ><i style="animation-delay:calc(360ms*var(--s))"></i
+                  ><i style="animation-delay:calc(90ms*var(--s))"></i
+                  ><i style="animation-delay:calc(540ms*var(--s))"></i
+                  ><i style="animation-delay:calc(270ms*var(--s))"></i
+                  ><i style="animation-delay:calc(720ms*var(--s))"></i></span
+                >loading
+              </figure>
+              <figure>
+                <span class="eq"><i></i><i></i><i></i></span>speaking
+              </figure>
+            </div>
+          </figure>
+          <div class="why" style="align-self:center">
+            <code>src/components/ui/dither.tsx:23</code><br>
+            <code>src/components/ui/hanzi.tsx:397</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- K hover -->
+      <section class="item" data-loop="2000">
+        <div class="head">
+          <span class="num">✓</span>
+          <h3>Card lifts on hover</h3>
+          <span class="tag keep">keep</span
+          ><span class="tag">desktop only</span>
+        </div>
+        <p class="take">
+          It lifts 4px under a mouse to say "tap me". It never fires on touch,
+          so phones don't get stuck hovers.
+        </p>
+        <div class="pair">
+          <figure class="stage tall">
+            <figcaption>current · hover it</figcaption>
+            <div class="pile hover">
+              <i class="under u2"></i
+              ><i class="under"></i>
+              <div class="card top">
+                <div class="face"><span class="hz">好</span></div>
+              </div>
+            </div>
+            <span class="spec">4px, 180ms</span>
+          </figure>
+          <div class="why" style="align-self:center">
+            <code>src/components/ui/deck.tsx:221</code>
+          </div>
+        </div>
+      </section>
+
+      <h2>Stays instant, on purpose</h2>
+      <ul class="instant">
+        <li>
+          Switching tabs and pages
+          <span>— you do it all day, so waiting would add up.</span>
+        </li>
+        <li>
+          "show answer" swapping to the four grade buttons
+          <span>— your thumb is already moving.</span>
+        </li>
+        <li>
+          Closing popovers and dialogs
+          <span>— leaving should never make you wait.</span>
+        </li>
+        <li>
+          Space, 1–4 and Enter <span>— never wait on any animation.</span>
+        </li>
+      </ul>
+
+      <p class="end">
+        Tell me which numbers (1–4) you want, and I'll write a step-by-step plan
+        for each one that any agent can carry out.
+      </p>
+    </main>
+
+    <script>
+    "use strict";
+    const slow = document.getElementById("slow");
+    const factor = () => (document.body.classList.contains("slow") ? 5 : 1);
+
+    // Draw each easing curve: x is time, y is progress.
+    for (const svg of document.querySelectorAll("svg.curve")) {
+      svg.setAttribute("viewBox", "0 0 100 100");
+      const map = (x, y) =>
+        `${(6 + x * 88).toFixed(1)},${(88 - y * 76).toFixed(1)}`;
+      let html = `<path class="axis" d="M${map(0, 1)} L${map(0, 0)} L${map(1, 0)}"/>`;
+      const colors = svg.dataset.color.split("|");
+      svg.dataset.curve.split("|").forEach((c, i) => {
+        const [x1, y1, x2, y2] = c.split(",").map(Number);
+        html += `<path class="line" stroke="${colors[i]}" d="M${map(0, 0)} C${map(x1, y1)} ${map(x2, y2)} ${map(1, 1)}"/>`;
+      });
+      svg.innerHTML = html;
+    }
+
+    // Each section replays on a loop while it's on screen; both sides of a pair restart together.
+    const loops = new Map();
+    const run = (item) => {
+      if ("alternate" in item.dataset) {
+        item.classList.toggle("left");
+      }
+      item.classList.remove("run");
+      void item.offsetWidth;
+      item.classList.add("run");
+    };
+    const start = (item) => {
+      stop(item);
+      run(item);
+      const base = Number(item.dataset.loop);
+      if (base) {
+        loops.set(
+          item,
+          setInterval(() => run(item), base * factor())
+        );
+      }
+    };
+    const stop = (item) => {
+      clearInterval(loops.get(item));
+      loops.delete(item);
+    };
+    const items = [...document.querySelectorAll(".item")];
+    const visible = new Set();
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            visible.add(e.target);
+            start(e.target);
+          } else {
+            visible.delete(e.target);
+            stop(e.target);
+            e.target.classList.remove("run");
+          }
+        }
+      },
+      { threshold: 0.35 }
+    );
+    items.forEach((item) => {
+      io.observe(item);
+      item.querySelectorAll(".stage, .primer").forEach((s) =>
+        s.addEventListener("click", (ev) => {
+          if (!ev.target.closest(".btn")) {
+            start(item);
+          }
+        })
+      );
+    });
+    slow.addEventListener("click", () => {
+      const on = document.body.classList.toggle("slow");
+      slow.setAttribute("aria-pressed", String(on));
+      visible.forEach(start);
+    });
+    </script>
+  </body>
+</html>

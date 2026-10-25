@@ -229,7 +229,7 @@ export function DitherButton({
   return (
     <button
       className={cn(
-        "relative isolate overflow-hidden rounded-md px-4 py-2 font-mono text-foreground text-xs transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/40 disabled:pointer-events-none disabled:opacity-40",
+        "relative isolate overflow-hidden rounded-md px-4 py-2 font-mono text-foreground text-xs transition-[opacity,scale] duration-160 ease-out focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/40 active:not-disabled:scale-97 disabled:pointer-events-none disabled:opacity-40",
         className
       )}
       ref={buttonRef}

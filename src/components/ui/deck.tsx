@@ -43,7 +43,7 @@ function cardMotion(thrown: "left" | "right" | null, waiting: boolean) {
 
 /** The answer side's content, laid over the card's grain. */
 export const cardAnswer =
-  "absolute inset-0 flex flex-col animate-answer @container-size motion-reduce:animate-none";
+  "absolute inset-0 flex flex-col animate-answer @container-size";
 /** A sentence's answer, stacked on the centre. */
 export const sentenceAnswer = cn(
   cardAnswer,
@@ -263,9 +263,12 @@ export const slotNote = "relative type-label text-muted-foreground";
 /** A card lying on the table without a flip: face down with a timer, or the empty place. */
 export function DeckSlot({
   state,
+  arrive = false,
   children,
 }: {
   state: "down" | "empty";
+  /** Settles onto the table, as the last card of a deck leaves. */
+  arrive?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -275,7 +278,8 @@ export function DeckSlot({
         "gap-2",
         state === "down"
           ? "bg-card before:pointer-events-none before:absolute before:inset-3 before:rounded-xl before:border before:border-foreground/8"
-          : "border-border-strong border-dashed bg-transparent shadow-none"
+          : "border-border-strong border-dashed bg-transparent shadow-none",
+        arrive && "animate-enter"
       )}
     >
       {state === "down" ? <CardGrain color="orange" /> : null}
