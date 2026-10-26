@@ -656,8 +656,15 @@
     "hanzi": "多",
     "pinyin": "duō",
     "syllables": ["duō"],
-    "meaning": "many",
-    "meanings": ["many", "much", "more", "a lot of"],
+    "meaning": "many; much",
+    "meanings": [
+      "many; much",
+      "a lot of",
+      "more",
+      "too much; too many",
+      "over (after a number)",
+      "how (before an adjective, as in ‘how big?’)"
+    ],
     "also": null,
     "sources": ["https://www.mdbg.net/chinese/dictionary?wdqb=多"]
   },
