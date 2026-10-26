@@ -2753,9 +2753,9 @@
   {
     "hanzi": "儿",
     "pinyin": "ér",
-    "keyword": "offspring",
-    "meanings": ["child", "son"],
-    "also": null,
+    "keyword": "baby",
+    "meanings": ["child", "son", "-r ending, as in 这儿 here, 那儿 there"],
+    "also": "-r ending",
     "readings": [],
     "strokes": 2,
     "radical": "儿",
