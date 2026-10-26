@@ -10390,5 +10390,95 @@
     "meanings": ["from", "since", "via", "to follow"],
     "also": null,
     "sources": ["https://en.wiktionary.org/wiki/从"]
+  },
+  {
+    "id": 1025,
+    "hanzi": "米饭",
+    "pinyin": "mǐfàn",
+    "syllables": ["mǐ", "fàn"],
+    "meaning": "cooked rice",
+    "meanings": ["cooked rice"],
+    "also": null,
+    "sources": ["https://www.mdbg.net/chinese/dictionary?wdqb=米饭"]
+  },
+  {
+    "id": 1026,
+    "hanzi": "商店",
+    "pinyin": "shāngdiàn",
+    "syllables": ["shāng", "diàn"],
+    "meaning": "shop",
+    "meanings": ["shop", "store"],
+    "also": null,
+    "sources": ["https://www.mdbg.net/chinese/dictionary?wdqb=商店"]
+  },
+  {
+    "id": 1027,
+    "hanzi": "肉",
+    "pinyin": "ròu",
+    "syllables": ["ròu"],
+    "meaning": "meat",
+    "meanings": ["meat", "flesh"],
+    "also": null,
+    "sources": ["https://www.mdbg.net/chinese/dictionary?wdqb=肉"]
+  },
+  {
+    "id": 1028,
+    "hanzi": "北方",
+    "pinyin": "běifāng",
+    "syllables": ["běi", "fāng"],
+    "meaning": "the north",
+    "meanings": ["the north", "northern part of a country", "northern China"],
+    "also": null,
+    "sources": ["https://www.mdbg.net/chinese/dictionary?wdqb=北方"]
+  },
+  {
+    "id": 1029,
+    "hanzi": "下午",
+    "pinyin": "xiàwǔ",
+    "syllables": ["xià", "wǔ"],
+    "meaning": "afternoon",
+    "meanings": ["afternoon", "p.m."],
+    "also": null,
+    "sources": ["https://www.mdbg.net/chinese/dictionary?wdqb=下午"]
+  },
+  {
+    "id": 1030,
+    "hanzi": "椅子",
+    "pinyin": "yǐzi",
+    "syllables": ["yǐ", "zi"],
+    "meaning": "chair",
+    "meanings": ["chair"],
+    "also": null,
+    "sources": ["https://www.mdbg.net/chinese/dictionary?wdqb=椅子"]
+  },
+  {
+    "id": 1031,
+    "hanzi": "沙发",
+    "pinyin": "shāfā",
+    "syllables": ["shā", "fā"],
+    "meaning": "sofa",
+    "meanings": ["sofa", "couch"],
+    "also": null,
+    "sources": ["https://www.mdbg.net/chinese/dictionary?wdqb=沙发"]
+  },
+  {
+    "id": 1032,
+    "hanzi": "桌子",
+    "pinyin": "zhuōzi",
+    "syllables": ["zhuō", "zi"],
+    "meaning": "table",
+    "meanings": ["table", "desk"],
+    "also": null,
+    "sources": ["https://www.mdbg.net/chinese/dictionary?wdqb=桌子"]
+  },
+  {
+    "id": 1033,
+    "hanzi": "包",
+    "pinyin": "bāo",
+    "syllables": ["bāo"],
+    "meaning": "bag",
+    "meanings": ["bag", "package", "bun", "to wrap"],
+    "also": null,
+    "sources": ["https://www.mdbg.net/chinese/dictionary?wdqb=包"]
   }
 ]

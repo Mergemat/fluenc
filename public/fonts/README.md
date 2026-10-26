@@ -26,7 +26,7 @@ The font is preloaded by the root document and precached by the service worker. 
 
 `noto-sans-sc-props.woff2` is a locally hosted subset of Noto Sans CJK SC Regular, used for prop glyphs in the studio, clue form, library, and palace. It includes the course characters and components that Noto has. A component symbol absent from Noto uses the Fluenc Hanzi glyph so it stays readable.
 
-The source is [Noto Sans CJK SC Regular](https://github.com/notofonts/noto-cjk/blob/165c01b46ea533872e002e0785ff17e44f6d97d8/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf), distributed under the [SIL Open Font License](../licenses/NotoSansSC-OFL.txt). The 301,392-byte WOFF2 subset retains its original outlines and is precached by the existing service worker font rule.
+The source is [Noto Sans CJK SC Regular](https://github.com/notofonts/noto-cjk/blob/165c01b46ea533872e002e0785ff17e44f6d97d8/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf), distributed under the [SIL Open Font License](../licenses/NotoSansSC-OFL.txt). The WOFF2 subset retains its original outlines and is precached by the existing service worker font rule.
 
 To rebuild, download the source OTF to `.cache/noto-sans-cjk-sc.otf`, then use the FontTools environment from the instructions above:
 

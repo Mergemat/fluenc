@@ -122,7 +122,7 @@ const props = Object.fromEntries(
 );
 
 const curriculum = {
-  version: "2026-10-24.1",
+  version: "2026-10-26.1",
   sources: {
     characters: "src/data/hanzi/characters.json",
     words: "src/data/hanzi/words.json",
