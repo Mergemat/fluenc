@@ -1,9 +1,17 @@
 // One library entry, built only from the cached library and palace (works offline).
 // Characters show their glyph, scene and the words that use them; words show their gloss.
+// Scene names and memory links are edited in place and saved on blur, like a lesson saves them.
 import { useQuery } from "@tanstack/react-query";
 import { Link, useCanGoBack } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { useCallback, useState } from "react";
+import {
+  type FocusEvent,
+  type KeyboardEvent,
+  type PointerEvent,
+  useCallback,
+  useState,
+} from "react";
+import { toast } from "sonner";
 import { useGoBack } from "../hooks/use-go-back";
 import type { LibraryData, PalaceData } from "../lib/learner-views";
 import type {
@@ -14,7 +22,9 @@ import type {
 import { getItemMeaning } from "../lib/meaning";
 import { defaultToneRooms } from "../lib/pinyin";
 import { cn } from "../lib/utils";
+import { saveLivingLinkOffline, saveMovieOffline } from "../offline/progress";
 import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
+import { useProgressMutation } from "../offline/use-progress-mutation";
 import { ClueCode } from "./character-studio/clue-code";
 import {
   clueCode,
@@ -25,7 +35,12 @@ import {
   clueTone,
   kindStyle,
 } from "./character-studio/clue-row";
-import { type Clue, lessonClues } from "./character-studio/clues";
+import {
+  type Clue,
+  cluePrompt,
+  lessonClues,
+  clueRole as roleText,
+} from "./character-studio/clues";
 import type { CharacterItem } from "./character-studio/types";
 import { DitherButton } from "./dither-kit/button";
 import { WordGloss } from "./review-card";
@@ -50,6 +65,22 @@ const entryMeaning = cn(meaningText, "text-3xl");
 const entrySound = cn(soundRow, "mt-0");
 const section = "mt-12 grid gap-2";
 const emptyNote = "type-control text-faint-foreground leading-wrap";
+/** The memory link as a line of text, typed over in place. */
+const linkInput =
+  "type-body w-full border-border border-b bg-transparent py-3 text-foreground outline-none transition-colors placeholder:type-control placeholder:text-faint-foreground focus:border-blue";
+
+/** Enter keeps what was typed, Escape puts the saved text back; either way the field lets go. */
+function commitKeys(saved: string) {
+  return (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Escape") {
+      event.currentTarget.value = saved;
+      event.currentTarget.blur();
+    } else if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+      event.preventDefault();
+      event.currentTarget.blur();
+    }
+  };
+}
 
 const statusLabel = {
   review: "learned",
@@ -175,6 +206,7 @@ function CharacterEntry({
   const [xray, setXray] = useState(false);
   const [hover, setHover] = useState<string | null>(null);
   const toggleXray = useCallback(() => setXray((value) => !value), []);
+  const rename = useRename(item);
   const pinPart = useCallback(
     (code: string) => setHover((previous) => (previous === code ? null : code)),
     []
@@ -245,7 +277,8 @@ function CharacterEntry({
           {clues.map((clue, index) => (
             <ClueRow
               clue={clue}
-              key={clue.id}
+              // A new saved name, here or from a sync, replaces whatever the field holds.
+              key={`${clue.id}:${clue.name}`}
               // The hairline under a row gives way when it or the row below is lit.
               lined={
                 index < clues.length - 1 &&
@@ -254,6 +287,7 @@ function CharacterEntry({
               }
               lit={hover === clue.code}
               onHover={setHover}
+              onRename={rename}
             />
           ))}
         </div>
@@ -284,46 +318,104 @@ function CharacterEntry({
   );
 }
 
+/**
+ * Save one renamed clue. A name belongs to its code, not this character, so it changes in every
+ * scene that uses it. The movie save leaves out the names it gets empty.
+ */
+function useRename(item: LibraryCharacter) {
+  const { mutate } = useProgressMutation(
+    (clue: Pick<Clue, "kind" | "code" | "name">) =>
+      saveMovieOffline({
+        characterId: item.id,
+        actorKey: item.movie.actorKey,
+        actorName: clue.kind === "actor" ? clue.name : "",
+        finalKey: item.movie.finalKey,
+        setName: clue.kind === "set" ? clue.name : "",
+        tone: item.movie.tone,
+        roomName: clue.kind === "room" ? clue.name : "",
+        props:
+          clue.kind === "prop"
+            ? [{ component: clue.code, propName: clue.name }]
+            : [],
+      })
+  );
+  return useCallback(
+    (clue: Clue, name: string) =>
+      mutate(
+        { ...clue, name },
+        { onError: () => toast(`couldn’t save “${name}” — try again`) }
+      ),
+    [mutate]
+  );
+}
+
 function ClueRow({
   clue,
   lit,
   lined,
   onHover,
+  onRename,
 }: {
   clue: Clue;
   lit: boolean;
   lined: boolean;
   onHover: (code: string | null) => void;
+  onRename: (clue: Clue, name: string) => void;
 }) {
   const empty = !clue.name.trim();
-  return (
-    <div
-      className={clueRow({ lit, lined })}
-      data-kind={clue.kind}
-      onPointerEnter={
-        clue.kind === "prop" ? () => onHover(clue.code) : undefined
+  const prop = clue.kind === "prop";
+  const enter = useCallback(
+    (event: PointerEvent) => {
+      if (event.pointerType !== "touch") {
+        onHover(clue.code);
       }
-      onPointerLeave={clue.kind === "prop" ? () => onHover(null) : undefined}
+    },
+    [onHover, clue.code]
+  );
+  const leave = useCallback(() => onHover(null), [onHover]);
+  // Names can change but not be cleared: an emptied field goes back to the saved name.
+  const commit = useCallback(
+    (event: FocusEvent<HTMLInputElement>) => {
+      const name = event.currentTarget.value.trim();
+      if (!name) {
+        event.currentTarget.value = clue.name;
+      } else if (name !== clue.name.trim()) {
+        onRename(clue, name);
+      }
+    },
+    [onRename, clue]
+  );
+  return (
+    <label
+      className={clueRow({ lit, lined, editable: true })}
+      data-kind={clue.kind}
+      onPointerEnter={prop ? enter : undefined}
+      onPointerLeave={prop ? leave : undefined}
       style={kindStyle(clue.kind, clue.partIndex)}
     >
       <span
-        className={clueCode({ kind: clue.kind, lit })}
-        lang={clue.kind === "prop" ? "zh-CN" : undefined}
+        className={clueCode({ kind: clue.kind, lit, editable: true })}
+        lang={prop ? "zh-CN" : undefined}
       >
         <ClueCode clue={clue} toneClassName={clueTone} />
         {clue.count && clue.count > 1 ? (
           <sup className={clueCount}>×{clue.count}</sup>
         ) : null}
       </span>
-      <span className={clueRole()}>
-        {clue.kind === "prop"
-          ? (clue.meaning ?? "prop")
-          : clue.role.toLowerCase()}
-      </span>
-      <span className={clueName({ empty })}>
-        {empty ? "not named yet" : clue.name}
-      </span>
-    </div>
+      <span className={clueRole()}>{roleText(clue)}</span>
+      <input
+        aria-label={`${clue.role} ${clue.code}${clue.meaning ? `, ${clue.meaning}` : ""}`}
+        autoCapitalize="none"
+        autoComplete="off"
+        className={clueName({ empty, editable: true })}
+        defaultValue={clue.name}
+        enterKeyHint="done"
+        onBlur={commit}
+        onKeyDown={commitKeys(clue.name)}
+        placeholder={empty ? cluePrompt(clue) : undefined}
+        spellCheck={false}
+      />
+    </label>
   );
 }
 
@@ -336,6 +428,9 @@ function WordEntry({
 }) {
   const meaning = getItemMeaning(item);
   const syllables = item.syllables ?? null;
+  const livingLink =
+    library?.words.find((word) => word.id === item.id)?.livingLink ??
+    item.livingLink;
   // A word's characters are distinct, so each part's id is a stable key.
   const characters = item.characterParts.map((part) => ({
     part,
@@ -394,17 +489,45 @@ function WordEntry({
 
       <section aria-label="Memory link" className={section}>
         <SectionHead className="mb-0" label="memory link" />
-        {item.livingLink ? (
-          <p className="type-body border-border border-b py-3 text-foreground">
-            {item.livingLink}
-          </p>
-        ) : (
-          <p className={emptyNote}>
-            no memory link yet — add one in its lesson
-          </p>
-        )}
+        <MemoryLink
+          // The loader's word is fixed; the cached library has the link as saved since.
+          key={livingLink}
+          saved={livingLink}
+          wordId={item.id}
+        />
       </section>
     </>
+  );
+}
+
+function MemoryLink({ saved, wordId }: { saved: string; wordId: string }) {
+  const { mutate } = useProgressMutation(saveLivingLinkOffline);
+  // The server keeps links of four or more characters; a shorter one goes back to the saved link.
+  const commit = useCallback(
+    (event: FocusEvent<HTMLInputElement>) => {
+      const story = event.currentTarget.value.trim();
+      if (story.length < 4) {
+        event.currentTarget.value = saved;
+      } else if (story !== saved) {
+        mutate(
+          { wordId, story },
+          { onError: () => toast("couldn’t save the memory link — try again") }
+        );
+      }
+    },
+    [mutate, saved, wordId]
+  );
+  return (
+    <input
+      aria-label="Memory link"
+      autoComplete="off"
+      className={linkInput}
+      defaultValue={saved}
+      enterKeyHint="done"
+      onBlur={commit}
+      onKeyDown={commitKeys(saved)}
+      placeholder="no memory link yet — type one"
+    />
   );
 }
 
