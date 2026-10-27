@@ -8,6 +8,14 @@ import {
   type OfflineGroup,
   packFiles,
 } from "../src/offline/files";
+import { migrateDatabase } from "./local-db";
+
+// Only production: preview builds may share its database and must not apply a branch's migrations.
+// Runs before the build so a failed migration stops the deploy.
+if (process.env.VERCEL_ENV === "production") {
+  await migrateDatabase();
+  console.info("Database: migrations applied");
+}
 
 const outputDirectory = process.env.VERCEL ? ".vercel/output" : ".output";
 await rm(outputDirectory, { recursive: true, force: true });

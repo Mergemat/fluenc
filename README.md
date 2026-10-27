@@ -79,8 +79,7 @@ The app deploys to Vercel as is. `vercel.json` sets the region and the reminder 
 
 1. Create a Turso database and set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`.
 2. Set `BETTER_AUTH_SECRET` and set `BETTER_AUTH_URL` to your public URL.
-3. Apply the migrations to that database: `TURSO_DATABASE_URL=… TURSO_AUTH_TOKEN=… bun run db:migrate`. Run this again whenever a deploy adds a migration in `drizzle/`.
-4. Deploy with `bunx vercel deploy --prod`.
+3. Deploy with `bunx vercel deploy --prod`. Production builds apply new migrations in `drizzle/` before building; preview builds never migrate.
 
 ### Reminders
 
