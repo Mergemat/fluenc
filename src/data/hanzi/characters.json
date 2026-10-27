@@ -4475,8 +4475,13 @@
   {
     "hanzi": "故",
     "pinyin": "gù",
-    "keyword": "accident",
-    "meanings": ["accident", "reason", "deliberately", "former"],
+    "keyword": "incident",
+    "meanings": [
+      "incident; happening",
+      "reason; cause",
+      "on purpose; intentionally",
+      "old; former"
+    ],
     "also": null,
     "readings": [],
     "strokes": 9,
