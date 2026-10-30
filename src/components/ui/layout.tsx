@@ -1,7 +1,15 @@
 // The page frame every route shares: one width and gutter, one header, one empty state and one
 // status line, so pages read as one app.
-import type { ReactNode } from "react";
+import {
+  Link,
+  type LinkComponentProps,
+  useCanGoBack,
+  useRouter,
+} from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
+import { type ReactNode, useCallback } from "react";
 
+import { useGoBack } from "../../hooks/use-go-back";
 import { cn } from "../../lib/utils";
 import { DitherGradient } from "../dither-kit/gradient";
 import type { PixelColor } from "../dither-kit/pixel";
@@ -29,6 +37,32 @@ export function Page({
 /** A link or button back up the trail, in a page title. */
 export const crumb =
   "inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground";
+
+/**
+ * The way back, first in a page title: to the page before when this visit came from one, so its
+ * scroll and filters are as they were; otherwise to `link`.
+ */
+export function BackCrumb({
+  children,
+  link,
+}: {
+  children: ReactNode;
+  link: Pick<LinkComponentProps, "to" | "search">;
+}) {
+  const goBack = useGoBack();
+  const canGoBack = useCanGoBack();
+  return canGoBack ? (
+    <button className={crumb} onClick={goBack} type="button">
+      <ArrowLeft size={14} />
+      {children}
+    </button>
+  ) : (
+    <Link className={crumb} {...link}>
+      <ArrowLeft size={14} />
+      {children}
+    </Link>
+  );
+}
 
 export function CrumbSlash() {
   return (
@@ -190,5 +224,47 @@ export function ErrorNote({ children }: { children: ReactNode }) {
     >
       {children}
     </p>
+  );
+}
+
+/** Something failed to load: trying again runs the page's loading once more. */
+export function RetryStatus({ title }: { title: string }) {
+  const router = useRouter();
+  const retry = useCallback(() => {
+    router.invalidate();
+  }, [router]);
+  return (
+    <Status
+      action={
+        <button className={statusAction} onClick={retry} type="button">
+          try again
+        </button>
+      }
+      title={title}
+    />
+  );
+}
+
+/** A page that isn't there: what is missing, and a way to somewhere that is. */
+export function MissingPage({
+  title,
+  back,
+  link,
+}: {
+  title: string;
+  back: string;
+  link: Pick<LinkComponentProps, "to" | "search">;
+}) {
+  return (
+    <Page>
+      <Status
+        action={
+          <Link className={statusAction} {...link}>
+            {back}
+          </Link>
+        }
+        title={title}
+      />
+    </Page>
   );
 }

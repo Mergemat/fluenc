@@ -1,6 +1,6 @@
 // Signing in links this device's progress to an account; signing out takes it off the device.
-import { countPending } from "../offline/progress";
-import { forgetDevice, syncNow } from "../offline/sync";
+import { countPending } from "../progress/store";
+import { forgetDevice, syncNow } from "../progress/sync";
 
 // Better Auth's client loads only when the learner signs in or out; nothing else needs it.
 let client: Promise<

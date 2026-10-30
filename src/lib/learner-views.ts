@@ -1,5 +1,6 @@
 import { State } from "ts-fsrs";
 
+import type { Sentence } from "../data/sentences";
 import type { Character, Word } from "../data/types";
 import { type Catalog, catalogFor } from "./catalog";
 import { directCharacters } from "./character-props";
@@ -11,8 +12,12 @@ import {
   type LearnerState,
   parseCardKey,
 } from "./learner-state";
-import { defaultToneRooms, getMovieCoordinates } from "./pinyin";
-import { compareReviewOrder, reviewDueAt } from "./review-schedule";
+import {
+  defaultToneRooms,
+  getMovieCoordinates,
+  type MovieCoordinates,
+} from "./pinyin";
+import { reviewDueAt, reviewPriority } from "./review-schedule";
 import { nextWordCharacters } from "./word-prerequisites";
 
 const starterCharacterIds = [
@@ -35,20 +40,46 @@ const starterCharacterIds = [
 /** How many places in the teaching order one unnamed prop costs a character. */
 const MISSING_PROP_PLACES = 8;
 
+// Views are derived again after every save; what only depends on the course is worked out once.
+const characterShapes = new WeakMap<
+  Character,
+  {
+    components: ReturnType<typeof groupHanziComponents>;
+    coordinates: MovieCoordinates;
+    direct: boolean;
+  }
+>();
+
+function characterShape(character: Character) {
+  let shape = characterShapes.get(character);
+  if (!shape) {
+    const direct = directCharacters.has(character.hanzi);
+    shape = {
+      coordinates: getMovieCoordinates(character.pinyin),
+      direct,
+      components: groupHanziComponents(
+        direct ? [character.hanzi] : character.components
+      ),
+    };
+    characterShapes.set(character, shape);
+  }
+  return shape;
+}
+
 function characterStudyItem(
   character: Character,
   state: LearnerState,
   catalog: Catalog
 ) {
-  const coordinates = getMovieCoordinates(character.pinyin);
+  const {
+    coordinates,
+    direct,
+    components: movieComponents,
+  } = characterShape(character);
   const actorName = state.actors[coordinates.actorKey] ?? "";
   const setName = state.sets[coordinates.finalKey] ?? "";
   const roomName =
     state.rooms[coordinates.tone] ?? defaultToneRooms[coordinates.tone];
-  const direct = directCharacters.has(character.hanzi);
-  const movieComponents = groupHanziComponents(
-    direct ? [character.hanzi] : character.components
-  );
   return {
     type: "character" as const,
     id: character.id,
@@ -90,14 +121,24 @@ function characterStudyItem(
   };
 }
 
+const wordParts = new WeakMap<
+  Word,
+  { id: string; hanzi: string; meaning: string }[]
+>();
+
 function characterParts(word: Word, catalog: Catalog) {
-  return word.characterIds.map((id) => {
-    const character = catalog.charactersById.get(id);
-    if (!character) {
-      throw new Error(`Missing curriculum character: ${id}`);
-    }
-    return { id, hanzi: character.hanzi, meaning: character.keyword };
-  });
+  let parts = wordParts.get(word);
+  if (!parts) {
+    parts = word.characterIds.map((id) => {
+      const character = catalog.charactersById.get(id);
+      if (!character) {
+        throw new Error(`Missing curriculum character: ${id}`);
+      }
+      return { id, hanzi: character.hanzi, meaning: character.keyword };
+    });
+    wordParts.set(word, parts);
+  }
+  return parts;
 }
 
 function wordStudyItem(word: Word, state: LearnerState, catalog: Catalog) {
@@ -145,6 +186,24 @@ function studyItem(
         meaning: sentence.meaning,
       }
     : null;
+}
+
+const sentenceShapes = new WeakMap<Sentence, string[]>();
+
+/** A sentence's course characters, each once. */
+function sentenceCharacters(sentence: Sentence, catalog: Catalog) {
+  let characters = sentenceShapes.get(sentence);
+  if (!characters) {
+    characters = [
+      ...new Set(
+        Array.from(sentence.hanzi).filter((character) =>
+          catalog.charactersById.has(character)
+        )
+      ),
+    ];
+    sentenceShapes.set(sentence, characters);
+  }
+  return characters;
 }
 
 /**
@@ -196,6 +255,22 @@ function focusPriorities(catalog: Catalog, learnedWords: ReadonlySet<string>) {
   return focus;
 }
 
+// A card keeps its object until it changes, so when it falls due is worked out once per change.
+const scheduledCards = new WeakMap<CardSnapshot, CardSnapshot>();
+
+/** The card with `due` moved to when review shows it. */
+function scheduledCard(card: CardSnapshot) {
+  let scheduled = scheduledCards.get(card);
+  if (!scheduled) {
+    scheduled = {
+      ...card,
+      due: reviewDueAt(new Date(card.due), card.state).toISOString(),
+    };
+    scheduledCards.set(card, scheduled);
+  }
+  return scheduled;
+}
+
 /** Review, Build and Get queues at a moment in time. */
 export function deriveDashboard(
   state: LearnerState,
@@ -204,10 +279,7 @@ export function deriveDashboard(
 ) {
   const items = introducedCards(state).map((item) => ({
     ...item,
-    card: {
-      ...item.card,
-      due: reviewDueAt(new Date(item.card.due), item.card.state).toISOString(),
-    },
+    card: scheduledCard(item.card),
   }));
   const introduced = new Set(items.map((item) => cardKey(item.type, item.id)));
   const introducedCharacters = new Set(
@@ -258,8 +330,15 @@ export function deriveDashboard(
   const nowIso = now.toISOString();
   const reviewQueue = items
     .filter((item) => item.card.due <= nowIso)
-    .sort((left, right) => compareReviewOrder(left.card, right.card))
-    .map(scheduled)
+    .map((item) => ({
+      item,
+      priority: reviewPriority(item.card.state),
+      due: Date.parse(item.card.due),
+    }))
+    .sort(
+      (left, right) => left.priority - right.priority || left.due - right.due
+    )
+    .map(({ item }) => scheduled(item))
     .filter((item) => item !== null);
   const scheduledQueue = items
     .filter((item) => item.card.due > nowIso)
@@ -288,57 +367,41 @@ export function deriveDashboard(
     item.characterIds.every((character) => introducedCharacters.has(character));
   const newWords = unintroducedWords
     .filter(wordReady)
+    .map((item) => ({ item, focus: focusPlace(cardKey("word", item.id)) }))
     .sort(
       (left, right) =>
-        focusPlace(cardKey("word", left.id)) -
-          focusPlace(cardKey("word", right.id)) || left.order - right.order
-    );
+        left.focus - right.focus || left.item.order - right.item.order
+    )
+    .map(({ item }) => item);
   const lockedWords = unintroducedWords.filter((item) => !wordReady(item));
   const nextWordParts = nextWordCharacters(lockedWords, introducedCharacters);
   const missingProps = (character: Character) =>
     [...new Set(character.components)].filter(
       (component) => !state.props[component]
     ).length;
+  // Each character's place is worked out once, so the sort compares numbers.
+  const starterPlace = (id: string) => {
+    const place = starterCharacterIds.indexOf(id);
+    return place < 0 ? Number.MAX_SAFE_INTEGER : place;
+  };
   const newCharacters = catalog.characters
     .filter((item) => !introduced.has(cardKey("character", item.id)))
-    .map((character) => ({ character, missingProps: missingProps(character) }))
+    .map((character) => ({
+      character,
+      focus: focusPlace(cardKey("character", character.id)),
+      word: nextWordParts.has(character.id) ? 0 : 1,
+      starter: starterPlace(character.id),
+      // Each prop the learner still has to name sets a character back a few places, so known
+      // props pay off without burying the characters the course needs most.
+      place: character.order + missingProps(character) * MISSING_PROP_PLACES,
+    }))
     .sort(
-      (
-        { character: left, missingProps: leftMissing },
-        { character: right, missingProps: rightMissing }
-      ) => {
-        const focusPriority =
-          focusPlace(cardKey("character", left.id)) -
-          focusPlace(cardKey("character", right.id));
-        if (focusPriority) {
-          return focusPriority;
-        }
-        const wordPriority =
-          Number(nextWordParts.has(right.id)) -
-          Number(nextWordParts.has(left.id));
-        if (wordPriority) {
-          return wordPriority;
-        }
-        const leftStarter = starterCharacterIds.indexOf(left.id);
-        const rightStarter = starterCharacterIds.indexOf(right.id);
-        if (leftStarter >= 0 || rightStarter >= 0) {
-          if (leftStarter < 0) {
-            return 1;
-          }
-          if (rightStarter < 0) {
-            return -1;
-          }
-          return leftStarter - rightStarter;
-        }
-        // Each prop the learner still has to name sets a character back a few places, so known
-        // props pay off without burying the characters the course needs most.
-        return (
-          left.order +
-            leftMissing * MISSING_PROP_PLACES -
-            (right.order + rightMissing * MISSING_PROP_PLACES) ||
-          left.order - right.order
-        );
-      }
+      (left, right) =>
+        left.focus - right.focus ||
+        left.word - right.word ||
+        left.starter - right.starter ||
+        left.place - right.place ||
+        left.character.order - right.character.order
     )
     .map(({ character }) => ({
       ...characterStudyItem(character, state, catalog),
@@ -346,46 +409,51 @@ export function deriveDashboard(
       focus: focus.get(cardKey("character", character.id))?.label ?? null,
     }));
 
+  const countIn = (list: readonly string[], set: ReadonlySet<string>) =>
+    list.reduce((count, entry) => count + Number(set.has(entry)), 0);
   const getQueue = catalog.sentences
-    .filter((sentence) => !introducedSentences.has(sentence.id))
-    .map((sentence) => {
-      const missingWords = sentence.words.filter(
-        (word) => !learnedWords.has(word)
-      );
-      const characters = [
-        ...new Set(
-          Array.from(sentence.hanzi).filter((character) =>
-            catalog.charactersById.has(character)
-          )
-        ),
-      ];
-      const missingCharacters = characters.filter(
-        (character) => !introducedCharacters.has(character)
-      );
+    .flatMap((sentence) => {
+      if (introducedSentences.has(sentence.id)) {
+        return [];
+      }
+      // Most sentences are far from known; only the few that are get their missing parts listed.
+      const characters = sentenceCharacters(sentence, catalog);
       const wordCoverage = sentence.words.length
-        ? (sentence.words.length - missingWords.length) / sentence.words.length
+        ? countIn(sentence.words, learnedWords) / sentence.words.length
         : 1;
       const characterCoverage = characters.length
-        ? (characters.length - missingCharacters.length) / characters.length
+        ? countIn(characters, introducedCharacters) / characters.length
         : 1;
-      return {
-        ...sentence,
-        coverage: Math.min(wordCoverage, characterCoverage),
-        missingWords,
-        missingCharacters,
-      };
+      const coverage = Math.min(wordCoverage, characterCoverage);
+      if (coverage < 0.9) {
+        return [];
+      }
+      return [
+        {
+          sentence: {
+            ...sentence,
+            coverage,
+            missingWords: sentence.words.filter(
+              (word) => !learnedWords.has(word)
+            ),
+            missingCharacters: characters.filter(
+              (character) => !introducedCharacters.has(character)
+            ),
+          },
+          focus: focusPlace(cardKey("sentence", sentence.id)),
+          anchoredAt: wordIntroducedAt.get(sentence.anchor) ?? -1,
+        },
+      ];
     })
-    .filter((sentence) => sentence.coverage >= 0.9)
     // Focus sentences first. Then, pairing Build with Get, a new word comes with sentences that
     // use it. Fully known sentences come before ones with an unknown left.
     .sort(
       (left, right) =>
-        focusPlace(cardKey("sentence", left.id)) -
-          focusPlace(cardKey("sentence", right.id)) ||
-        (wordIntroducedAt.get(right.anchor) ?? -1) -
-          (wordIntroducedAt.get(left.anchor) ?? -1) ||
-        right.coverage - left.coverage
-    );
+        left.focus - right.focus ||
+        right.anchoredAt - left.anchoredAt ||
+        right.sentence.coverage - left.sentence.coverage
+    )
+    .map(({ sentence }) => sentence);
 
   return {
     reviewQueue,
@@ -443,12 +511,8 @@ export function deriveLibrary(
       readings: character.readings,
       rank: character.frequencyRank,
       status: characterStatus(character.id) ?? ("new" as const),
-      movie: getMovieCoordinates(character.pinyin),
-      components: groupHanziComponents(
-        directCharacters.has(character.hanzi)
-          ? [character.hanzi]
-          : character.components
-      ),
+      movie: characterShape(character).coordinates,
+      components: characterShape(character).components,
       structure: character.componentStructure,
       componentNote: character.componentNote,
     })),

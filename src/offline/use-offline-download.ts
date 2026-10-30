@@ -29,6 +29,9 @@ export type DownloadStatus =
 const REVISIONS_KEY = "/__revisions";
 // How long a download may go without receiving anything.
 const STEP_TIMEOUT = 30_000;
+// The longest the download waits for an idle moment, and the wait where browsers can't report one.
+const IDLE_TIMEOUT = 5000;
+const IDLE_FALLBACK = 2000;
 
 const withTimeout = <T>(promise: Promise<T>, ms = STEP_TIMEOUT) =>
   new Promise<T>((resolve, reject) => {
@@ -116,21 +119,23 @@ async function fillFromPack(
     }
     bytes.set(value, received);
     received += value.length;
-    const arrived: OfflineFile[] = [];
-    while (waiting[0] && waiting[0].offset + waiting[0].length <= received) {
-      arrived.push(waiting.shift() as OfflineFile);
+    while (
+      isActive() &&
+      waiting[0] &&
+      waiting[0].offset + waiting[0].length <= received
+    ) {
+      const file = waiting.shift() as OfflineFile;
+      // biome-ignore lint/performance/noAwaitInLoops: one file at a time, so taps get a turn between them.
+      await group.cache.put(
+        file.url,
+        new Response(bytes.slice(file.offset, file.offset + file.length), {
+          headers: { "Content-Type": group.contentType },
+        })
+      );
+      onFile();
+      // Storing a file takes the main thread a moment; a tap waiting behind hundreds of them would not.
+      await yieldToInput();
     }
-    await Promise.all(
-      arrived.map(async (file) => {
-        await group.cache.put(
-          file.url,
-          new Response(bytes.slice(file.offset, file.offset + file.length), {
-            headers: { "Content-Type": group.contentType },
-          })
-        );
-        onFile();
-      })
-    );
   }
   if (!isActive()) {
     await reader.cancel();
@@ -148,9 +153,13 @@ async function fillCaches(groups: CacheGroup[], callbacks: DownloadCallbacks) {
   let completed =
     total - groups.reduce((sum, group) => sum + group.stale.length, 0);
   callbacks.onProgress({ completed, total });
+  // Progress shows as a whole percentage, so it is only worth reporting when that changes.
+  let shown = Math.floor((completed / total) * 100);
   const onFile = () => {
     completed += 1;
-    if (callbacks.isActive()) {
+    const percentage = Math.floor((completed / total) * 100);
+    if (callbacks.isActive() && percentage !== shown) {
+      shown = percentage;
       callbacks.onProgress({ completed, total });
     }
   };
@@ -166,12 +175,33 @@ async function fillCaches(groups: CacheGroup[], callbacks: DownloadCallbacks) {
   );
 }
 
+/** Let input that arrived meanwhile be handled first. */
+const yieldToInput = () =>
+  new Promise<void>((resolve) => {
+    setTimeout(resolve, 0);
+  });
+
+/** Resolves once the page has nothing more pressing to do, such as just after it opens. */
+const whenIdle = () =>
+  new Promise<void>((resolve) => {
+    if (typeof requestIdleCallback === "function") {
+      requestIdleCallback(() => resolve(), { timeout: IDLE_TIMEOUT });
+    } else {
+      setTimeout(resolve, IDLE_FALLBACK);
+    }
+  });
+
 /** Download everything practice needs offline: "ready" once done, "idle" while waiting to be. */
 async function downloadOfflineFiles(
   callbacks: DownloadCallbacks
 ): Promise<"ready" | "idle"> {
   // Offline practice downloads by itself; without a connection it waits for one.
   if (!navigator.onLine) {
+    return "idle";
+  }
+  // The download is for later; opening the app and the first taps come first.
+  await whenIdle();
+  if (!callbacks.isActive()) {
     return "idle";
   }
   const response = await withTimeout(

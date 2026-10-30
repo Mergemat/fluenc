@@ -55,17 +55,40 @@ await legacy.add("outbox", {
 });
 legacy.close();
 
-const {
-  clearProgress,
-  countPending,
-  readLearner,
-  readOutgoing,
-  saveEnrollment,
-  saveReview,
-} = await import("./progress");
+const { countPending, readOutgoing, readTable } = await import("./store");
+const { saveEnrollment, saveReview } = await import("./actions");
+const { forgetDevice, getSyncStatus, syncNow } = await import("./sync");
+const { getLearner, loadLearner } = await import("./views");
+const { stateOf } = await import("./rows");
+
+/** Progress as the device saved it, and as the screen shows it; the two must agree. */
+async function readLearner() {
+  const [cards, names, livingLinks, focus] = await Promise.all([
+    readTable("cards"),
+    readTable("names"),
+    readTable("livingLinks"),
+    readTable("focus"),
+  ]);
+  const saved = stateOf({ cards, names, livingLinks, focus });
+  expect(getLearner().state).toEqual(saved);
+  return { state: saved };
+}
+
+// Test files share modules, and one that ran earlier may have started progress with no device
+// database; start it again so it reads this one.
+const collections = await import("./collections");
+await Promise.all(
+  [
+    collections.cards,
+    collections.names,
+    collections.livingLinks,
+    collections.focus,
+    collections.device,
+  ].map((collection) => collection.cleanup({ dependents: true }))
+);
+await loadLearner();
 const migrated = await readLearner();
 const migratedQueue = await readOutgoing(10);
-const { getSyncStatus, syncNow } = await import("./sync");
 
 const learner = { id: "user-1", email: "learner@example.com" };
 const emptyPatch: LearnerPatch = {
@@ -137,7 +160,7 @@ beforeEach(async () => {
     configurable: true,
     value: { onLine: true },
   });
-  await clearProgress();
+  await forgetDevice();
 });
 
 afterAll(() => {
@@ -180,8 +203,10 @@ test("a device that has never been online saves and shows progress", async () =>
     configurable: true,
     value: { onLine: false },
   });
-  const saved = await saveEnrollment({ itemType: "sentence", itemId: "s01" });
-  expect(cardIds(saved.state)).toEqual(["sentence:s01"]);
+  const saving = saveEnrollment({ itemType: "sentence", itemId: "s01" });
+  // The card shows before it is written.
+  expect(cardIds(getLearner().state)).toEqual(["sentence:s01"]);
+  await saving;
   expect(cardIds((await readLearner()).state)).toEqual(["sentence:s01"]);
   expect(await countPending()).toBe(1);
   expect(await syncNow()).toBe(false);

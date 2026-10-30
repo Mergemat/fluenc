@@ -7,17 +7,16 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
-  useEffectEvent,
   useState,
 } from "react";
 
+import { isShortcut, useWindowKeys } from "../hooks/use-window-keys";
 import { defaultToneRooms } from "../lib/pinyin";
 import { cn } from "../lib/utils";
 import { brand, shell } from "./app-shell";
-import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import { BrandMark } from "./ui/brand-mark";
-import { action, actionKey } from "./ui/buttons";
+import { ActionButton } from "./ui/button";
 import { glyphBox, HanziGlyph, ToneContour } from "./ui/hanzi";
 import { chip, label, PageHeader } from "./ui/layout";
 import { partColor } from "./ui/part-colors";
@@ -330,19 +329,12 @@ export function WelcomeView({
     const timer = setTimeout(() => setSlide(slide + 1), SLIDE_MS);
     return () => clearTimeout(timer);
   }, [slide, last]);
-  const onKey = useEffectEvent((event: KeyboardEvent) => {
-    if (
-      event.key === "Enter" &&
-      !(event.target instanceof Element && event.target.closest("button, a"))
-    ) {
+  useWindowKeys((event) => {
+    if (event.key === "Enter" && isShortcut(event, "button, a")) {
       event.preventDefault();
       next();
     }
   });
-  useEffect(() => {
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 
   const { kicker, title, line, visual } = slides[slide];
   return (
@@ -393,15 +385,15 @@ export function WelcomeView({
               back
             </button>
           ) : null}
-          <DitherButton
-            className={cn(action, "short:max-studio:h-11")}
+          <ActionButton
+            className="short:max-studio:h-11"
             color="blue"
+            hint="↵"
             onClick={next}
             variant="gradient"
           >
-            <span>{last ? "start learning" : "next"}</span>
-            <kbd className={actionKey}>↵</kbd>
-          </DitherButton>
+            {last ? "start learning" : "next"}
+          </ActionButton>
         </footer>
       </main>
     </div>

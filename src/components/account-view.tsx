@@ -4,9 +4,8 @@ import { type FormEvent, useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { signIn } from "../account/account";
-import { useSyncStatus } from "../offline/sync";
-import { DitherButton } from "./dither-kit/button";
-import { tool } from "./ui/buttons";
+import { useSyncStatus } from "../progress/sync";
+import { ToolButton } from "./ui/button";
 import { ErrorNote, Page, PageHeader } from "./ui/layout";
 
 type Mode = "sign-in" | "sign-up";
@@ -120,16 +119,9 @@ export function AccountView() {
         </label>
         {error ? <ErrorNote>{error}</ErrorNote> : null}
         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <DitherButton
-            className={tool}
-            color="blue"
-            disabled={busy}
-            type="submit"
-            variant="gradient"
-          >
-            <Icon className="shrink-0" size={13} />
+          <ToolButton disabled={busy} icon={Icon} tone="primary" type="submit">
             {busy ? "one moment…" : text.submit}
-          </DitherButton>
+          </ToolButton>
           <button
             className="type-label text-muted-foreground underline underline-offset-3 transition-colors hover:text-foreground"
             onClick={toggle}

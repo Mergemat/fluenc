@@ -8,19 +8,20 @@ import {
   type PointerEvent,
   useCallback,
   useEffect,
-  useEffectEvent,
   useId,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { toast } from "sonner";
-
+import {
+  FOCUSED_KEYS,
+  isShortcut,
+  useWindowKeys,
+} from "../hooks/use-window-keys";
 import { directCharacters } from "../lib/character-props";
 import { getItemMeaning } from "../lib/meaning";
 import { cn } from "../lib/utils";
-import { saveEnrollment, saveMovieOffline } from "../offline/progress";
-import { useProgressMutation } from "../offline/use-progress-mutation";
+import { saveEnrollment, saveMovie, useSave } from "../progress/actions";
 import { ClueCode } from "./character-studio/clue-code";
 import {
   clueCode,
@@ -38,6 +39,7 @@ import {
   cueKey,
   lessonClues,
 } from "./character-studio/clues";
+import { finishLabel, toastAdded } from "./character-studio/finish";
 import {
   studio,
   studioAction,
@@ -51,7 +53,7 @@ import {
 } from "./character-studio/studio";
 import type { CharacterItem, Cue } from "./character-studio/types";
 import { DitherButton } from "./dither-kit/button";
-import { DitherGradient } from "./dither-kit/gradient";
+import { ActionButton } from "./ui/button";
 import {
   AudioButton,
   glyphBox,
@@ -190,32 +192,11 @@ function ClueRow({
   );
 }
 
-/** The words list itself: loading, unavailable offline, or one word per line. */
+/** The words list itself, one word per line. */
 function UsageList({ usage }: { usage: ReturnType<typeof useUsage> }) {
-  if (usage.pending) {
-    return (
-      <span className="relative h-3 w-full max-w-72 animate-pulse overflow-hidden rounded-xs">
-        <DitherGradient cell={2} direction="right" from="grey" opacity={0.6} />
-      </span>
-    );
-  }
-  if (usage.error) {
-    return (
-      <p className="type-label text-faint-foreground leading-wrap">
-        words unavailable offline ·{" "}
-        <button
-          className="text-muted-foreground underline"
-          onClick={usage.retry}
-          type="button"
-        >
-          retry
-        </button>
-      </p>
-    );
-  }
   return (
     <ul className="grid list-none">
-      {usage.data?.words.map((word) => (
+      {usage.words.map((word) => (
         <li
           className="type-body flex min-w-0 items-baseline gap-2 whitespace-nowrap text-muted-foreground leading-8"
           key={word.id}
@@ -273,9 +254,9 @@ function UsageWords({
     };
   }, [open]);
 
-  const count = usage.data?.words.length;
+  const count = usage.words.length;
   // A character used on its own has nothing to show.
-  if (usage.data && !count) {
+  if (!count) {
     return null;
   }
   return (
@@ -289,12 +270,11 @@ function UsageWords({
         type="button"
       >
         words
-        {count ? <span className="text-foreground">{count}</span> : null}
+        <span className="text-foreground">{count}</span>
         <ChevronDown aria-hidden="true" size={12} />
       </button>
       {open ? (
         <section
-          aria-busy={usage.pending}
           aria-label={`Words with ${hanzi}`}
           className="absolute top-full right-0 mt-1.5 box-border min-w-56 max-w-panel origin-top-right animate-enter rounded-lg border border-border-strong bg-popover px-3.5 py-2 shadow-popover"
           id={panel}
@@ -306,16 +286,6 @@ function UsageWords({
   );
 }
 
-function actionLabel(saving: boolean, missing: number, failed: boolean) {
-  if (saving) {
-    return "saving";
-  }
-  if (missing) {
-    return `name ${missing} clue${missing > 1 ? "s" : ""}`;
-  }
-  return failed ? "could not save — try again" : "add to reviews";
-}
-
 interface LessonShortcuts {
   finish: () => void;
   toggleXray: () => void;
@@ -324,18 +294,10 @@ interface LessonShortcuts {
 
 /** Enter finishes, x shows every part, w opens writing — unless typing or in a dialog. */
 function useLessonShortcuts(shortcuts: LessonShortcuts) {
-  const onKey = useEffectEvent((event: globalThis.KeyboardEvent) => {
+  useWindowKeys((event) => {
     if (
       event.defaultPrevented ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.altKey
-    ) {
-      return;
-    }
-    if (
-      event.target instanceof Element &&
-      event.target.closest("input, textarea, button, a, [role=dialog], dialog")
+      !isShortcut(event, `${FOCUSED_KEYS}, dialog`)
     ) {
       return;
     }
@@ -348,18 +310,14 @@ function useLessonShortcuts(shortcuts: LessonShortcuts) {
       shortcuts.write();
     }
   });
-  useEffect(() => {
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 }
 
 /** Save the scene's names, then put the character into reviews. */
 function useSaveLesson(item: CharacterItem, clues: Clue[]) {
-  return useProgressMutation(async () => {
+  return useSave(async () => {
     const name = (kind: Cue["kind"]) =>
       clues.find((clue) => clue.kind === kind)?.name.trim() ?? "";
-    await saveMovieOffline({
+    await saveMovie({
       characterId: item.id,
       actorKey: item.movie.actorKey,
       actorName: name("actor"),
@@ -393,18 +351,21 @@ function LessonActions({
   return (
     <footer className={studioActions} data-actions>
       {/* Grey dotted until every clue is named, then the blue gradient with bloom. */}
-      <DitherButton
+      <ActionButton
+        alert={failed}
         className={studioAction}
         color={missing ? "grey" : "blue"}
         disabled={saving}
+        hint="↵"
         onClick={onFinish}
         variant={missing ? "dotted" : "gradient"}
       >
-        <span role={failed ? "alert" : undefined}>
-          {actionLabel(saving, missing, failed)}
-        </span>
-        <kbd>↵</kbd>
-      </DitherButton>
+        {finishLabel(
+          saving,
+          failed,
+          missing ? `name ${missing} clue${missing > 1 ? "s" : ""}` : null
+        )}
+      </ActionButton>
       <DitherButton
         aria-label={`Write ${hanzi}`}
         className={studioActionSide}
@@ -455,15 +416,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
     if (isPending) {
       return;
     }
-    mutate(undefined, {
-      onSuccess: () =>
-        toast(
-          <>
-            <b className="font-hanzi">{item.hanzi}</b>
-            <span>added to reviews</span>
-          </>
-        ),
-    });
+    mutate(undefined, { onSuccess: () => toastAdded(item.hanzi) });
   }, [firstMissing, focusClue, isPending, mutate, item.hanzi]);
 
   useLessonShortcuts({

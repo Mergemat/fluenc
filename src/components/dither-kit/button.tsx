@@ -3,12 +3,14 @@ import { cn } from "./lib";
 import { rgb } from "./palette";
 import {
   BAYER4,
+  cachedTexture,
   clamp01,
   fillOf,
   type PixelBloom,
   type PixelColor,
   pixelBloomStyle,
   pixelPrefersReducedMotion,
+  setCell,
 } from "./pixel";
 
 const CELL = 2; // css px per dither cell — same chunk as the charts
@@ -79,25 +81,44 @@ function cellAlpha(
  * with `intensity` (0 rest, 1 hover, ~1.5 pressed) lifting density and alpha —
  * the same lift the charts do on hover.
  */
-function paintButton(
-  ctx: CanvasRenderingContext2D,
-  bloomCtx: CanvasRenderingContext2D | null,
+function buttonTexture(
   cols: number,
   rows: number,
   { fill, variant }: PaintState,
   intensity: number
-): void {
-  ctx.clearRect(0, 0, cols, rows);
+) {
+  const texture = new ImageData(cols, rows);
   for (let y = 0; y < rows; y += 1) {
     const density = rowDensity(variant, y, rows);
     for (let x = 0; x < cols; x += 1) {
       const alpha = cellAlpha(variant, x, y, density, intensity);
       if (alpha !== null) {
-        ctx.fillStyle = rgb(fill, 1, alpha);
-        ctx.fillRect(x, y, 1, 1);
+        setCell(texture.data, y * cols + x, fill, alpha);
       }
     }
   }
+  return texture;
+}
+
+function paintButton(
+  ctx: CanvasRenderingContext2D,
+  bloomCtx: CanvasRenderingContext2D | null,
+  cols: number,
+  rows: number,
+  state: PaintState,
+  intensity: number
+): void {
+  const { fill, variant } = state;
+  // Buttons at rest look alike; a hover's frames are each painted once and not kept.
+  ctx.putImageData(
+    intensity === 0
+      ? cachedTexture(`button ${cols}x${rows} ${fill} ${variant}`, () =>
+          buttonTexture(cols, rows, state, 0)
+        )
+      : buttonTexture(cols, rows, state, intensity),
+    0,
+    0
+  );
   // Soft outline in the fill colour, brightening a touch on hover.
   ctx.fillStyle = rgb(fill, 1, clamp01(0.5 + 0.25 * intensity));
   ctx.fillRect(0, 0, cols, 1);
@@ -177,10 +198,15 @@ export function DitherButton({
       }
     };
 
-    const resize = () => {
-      const box = button.getBoundingClientRect();
-      cols = Math.max(4, Math.round(box.width / CELL));
-      rows = Math.max(4, Math.round(box.height / CELL));
+    // A resize that keeps the same cells keeps the same picture.
+    const resize = (width: number, height: number) => {
+      const nextCols = Math.max(4, Math.round(width / CELL));
+      const nextRows = Math.max(4, Math.round(height / CELL));
+      if (nextCols === cols && nextRows === rows) {
+        return;
+      }
+      cols = nextCols;
+      rows = nextRows;
       canvas.width = cols;
       canvas.height = rows;
       if (bloomCanvas) {
@@ -189,7 +215,6 @@ export function DitherButton({
       }
       paint();
     };
-    resize();
 
     const enter = () => {
       hovered = true;
@@ -207,9 +232,22 @@ export function DitherButton({
     button.addEventListener("pointerup", up);
     button.addEventListener("pointercancel", up);
 
+    // It reports the box once observed, so the first paint needs no layout read of its own.
     const ro =
-      typeof ResizeObserver === "undefined" ? null : new ResizeObserver(resize);
-    ro?.observe(button);
+      typeof ResizeObserver === "undefined"
+        ? null
+        : new ResizeObserver(([entry]) => {
+            const box = entry?.borderBoxSize[0];
+            if (box) {
+              resize(box.inlineSize, box.blockSize);
+            }
+          });
+    if (ro) {
+      ro.observe(button);
+    } else {
+      const box = button.getBoundingClientRect();
+      resize(box.width, box.height);
+    }
 
     return () => {
       if (raf) {

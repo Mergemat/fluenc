@@ -2,7 +2,6 @@
 // exactly the scroller's height, so they never scroll. Older pages use the shared colour tokens.
 // Desktop gets a sidebar (navigation, course progress, profile, settings) so pages keep the full height;
 // tablets get a top bar and phones a tab bar.
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
   BookOpen,
@@ -15,15 +14,15 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useHydrated } from "../hooks/use-hydrated";
+import { useMediaQuery } from "../hooks/use-media-query";
 
-import type { DashboardData } from "../lib/learner-views";
 import { cn } from "../lib/utils";
-import { profileQueryOptions } from "../offline/queries";
 import {
   type SyncAttention,
   syncAttention,
   useSyncStatus,
-} from "../offline/sync";
+} from "../progress/sync";
+import { useDueCount, useProfile } from "../progress/views";
 import { AppScroll } from "./app-scroll";
 import { DitherGradient } from "./dither-kit/gradient";
 import { BrandMark } from "./ui/brand-mark";
@@ -61,10 +60,12 @@ export const iconButton =
 const badge =
   "box-border h-4 min-w-5 rounded-sm bg-primary px-1 text-center type-micro text-primary-foreground leading-4";
 
+// The theme's `lg` breakpoint, where the sidebar shows.
+const WIDE = "(min-width: 1024px)";
+
 /** How far through the course the learner is, learned and learning; shown in the desktop sidebar. */
 function CourseProgress() {
-  const { data } = useQuery(profileQueryOptions);
-  const meters = data?.tracks.filter(
+  const meters = useProfile().tracks.filter(
     (track) => track.id === "characters" || track.id === "words"
   );
   return (
@@ -73,7 +74,7 @@ function CourseProgress() {
       className="group/course mt-auto hidden gap-4 border-border border-t px-3 py-3.5 lg:grid"
       to="/profile"
     >
-      {meters?.map((meter) => (
+      {meters.map((meter) => (
         <div className="grid gap-2" key={meter.id}>
           <p className="type-label m-0 flex items-baseline justify-between text-muted-foreground group-hover/course:text-foreground">
             <span>{meter.label}</span>
@@ -126,15 +127,13 @@ function SyncMark() {
 }
 
 export function AppShell({
-  data,
   pathname,
   children,
 }: {
-  data: DashboardData;
   pathname: string;
   children: ReactNode;
 }) {
-  const due = data.reviewQueue.length;
+  const due = useDueCount();
   const fixed =
     pathname.startsWith("/lessons") ||
     pathname.startsWith("/review") ||
@@ -148,6 +147,8 @@ export function AppShell({
   // dither-kit paints its canvases in effects, so server HTML has none of them. Hold the shell
   // until hydration: children's effects (the canvas paints) run before this one flips it on.
   const hydrated = useHydrated();
+  // The sidebar's course meters work out the whole profile; a phone never shows them.
+  const wide = useMediaQuery(WIDE);
 
   return (
     <div
@@ -205,7 +206,7 @@ export function AppShell({
             </Link>
           ))}
         </nav>
-        <CourseProgress />
+        {wide ? <CourseProgress /> : null}
         {corner.map((item, index) => (
           <Link
             activeProps={{ "aria-current": "page" }}

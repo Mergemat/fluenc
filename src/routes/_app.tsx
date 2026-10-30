@@ -1,25 +1,18 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import {
-  createFileRoute,
-  Outlet,
-  useLocation,
-  useRouter,
-} from "@tanstack/react-router";
-import { useCallback } from "react";
+import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 
 import { AppShell } from "../components/app-shell";
-import { Status, statusAction } from "../components/ui/layout";
+import { RetryStatus, Status } from "../components/ui/layout";
 import { Toaster } from "../components/ui/sonner";
 import { OfflineDownloadProvider } from "../offline/offline-download-provider";
-import { dashboardQueryOptions, loadLearner } from "../offline/queries";
-import { useOfflineSync } from "../offline/use-offline-sync";
+import { useSync } from "../progress/use-sync";
+import { loadLearner } from "../progress/views";
 import { useAppUpdate } from "../updates/use-app-update";
 
 export const Route = createFileRoute("/_app")({
   // Progress lives on the device, so the server only sends the shell; the device fills it in.
   ssr: false,
-  loader: async ({ context }) => {
-    await loadLearner(context.queryClient);
+  loader: async () => {
+    await loadLearner();
   },
   pendingComponent: () => <Status loading title="opening fluenc" />,
   pendingMinMs: 0,
@@ -28,14 +21,13 @@ export const Route = createFileRoute("/_app")({
 });
 
 function AppLayout() {
-  const { data } = useSuspenseQuery(dashboardQueryOptions);
   const pathname = useLocation({ select: (location) => location.pathname });
-  useOfflineSync();
+  useSync();
   useAppUpdate();
 
   return (
     <OfflineDownloadProvider>
-      <AppShell data={data} pathname={pathname}>
+      <AppShell pathname={pathname}>
         <Outlet />
       </AppShell>
       <Toaster />
@@ -44,18 +36,5 @@ function AppLayout() {
 }
 
 function StartupError() {
-  const router = useRouter();
-  const retry = useCallback(() => {
-    router.invalidate();
-  }, [router]);
-  return (
-    <Status
-      action={
-        <button className={statusAction} onClick={retry} type="button">
-          try again
-        </button>
-      }
-      title="couldn’t open your progress on this device"
-    />
-  );
+  return <RetryStatus title="couldn’t open your progress on this device" />;
 }

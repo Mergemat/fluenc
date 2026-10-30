@@ -39,6 +39,39 @@ export function hueFill(hue: number): Rgb {
   ];
 }
 
+/**
+ * Painted textures, by everything that decides their pixels. A deck mounts the same card backs and
+ * buttons over and over; each is worked out once.
+ */
+const textures = new Map<string, ImageData>();
+const MAX_TEXTURES = 64;
+
+export function cachedTexture(key: string, paint: () => ImageData) {
+  let texture = textures.get(key);
+  if (!texture) {
+    texture = paint();
+    if (textures.size >= MAX_TEXTURES) {
+      textures.delete(textures.keys().next().value as string);
+    }
+    textures.set(key, texture);
+  }
+  return texture;
+}
+
+/** Write one cell into a texture: one pixel per cell, scaled up by CSS. */
+export function setCell(
+  data: Uint8ClampedArray,
+  index: number,
+  [r, g, b]: Rgb,
+  alpha: number
+) {
+  const offset = index * 4;
+  data[offset] = r;
+  data[offset + 1] = g;
+  data[offset + 2] = b;
+  data[offset + 3] = Math.round(alpha * 255);
+}
+
 /** Resolve a {@link PixelColor} to its rgb fill. */
 export function fillOf(color: PixelColor): Rgb {
   return typeof color === "number" ? hueFill(color) : PALETTE[color].fill;

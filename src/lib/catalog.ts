@@ -181,6 +181,8 @@ export const catalog = createCatalog(
 );
 
 const focusCatalogs = new WeakMap<readonly FocusEntry[], Catalog>();
+// Saves read focus afresh each time; the same entries in a new array still reuse their catalog.
+let latest: { entries: string; catalog: Catalog } | null = null;
 
 /** The course with a learner's focus entries. Progress cached before focus existed has none. */
 export function catalogFor(state: { focus?: readonly FocusEntry[] }) {
@@ -190,7 +192,12 @@ export function catalogFor(state: { focus?: readonly FocusEntry[] }) {
   }
   let built = focusCatalogs.get(focus);
   if (!built) {
-    built = createCatalog(curriculumJson as Curriculum, courseSentences, focus);
+    const entries = JSON.stringify(focus);
+    built =
+      latest?.entries === entries
+        ? latest.catalog
+        : createCatalog(curriculumJson as Curriculum, courseSentences, focus);
+    latest = { entries, catalog: built };
     focusCatalogs.set(focus, built);
   }
   return built;

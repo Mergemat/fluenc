@@ -1,16 +1,9 @@
 // Home: the one thing to do next, large, beside a short list of everything else today. Reviews
 // come first while any are due, then the next lesson, then reading. Each still opens on its own;
 // the next one gets the page's only button, and Space or Enter.
-import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useMemo,
-} from "react";
-
+import { type ReactNode, useCallback, useMemo } from "react";
+import { isShortcut, useWindowKeys } from "../hooks/use-window-keys";
 import {
   activityCalendar,
   activityStreaks,
@@ -21,10 +14,9 @@ import type { BuildItem, DashboardData } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { nextReviews } from "../lib/review-schedule";
 import { cn } from "../lib/utils";
-import { profileQueryOptions } from "../offline/queries";
-import { DitherButton } from "./dither-kit/button";
+import { useIntroductions } from "../progress/views";
 import { DitherGradient } from "./dither-kit/gradient";
-import { action, actionKey } from "./ui/buttons";
+import { ActionButton } from "./ui/button";
 import { MoviePinyin } from "./ui/hanzi";
 import { Page, PageHeader, SectionHead } from "./ui/layout";
 
@@ -70,15 +62,15 @@ function Primary({ to, label }: { to: Lead; label: string }) {
   const navigate = useNavigate();
   const go = useCallback(() => navigate({ to }), [navigate, to]);
   return (
-    <DitherButton
-      className={cn(action, "mt-2 short:max-studio:h-11")}
+    <ActionButton
+      className="mt-2 short:max-studio:h-11"
       color="blue"
+      hint="space"
       onClick={go}
       variant="gradient"
     >
-      <span>{label}</span>
-      <kbd className={actionKey}>space</kbd>
-    </DitherButton>
+      {label}
+    </ActionButton>
   );
 }
 
@@ -249,21 +241,18 @@ function Later({
 
 /** This week's days with something new, the way the profile's graph counts them. */
 function useWeek() {
-  const { data } = useQuery(profileQueryOptions);
+  const introductions = useIntroductions();
   const today = dayKey(new Date());
   return useMemo(() => {
-    if (!data) {
-      return null;
-    }
     const now = dateOfKey(today);
-    const [days = []] = activityCalendar(data.introductions, now, 1);
+    const [days = []] = activityCalendar(introductions, now, 1);
     return {
       today,
       days,
       active: days.filter((day) => day.count > 0).length,
-      learning: activityStreaks(data.introductions, now).activeDays,
+      learning: activityStreaks(introductions, now).activeDays,
     };
-  }, [data, today]);
+  }, [introductions, today]);
 }
 
 /** Everything that isn't next, in the order it comes, and the week so far. */
@@ -324,17 +313,13 @@ function LaterToday({
           </Later>
         )}
         <Later
-          label={
-            week
-              ? `this week · ${plural(week.active, "day", "days")} · ${week.learning} learning`
-              : "this week"
-          }
+          label={`this week · ${plural(week.active, "day", "days")} · ${week.learning} learning`}
           lead="周"
           name="This week"
           to="/profile"
         >
           <span className="flex gap-1.5">
-            {(week?.days ?? []).map((day, index) => (
+            {week.days.map((day, index) => (
               <span
                 className="type-micro grid justify-items-center gap-1 text-faint-foreground"
                 key={day.key}
@@ -342,7 +327,7 @@ function LaterToday({
                 <i
                   className={cn(
                     "relative size-6 overflow-hidden rounded-sm",
-                    day.key === week?.today
+                    day.key === week.today
                       ? "inset-ring inset-ring-blue"
                       : "bg-popover"
                   )}
@@ -370,30 +355,17 @@ function LaterToday({
 export function TodayView({ data }: { data: DashboardData }) {
   const lead = leadOf(data);
   const navigate = useNavigate();
-  const onKey = useEffectEvent((event: KeyboardEvent) => {
+  useWindowKeys((event) => {
     if (
-      !lead ||
-      event.repeat ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.altKey ||
-      !(event.code === "Space" || event.key === "Enter")
+      lead &&
+      !event.repeat &&
+      (event.code === "Space" || event.key === "Enter") &&
+      isShortcut(event)
     ) {
-      return;
+      event.preventDefault();
+      navigate({ to: lead });
     }
-    if (
-      event.target instanceof Element &&
-      event.target.closest("input, textarea, button, a, [role=dialog]")
-    ) {
-      return;
-    }
-    event.preventDefault();
-    navigate({ to: lead });
   });
-  useEffect(() => {
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 
   return (
     <Page

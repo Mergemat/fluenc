@@ -14,7 +14,7 @@ import {
 import { useMandarinSpeech } from "../../hooks/use-mandarin-speech";
 import { getToneDetail } from "../../lib/tones";
 import { cn } from "../../lib/utils";
-import { libraryQueryOptions } from "../../offline/queries";
+import { useLibrary } from "../../progress/views";
 import { DitherGradient } from "../dither-kit/gradient";
 import { PixelLoader } from "./dither";
 import { partColor, partPixelColor } from "./part-colors";
@@ -419,20 +419,17 @@ export interface UsageWord {
 /** Words that use the character, preferring ones built from characters you know. */
 const noExtraKnown: ReadonlySet<string> = new Set();
 export function useUsage(hanzi: string, alsoKnown = noExtraKnown) {
-  const library = useQuery(libraryQueryOptions);
-  const result = useMemo(() => {
-    if (!library.data) {
-      return null;
-    }
+  const library = useLibrary();
+  return useMemo(() => {
     const known = new Set(
-      library.data.characters
+      library.characters
         .filter((entry) => entry.status !== "new")
         .map((entry) => entry.hanzi)
     );
     for (const char of alsoKnown) {
       known.add(char);
     }
-    const words: UsageWord[] = library.data.words
+    const words: UsageWord[] = library.words
       .filter((word) => word.hanzi !== hanzi && word.hanzi.includes(hanzi))
       .map((word) => {
         const chars = Array.from(word.hanzi).map((char, position) => ({
@@ -454,17 +451,7 @@ export function useUsage(hanzi: string, alsoKnown = noExtraKnown) {
       .sort((a, b) => a.unknown - b.unknown || a.rank - b.rank)
       .slice(0, 3);
     return { words };
-  }, [library.data, hanzi, alsoKnown]);
-  const { refetch } = library;
-  const retry = useCallback(() => {
-    refetch();
-  }, [refetch]);
-  return {
-    data: result,
-    pending: library.isPending,
-    error: library.isError,
-    retry,
-  };
+  }, [library, hanzi, alsoKnown]);
 }
 
 export function UsageHanzi({ chars }: { chars: UsageWord["chars"] }) {

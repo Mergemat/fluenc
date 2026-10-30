@@ -1,21 +1,38 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { Workbox } from "workbox-window";
 
+import { whenSaved } from "../progress/saves";
+
 const UPDATE_TOAST = "app-update";
 
-/** Reload, switching to a waiting version first so the reload brings it in. */
+// A version that never takes over must not leave the reload waiting forever.
+const TAKEOVER_TIMEOUT = 3000;
+let switching = false;
+
+/**
+ * Reload once every save is written, switching to a waiting version first so the reload brings
+ * it in. Progress is on the device, so nothing is lost.
+ */
 export async function reloadApp() {
+  await whenSaved();
   const waiting = (await navigator.serviceWorker?.getRegistration())?.waiting;
   if (!waiting) {
     window.location.reload();
     return;
   }
+  switching = true;
+  const timer = window.setTimeout(
+    () => window.location.reload(),
+    TAKEOVER_TIMEOUT
+  );
   navigator.serviceWorker.addEventListener(
     "controllerchange",
-    () => window.location.reload(),
+    () => {
+      window.clearTimeout(timer);
+      window.location.reload();
+    },
     { once: true }
   );
   waiting.postMessage({ type: "SKIP_WAITING" });
@@ -27,7 +44,6 @@ export async function reloadApp() {
  */
 export function useAppUpdate() {
   const [waiting, setWaiting] = useState(false);
-  const queryClient = useQueryClient();
   // A lesson can hold a half-written Hanzi Movie; it is not saved until the lesson is done.
   const drafting = useLocation({
     select: (location) => location.pathname.startsWith("/lessons"),
@@ -50,6 +66,15 @@ export function useAppUpdate() {
         worker?.update().catch(() => undefined);
       }
     };
+    // Another tab switched to the new version; this one still runs the old files. A first
+    // install also takes over, but there were no old files then.
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    const onTakeover = () => {
+      if (hadController && !switching) {
+        onWaiting();
+      }
+    };
+    navigator.serviceWorker.addEventListener("controllerchange", onTakeover);
     document.addEventListener("visibilitychange", check);
     const interval = window.setInterval(check, 60 * 60 * 1000);
 
@@ -68,6 +93,10 @@ export function useAppUpdate() {
       .catch(() => undefined);
     return () => {
       active = false;
+      navigator.serviceWorker.removeEventListener(
+        "controllerchange",
+        onTakeover
+      );
       document.removeEventListener("visibilitychange", check);
       window.clearInterval(interval);
       worker?.removeEventListener("waiting", onWaiting);
@@ -83,12 +112,7 @@ export function useAppUpdate() {
       duration: Number.POSITIVE_INFINITY,
       action: {
         label: "update",
-        onClick: (event) => {
-          // Progress is on the device, so a reload loses nothing once saves have finished.
-          if (queryClient.isMutating()) {
-            event.preventDefault();
-            return;
-          }
+        onClick: () => {
           reloadApp().catch(() => undefined);
         },
       },
@@ -96,5 +120,5 @@ export function useAppUpdate() {
     return () => {
       toast.dismiss(UPDATE_TOAST);
     };
-  }, [waiting, drafting, queryClient]);
+  }, [waiting, drafting]);
 }

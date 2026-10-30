@@ -16,6 +16,22 @@ const dotColors: Record<Status, string> = {
 };
 
 /** A small square in the colour of a learning status. */
+/** A status as a page header's meta: its dot, then what it means here. */
+export function StatusMeta({
+  status,
+  children,
+}: {
+  status: Status;
+  children: ReactNode;
+}) {
+  return (
+    <span className="inline-flex items-center gap-2">
+      <StatusDot status={status} />
+      {children}
+    </span>
+  );
+}
+
 export function StatusDot({ status }: { status: Status }) {
   return (
     <i

@@ -4,32 +4,31 @@
 // in, and saves in the background. The pile and the buttons stay put for the whole session, so a
 // grade only builds the new top card. The reveal button and the grades share one slot, so
 // revealing never moves anything.
-import { useQuery } from "@tanstack/react-query";
 import { Undo2 } from "lucide-react";
 import {
   type CSSProperties,
   type ReactNode,
   useCallback,
   useEffect,
-  useEffectEvent,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { type Grade, Rating } from "ts-fsrs";
+import { isShortcut, useWindowKeys } from "../hooks/use-window-keys";
 import { cardKey as storedKey, toCard } from "../lib/learner-state";
 import type { ReviewItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { previewDue, waitLabel } from "../lib/review-schedule";
 import { cn } from "../lib/utils";
-import { saveReview, takeBackReview } from "../offline/progress";
-import { reviewBackQueryOptions } from "../offline/queries";
-import { useProgressMutation } from "../offline/use-progress-mutation";
+import { saveReview, takeBackReview } from "../progress/actions";
+import { useReviewBack } from "../progress/views";
 import { ClueCode } from "./character-studio/clue-code";
 import { lessonClues } from "./character-studio/clues";
 import { DitherButton } from "./dither-kit/button";
 import type { DitherColor } from "./dither-kit/palette";
-import { action, actionKey } from "./ui/buttons";
+import { ActionButton } from "./ui/button";
+import { actionKey } from "./ui/buttons";
 import {
   cardAnswer,
   cardMeaning,
@@ -459,7 +458,6 @@ interface Leaving {
  * save that fails puts it back. The graded card stays on the pile, thrown, until its throw ends.
  */
 function useGrading(due: ReviewItem[], onRestore: (item: ReviewItem) => void) {
-  const { mutateAsync } = useProgressMutation(saveReview);
   const [graded, setGraded] = useState<ReadonlySet<string>>(() => new Set());
   // A saved grade gives its card a new key. Forget the old one, since taking the review back brings
   // the card back under it.
@@ -509,13 +507,8 @@ function useGrading(due: ReviewItem[], onRestore: (item: ReviewItem) => void) {
         gone(key);
       }, THROWN_FALLBACK_MS);
       timers.current.add(timer);
-      const settle = window.setTimeout(() => {
-        timers.current.delete(settle);
-        setSettled(true);
-      }, SETTLE_MS);
-      timers.current.add(settle);
       const save = () =>
-        mutateAsync({
+        saveReview({
           itemType: item.type,
           itemId: item.id,
           rating,
@@ -530,18 +523,22 @@ function useGrading(due: ReviewItem[], onRestore: (item: ReviewItem) => void) {
           setFailed(true);
           onRestore(item);
         });
-      const saveTimer = window.setTimeout(() => {
-        saves.current.delete(saveTimer);
-        save();
+      // The throw ends: the deck settles and the save goes, in one render. A flush may have sent
+      // the save already.
+      const settle = window.setTimeout(() => {
+        timers.current.delete(settle);
+        setSettled(true);
+        saves.current.get(settle)?.();
+        saves.current.delete(settle);
       }, SETTLE_MS);
-      saves.current.set(saveTimer, save);
+      timers.current.add(settle);
+      saves.current.set(settle, save);
     },
-    [mutateAsync, gone, onRestore]
+    [gone, onRestore]
   );
-  // Saves waiting on a throw go now, so whatever runs next sees them.
+  // Saves waiting on a throw go now, so whatever runs next sees them; the throws still settle.
   const flush = useCallback(() => {
     for (const [timer, save] of saves.current) {
-      window.clearTimeout(timer);
       saves.current.delete(timer);
       save();
     }
@@ -559,38 +556,27 @@ function useBack(
   /** A grade not saved yet, which flushing makes the one to take back. */
   pending: boolean
 ) {
-  const { data: memory } = useQuery(reviewBackQueryOptions);
-  const { mutate } = useProgressMutation(takeBackReview);
-  const canTakeBack = pending || (memory?.canTakeBack ?? false);
+  const memory = useReviewBack();
+  const canTakeBack = pending || memory.canTakeBack;
   const goBack = useCallback(() => {
     flush();
     onBack();
-    mutate(undefined);
-  }, [flush, onBack, mutate]);
-  const onKey = useEffectEvent((event: KeyboardEvent) => {
+    // A failed take-back leaves the review as it was, which the deck already shows.
+    takeBackReview().catch(() => undefined);
+  }, [flush, onBack]);
+  // Backspace goes back even from a button: it does nothing there.
+  useWindowKeys((event) => {
     if (
-      event.key !== "Backspace" ||
-      event.repeat ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.altKey ||
-      (event.target instanceof Element &&
-        event.target.closest("input, textarea, [role=dialog]"))
+      event.key === "Backspace" &&
+      !event.repeat &&
+      isShortcut(event, "input, textarea, [role=dialog]")
     ) {
-      return;
+      event.preventDefault();
+      goBack();
     }
-    event.preventDefault();
-    goBack();
-  });
-  useEffect(() => {
-    if (!canTakeBack) {
-      return;
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [canTakeBack]);
+  }, canTakeBack);
   return {
-    takenBack: memory?.takenBack ?? [],
+    takenBack: memory.takenBack,
     button: canTakeBack ? (
       <button className={crumb} onClick={goBack} type="button">
         <Undo2 size={14} />
@@ -692,20 +678,8 @@ export function ReviewDeck({
   );
 
   // Space or Enter reveals; 1–4 rates once the answer shows.
-  const onKey = useEffectEvent((event: KeyboardEvent) => {
-    if (
-      !active ||
-      event.repeat ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.altKey
-    ) {
-      return;
-    }
-    if (
-      event.target instanceof Element &&
-      event.target.closest("input, textarea, button, a, [role=dialog]")
-    ) {
+  useWindowKeys((event) => {
+    if (!active || event.repeat || !isShortcut(event)) {
       return;
     }
     if ((event.code === "Space" || event.key === "Enter") && !revealed) {
@@ -715,10 +689,6 @@ export function ReviewDeck({
       rate(Number(event.key) as Grade);
     }
   });
-  useEffect(() => {
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 
   if (!(active || saving || leaving.length)) {
     return done(worked, back.button);
@@ -777,22 +747,21 @@ export function ReviewDeck({
         </DeckTable>
 
         <footer className={deckActions()}>
-          <DitherButton
+          <ActionButton
             aria-hidden={revealed || !active}
             className={cn(
-              action,
               deckAction,
               "h-14",
               (revealed || !active) && "invisible"
             )}
             color="blue"
+            hint="space"
             inert={revealed || !active}
             onClick={reveal}
             variant="gradient"
           >
-            <span>show answer</span>
-            <kbd className={actionKey}>space</kbd>
-          </DitherButton>
+            show answer
+          </ActionButton>
           <fieldset
             aria-hidden={!revealed}
             aria-label="How well did you recall it?"

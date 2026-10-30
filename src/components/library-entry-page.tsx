@@ -1,9 +1,3 @@
-// One library entry, built only from the cached library and palace (works offline).
-// Characters show their glyph, scene and the words that use them; words show their gloss.
-// Scene names and memory links are edited in place and saved on blur, like a lesson saves them.
-import { useQuery } from "@tanstack/react-query";
-import { Link, useCanGoBack } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
 import {
   type FocusEvent,
   type KeyboardEvent,
@@ -12,7 +6,6 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
-import { useGoBack } from "../hooks/use-go-back";
 import type { LibraryData, PalaceData } from "../lib/learner-views";
 import type {
   LibraryCharacter,
@@ -22,9 +15,8 @@ import type {
 import { getItemMeaning } from "../lib/meaning";
 import { defaultToneRooms } from "../lib/pinyin";
 import { cn } from "../lib/utils";
-import { saveLivingLinkOffline, saveMovieOffline } from "../offline/progress";
-import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
-import { useProgressMutation } from "../offline/use-progress-mutation";
+import { saveLivingLink, saveMovie, useSave } from "../progress/actions";
+import { useLibrary, usePalace } from "../progress/views";
 import { ClueCode } from "./character-studio/clue-code";
 import {
   clueCode,
@@ -54,8 +46,14 @@ import {
   pinyinText,
   soundRow,
 } from "./ui/hanzi";
-import { CrumbSlash, crumb, Page, PageHeader, SectionHead } from "./ui/layout";
-import { StatusDot, Tile, TileGlyph, tileClass, Wall } from "./ui/tile";
+import {
+  BackCrumb,
+  CrumbSlash,
+  Page,
+  PageHeader,
+  SectionHead,
+} from "./ui/layout";
+import { StatusMeta, Tile, TileGlyph, tileClass, Wall } from "./ui/tile";
 
 /** The character or gloss beside its definition; stacked and centred on phones. */
 const hero =
@@ -95,10 +93,8 @@ export function LibraryEntryPage({
   item: LibraryEntry;
   from?: "palace";
 }) {
-  const goBack = useGoBack();
-  const canGoBack = useCanGoBack();
-  const library = useQuery(libraryQueryOptions);
-  const palace = useQuery(palaceQueryOptions);
+  const library = useLibrary();
+  const palace = usePalace();
   const back = from === "palace" ? "palace" : "library";
 
   return (
@@ -107,27 +103,19 @@ export function LibraryEntryPage({
         <PageHeader
           heading={false}
           meta={
-            <span className="inline-flex items-center gap-2">
-              <StatusDot status={item.status} />
+            <StatusMeta status={item.status}>
               {statusLabel[item.status]}
-            </span>
+            </StatusMeta>
           }
           title={
             <>
-              {canGoBack ? (
-                <button className={crumb} onClick={goBack} type="button">
-                  <ArrowLeft size={14} />
-                  {back}
-                </button>
-              ) : (
-                <Link
-                  className={crumb}
-                  to={from === "palace" ? "/profile/palace" : "/library"}
-                >
-                  <ArrowLeft size={14} />
-                  {back}
-                </Link>
-              )}
+              <BackCrumb
+                link={{
+                  to: from === "palace" ? "/profile/palace" : "/library",
+                }}
+              >
+                {back}
+              </BackCrumb>
               <CrumbSlash />
               <span className="font-hanzi" lang="zh-CN">
                 {item.hanzi}
@@ -138,13 +126,9 @@ export function LibraryEntryPage({
       }
     >
       {item.kind === "characters" ? (
-        <CharacterEntry
-          item={item}
-          library={library.data}
-          palace={palace.data}
-        />
+        <CharacterEntry item={item} library={library} palace={palace} />
       ) : (
-        <WordEntry item={item} library={library.data} />
+        <WordEntry item={item} library={library} />
       )}
     </Page>
   );
@@ -323,21 +307,20 @@ function CharacterEntry({
  * scene that uses it. The movie save leaves out the names it gets empty.
  */
 function useRename(item: LibraryCharacter) {
-  const { mutate } = useProgressMutation(
-    (clue: Pick<Clue, "kind" | "code" | "name">) =>
-      saveMovieOffline({
-        characterId: item.id,
-        actorKey: item.movie.actorKey,
-        actorName: clue.kind === "actor" ? clue.name : "",
-        finalKey: item.movie.finalKey,
-        setName: clue.kind === "set" ? clue.name : "",
-        tone: item.movie.tone,
-        roomName: clue.kind === "room" ? clue.name : "",
-        props:
-          clue.kind === "prop"
-            ? [{ component: clue.code, propName: clue.name }]
-            : [],
-      })
+  const { mutate } = useSave((clue: Pick<Clue, "kind" | "code" | "name">) =>
+    saveMovie({
+      characterId: item.id,
+      actorKey: item.movie.actorKey,
+      actorName: clue.kind === "actor" ? clue.name : "",
+      finalKey: item.movie.finalKey,
+      setName: clue.kind === "set" ? clue.name : "",
+      tone: item.movie.tone,
+      roomName: clue.kind === "room" ? clue.name : "",
+      props:
+        clue.kind === "prop"
+          ? [{ component: clue.code, propName: clue.name }]
+          : [],
+    })
   );
   return useCallback(
     (clue: Clue, name: string) =>
@@ -501,7 +484,7 @@ function WordEntry({
 }
 
 function MemoryLink({ saved, wordId }: { saved: string; wordId: string }) {
-  const { mutate } = useProgressMutation(saveLivingLinkOffline);
+  const { mutate } = useSave(saveLivingLink);
   // The server keeps links of four or more characters; a shorter one goes back to the saved link.
   const commit = useCallback(
     (event: FocusEvent<HTMLInputElement>) => {
