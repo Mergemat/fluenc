@@ -105,8 +105,8 @@ export function PalaceView() {
             <div key={`${entry.kind}:${entry.key}`}>
               {head ? (
                 <SectionHead
-                  // The row above pads itself, which makes up the rest of the section gap.
-                  className={index ? "mt-8" : undefined}
+                  // Rows pad themselves, which makes up the rest of the gaps around a head.
+                  className={index ? "mt-8 mb-0" : "mt-4 mb-0"}
                   label={entry.group}
                 />
               ) : null}

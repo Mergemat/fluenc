@@ -152,7 +152,7 @@ export function PalaceClueView({
         </div>
       </header>
       {row.name ? null : (
-        <p className="type-control m-0 text-muted-foreground leading-wrap">
+        <p className="type-control mt-3 mb-0 text-muted-foreground leading-wrap">
           it gets its name in the lesson of its first character
         </p>
       )}
