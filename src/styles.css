@@ -261,9 +261,6 @@
   --animate-fade-in: fade-in 160ms var(--ease-out);
   --animate-pixel: pixel 0.8s steps(1) infinite;
   --animate-eq: eq 0.5s ease-in-out infinite alternate;
-  --animate-writing-hint: writing-hint 1.4s ease-in-out infinite;
-  --animate-writing-paint: writing-paint 260ms var(--ease-out) both;
-  --animate-writing-start: writing-start 1.2s ease-in-out infinite;
   --animate-deal: deal 180ms var(--ease-out) backwards;
   --animate-throw-left: throw-left 300ms var(--ease-throw) forwards;
   --animate-throw-right: throw-right 300ms var(--ease-throw) forwards;
@@ -314,24 +311,6 @@
   @keyframes eq {
     to {
       transform: scaleY(0.35);
-    }
-  }
-  @keyframes writing-hint {
-    50% {
-      opacity: 0.12;
-    }
-  }
-  @keyframes writing-paint {
-    from {
-      stroke-dashoffset: 1;
-    }
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-  @keyframes writing-start {
-    50% {
-      opacity: 0.25;
     }
   }
   /* Position only: a filter here would flatten the card for a moment and show its back. */
@@ -407,13 +386,9 @@
   --color-part: var(--part);
   /* A library entry's character: a square up to 300px, never taller than a phone is wide. */
   --spacing-entry-glyph: min(78vw, 300px);
-  /* The writing pad: as large as the screen allows, leaving room for its header and pips; its
-     frame adds the padding around it. */
-  --spacing-writing: min(calc(100vw - 48px), calc(100dvh - 190px), 480px);
-  --spacing-writing-frame: calc(var(--spacing-writing) + 28px);
   /* A glyph's own square: its box, up to `--glyph-max`. */
   --spacing-glyph-box: min(100cqw, 100cqh, var(--glyph-max, 360px));
-  /* The font glyph standing in for a stroke glyph, matched to its outline. */
+  /* The font glyph standing in for the glyph drawn by parts, matched to its outline. */
   --text-glyph-ghost: calc(
     min(100cqw, 100cqh, var(--glyph-max, 360px)) *
     914 / 1024

@@ -1,7 +1,7 @@
 // A character lesson reads in movie-method order: character → meaning → pinyin → clues
 // (saved ones already written in) → imagine the scene → name only what is missing, inline.
 // Enter drives the whole lesson; nothing scrolls and nothing shifts while it loads.
-import { ChevronDown, Info, PenLine, X } from "lucide-react";
+import { ChevronDown, Info, X } from "lucide-react";
 import {
   type ChangeEvent,
   type KeyboardEvent,
@@ -43,7 +43,6 @@ import { finishLabel, toastAdded } from "./character-studio/finish";
 import {
   studio,
   studioAction,
-  studioActionSide,
   studioActions,
   studioAlt,
   studioClues,
@@ -52,7 +51,6 @@ import {
   studioRead,
 } from "./character-studio/studio";
 import type { CharacterItem, Cue } from "./character-studio/types";
-import { DitherButton } from "./dither-kit/button";
 import { ActionButton } from "./ui/button";
 import {
   AudioButton,
@@ -65,7 +63,6 @@ import {
   useUsage,
 } from "./ui/hanzi";
 import { PageHeader, SectionHead } from "./ui/layout";
-import { WritingModal } from "./writing-modal";
 
 interface ClueRowEvents {
   /** Move on from a clue: to the next one still empty, or finish the lesson. */
@@ -289,10 +286,9 @@ function UsageWords({
 interface LessonShortcuts {
   finish: () => void;
   toggleXray: () => void;
-  write: () => void;
 }
 
-/** Enter finishes, x shows every part, w opens writing — unless typing or in a dialog. */
+/** Enter finishes, x shows every part — unless typing or in a dialog. */
 function useLessonShortcuts(shortcuts: LessonShortcuts) {
   useWindowKeys((event) => {
     if (
@@ -306,8 +302,6 @@ function useLessonShortcuts(shortcuts: LessonShortcuts) {
       shortcuts.finish();
     } else if (event.key === "x") {
       shortcuts.toggleXray();
-    } else if (event.key === "w") {
-      shortcuts.write();
     }
   });
 }
@@ -334,19 +328,15 @@ function useSaveLesson(item: CharacterItem, clues: Clue[]) {
 }
 
 function LessonActions({
-  hanzi,
   missing,
   saving,
   failed,
   onFinish,
-  onWrite,
 }: {
-  hanzi: string;
   missing: number;
   saving: boolean;
   failed: boolean;
   onFinish: () => void;
-  onWrite: () => void;
 }) {
   return (
     <footer className={studioActions} data-actions>
@@ -366,16 +356,6 @@ function LessonActions({
           missing ? `name ${missing} clue${missing > 1 ? "s" : ""}` : null
         )}
       </ActionButton>
-      <DitherButton
-        aria-label={`Write ${hanzi}`}
-        className={studioActionSide}
-        color="grey"
-        onClick={onWrite}
-        title="write (w)"
-        variant="dotted"
-      >
-        <PenLine size={17} />
-      </DitherButton>
     </footer>
   );
 }
@@ -393,7 +373,6 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
   const [hover, setHover] = useState<string | null>(null);
   const [pinned, setPinned] = useState<string | null>(null);
   const [xray, setXray] = useState(false);
-  const [writing, setWriting] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const activeClue = clues.find((clue) => clue.id === active);
   const highlighted =
@@ -422,7 +401,6 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
   useLessonShortcuts({
     finish: primary,
     toggleXray: () => setXray((value) => !value),
-    write: () => setWriting(true),
   });
 
   const advance = useCallback(
@@ -479,8 +457,6 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
   );
   const toggleNote = useCallback(() => setNoteOpen((open) => !open), []);
   const closeNote = useCallback(() => setNoteOpen(false), []);
-  const openWriting = useCallback(() => setWriting(true), []);
-  const closeWriting = useCallback(() => setWriting(false), []);
 
   const dense = props.length > 3;
   const lit = (clue: Clue) => clue.kind === "prop" && highlighted === clue.code;
@@ -623,23 +599,10 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
 
       <LessonActions
         failed={finish.isError}
-        hanzi={item.hanzi}
         missing={missing.length}
         onFinish={primary}
-        onWrite={openWriting}
         saving={finish.isPending}
       />
-
-      {writing ? (
-        <WritingModal
-          hanzi={item.hanzi}
-          onClose={closeWriting}
-          parts={props.map((prop) => ({
-            code: prop.code,
-            label: prop.name.trim() || prop.meaning || "",
-          }))}
-        />
-      ) : null}
     </article>
   );
 }
