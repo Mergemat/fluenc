@@ -169,7 +169,7 @@ function Profile({ data }: { data: ProfileData }) {
         </span>
       </SectionHead>
       <ActivityGraph weeks={weeks} />
-      <p className="type-control mt-4 mb-12 flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
+      <p className="type-control mt-4 mb-9 flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
         <span>
           <b className={num}>{streaks.current}</b> day streak
         </span>

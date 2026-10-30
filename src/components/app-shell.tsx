@@ -48,9 +48,9 @@ const corner = [
 export const shell =
   "flex h-dvh flex-col overflow-hidden pt-safe-top font-sans features-ss01 text-foreground antialiased bg-background max-md:pt-safe-header";
 
-/** Fluenc's name beside its mark. */
+/** Fluenc's name beside its mark, pulled out by the step of space the mark keeps inside its box. */
 export const brand =
-  "flex items-center gap-2.5 font-mono font-semibold text-xl text-foreground leading-none tracking-snug type-reset lg:h-8 lg:px-2.5";
+  "-ml-1 flex items-center gap-2.5 font-mono font-semibold text-xl text-foreground leading-none tracking-snug type-reset";
 
 /** The bar along the top of the app and the welcome reel, below the sidebar's width. */
 export const topBar =
@@ -175,7 +175,11 @@ export function AppShell({
           "relative group-data-booting/shell:invisible lg:h-auto lg:min-h-0 lg:flex-col lg:items-stretch lg:gap-0 lg:border-border lg:border-r lg:px-3 lg:pt-5 lg:pb-4"
         )}
       >
-        <Link aria-label="Fluenc home" className={brand} to="/today">
+        <Link
+          aria-label="Fluenc home"
+          className={cn(brand, "lg:ml-0 lg:h-8 lg:px-2.5")}
+          to="/today"
+        >
           <BrandMark />
           <span>fluenc</span>
         </Link>

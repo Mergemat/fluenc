@@ -371,7 +371,7 @@ export function WelcomeView({
           onClick={last ? undefined : next}
         >
           <p className={label}>{kicker}</p>
-          <h1 className="type-display flex flex-wrap items-center gap-x-2 welcome-short:gap-x-1.5 text-2xl welcome-short:text-xl tracking-snug">
+          <h1 className="type-display flex flex-wrap items-center gap-x-2 welcome-short:gap-x-1.5 welcome-short:text-2xl tracking-snug">
             {title}
           </h1>
           <p className="type-body text-pretty text-muted-foreground">{line}</p>

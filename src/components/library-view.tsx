@@ -51,8 +51,9 @@ const statuses = [
 /** Search field and filters, above the results. */
 export const controls = "mb-6 grid gap-4";
 /** Filter groups: chip sets on one line, wrapping, the last pushed to the end. */
-export const filterBar = "flex flex-wrap justify-between gap-2";
-export const filterSet = "flex flex-wrap gap-x-4 gap-y-2";
+// Groups that wrap sit further apart than chips that wrap inside one group.
+export const filterBar = "flex flex-wrap justify-between gap-x-2 gap-y-3";
+export const filterSet = "flex flex-wrap gap-x-4 gap-y-3";
 /** A fieldset of chips, without the browser's border and padding. */
 export const filterGroup = "flex min-w-0 flex-wrap gap-2";
 
@@ -464,7 +465,8 @@ function LibrarySectionBlock({
   return (
     <section
       aria-labelledby={`${id}-title`}
-      className="flex scroll-mt-10 flex-col gap-2 pt-12 first-of-type:pt-6"
+      // The tiles above pad themselves, which makes up the rest of the section gap.
+      className="flex scroll-mt-10 flex-col gap-2 pt-9 first-of-type:pt-6"
       id={id}
     >
       {/* Reads like every section head: label, then its count after a dot. */}

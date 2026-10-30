@@ -612,7 +612,8 @@
 /* The largest a glyph inside grows: `glyph-max-75` (300px), `glyph-max-glyph` (the lesson size). */
 @utility glyph-max-* {
   --glyph-max: --value(--spacing-*);
-  --glyph-max: calc(var(--spacing) * --value(number));
+  /* Steps off the named scale, still in 4px units: the theme unsets `--spacing`. */
+  --glyph-max: calc(4px * --value(integer));
 }
 /* A sound lighting up: its colour, glow and lift move together. */
 @utility transition-glow {

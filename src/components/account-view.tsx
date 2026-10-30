@@ -118,6 +118,7 @@ export function AccountView() {
         {error ? <ErrorNote>{error}</ErrorNote> : null}
         <div className="mt-2 grid justify-items-center gap-4">
           <ActionButton
+            className="short:max-studio:h-11"
             color="blue"
             disabled={busy}
             hint="↵"
