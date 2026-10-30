@@ -52,8 +52,8 @@ const statuses = [
 export const controls = "mb-6 grid gap-4";
 /** Filter groups: chip sets on one line, wrapping, the last pushed to the end. */
 // Groups that wrap sit further apart than chips that wrap inside one group.
-export const filterBar = "flex flex-wrap justify-between gap-x-2 gap-y-3";
-export const filterSet = "flex flex-wrap gap-x-4 gap-y-3";
+export const filterBar = "flex flex-wrap justify-between gap-x-2 gap-y-4";
+export const filterSet = "flex flex-wrap gap-x-4 gap-y-4";
 /** A fieldset of chips, without the browser's border and padding. */
 export const filterGroup = "flex min-w-0 flex-wrap gap-2";
 

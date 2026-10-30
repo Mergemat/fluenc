@@ -216,7 +216,7 @@ function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
     >
       <span
         className={cn(
-          "type-code justify-self-center whitespace-nowrap text-kind",
+          "type-code justify-self-start whitespace-nowrap text-kind",
           props && "font-hanzi-props font-normal text-3xl"
         )}
         lang={props ? "zh-CN" : undefined}
@@ -241,10 +241,11 @@ function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
         ) : null}
       </span>
       <span className="type-control whitespace-nowrap text-foreground tabular-nums">
-        {row.characters}
+        {/* Before the count, so counts line up at the row's end. */}
         <small className="text-muted-foreground text-xs max-xs:hidden">
-          {row.started ? ` · ${row.started} started` : ""}
+          {row.started ? `${row.started} started · ` : ""}
         </small>
+        {row.characters}
       </span>
       <ChevronRight aria-hidden="true" size={15} />
       {row.started ? (
