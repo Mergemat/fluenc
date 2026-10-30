@@ -255,6 +255,22 @@ function focusPriorities(catalog: Catalog, learnedWords: ReadonlySet<string>) {
   return focus;
 }
 
+// A card keeps its object until it changes, so when it falls due is worked out once per change.
+const scheduledCards = new WeakMap<CardSnapshot, CardSnapshot>();
+
+/** The card with `due` moved to when review shows it. */
+function scheduledCard(card: CardSnapshot) {
+  let scheduled = scheduledCards.get(card);
+  if (!scheduled) {
+    scheduled = {
+      ...card,
+      due: reviewDueAt(new Date(card.due), card.state).toISOString(),
+    };
+    scheduledCards.set(card, scheduled);
+  }
+  return scheduled;
+}
+
 /** Review, Build and Get queues at a moment in time. */
 export function deriveDashboard(
   state: LearnerState,
@@ -263,10 +279,7 @@ export function deriveDashboard(
 ) {
   const items = introducedCards(state).map((item) => ({
     ...item,
-    card: {
-      ...item.card,
-      due: reviewDueAt(new Date(item.card.due), item.card.state).toISOString(),
-    },
+    card: scheduledCard(item.card),
   }));
   const introduced = new Set(items.map((item) => cardKey(item.type, item.id)));
   const introducedCharacters = new Set(
@@ -354,11 +367,12 @@ export function deriveDashboard(
     item.characterIds.every((character) => introducedCharacters.has(character));
   const newWords = unintroducedWords
     .filter(wordReady)
+    .map((item) => ({ item, focus: focusPlace(cardKey("word", item.id)) }))
     .sort(
       (left, right) =>
-        focusPlace(cardKey("word", left.id)) -
-          focusPlace(cardKey("word", right.id)) || left.order - right.order
-    );
+        left.focus - right.focus || left.item.order - right.item.order
+    )
+    .map(({ item }) => item);
   const lockedWords = unintroducedWords.filter((item) => !wordReady(item));
   const nextWordParts = nextWordCharacters(lockedWords, introducedCharacters);
   const missingProps = (character: Character) =>
@@ -395,40 +409,51 @@ export function deriveDashboard(
       focus: focus.get(cardKey("character", character.id))?.label ?? null,
     }));
 
+  const countIn = (list: readonly string[], set: ReadonlySet<string>) =>
+    list.reduce((count, entry) => count + Number(set.has(entry)), 0);
   const getQueue = catalog.sentences
-    .filter((sentence) => !introducedSentences.has(sentence.id))
-    .map((sentence) => {
-      const missingWords = sentence.words.filter(
-        (word) => !learnedWords.has(word)
-      );
+    .flatMap((sentence) => {
+      if (introducedSentences.has(sentence.id)) {
+        return [];
+      }
+      // Most sentences are far from known; only the few that are get their missing parts listed.
       const characters = sentenceCharacters(sentence, catalog);
-      const missingCharacters = characters.filter(
-        (character) => !introducedCharacters.has(character)
-      );
       const wordCoverage = sentence.words.length
-        ? (sentence.words.length - missingWords.length) / sentence.words.length
+        ? countIn(sentence.words, learnedWords) / sentence.words.length
         : 1;
       const characterCoverage = characters.length
-        ? (characters.length - missingCharacters.length) / characters.length
+        ? countIn(characters, introducedCharacters) / characters.length
         : 1;
-      return {
-        ...sentence,
-        coverage: Math.min(wordCoverage, characterCoverage),
-        missingWords,
-        missingCharacters,
-      };
+      const coverage = Math.min(wordCoverage, characterCoverage);
+      if (coverage < 0.9) {
+        return [];
+      }
+      return [
+        {
+          sentence: {
+            ...sentence,
+            coverage,
+            missingWords: sentence.words.filter(
+              (word) => !learnedWords.has(word)
+            ),
+            missingCharacters: characters.filter(
+              (character) => !introducedCharacters.has(character)
+            ),
+          },
+          focus: focusPlace(cardKey("sentence", sentence.id)),
+          anchoredAt: wordIntroducedAt.get(sentence.anchor) ?? -1,
+        },
+      ];
     })
-    .filter((sentence) => sentence.coverage >= 0.9)
     // Focus sentences first. Then, pairing Build with Get, a new word comes with sentences that
     // use it. Fully known sentences come before ones with an unknown left.
     .sort(
       (left, right) =>
-        focusPlace(cardKey("sentence", left.id)) -
-          focusPlace(cardKey("sentence", right.id)) ||
-        (wordIntroducedAt.get(right.anchor) ?? -1) -
-          (wordIntroducedAt.get(left.anchor) ?? -1) ||
-        right.coverage - left.coverage
-    );
+        left.focus - right.focus ||
+        right.anchoredAt - left.anchoredAt ||
+        right.sentence.coverage - left.sentence.coverage
+    )
+    .map(({ sentence }) => sentence);
 
   return {
     reviewQueue,
