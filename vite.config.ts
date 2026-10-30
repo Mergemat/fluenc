@@ -53,6 +53,8 @@ export default defineConfig({
   environments: {
     client: {
       build: {
+        // `bun run bench --profile` reads function names from the profile.
+        minify: process.env.FLUENC_UNMINIFIED !== "1",
         rolldownOptions: {
           // The course catalog and sentences ship with the app. Their own chunks keep their hash,
           // so a code change does not re-download the course.
