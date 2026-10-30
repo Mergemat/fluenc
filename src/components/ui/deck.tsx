@@ -146,7 +146,7 @@ export function DeckTable({
 /**
  * A pile: `under` cards beneath whatever lies on top. Wide piles hold sentences. A playing card's
  * proportions where there is room; on a short screen it keeps its width and gets shorter. The
- * margin clears the pile's edges (four cards 6px apart).
+ * margin clears the pile's edges: four cards 6px apart, and their tilt at the corners.
  */
 export function DeckPile({
   under,
@@ -160,7 +160,7 @@ export function DeckPile({
   return (
     <div
       className={cn(
-        "perspective-deck relative mb-6 w-full flex-none",
+        "perspective-deck relative mb-8 w-full flex-none",
         wide
           ? "aspect-7/5 max-h-pile-wide max-w-xl"
           : "aspect-5/7 max-h-pile max-w-96"
