@@ -38,9 +38,13 @@ async function updateSubscription(
 }
 
 async function activeRegistration() {
-  const registration = await navigator.serviceWorker.register("/sw.js", {
-    scope: "/",
-  });
+  // Registering with other options than the app's update check starts a new update of the worker.
+  const registration =
+    (await navigator.serviceWorker.getRegistration("/")) ??
+    (await navigator.serviceWorker.register("/sw.js", {
+      scope: "/",
+      updateViaCache: "none",
+    }));
   if (registration.active) {
     return registration;
   }
