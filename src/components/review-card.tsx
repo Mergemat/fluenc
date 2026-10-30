@@ -4,6 +4,8 @@
 // in, and saves in the background. The pile and the buttons stay put for the whole session, so a
 // grade only builds the new top card. The reveal button and the grades share one slot, so
 // revealing never moves anything.
+import { useQuery } from "@tanstack/react-query";
+import { Undo2 } from "lucide-react";
 import {
   type CSSProperties,
   type ReactNode,
@@ -15,12 +17,13 @@ import {
   useState,
 } from "react";
 import { type Grade, Rating } from "ts-fsrs";
-import { toCard } from "../lib/learner-state";
+import { cardKey as storedKey, toCard } from "../lib/learner-state";
 import type { ReviewItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { previewDue, waitLabel } from "../lib/review-schedule";
 import { cn } from "../lib/utils";
-import { saveReview } from "../offline/progress";
+import { saveReview, takeBackReview } from "../offline/progress";
+import { reviewBackQueryOptions } from "../offline/queries";
 import { useProgressMutation } from "../offline/use-progress-mutation";
 import { ClueCode } from "./character-studio/clue-code";
 import { lessonClues } from "./character-studio/clues";
@@ -49,7 +52,7 @@ import {
   MoviePinyin,
   pinyinText,
 } from "./ui/hanzi";
-import { PageHeader } from "./ui/layout";
+import { crumb, PageHeader } from "./ui/layout";
 import { partColor } from "./ui/part-colors";
 
 const ratings: {
@@ -455,9 +458,15 @@ interface Leaving {
  * Grading: a grade takes the card out of the queue at once and saves it once the throw is over; a
  * save that fails puts it back. The graded card stays on the pile, thrown, until its throw ends.
  */
-function useGrading(onRestore: (item: ReviewItem) => void) {
+function useGrading(due: ReviewItem[], onRestore: (item: ReviewItem) => void) {
   const { mutateAsync } = useProgressMutation(saveReview);
   const [graded, setGraded] = useState<ReadonlySet<string>>(() => new Set());
+  // A saved grade gives its card a new key. Forget the old one, since taking the review back brings
+  // the card back under it.
+  const dueKeys = new Set(due.map(cardKey));
+  if ([...graded].some((key) => !dueKeys.has(key))) {
+    setGraded(new Set([...graded].filter((key) => dueKeys.has(key))));
+  }
   const [leaving, setLeaving] = useState<Leaving[]>([]);
   const [failed, setFailed] = useState(false);
   // False while a throw and a rise are under way.
@@ -529,7 +538,67 @@ function useGrading(onRestore: (item: ReviewItem) => void) {
     },
     [mutateAsync, gone, onRestore]
   );
-  return { graded, leaving, failed, settled, grade, gone };
+  // Saves waiting on a throw go now, so whatever runs next sees them.
+  const flush = useCallback(() => {
+    for (const [timer, save] of saves.current) {
+      window.clearTimeout(timer);
+      saves.current.delete(timer);
+      save();
+    }
+  }, []);
+  return { graded, leaving, failed, settled, grade, gone, flush };
+}
+
+/**
+ * Going back a card takes back this device's last review, so its card returns as it was. A save
+ * still waiting on its throw goes first, so that is the review taken back. Backspace does the same.
+ */
+function useBack(
+  flush: () => void,
+  onBack: () => void,
+  /** A grade not saved yet, which flushing makes the one to take back. */
+  pending: boolean
+) {
+  const { data: memory } = useQuery(reviewBackQueryOptions);
+  const { mutate } = useProgressMutation(takeBackReview);
+  const canTakeBack = pending || (memory?.canTakeBack ?? false);
+  const goBack = useCallback(() => {
+    flush();
+    onBack();
+    mutate(undefined);
+  }, [flush, onBack, mutate]);
+  const onKey = useEffectEvent((event: KeyboardEvent) => {
+    if (
+      event.key !== "Backspace" ||
+      event.repeat ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.altKey ||
+      (event.target instanceof Element &&
+        event.target.closest("input, textarea, [role=dialog]"))
+    ) {
+      return;
+    }
+    event.preventDefault();
+    goBack();
+  });
+  useEffect(() => {
+    if (!canTakeBack) {
+      return;
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [canTakeBack]);
+  return {
+    takenBack: memory?.takenBack ?? [],
+    button: canTakeBack ? (
+      <button className={crumb} onClick={goBack} type="button">
+        <Undo2 size={14} />
+        back
+        <kbd className={actionKey}>⌫</kbd>
+      </button>
+    ) : null,
+  };
 }
 
 /** Opening review with nothing due shows its end still; finishing a deck here lets it arrive. */
@@ -550,23 +619,42 @@ export function ReviewDeck({
   done,
 }: {
   queue: ReviewItem[];
-  /** Told whether this visit worked a deck to its end, so only that arrives with motion. */
-  done: (arrived: boolean) => ReactNode;
+  /**
+   * Told whether this visit worked a deck to its end, so only that arrives with motion, and given
+   * the back button for its header.
+   */
+  done: (arrived: boolean, back: ReactNode) => ReactNode;
 }) {
   const [selected, setSelected] = useState(() => due[0]);
   // A card whose save failed comes back to the top, where its error is.
-  const { graded, leaving, failed, settled, grade, gone } =
-    useGrading(setSelected);
+  const { graded, leaving, failed, settled, grade, gone, flush } = useGrading(
+    due,
+    setSelected
+  );
   // Graded cards wait for their save outside the queue.
   const queue = due.filter((item) => !graded.has(cardKey(item)));
-  // A learning step becoming due must not replace the card being answered.
+  const [revealedKey, setRevealedKey] = useState<string | null>(null);
+  // The card taken back is asked again from its front.
+  const saving = queue.length < due.length;
+  const back = useBack(
+    flush,
+    useCallback(() => setRevealedKey(null), []),
+    saving
+  );
+  // The card taken back last returns to the top. Otherwise, a learning step becoming due must not
+  // replace the card being answered.
+  const isCard = (key?: string) => (item: ReviewItem) =>
+    storedKey(item.type, item.id) === key;
+  const returned = back.takenBack.findLast((key) => queue.some(isCard(key)));
   const active =
+    queue.find(isCard(returned)) ??
     queue.find(
       (item) =>
         item.type === selected?.type &&
         item.id === selected.id &&
         item.reps === selected.reps
-    ) ?? queue[0];
+    ) ??
+    queue[0];
   if (
     active?.type !== selected?.type ||
     active?.id !== selected?.id ||
@@ -585,7 +673,6 @@ export function ReviewDeck({
   if (shown.key !== activeKey) {
     setShown({ key: activeKey, at: Date.now() });
   }
-  const [revealedKey, setRevealedKey] = useState<string | null>(null);
   const revealed = activeKey !== null && revealedKey === activeKey;
   const waits = useMemo(() => (active ? waitsFor(active) : null), [active]);
 
@@ -633,9 +720,8 @@ export function ReviewDeck({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const saving = queue.length < due.length;
   if (!(active || saving || leaving.length)) {
-    return done(worked);
+    return done(worked, back.button);
   }
 
   // The next card waits built under the top one, so it rises into place without being drawn; the
@@ -646,17 +732,24 @@ export function ReviewDeck({
   const cards = [
     ...(waitingNext ? [{ item: waitingNext, side: null, waiting: true }] : []),
     ...(active ? [{ item: active, side: null, waiting: false }] : []),
-    ...leaving.map((card) => ({ ...card, waiting: false })),
+    // A card taken back while it still flies off returns to the top instead.
+    ...leaving
+      .filter((card) => cardKey(card.item) !== activeKey)
+      .map((card) => ({ ...card, waiting: false })),
   ];
   return (
     <>
       <PageHeader
         meta={
-          active ? (
-            <span>
-              <b className="font-medium text-foreground">{queue.length}</b> left
-            </span>
-          ) : null
+          <>
+            {back.button}
+            {active ? (
+              <span>
+                <b className="font-medium text-foreground">{queue.length}</b>{" "}
+                left
+              </span>
+            ) : null}
+          </>
         }
         title="review"
       />

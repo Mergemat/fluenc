@@ -77,6 +77,15 @@ export const palaceQueryOptions = queryOptions({
   select: selectPalace,
 });
 
+/** Whether review can go back a card, and the cards taken back, which return to the top. */
+export const reviewBackQueryOptions = queryOptions({
+  ...learnerQueryOptions,
+  select: ({ canTakeBack, takenBack }: LearnerSnapshot) => ({
+    canTakeBack,
+    takenBack,
+  }),
+});
+
 export const profileQueryOptions = queryOptions({
   ...learnerQueryOptions,
   select: selectProfile,

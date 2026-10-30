@@ -12,6 +12,31 @@ export const reviewInput = z.object({
   reviewedAt: z.iso.datetime(),
 });
 
+const cardSnapshot = z.object({
+  due: z.iso.datetime(),
+  stability: z.number(),
+  difficulty: z.number(),
+  elapsedDays: z.number().int(),
+  scheduledDays: z.number().int(),
+  learningSteps: z.number().int(),
+  reps: z.number().int(),
+  lapses: z.number().int(),
+  state: z.number().int(),
+  lastReview: z.iso.datetime().nullable(),
+  introducedAt: z.iso.datetime().optional(),
+});
+
+/**
+ * Takes a review back. `card` is the card as it was before the review, which the device restores;
+ * the server rebuilds the card from its events instead, without the review.
+ */
+export const undoInput = z.object({
+  reviewId: z.string().min(8).max(64),
+  itemType: z.enum(studyItemTypes),
+  itemId: z.string().min(1),
+  card: cardSnapshot,
+});
+
 export const enrollInput = z.object({
   itemType: z.enum(studyItemTypes),
   itemId: z.string().min(1),
@@ -61,6 +86,7 @@ const change = { id: z.string().min(8).max(64), at: z.iso.datetime() };
 export const deviceOperation = z.discriminatedUnion("kind", [
   z.object({ ...change, kind: z.literal("enroll"), data: enrollInput }),
   z.object({ ...change, kind: z.literal("review"), data: reviewInput }),
+  z.object({ ...change, kind: z.literal("undo"), data: undoInput }),
   z.object({ ...change, kind: z.literal("movie"), data: movieInput }),
   z.object({ ...change, kind: z.literal("livingLink"), data: livingLinkInput }),
 ]);
@@ -75,6 +101,7 @@ export const syncRequest = z.object({
 });
 
 export type ReviewInput = z.infer<typeof reviewInput>;
+export type UndoInput = z.infer<typeof undoInput>;
 export type EnrollInput = z.infer<typeof enrollInput>;
 export type MovieInput = z.infer<typeof movieInput>;
 export type LivingLinkInput = z.infer<typeof livingLinkInput>;

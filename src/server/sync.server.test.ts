@@ -113,6 +113,40 @@ test("a review that arrives late is scheduled as if it had arrived in order", as
   );
 });
 
+test("a review taken back leaves the card as if it never happened, even when another arrives late", async () => {
+  const enrolled = enroll("s01", "2026-10-01T08:00:00.000Z");
+  const first = review("s01", "2026-10-02T08:00:00.000Z");
+  const late = review("s01", "2026-10-01T20:00:00.000Z", 1);
+  const mistaken = review("s01", "2026-10-04T08:00:00.000Z", 4);
+
+  await writeOperations("learner-never-mistaken", [enrolled, late, first]);
+
+  const learner = "learner-took-back";
+  await writeOperations(learner, [copy(enrolled)]);
+  // The device taking the review back missed the first review.
+  const card = (await readLearnerState(learner)).cards["sentence:s01"];
+  if (!card) {
+    throw new Error("expected the card");
+  }
+  await writeOperations(learner, [copy(first)]);
+  const before = await readLearnerState(learner);
+  const mistake = copy(mistaken);
+  await writeOperations(learner, [
+    mistake,
+    change({
+      kind: "undo",
+      data: { reviewId: mistake.id, itemType: "sentence", itemId: "s01", card },
+    }),
+  ]);
+  expect(await readLearnerState(learner)).toEqual(before);
+
+  // A review made before the mistake, by a device that was offline, still counts; the mistake does not.
+  await writeOperations(learner, [copy(late)]);
+  expect((await readLearnerState(learner)).cards).toEqual(
+    (await readLearnerState("learner-never-mistaken")).cards
+  );
+});
+
 test("a late review of the learner's own word keeps its card", async () => {
   const learner = "learner-own-word";
   // Not a course word, so only focus puts it in the learner's catalog.

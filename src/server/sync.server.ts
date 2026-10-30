@@ -236,7 +236,11 @@ export async function readLearnerState(learnerId: string) {
 }
 
 function targetCardKey(operation: ProgressOperation) {
-  if (operation.kind !== "enroll" && operation.kind !== "review") {
+  if (
+    operation.kind !== "enroll" &&
+    operation.kind !== "review" &&
+    operation.kind !== "undo"
+  ) {
     return null;
   }
   const target = studyIdentity(operation.data.itemType, operation.data.itemId);
@@ -310,7 +314,8 @@ for (const [wordId, characterId] of Object.entries(
 
 /**
  * Cards a change arrived for after a later one: a review older than the card's last, or an enroll
- * older than its introduction. Applied now, it would land out of order.
+ * older than its introduction. Applied now, it would land out of order. An undo's card is rebuilt
+ * too, since the review it takes back may not be the card's last.
  */
 function lateCards(state: LearnerState, operations: ProgressOperation[]) {
   const late = new Set<string>();
@@ -328,7 +333,7 @@ function lateCards(state: LearnerState, operations: ProgressOperation[]) {
       operation.kind === "enroll" &&
       card.introducedAt !== undefined &&
       operation.data.enrolledAt < card.introducedAt;
-    if (reviewedEarlier || enrolledEarlier) {
+    if (reviewedEarlier || enrolledEarlier || operation.kind === "undo") {
       late.add(key);
     }
   }
@@ -398,8 +403,9 @@ const isNewer = (column: SQLiteColumn) =>
   sql`excluded.${sql.identifier(column.name)} >= ${column}`;
 
 /**
- * Rebuild cards from every enroll and review stored for them, in the order they were made. An
- * enroll comes first even if its device's clock says otherwise, so no review is dropped.
+ * Rebuild cards from every enroll and review stored for them, in the order they were made, less
+ * the reviews taken back. An enroll comes first even if its device's clock says otherwise, so no
+ * review is dropped.
  */
 async function replayCards(
   transaction: Transaction,
@@ -422,7 +428,7 @@ async function replayCards(
     .where(
       and(
         eq(events.learnerId, learnerId),
-        inArray(events.kind, ["enroll", "review"]),
+        inArray(events.kind, ["enroll", "review", "undo"]),
         inArray(sql`json_extract(${events.data}, '$.itemId')`, itemIds)
       )
     )
@@ -439,7 +445,14 @@ async function replayCards(
     )
     .filter((operation) => keys.has(targetCardKey(operation) ?? ""));
   const enrolls = stored.filter((operation) => operation.kind === "enroll");
-  const reviews = stored.filter((operation) => operation.kind === "review");
+  const undone = new Set(
+    stored.flatMap((operation) =>
+      operation.kind === "undo" ? [operation.data.reviewId] : []
+    )
+  );
+  const reviews = stored.filter(
+    (operation) => operation.kind === "review" && !undone.has(operation.id)
+  );
   const cards = Object.fromEntries(
     Object.entries(state.cards).filter(([key]) => !keys.has(key))
   );

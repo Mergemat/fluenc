@@ -11,6 +11,7 @@ import type {
   LivingLinkInput,
   MovieInput,
   ReviewInput,
+  UndoInput,
 } from "../server/sync.contract";
 import { type Catalog, catalogFor } from "./catalog";
 import { studyIdentity } from "./character-words";
@@ -67,7 +68,8 @@ export type ProgressChange =
   | { kind: "focus"; data: FocusInput }
   | { kind: "livingLink"; data: LivingLinkInput }
   | { kind: "movie"; data: MovieInput }
-  | { kind: "review"; data: ReviewInput };
+  | { kind: "review"; data: ReviewInput }
+  | { kind: "undo"; data: UndoInput };
 
 /** A change as it is stored and sent. */
 export type ProgressOperation = {
@@ -253,6 +255,15 @@ function applyReview(state: LearnerState, data: ReviewInput): LearnerState {
   return { ...state, cards: { ...state.cards, [key]: snapshot } };
 }
 
+function applyUndo(state: LearnerState, data: UndoInput): LearnerState {
+  const target = studyIdentity(data.itemType, data.itemId);
+  const key = cardKey(target.itemType, target.itemId);
+  if (!state.cards[key]) {
+    return state;
+  }
+  return { ...state, cards: { ...state.cards, [key]: data.card } };
+}
+
 function applyMovie(state: LearnerState, data: MovieInput): LearnerState {
   const { actorKey, actorName, finalKey, setName, tone, roomName, props } =
     data;
@@ -287,6 +298,8 @@ export function applyOperation(
       return applyEnroll(state, operation.data, catalog);
     case "review":
       return applyReview(state, operation.data);
+    case "undo":
+      return applyUndo(state, operation.data);
     case "movie":
       return applyMovie(state, operation.data);
     default:

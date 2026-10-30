@@ -1,5 +1,11 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useEffectEvent, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useState,
+} from "react";
 import type { DashboardData } from "../lib/learner-views";
 import { isLearning, nextReviews } from "../lib/review-schedule";
 import { cn } from "../lib/utils";
@@ -44,9 +50,10 @@ export function ReviewView({ data }: { data: DashboardData }) {
 
   const coming = learning.length;
   const done = useCallback(
-    (arrived: boolean) => (
+    (arrived: boolean, back: ReactNode) => (
       <ReviewDone
         arrived={arrived}
+        back={back}
         coming={coming}
         data={data}
         nextLearningAt={nextLearningAt}
@@ -73,6 +80,7 @@ function ReviewDone({
   coming,
   nextLearningAt,
   arrived,
+  back,
 }: {
   state: DoneState;
   data: DashboardData;
@@ -80,6 +88,8 @@ function ReviewDone({
   nextLearningAt: string | null;
   /** The last card of a deck just left, so the slot settles in rather than standing there. */
   arrived: boolean;
+  /** Takes the last review back, when there is one. */
+  back: ReactNode;
 }) {
   const navigate = useNavigate();
   const waiting = state === "waiting";
@@ -117,7 +127,15 @@ function ReviewDone({
     // The dashboard refetches when the first card is due, which deals the deck back in.
     return (
       <>
-        <PageHeader meta="back after a short break" title="review" />
+        <PageHeader
+          meta={
+            <>
+              {back}
+              <span>back after a short break</span>
+            </>
+          }
+          title="review"
+        />
         <div className={deck} data-state="waiting" role="status">
           <DeckTable>
             <DeckPile under={coming - 1}>
@@ -154,7 +172,7 @@ function ReviewDone({
   }
   return (
     <>
-      <PageHeader title="review" />
+      <PageHeader meta={back} title="review" />
       <div className={deck} data-state={state}>
         <DeckTable>
           <DeckPile under={0}>
