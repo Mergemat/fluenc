@@ -25,8 +25,8 @@ export const studioClues =
 
 /** Learn, review and read end in the same action row: as wide as review's column, centred. */
 export const studioActions =
-  "flex w-full gap-2 self-end justify-self-center studio:col-span-2 studio:row-start-5 studio:max-w-actions";
-export const studioAction = cn(action, "min-w-0 flex-1 max-studio:short:h-11");
+  "flex w-full gap-2 self-end justify-self-center studio:col-span-2 studio:row-start-5 studio:max-w-deck";
+export const studioAction = cn(action, "min-w-0 flex-1");
 
 /** The meaning, other meanings and pinyin, sized for the lesson; a short phone drops the others. */
 export const studioMeaning = cn(meaningText, "studio:text-3xl text-3xl");

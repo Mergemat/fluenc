@@ -749,11 +749,7 @@ export function ReviewDeck({
         <footer className={deckActions()}>
           <ActionButton
             aria-hidden={revealed || !active}
-            className={cn(
-              deckAction,
-              "h-14",
-              (revealed || !active) && "invisible"
-            )}
+            className={cn(deckAction, (revealed || !active) && "invisible")}
             color="blue"
             hint="space"
             inert={revealed || !active}

@@ -156,7 +156,6 @@
 
   --container-frame: calc(1000px + 2 * var(--spacing-gutter));
   --container-welcome: calc(480px + 2 * var(--spacing-gutter));
-  --container-actions: 760px;
   --container-deck: 560px;
   --container-form: 420px;
   --container-measure: 46ch;

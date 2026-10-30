@@ -3,7 +3,6 @@ import { useCallback } from "react";
 
 import { isShortcut, useWindowKeys } from "../hooks/use-window-keys";
 import type { DashboardData } from "../lib/learner-views";
-import { cn } from "../lib/utils";
 import { ReadingLesson } from "./reading-lesson";
 import { ActionButton } from "./ui/button";
 import {
@@ -71,7 +70,7 @@ function ReadingEmpty() {
       </DeckTable>
       <footer className={deckActions()}>
         <ActionButton
-          className={cn(deckAction, "h-14")}
+          className={deckAction}
           color="blue"
           hint="↵"
           onClick={next}

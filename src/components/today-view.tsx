@@ -62,7 +62,7 @@ function Primary({ to, label }: { to: Lead; label: string }) {
   const go = useCallback(() => navigate({ to }), [navigate, to]);
   return (
     <ActionButton
-      className="mt-2 short:max-studio:h-11"
+      className="mt-2"
       color="blue"
       hint="space"
       onClick={go}

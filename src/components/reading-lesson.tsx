@@ -122,7 +122,7 @@ export function ReadingLesson({
       </DeckTable>
       <footer className={deckActions(true)}>
         <ActionButton
-          className="h-14 self-end"
+          className="self-end"
           color="blue"
           disabled={playing || isPending}
           hint="space"
@@ -133,7 +133,7 @@ export function ReadingLesson({
         </ActionButton>
         {revealed && shadowed ? (
           <ActionButton
-            className="h-14 self-end"
+            className="self-end"
             color="green"
             disabled={isPending}
             hint="↵"
