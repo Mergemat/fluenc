@@ -3,6 +3,7 @@ import { type FormEvent, useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { signIn } from "../account/account";
+import { cn } from "../lib/utils";
 import { useSyncStatus } from "../progress/sync";
 import { ActionButton } from "./ui/button";
 import { ErrorNote, Page, PageHeader } from "./ui/layout";
@@ -85,7 +86,7 @@ export function AccountView() {
   return (
     <Page head={<PageHeader title={text.title} />}>
       <form className="grid max-w-form gap-4" onSubmit={submit}>
-        <p className={note}>
+        <p className={cn(note, "mb-2")}>
           sync progress between your devices. what you learned here joins the
           account.
         </p>
