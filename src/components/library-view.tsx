@@ -466,7 +466,7 @@ function LibrarySectionBlock({
     <section
       aria-labelledby={`${id}-title`}
       // The tiles above pad themselves, which makes up the rest of the section gap.
-      className="flex scroll-mt-10 flex-col gap-2 pt-9 first-of-type:pt-6"
+      className="flex scroll-mt-10 flex-col gap-2 pt-10 first-of-type:pt-6"
       id={id}
     >
       {/* Reads like every section head: label, then its count after a dot. */}

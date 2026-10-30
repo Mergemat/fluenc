@@ -538,7 +538,7 @@ export function AudioButton({
       aria-label={`Play ${text}`}
       className={cn(
         "grid size-8 shrink-0 place-items-center rounded-md border border-border text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground disabled:cursor-progress disabled:opacity-100",
-        label && "type-control inline-flex w-auto gap-2 pr-3 pl-2.5",
+        label && "type-control inline-flex h-7 w-auto gap-2 pr-3 pl-2.5",
         speaking &&
           "border-blue/50 text-blue hover:border-blue/50 hover:text-blue",
         speech.status === "error" && "text-red hover:text-red",

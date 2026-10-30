@@ -463,7 +463,8 @@ function WordEntry({
         </Wall>
       </section>
 
-      <section aria-label="Memory link" className={section}>
+      {/* After a wall, whose tiles pad themselves. */}
+      <section aria-label="Memory link" className={cn(section, "mt-10")}>
         <SectionHead className="mb-0" label="memory link" />
         <MemoryLink
           // The loader's word is fixed; the cached library has the link as saved since.
