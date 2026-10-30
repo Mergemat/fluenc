@@ -10,7 +10,7 @@
     "src/data/*.generated.json": true
   },
   "search.exclude": {
-    "public/hanzi": true,
+    "assets/strokes.json": true,
     "src/data/*.json": true,
     "drizzle/meta": true
   }

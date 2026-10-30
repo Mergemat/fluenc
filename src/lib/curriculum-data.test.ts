@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import strokeData from "../../assets/strokes.json";
 
 import curriculumJson from "../data/curriculum.generated.json";
 import characterJson from "../data/hanzi/characters.json";
@@ -47,33 +48,23 @@ test("the generated curriculum is up to date with the database", () => {
   expect(curriculum.characters).toHaveLength(characters.length);
 });
 
-test("every stroke file draws each prop of its character, and only those", async () => {
+test("every character's strokes draw each of its props, and only those", () => {
   const problems: string[] = [];
-  const shapes = await Promise.all(
-    curriculum.characters.map(
-      async ({ hanzi }) =>
-        (await Bun.file(
-          new URL(`../../public/hanzi/${hanzi}.json`, import.meta.url)
-        ).json()) as {
-          strokes: string[];
-          medians: number[][][];
-          owners: string[];
-        }
-    )
-  );
-  for (const [index, character] of curriculum.characters.entries()) {
-    const shape = shapes[index];
+  const shapes = strokeData.characters as Record<
+    string,
+    { owners: string[]; strokes: string[] }
+  >;
+  for (const character of curriculum.characters) {
+    const shape = shapes[character.hanzi];
     if (!shape) {
+      problems.push(`${character.hanzi}: no strokes`);
       continue;
     }
     const parts = directCharacters.has(character.hanzi)
       ? [character.hanzi]
       : character.components;
-    if (
-      shape.owners.length !== shape.strokes.length ||
-      shape.medians.length !== shape.strokes.length
-    ) {
-      problems.push(`${character.hanzi}: owners or medians miss strokes`);
+    if (shape.owners.length !== shape.strokes.length) {
+      problems.push(`${character.hanzi}: owners miss strokes`);
     }
     if (
       [...new Set(shape.owners)].sort().join() !==

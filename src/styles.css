@@ -1,39 +1,11 @@
 @import "tailwindcss";
+/* The app's fonts, cut down to what it shows: see scripts/build-fonts.ts. */
+@import "./fonts.generated.css";
 
 /* Fluenc's design system as Tailwind theme tokens. Colours use shadcn's names, so dither-kit and
    any other shadcn registry component pick up the app's colours as they are. Components are
    styled with utilities; this file only holds what utilities can't say: the tokens, the base,
    named variants for relational states, the type roles, and a few compound rules. */
-
-@font-face {
-  font-family: "Geist";
-  src: url("/fonts/geist/Geist-Variable.woff2") format("woff2");
-  font-weight: 100 900;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist Mono";
-  src: url("/fonts/geist/GeistMono-Variable.woff2") format("woff2");
-  font-weight: 100 900;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist Pixel";
-  src: url("/fonts/geist/GeistPixel-Square.woff2") format("woff2");
-  font-display: swap;
-}
-@font-face {
-  font-family: "Fluenc Hanzi";
-  src: url("/fonts/fluenc-hanzi.woff2") format("woff2");
-  font-display: swap;
-}
-@font-face {
-  font-family: "Noto Sans CJK SC";
-  src: url("/fonts/noto-sans-sc-props.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
 
 /* Tailwind's defaults go; only the tokens below exist. A block of its own, so it always comes first. */
 @theme {
@@ -289,9 +261,6 @@
   --animate-fade-in: fade-in 160ms var(--ease-out);
   --animate-pixel: pixel 0.8s steps(1) infinite;
   --animate-eq: eq 0.5s ease-in-out infinite alternate;
-  --animate-writing-hint: writing-hint 1.4s ease-in-out infinite;
-  --animate-writing-paint: writing-paint 260ms var(--ease-out) both;
-  --animate-writing-start: writing-start 1.2s ease-in-out infinite;
   --animate-deal: deal 180ms var(--ease-out) backwards;
   --animate-throw-left: throw-left 300ms var(--ease-throw) forwards;
   --animate-throw-right: throw-right 300ms var(--ease-throw) forwards;
@@ -342,24 +311,6 @@
   @keyframes eq {
     to {
       transform: scaleY(0.35);
-    }
-  }
-  @keyframes writing-hint {
-    50% {
-      opacity: 0.12;
-    }
-  }
-  @keyframes writing-paint {
-    from {
-      stroke-dashoffset: 1;
-    }
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-  @keyframes writing-start {
-    50% {
-      opacity: 0.25;
     }
   }
   /* Position only: a filter here would flatten the card for a moment and show its back. */
@@ -435,13 +386,9 @@
   --color-part: var(--part);
   /* A library entry's character: a square up to 300px, never taller than a phone is wide. */
   --spacing-entry-glyph: min(78vw, 300px);
-  /* The writing pad: as large as the screen allows, leaving room for its header and pips; its
-     frame adds the padding around it. */
-  --spacing-writing: min(calc(100vw - 48px), calc(100dvh - 190px), 480px);
-  --spacing-writing-frame: calc(var(--spacing-writing) + 28px);
   /* A glyph's own square: its box, up to `--glyph-max`. */
   --spacing-glyph-box: min(100cqw, 100cqh, var(--glyph-max, 360px));
-  /* The font glyph standing in for a stroke glyph, matched to its outline. */
+  /* The font glyph standing in for the glyph drawn by parts, matched to its outline. */
   --text-glyph-ghost: calc(
     min(100cqw, 100cqh, var(--glyph-max, 360px)) *
     914 / 1024
@@ -658,10 +605,6 @@
 /* Geist's single-storey a, for the app's own voice. */
 @utility features-ss01 {
   font-feature-settings: "ss01";
-}
-/* SVG strokes drawn under their fill, so a lit outline never eats into the shape. */
-@utility paint-stroke-first {
-  paint-order: stroke;
 }
 /* A tone contour's pen. */
 @utility tone-stroke {

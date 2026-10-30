@@ -1,7 +1,7 @@
 // What screens read. Each view is derived from the parts of the learner state it uses, once,
 // however many components read it, and each hook hands a component only what it shows. The views
 // are course logic over the whole catalog, not queries.
-import { createLiveQueryCollection, useLiveQuery } from "@tanstack/react-db";
+import { useSyncExternalStore } from "react";
 
 import {
   deriveLibrary,
@@ -95,20 +95,50 @@ export const useDueCount = () => useLearner(selectDue);
 /** When each introduced item was met, for the activity graph. */
 export const useIntroductions = () => useLearner(selectIntroductions);
 
-// One query for every reader, kept for as long as the app is open.
-const deviceQuery = createLiveQueryCollection({
-  query: (q) => q.from({ row: device }).findOne(),
-  gcTime: 0,
-});
-
 const noneTakenBack: string[] = [];
 
-/** Whether review can go back a card, and the cards taken back, which return to the top. */
-export function useReviewBack() {
-  const { data } = useLiveQuery(deviceQuery);
-  const row = data?.id === DEVICE ? data : undefined;
-  return {
+interface ReviewBack {
+  /** Whether a review on this device can be taken back. */
+  canTakeBack: boolean;
+  /** Cards taken back and not answered again, which return to the top. */
+  takenBack: string[];
+}
+
+// Kept as one value, so a reader renders only when what it shows changes.
+let back: ReviewBack = { canTakeBack: false, takenBack: noneTakenBack };
+const backReaders = new Set<() => void>();
+let watching = false;
+
+function readBack() {
+  const row = device.get(DEVICE);
+  const next: ReviewBack = {
     canTakeBack: (row?.reviewed.length ?? 0) > 0,
     takenBack: row?.takenBack ?? noneTakenBack,
   };
+  if (
+    next.canTakeBack !== back.canTakeBack ||
+    JSON.stringify(next.takenBack) !== JSON.stringify(back.takenBack)
+  ) {
+    back = next;
+    for (const reader of backReaders) {
+      reader();
+    }
+  }
+}
+
+const subscribeBack = (reader: () => void) => {
+  if (!watching) {
+    watching = true;
+    device.subscribeChanges(readBack, { includeInitialState: true });
+  }
+  backReaders.add(reader);
+  return () => {
+    backReaders.delete(reader);
+  };
+};
+const currentBack = () => back;
+
+/** Whether review can go back a card, and the cards taken back, which return to the top. */
+export function useReviewBack() {
+  return useSyncExternalStore(subscribeBack, currentBack, currentBack);
 }

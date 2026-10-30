@@ -54,10 +54,12 @@ VS Code suggests the Biome and Tailwind extensions and formats on save.
 | `bun run db:seed` / `db:reset` | Add the demo account, or start the local database over |
 | `bun run db:generate` / `db:migrate` | Create a migration after changing `src/db/schema.ts`, or apply migrations |
 | `bun run focus` | Add, list or remove focus words and sentences for an account |
-| `bun run data:sync` | Check the character database in `src/data/hanzi`, then rebuild the curriculum, reading sentences and stroke owners from it |
-| `bun run data:font` | Rebuild the hanzi font |
+| `bun run data:sync` | Check the character database in `src/data/hanzi`, then rebuild the curriculum, reading sentences and stroke owners from it, and the hanzi fonts when the characters or their parts changed |
+| `bun run data:font` | Rebuild the hanzi fonts by hand (needs [uv](https://docs.astral.sh/uv/)) |
 
 `src/data/README.md` explains the character database, the teaching order and how to change them.
+
+`public/` holds only what browsers ask for by a fixed name: icons, the manifest and licenses. Stroke files, recordings and fonts live in `assets/`, and the build publishes them under paths named by their content, so devices keep them until they change. `assets/fonts/README.md` explains how the fonts are built.
 
 ### Focus
 

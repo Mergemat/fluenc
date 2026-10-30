@@ -1,7 +1,7 @@
 // The lesson frame character and word lessons share: header, the thing to learn, its clues and
 // the action row. Phones stack them; from `studio` up the prompt sits beside the clues.
 import { cn } from "../../lib/utils";
-import { action, actionSide } from "../ui/buttons";
+import { action } from "../ui/buttons";
 import { altText, meaningText } from "../ui/hanzi";
 
 /**
@@ -27,7 +27,6 @@ export const studioClues =
 export const studioActions =
   "flex w-full max-w-actions gap-2 self-end justify-self-center studio:col-span-2 studio:row-start-5";
 export const studioAction = cn(action, "min-w-0 flex-1 max-studio:short:h-11");
-export const studioActionSide = cn(actionSide, "max-studio:short:size-11");
 
 /** The meaning, other meanings and pinyin, sized for the lesson; a short phone drops the others. */
 export const studioMeaning = cn(meaningText, "studio:text-3xl text-3xl");

@@ -103,6 +103,18 @@ const sameFocus = (left: FocusEntry[], right: FocusEntry[]) =>
   JSON.stringify(left) === JSON.stringify(right);
 
 function mirror() {
+  // The app opens progress before it shows anything, so no save is waiting yet: the saved rows are
+  // what shows. They are read as stored, rather than through a snapshot that copies each one,
+  // and the changes after are followed from here. Both happen in this one task.
+  show({
+    state: stateOf({
+      cards: cards.base.values(),
+      names: names.base.values(),
+      livingLinks: livingLinks.base.values(),
+      focus: focus.base.values(),
+    }),
+    at: Date.now(),
+  });
   cards.subscribeChanges(
     (changes) =>
       update({
@@ -113,7 +125,7 @@ function mirror() {
           sameCard
         ),
       }),
-    { includeInitialState: true }
+    { includeInitialState: false }
   );
   names.subscribeChanges(
     (changes) => {
@@ -127,7 +139,7 @@ function mirror() {
       }
       update(next);
     },
-    { includeInitialState: true }
+    { includeInitialState: false }
   );
   livingLinks.subscribeChanges(
     (changes) =>
@@ -137,7 +149,7 @@ function mirror() {
           row.story,
         ]),
       }),
-    { includeInitialState: true }
+    { includeInitialState: false }
   );
   focus.subscribeChanges(
     () => {
@@ -147,7 +159,7 @@ function mirror() {
         update({ focus: next });
       }
     },
-    { includeInitialState: true }
+    { includeInitialState: false }
   );
 }
 

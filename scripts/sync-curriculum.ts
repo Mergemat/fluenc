@@ -133,33 +133,28 @@ const curriculum = {
   props,
 };
 
-// Each stored stroke goes to the prop that draws it. Stroke paths and medians are the vendored
-// Arphic outlines in public/hanzi and never change; only `owners` follows the decomposition.
-const STROKE_NOTICE =
-  "Fluenc: added the teaching prop that draws each stroke; stroke paths and medians unchanged. Graphics copyright Arphic Technology Co., Ltd.; Arphic Public License, /licenses/ARPHICPL.TXT.";
-
+// Each stroke goes to the prop that draws it. Stroke paths are the vendored Arphic outlines in
+// assets/strokes.json and never change; only `owners` follows the decomposition.
+const STROKES = "assets/strokes.json";
 interface Shape {
-  medians: number[][][];
   owners: string[];
   strokes: string[];
 }
+const strokeData = (await Bun.file(STROKES).json()) as {
+  characters: Record<string, Shape>;
+  notice: string;
+};
 
 const strokesOf = (part: string) =>
   props[part]?.strokes ??
   courseCharacters.find((character) => character.hanzi === part)?.strokes;
 
-const shapes = await Promise.all(
-  courseCharacters.map(async (character) => {
-    const file = Bun.file(`public/hanzi/${character.hanzi}.json`);
-    return (await file.exists()) ? ((await file.json()) as Shape) : null;
-  })
-);
 const undecided: string[] = [];
-const strokeWrites: Promise<number>[] = [];
-for (const [index, character] of courseCharacters.entries()) {
-  const shape = shapes[index];
+let ownersChanged = false;
+for (const character of courseCharacters) {
+  const shape = strokeData.characters[character.hanzi];
   if (!shape) {
-    undecided.push(`${character.hanzi} (no stroke file)`);
+    undecided.push(`${character.hanzi} (no strokes)`);
     continue;
   }
   const parts = directCharacters.has(character.hanzi)
@@ -171,17 +166,13 @@ for (const [index, character] of courseCharacters.entries()) {
       `${character.hanzi}: [${shape.owners.join(" ")}] → ${parts.join(" ")}`
     );
   } else if (owners.join() !== shape.owners.join()) {
-    strokeWrites.push(
-      Bun.write(
-        `public/hanzi/${character.hanzi}.json`,
-        `${JSON.stringify({ _notice: STROKE_NOTICE, strokes: shape.strokes, medians: shape.medians, owners })}\n`
-      )
-    );
+    shape.owners = owners;
+    ownersChanged = true;
   }
 }
 if (undecided.length) {
   throw new Error(
-    `Set "owners" by hand in public/hanzi for ${undecided.length} characters:\n${undecided.join("\n")}`
+    `Set "owners" by hand in ${STROKES} for ${undecided.length} characters:\n${undecided.join("\n")}`
   );
 }
 
@@ -191,16 +182,45 @@ const sentences = selectSentences(
   reviewedSentences
 );
 
+// The fonts draw the course's characters, their props and their parts in teaching order (see
+// scripts/build-fonts.ts), so they're rebuilt whenever any of that changes.
+const CURRICULUM = new URL(
+  "../src/data/curriculum.generated.json",
+  import.meta.url
+);
+const drawn = (course: typeof curriculum) =>
+  JSON.stringify(
+    course.characters.map((character) => [
+      character.order,
+      character.hanzi,
+      character.components,
+    ])
+  );
+const previous = await Bun.file(CURRICULUM)
+  .json()
+  .catch(() => null);
+const fontsStale =
+  ownersChanged || !previous || drawn(previous) !== drawn(curriculum);
+
+// One character a line, so a change to one character's owners is a one-line diff.
+const strokeLines = Object.entries(strokeData.characters).map(
+  ([hanzi, shape]) =>
+    `    ${JSON.stringify(hanzi)}: ${JSON.stringify({ strokes: shape.strokes, owners: shape.owners })}`
+);
 await Promise.all([
-  ...strokeWrites,
+  ...(ownersChanged
+    ? [
+        Bun.write(
+          STROKES,
+          `{\n  "notice": ${JSON.stringify(strokeData.notice)},\n  "characters": {\n${strokeLines.join(",\n")}\n  }\n}\n`
+        ),
+      ]
+    : []),
   Bun.write(
     new URL("../src/data/character-words.generated.json", import.meta.url),
     `${JSON.stringify(characterWordEquivalences(courseCharacters, courseWords))}\n`
   ),
-  Bun.write(
-    new URL("../src/data/curriculum.generated.json", import.meta.url),
-    `${JSON.stringify(curriculum)}\n`
-  ),
+  Bun.write(CURRICULUM, `${JSON.stringify(curriculum)}\n`),
   Bun.write(
     new URL("../src/data/sentences.generated.json", import.meta.url),
     `${JSON.stringify({
@@ -221,6 +241,19 @@ await Promise.all([
   ),
 ]);
 
+if (fontsStale) {
+  console.log(
+    "The course draws different characters or parts; rebuilding the fonts."
+  );
+  const fonts = Bun.spawn(["bun", "run", "data:font"], {
+    stdout: "inherit",
+    stderr: "inherit",
+  });
+  if ((await fonts.exited) !== 0) {
+    throw new Error("Font rebuild failed; see the error above.");
+  }
+}
+
 console.log(
-  `Synced ${courseWords.length} words, ${courseCharacters.length} characters, ${Object.keys(props).length} props, ${sentences.length} sentences and ${strokeWrites.length} changed stroke files.`
+  `Synced ${courseWords.length} words, ${courseCharacters.length} characters, ${Object.keys(props).length} props, ${sentences.length} sentences${ownersChanged ? ", with new stroke owners" : ""}.`
 );

@@ -1,7 +1,8 @@
 // Serve the production build locally the way Vercel does: files on disk first, then the app server.
 // Nitro's own static handler only knows files that existed when it was bundled, which misses the
 // prerendered offline shell, the service worker and the offline file list written after it.
-import { resolve, sep } from "node:path";
+import { extname, resolve, sep } from "node:path";
+import { brotliCompressSync } from "node:zlib";
 
 const publicDirectory = resolve(".output/public");
 const port = Number(process.env.PORT ?? 3000);
@@ -47,6 +48,28 @@ async function staticFile(pathname: string) {
   return (await file.exists()) ? file : null;
 }
 
+// Vercel's CDN sends text files compressed; sizes and load times here should match.
+const COMPRESSIBLE = new Set([
+  ".css",
+  ".html",
+  ".js",
+  ".json",
+  ".svg",
+  ".txt",
+  ".webmanifest",
+]);
+const NAMED_BY_CONTENT = /^\/(assets|offline|strokes|audio)\//;
+const compressed = new Map<string, Buffer<ArrayBuffer>>();
+
+async function brotli(path: string, file: Blob) {
+  let body = compressed.get(path);
+  if (!body) {
+    body = brotliCompressSync(await file.arrayBuffer()) as Buffer<ArrayBuffer>;
+    compressed.set(path, body);
+  }
+  return body;
+}
+
 Bun.serve({
   port,
   async fetch(request) {
@@ -56,9 +79,23 @@ Bun.serve({
         ? await staticFile(url.pathname)
         : null;
     if (file) {
-      const cache = url.pathname.startsWith("/assets/")
+      // Files named by their content are kept for good, as Vercel's routes say (vite.config.ts).
+      const cache = NAMED_BY_CONTENT.test(url.pathname)
         ? "public, max-age=31536000, immutable"
         : "public, max-age=0, must-revalidate";
+      const { type } = file;
+      if (
+        COMPRESSIBLE.has(extname(url.pathname)) &&
+        request.headers.get("accept-encoding")?.includes("br")
+      ) {
+        return new Response(await brotli(url.pathname, file), {
+          headers: {
+            "Cache-Control": cache,
+            "Content-Encoding": "br",
+            "Content-Type": type,
+          },
+        });
+      }
       return new Response(file, { headers: { "Cache-Control": cache } });
     }
     return fetch(`http://127.0.0.1:${appPort}${url.pathname}${url.search}`, {
