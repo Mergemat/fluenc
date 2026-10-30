@@ -271,7 +271,7 @@ export function AppShell({
         {navigation.map((item) => (
           <Link
             activeProps={{ "aria-current": "page" }}
-            className="type-micro relative flex min-w-0 flex-1 flex-col items-center gap-1.5 overflow-hidden rounded-lg pt-1.5 pb-1 current:text-foreground text-muted-foreground transition-colors"
+            className="type-micro relative flex min-w-0 flex-1 flex-col items-center gap-1 overflow-hidden rounded-lg border border-transparent current:border-blue pt-1 pb-1.5 current:text-foreground text-muted-foreground transition-colors"
             key={item.to}
             to={item.to}
           >
@@ -282,7 +282,7 @@ export function AppShell({
                     cell={2}
                     direction="up"
                     from="blue"
-                    opacity={0.35}
+                    opacity={0.45}
                   />
                 ) : null}
                 <span className="relative grid h-6 w-10 place-items-center rounded-md">

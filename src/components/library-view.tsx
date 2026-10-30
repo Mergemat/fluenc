@@ -425,9 +425,12 @@ function LibraryResults({
         {sections.map((section) => (
           <button
             className={cn(
-              // Text keys, the first on the gutter, like a crumb trail.
+              // Text keys, the first on the gutter, like a crumb trail. By sound, the sounds
+              // already started stand out.
               "type-control h-8 shrink-0 px-2.5 tabular-nums transition-colors first:pl-0 hover:text-foreground",
-              section.learned > 0 ? "text-foreground" : "text-muted-foreground"
+              progress && section.learned > 0
+                ? "text-foreground"
+                : "text-muted-foreground"
             )}
             key={section.key}
             onClick={jumpTo}
@@ -494,7 +497,11 @@ function LibrarySectionBlock({
           />
         ) : null}
         <div
-          className={cn(headMeta, progress ? "max-md:ml-auto" : "dot-before")}
+          className={cn(
+            headMeta,
+            // The dot is a flex item here, so the gap would double its spacing.
+            progress ? "max-md:ml-auto" : "dot-before gap-0"
+          )}
         >
           {progress ? (
             <>
