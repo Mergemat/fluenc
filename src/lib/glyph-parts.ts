@@ -1,6 +1,6 @@
-// A course character drawn as its parts. The parts font (scripts/sync-hanzi-font.ts) holds each part
-// of each course character as its own glyph, in place, at a private-use code point worked out here,
-// so the app and the font build agree on where each part is without a table between them.
+// A course character drawn as its parts. In the parts font (scripts/sync-hanzi-font.ts) each course
+// character is a colour glyph with one layer per part, and the layer's palette slot is the part's
+// place in `glyphParts`.
 import curriculum from "../data/curriculum.generated.json";
 import { directCharacters } from "./character-props";
 
@@ -10,25 +10,24 @@ export const partsOf = (character: { hanzi: string; components: string[] }) =>
     ? [character.hanzi]
     : [...new Set(character.components)];
 
-// Supplementary Private Use Area-A: nothing else the app shows lives here. Parts are numbered in
-// teaching order, the order the font is cut into chunks in, so each chunk is a single range.
-// `bun run data:sync` rebuilds the fonts whenever this numbering would change.
-const places = new Map<string, { first: number; parts: string[] }>();
-let next = 0xf_00_00;
-for (const character of curriculum.characters.toSorted(
-  (left, right) => left.order - right.order
-)) {
-  const parts = partsOf(character);
-  places.set(character.hanzi, { first: next, parts });
-  next += parts.length;
-}
+const places = new Map(
+  curriculum.characters.map((character) => [
+    character.hanzi,
+    partsOf(character),
+  ])
+);
 
-/** Where the parts font draws `part` of `hanzi`; null for a character or part it doesn't have. */
-export function partCodePoint(hanzi: string, part: string) {
-  const place = places.get(hanzi);
-  const slot = place?.parts.indexOf(part) ?? -1;
-  return place && slot >= 0 ? place.first + slot : null;
-}
+/** The parts the parts font draws `hanzi` as, in slot order; null for a character outside the course. */
+export const glyphParts = (hanzi: string) => places.get(hanzi) ?? null;
 
-/** The parts the parts font draws `hanzi` as; null for a character outside the course. */
-export const glyphParts = (hanzi: string) => places.get(hanzi)?.parts ?? null;
+/**
+ * The font's own palette: one colour per slot, far apart, so a canvas drawing of a character tells
+ * which part covers each pixel. The page draws with palettes of its own.
+ */
+export const SLOT_COLORS: [number, number, number][] = [
+  [255, 0, 0],
+  [0, 255, 0],
+  [0, 0, 255],
+  [255, 255, 0],
+  [0, 255, 255],
+];

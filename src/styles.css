@@ -606,10 +606,6 @@
 @utility features-ss01 {
   font-feature-settings: "ss01";
 }
-/* SVG strokes drawn under their fill, so a lit outline never eats into the shape. */
-@utility paint-stroke-first {
-  paint-order: stroke;
-}
 /* A tone contour's pen. */
 @utility tone-stroke {
   stroke-width: 2.4;

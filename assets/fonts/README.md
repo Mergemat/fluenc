@@ -19,7 +19,7 @@ The font uses a 1,024-unit em. FontTools converts cubic curves to quadratic curv
 
 The font is a modified derivative of the Arphic stroke graphics and is freely available under the [Arphic Public License](../licenses/ARPHICPL.TXT). Its name table records the source copyright and the 2026-09-11 conversion and component extraction. The font family is `Fluenc Hanzi`.
 
-`fluenc-hanzi-parts.woff2` (`Fluenc Hanzi Parts`) draws each course character part by part: every part is its own glyph, in place in the character's em square, at a private-use code point worked out in `src/lib/glyph-parts.ts`. The studio, cards and library stack a character's part glyphs to colour, highlight and pick its parts. It comes from the same strokes, split by their `owners`, under the same license.
+`fluenc-hanzi-parts.woff2` (`Fluenc Hanzi Parts`) draws each course character as a COLR colour font: at the character's own code point, one layer per part, each on the palette slot of the part's place in `src/lib/glyph-parts.ts`. The plain glyph is made of the same layers. The font's own palette gives every slot a distinct colour, so a canvas drawing tells the parts apart for hit-testing; the page draws with palettes of its own (`@font-palette-values`) to fade, clear or isolate a part. It comes from the same strokes, split by their `owners`, under the same license.
 
 ## Rebuild
 

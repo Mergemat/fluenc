@@ -1,8 +1,12 @@
-"""Encode stroke outlines as a static WOFF2 font: one glyph per code point in the input."""
+"""Encode stroke outlines as a static WOFF2 font: one glyph per code point in the input.
+
+An input glyph with `layers` becomes a colour glyph: one layer per part, on the palette slot of its
+place, and a plain glyph made of the same layers for renderers without colour."""
 import json
 import sys
 from pathlib import Path
 
+from fontTools.colorLib.builder import buildCOLR, buildCPAL
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.boundsPen import BoundsPen
 from fontTools.pens.cu2quPen import Cu2QuPen
@@ -16,14 +20,20 @@ entries = request['glyphs']
 family = request['family']
 font = FontBuilder(1024, isTTF=True)
 names = {entry['codePoint']: f'u{entry["codePoint"]:04X}' for entry in entries}
-font.setupGlyphOrder(['.notdef', *names.values()])
+layerNames = {}
+for entry in entries:
+    if 'layers' in entry:
+        name = names[entry['codePoint']]
+        layerNames[name] = [f'{name}.{slot}' for slot in range(len(entry['layers']))]
+font.setupGlyphOrder(['.notdef', *names.values(), *(layer for layers in layerNames.values() for layer in layers)])
 font.setupCharacterMap(names)
 glyphs = {'.notdef': TTGlyphPen(None).glyph()}
-for entry in entries:
-    path = ' '.join(entry['strokes'])
+
+
+def outline(path, normalize, label):
     pen = TTGlyphPen(None)
     target = Cu2QuPen(pen, max_err=0.1)
-    if entry['normalize']:
+    if normalize:
         bounds = BoundsPen(None)
         parse_path(path, bounds)
         left, bottom, right, top = bounds.bounds
@@ -32,12 +42,35 @@ for entry in entries:
     parse_path(path, target)
     glyph = pen.glyph()
     if not glyph.numberOfContours:
-        raise ValueError(f'Empty glyph: U+{entry["codePoint"]:04X}')
+        raise ValueError(f'Empty glyph: {label}')
     # Stroke contours may overlap where the original character strokes meet.
     glyph.flags[0] |= 0x40
-    glyphs[names[entry['codePoint']]] = glyph
+    return glyph
+
+
+colorLayers = {}
+for entry in entries:
+    name = names[entry['codePoint']]
+    if name not in layerNames:
+        glyphs[name] = outline(' '.join(entry['strokes']), entry['normalize'], name)
+        continue
+    plain = TTGlyphPen(glyphs)
+    for layer, strokes in zip(layerNames[name], entry['layers']):
+        glyphs[layer] = outline(' '.join(strokes), False, layer)
+        # The plain glyph reuses the layers' outlines rather than storing them twice.
+        plain.addComponent(layer, (1, 0, 0, 1, 0, 0))
+    glyphs[name] = plain.glyph()
+    # Parts may touch where their strokes meet.
+    glyphs[name].components[0].flags |= 0x400
+    colorLayers[name] = [(layer, slot) for slot, layer in enumerate(layerNames[name])]
 font.setupGlyf(glyphs)
-font.setupHorizontalMetrics({name: (1024, glyph.xMin if glyph.numberOfContours else 0) for name, glyph in glyphs.items()})
+glyf = font.font['glyf']
+for glyph in glyf.glyphs.values():
+    glyph.recalcBounds(glyf)
+font.setupHorizontalMetrics({name: (1024, glyph.xMin if glyph.numberOfContours else 0) for name, glyph in glyf.glyphs.items()})
+if colorLayers:
+    font.font['COLR'] = buildCOLR(colorLayers, version=0)
+    font.font['CPAL'] = buildCPAL([[(red / 255, green / 255, blue / 255, 1.0) for red, green, blue in request['palette']]])
 font.setupHorizontalHeader(ascent=900, descent=-124)
 font.setupNameTable({
     'familyName': family,

@@ -1,11 +1,11 @@
 // Hanzi building blocks: stroke glyph, movie-coded pinyin, audio, and usage examples.
 // Each keeps a fixed footprint while it loads so nothing around it moves.
 import {
-  type CSSProperties,
   useCallback,
   useEffect,
   useEffectEvent,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -13,13 +13,13 @@ import {
 } from "react";
 
 import { useMandarinSpeech } from "../../hooks/use-mandarin-speech";
-import { glyphParts, partCodePoint } from "../../lib/glyph-parts";
+import { glyphParts, SLOT_COLORS } from "../../lib/glyph-parts";
 import { getToneDetail } from "../../lib/tones";
 import { cn } from "../../lib/utils";
 import { useLibrary } from "../../progress/views";
 import { DitherGradient } from "../dither-kit/gradient";
 import { PixelLoader } from "./dither";
-import { partColor, partPixelColor } from "./part-colors";
+import { partPixelColor } from "./part-colors";
 
 // The parts font draws in a 1024-unit em with its baseline 900 units down. This places it in the
 // SVG's 1024 box with a 55-unit margin.
@@ -28,7 +28,7 @@ const GLYPH_BASELINE = 55 + 900 * GLYPH_SCALE;
 const GLYPH_TRANSFORM = `translate(55 ${GLYPH_BASELINE}) scale(${GLYPH_SCALE})`;
 const PARTS_FONT = '"Fluenc Hanzi Parts"';
 // Parts are drawn scaled far down from 1024, where Chrome snaps text to whole pixels and parts
-// drift off their outlines and clips; geometricPrecision keeps the outlines where they are.
+// drift off their masks; geometricPrecision keeps the outlines where they are.
 const partText = {
   fontFamily: PARTS_FONT,
   fontSize: 1024,
@@ -81,73 +81,113 @@ function usePartsFont(text: string) {
   return { loaded, failed: failed === text };
 }
 
-// Hit-testing is by ink: SVG text answers for its whole character box, so each part is drawn once
-// into a small mask, and a point belongs to the topmost part with ink there.
-const MASK = 128;
-const masks = new Map<string, Uint8ClampedArray[]>();
+// The page draws the parts font with palettes of its own: plain, clear, one part left clear for its
+// fill (the others fade with the text's opacity), and one part alone, for its fill's mask. Palette
+// colours must be literal, so they're written from the theme's ink once a glyph first shows.
+let palettesWritten = false;
+function writePalettes() {
+  if (palettesWritten) {
+    return;
+  }
+  palettesWritten = true;
+  const ink = getComputedStyle(document.documentElement)
+    .getPropertyValue("--color-foreground")
+    .trim();
+  const rule = (name: string, color: (slot: number) => string) =>
+    `@font-palette-values --parts-${name} { font-family: ${PARTS_FONT}; override-colors: ${SLOT_COLORS.map((_, slot) => `${slot} ${color(slot)}`).join(", ")}; }`;
+  const style = document.createElement("style");
+  style.textContent = [
+    rule("plain", () => ink),
+    rule("clear", () => "transparent"),
+    ...SLOT_COLORS.flatMap((_, lit) => [
+      rule(`lit-${lit}`, (slot) => (slot === lit ? "transparent" : ink)),
+      rule(`only-${lit}`, (slot) => (slot === lit ? "white" : "transparent")),
+    ]),
+  ].join("\n");
+  document.head.append(style);
+}
 
-function partMasks(glyphs: string[]) {
-  const key = glyphs.join("");
-  let drawn = masks.get(key);
-  if (!drawn) {
+// Hit-testing is by ink: SVG text answers for its whole character box. On a canvas the parts font
+// draws with its own palette, a colour per slot, so one small drawing tells the parts apart.
+const MASK = 128;
+const slotMaps = new Map<string, Int8Array>();
+
+const nearestSlot = (pixels: Uint8ClampedArray, at: number) => {
+  let nearest = 0;
+  let distance = Number.POSITIVE_INFINITY;
+  for (const [slot, [red, green, blue]] of SLOT_COLORS.entries()) {
+    const away =
+      ((pixels[at] ?? 0) - red) ** 2 +
+      ((pixels[at + 1] ?? 0) - green) ** 2 +
+      ((pixels[at + 2] ?? 0) - blue) ** 2;
+    if (away < distance) {
+      nearest = slot;
+      distance = away;
+    }
+  }
+  return nearest;
+};
+
+/** For each pixel of the character drawn `MASK` square, the slot of the part inked there, or -1. */
+function slotMap(hanzi: string) {
+  let map = slotMaps.get(hanzi);
+  if (!map) {
     const context = new OffscreenCanvas(MASK, MASK).getContext("2d");
     if (!context) {
-      return [];
+      return null;
     }
     const unit = MASK / 1024;
     context.font = `1024px ${PARTS_FONT}`;
-    drawn = glyphs.map((glyph) => {
-      context.setTransform(1, 0, 0, 1, 0, 0);
-      context.clearRect(0, 0, MASK, MASK);
-      context.setTransform(
-        unit * GLYPH_SCALE,
-        0,
-        0,
-        unit * GLYPH_SCALE,
-        55 * unit,
-        GLYPH_BASELINE * unit
-      );
-      context.fillText(glyph, 0, 0);
-      return context.getImageData(0, 0, MASK, MASK).data;
-    });
-    masks.set(key, drawn);
+    context.setTransform(
+      unit * GLYPH_SCALE,
+      0,
+      0,
+      unit * GLYPH_SCALE,
+      55 * unit,
+      GLYPH_BASELINE * unit
+    );
+    context.fillText(hanzi, 0, 0);
+    const pixels = context.getImageData(0, 0, MASK, MASK).data;
+    map = new Int8Array(MASK * MASK).fill(-1);
+    for (let index = 0; index < map.length; index += 1) {
+      if (pixels[index * 4 + 3]) {
+        map[index] = nearestSlot(pixels, index * 4);
+      }
+    }
+    slotMaps.set(hanzi, map);
   }
-  return drawn;
+  return map;
 }
 
-// A pointer this close to a part's edge still points at it, as the strokes' outline used to.
+// A pointer this close to a part's edge still points at it.
 const REACH = 2;
 
-/** The part under a pointer, by where its ink is. */
-function partAtPoint(
-  svg: SVGSVGElement,
-  event: MouseEvent,
-  glyphs: string[],
-  parts: string[]
-) {
+/** The slot of the part under a pointer, by where its ink is: the nearest within `REACH`. */
+function slotAtPoint(svg: SVGSVGElement, event: MouseEvent, hanzi: string) {
+  const map = slotMap(hanzi);
+  if (!map) {
+    return -1;
+  }
   const box = svg.getBoundingClientRect();
   const x = Math.floor(((event.clientX - box.left) / box.width) * MASK);
   const y = Math.floor(((event.clientY - box.top) / box.height) * MASK);
-  const drawn = partMasks(glyphs);
-  for (let index = parts.length - 1; index >= 0; index -= 1) {
-    const mask = drawn[index];
-    for (let dy = -REACH; mask && dy <= REACH; dy += 1) {
-      for (let dx = -REACH; dx <= REACH; dx += 1) {
-        const px = x + dx;
-        const py = y + dy;
-        if (
-          px >= 0 &&
-          py >= 0 &&
-          px < MASK &&
-          py < MASK &&
-          mask[(py * MASK + px) * 4 + 3]
-        ) {
-          return parts[index] ?? null;
-        }
+  let found = -1;
+  let distance = Number.POSITIVE_INFINITY;
+  for (let dy = -REACH; dy <= REACH; dy += 1) {
+    for (let dx = -REACH; dx <= REACH; dx += 1) {
+      const px = x + dx;
+      const py = y + dy;
+      const slot =
+        px >= 0 && py >= 0 && px < MASK && py < MASK
+          ? (map[py * MASK + px] ?? -1)
+          : -1;
+      if (slot >= 0 && dx * dx + dy * dy < distance) {
+        found = slot;
+        distance = dx * dx + dy * dy;
       }
     }
   }
-  return null;
+  return found;
 }
 
 const NON_ID_CHARACTERS = /[^a-zA-Z0-9]/g;
@@ -182,8 +222,9 @@ function glyphState(ready: boolean, failed: boolean) {
 
 /**
  * The character in a square box. The font glyph holds the exact footprint while the parts font
- * loads, then the character drawn part by part fades in on top of it — nothing moves. A lit part is
- * filled by a dither-kit gradient clipped to that part.
+ * loads, then the character in the parts font fades in on top of it — nothing moves. A palette
+ * fades the other parts while one is lit, and a lit part is filled by a dither-kit gradient masked
+ * to that part.
  */
 export function HanziGlyph({
   hanzi,
@@ -204,25 +245,19 @@ export function HanziGlyph({
 }) {
   const id = `g${useId().replace(NON_ID_CHARACTERS, "")}`;
   const svg = useRef<SVGSVGElement>(null);
-  // Drawn by parts only when every part of the character is one of `parts`.
-  const glyphs = useMemo(() => {
+  // The parts font's slot order; drawn by parts only when every part of the character is in `parts`.
+  const slots = useMemo(() => {
     const drawn = glyphParts(hanzi);
-    if (!drawn?.every((part) => parts.includes(part))) {
-      return null;
-    }
-    const codePoints = parts.map((part) => partCodePoint(hanzi, part));
-    return codePoints.every((codePoint) => codePoint !== null)
-      ? codePoints.map((codePoint) => String.fromCodePoint(codePoint))
-      : null;
+    return drawn?.every((part) => parts.includes(part)) ? drawn : null;
   }, [hanzi, parts]);
-  const font = usePartsFont(glyphs?.join("") ?? "");
-  const ready = glyphs !== null && font.loaded;
+  const font = usePartsFont(slots ? hanzi : "");
+  const ready = slots !== null && font.loaded;
   const lit = (code: string) => !concealed && (xray || highlighted === code);
 
   // Parts are picked and previewed by pointer; the lesson's clue inputs are the keyboard path.
   const pointedAt = (event: MouseEvent) =>
-    svg.current && glyphs
-      ? partAtPoint(svg.current, event, glyphs, parts)
+    svg.current && slots
+      ? (slots[slotAtPoint(svg.current, event, hanzi)] ?? null)
       : null;
   const select = useEffectEvent((event: MouseEvent) => {
     const code = pointedAt(event);
@@ -260,7 +295,16 @@ export function HanziGlyph({
     };
   }, [ready, concealed]);
 
-  const state = glyphState(ready, glyphs === null || font.failed);
+  useLayoutEffect(() => {
+    if (ready) {
+      writePalettes();
+    }
+  }, [ready]);
+
+  const state = glyphState(ready, slots === null || font.failed);
+  const drawnWith = slots
+    ? palette(slots, highlighted, xray, concealed)
+    : "plain";
   return (
     <div
       className="relative grid size-glyph-box *:col-start-1 *:row-start-1"
@@ -276,7 +320,7 @@ export function HanziGlyph({
       >
         {hanzi}
       </span>
-      {ready && glyphs ? (
+      {ready && slots ? (
         <svg
           aria-label={hanzi}
           className="size-full overflow-visible"
@@ -285,61 +329,44 @@ export function HanziGlyph({
           viewBox="0 0 1024 1024"
         >
           <defs>
-            {parts.map((code, index) => (
-              <clipPath
-                clipPathUnits="objectBoundingBox"
-                id={`${id}-c${index}`}
-                key={code}
-              >
-                <text
-                  style={partText}
-                  transform={`scale(${1 / 1024}) ${GLYPH_TRANSFORM}`}
+            {slots.map((code, slot) =>
+              lit(code) ? (
+                <mask
+                  id={`${id}-m${slot}`}
+                  key={code}
+                  maskContentUnits="objectBoundingBox"
                 >
-                  {glyphs[index]}
-                </text>
-              </clipPath>
-            ))}
+                  <text
+                    style={{ ...partText, fontPalette: `--parts-only-${slot}` }}
+                    transform={`scale(${1 / 1024}) ${GLYPH_TRANSFORM}`}
+                  >
+                    {hanzi}
+                  </text>
+                </mask>
+              ) : null
+            )}
           </defs>
-          <g transform={GLYPH_TRANSFORM}>
-            {parts.map((code, index) => (
-              <g
-                className={cn(
-                  "transition-opacity duration-180",
-                  !concealed &&
-                    Boolean(highlighted) &&
-                    highlighted !== code &&
-                    !xray &&
-                    "opacity-14"
-                )}
-                data-part={code}
-                key={code}
-                style={{ "--part": partColor(index) } as CSSProperties}
-              >
-                <text
-                  className={cn(
-                    "paint-stroke-first transition-colors duration-180",
-                    lit(code)
-                      ? "fill-transparent stroke-5 stroke-part"
-                      : "fill-foreground stroke-7 stroke-transparent"
-                  )}
-                  style={partText}
-                >
-                  {glyphs[index]}
-                </text>
-              </g>
-            ))}
-          </g>
+          <text
+            className={cn(
+              "transition-[font-palette,opacity] duration-180",
+              drawnWith.startsWith("lit-") && "opacity-14"
+            )}
+            style={{ ...partText, fontPalette: `--parts-${drawnWith}` }}
+            transform={GLYPH_TRANSFORM}
+          >
+            {hanzi}
+          </text>
         </svg>
       ) : null}
-      {ready
+      {ready && slots
         ? parts.map((code, index) =>
             lit(code) ? (
-              // Without paint containment Chrome places a text clip up to a pixel off when the
+              // Without paint containment Chrome places a text mask up to a pixel off when the
               // box sits at a fractional position.
               <div
                 className="pointer-events-none absolute inset-0 contain-paint"
                 key={code}
-                style={{ clipPath: `url(#${id}-c${index})` }}
+                style={{ mask: `url(#${id}-m${slots.indexOf(code)})` }}
               >
                 <DitherGradient
                   bloom="low"
@@ -353,6 +380,23 @@ export function HanziGlyph({
         : null}
     </div>
   );
+}
+
+/** The palette the character is drawn with (see `writePalettes`). */
+function palette(
+  slots: string[],
+  highlighted: string | null,
+  xray: boolean,
+  concealed: boolean
+) {
+  if (concealed) {
+    return "plain";
+  }
+  if (xray) {
+    return "clear";
+  }
+  const slot = highlighted ? slots.indexOf(highlighted) : -1;
+  return slot >= 0 ? `lit-${slot}` : "plain";
 }
 
 const SYLLABLE_SEPARATOR = /[\s,/]+/;

@@ -10,7 +10,6 @@
 import { mkdir, rm } from "node:fs/promises";
 
 import curriculum from "../src/data/curriculum.generated.json";
-import { partCodePoint, partsOf } from "../src/lib/glyph-parts";
 import { python } from "./font-python";
 
 const WEB = "assets/fonts/web";
@@ -102,24 +101,21 @@ interface Face {
   weight?: string;
 }
 
-/** Teaching order cut into runs of `CHUNK`, each with the code points `pick` gives its members. */
-function runs<T>(items: T[], pick: (item: T) => number[]) {
-  const groups: number[][] = [];
-  for (let index = 0; index * CHUNK < items.length; index += 1) {
-    groups.push(items.slice(index * CHUNK, (index + 1) * CHUNK).flatMap(pick));
-  }
-  return groups;
+// Every Chinese font is cut the same way, so their faces share unicode-ranges, which the
+// stylesheet's compression mostly takes back.
+const groups: number[][] = [];
+for (let index = 0; index * CHUNK < taught.length; index += 1) {
+  groups.push(taught.slice(index * CHUNK, (index + 1) * CHUNK));
 }
 
 /**
- * Cut a Chinese font into one file per group of code points. A font set in lines of text needs a
+ * Cut a Chinese font into one file per group. A font set in lines of text needs a
  * metrics face as well.
  */
 async function chunk(
   source: string,
   name: string,
   family: string,
-  groups: number[][],
   inLines = true
 ) {
   await rm(`${WEB}/${name}`, { recursive: true, force: true });
@@ -178,15 +174,13 @@ const faces = [
   ...(await chunk(
     "assets/fonts/fluenc-hanzi.woff2",
     "fluenc-hanzi",
-    "Fluenc Hanzi",
-    runs(taught, (codePoint) => [codePoint])
+    "Fluenc Hanzi"
   )),
   ...(
     await chunk(
       "assets/fonts/noto-sans-sc-props.woff2",
       "noto-sans-sc-props",
-      "Noto Sans CJK SC",
-      runs(taught, (codePoint) => [codePoint])
+      "Noto Sans CJK SC"
     )
   ).map((face) => ({ ...face, weight: "400" })),
   // Drawn only as SVG text, never in a line.
@@ -194,14 +188,10 @@ const faces = [
     "assets/fonts/fluenc-hanzi-parts.woff2",
     "fluenc-hanzi-parts",
     "Fluenc Hanzi Parts",
-    runs(byTeachingOrder, (character) =>
-      partsOf(character).flatMap(
-        (part) => partCodePoint(character.hanzi, part) ?? []
-      )
-    ),
     false
   )),
 ];
+
 await Bun.write(
   "src/fonts.generated.css",
   `/* Written by scripts/build-fonts.ts from the fonts in assets/fonts. */\n\n${faces.map(faceRule).join("\n\n")}\n`

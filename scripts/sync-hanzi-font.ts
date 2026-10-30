@@ -4,15 +4,15 @@ import { join } from "node:path";
 
 import strokeData from "../assets/strokes.json";
 import curriculum from "../src/data/curriculum.generated.json";
-import { partCodePoint, partsOf } from "../src/lib/glyph-parts";
+import { partsOf, SLOT_COLORS } from "../src/lib/glyph-parts";
 import { python } from "./font-python";
 
 // Two fonts from the stroke outlines in assets/strokes.json:
 //
 // - Fluenc Hanzi: every course character from its own strokes, and every component from the
 //   strokes it draws in a course character.
-// - Fluenc Hanzi Parts: each part of each course character as its own glyph, in place, so a
-//   character can be drawn part by part (see src/lib/glyph-parts.ts).
+// - Fluenc Hanzi Parts: every course character as a colour glyph with one layer per part, so the
+//   page can colour, light and pick each part (see src/lib/glyph-parts.ts).
 interface Shape {
   owners: string[];
   strokes: string[];
@@ -34,6 +34,10 @@ interface Glyph {
   codePoint: number;
   normalize: boolean;
   strokes: string[];
+}
+interface LayeredGlyph {
+  codePoint: number;
+  layers: string[][];
 }
 
 const codePoint = (text: string) => text.codePointAt(0) ?? 0;
@@ -73,22 +77,39 @@ const characterGlyphs: Glyph[] = [
   });
 
 // Every part must draw something, or the character couldn't be shown part by part.
-const partGlyphs: Glyph[] = curriculum.characters.flatMap((character) =>
-  partsOf(character).map((part) => {
-    const strokes = strokesOwnedBy(shapeOf(character.hanzi), part);
-    const at = partCodePoint(character.hanzi, part);
-    if (!(strokes.length && at)) {
-      throw new Error(`${character.hanzi} draws nothing for its part ${part}`);
-    }
-    return { codePoint: at, strokes, normalize: false };
-  })
-);
+const layeredGlyphs: LayeredGlyph[] = curriculum.characters.map((character) => {
+  const parts = partsOf(character);
+  if (parts.length > SLOT_COLORS.length) {
+    throw new Error(
+      `${character.hanzi} has ${parts.length} parts; the parts font has ${SLOT_COLORS.length} slots (src/lib/glyph-parts.ts).`
+    );
+  }
+  return {
+    codePoint: codePoint(character.hanzi),
+    layers: parts.map((part) => {
+      const strokes = strokesOwnedBy(shapeOf(character.hanzi), part);
+      if (!strokes.length) {
+        throw new Error(
+          `${character.hanzi} draws nothing for its part ${part}`
+        );
+      }
+      return strokes;
+    }),
+  };
+});
 
-async function encode(family: string, output: string, glyphs: Glyph[]) {
+async function encode(
+  family: string,
+  output: string,
+  glyphs: Glyph[] | LayeredGlyph[]
+) {
   const directory = await mkdtemp(join(tmpdir(), "fluenc-hanzi-font-"));
   try {
     const input = join(directory, "glyphs.json");
-    await Bun.write(input, JSON.stringify({ family, output, glyphs }));
+    await Bun.write(
+      input,
+      JSON.stringify({ family, output, glyphs, palette: SLOT_COLORS })
+    );
     const encoder = Bun.spawn(
       [...python, "scripts/build-hanzi-font.py", input],
       { stdout: "inherit", stderr: "inherit" }
@@ -109,5 +130,5 @@ await encode(
 await encode(
   "Fluenc Hanzi Parts",
   "assets/fonts/fluenc-hanzi-parts.woff2",
-  partGlyphs
+  layeredGlyphs
 );
