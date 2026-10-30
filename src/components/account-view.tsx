@@ -1,11 +1,10 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogIn, UserPlus } from "lucide-react";
 import { type FormEvent, useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { signIn } from "../account/account";
 import { useSyncStatus } from "../progress/sync";
-import { ToolButton } from "./ui/button";
+import { ActionButton } from "./ui/button";
 import { ErrorNote, Page, PageHeader } from "./ui/layout";
 
 type Mode = "sign-in" | "sign-up";
@@ -83,7 +82,6 @@ export function AccountView() {
   }
 
   const text = copy[mode];
-  const Icon = mode === "sign-in" ? LogIn : UserPlus;
   return (
     <Page head={<PageHeader title={text.title} />}>
       <form className="grid max-w-form gap-4" onSubmit={submit}>
@@ -118,10 +116,16 @@ export function AccountView() {
           />
         </label>
         {error ? <ErrorNote>{error}</ErrorNote> : null}
-        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <ToolButton disabled={busy} icon={Icon} tone="primary" type="submit">
+        <div className="mt-2 grid justify-items-center gap-4">
+          <ActionButton
+            color="blue"
+            disabled={busy}
+            hint="↵"
+            type="submit"
+            variant="gradient"
+          >
             {busy ? "one moment…" : text.submit}
-          </ToolButton>
+          </ActionButton>
           <button
             className="type-label text-muted-foreground underline underline-offset-3 transition-colors hover:text-foreground"
             onClick={toggle}

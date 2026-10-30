@@ -34,7 +34,7 @@ const tabs: { id: ClueKind; label: string }[] = [
 
 type Show = "all" | "named" | "open";
 
-/** A palace row; every row after the first has a divider above it. */
+/** A palace row; every row after the first in its group has a divider above it. */
 const rowClass = (first: boolean) =>
   cn(
     "relative grid min-h-14 grid-cols-clue-row items-center gap-4 overflow-hidden py-1.5 pr-3.5 pl-2 text-muted-foreground transition-colors max-xs:grid-cols-clue-row-xs max-xs:gap-2",
@@ -99,17 +99,20 @@ export function PalaceView() {
     }
     return (
       <div className="grid overflow-hidden">
-        {shown.map((entry, index) => (
-          <div key={`${entry.kind}:${entry.key}`}>
-            {entry.group && entry.group !== shown[index - 1]?.group ? (
-              <SectionHead
-                className={index ? "mt-12" : undefined}
-                label={entry.group}
-              />
-            ) : null}
-            <ClueLink first={index === 0} row={entry} />
-          </div>
-        ))}
+        {shown.map((entry, index) => {
+          const head = entry.group && entry.group !== shown[index - 1]?.group;
+          return (
+            <div key={`${entry.kind}:${entry.key}`}>
+              {head ? (
+                <SectionHead
+                  className={index ? "mt-12" : undefined}
+                  label={entry.group}
+                />
+              ) : null}
+              <ClueLink first={index === 0 || !!head} row={entry} />
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -206,8 +209,7 @@ function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
       <span
         className={cn(
           "type-code justify-self-center whitespace-nowrap text-kind",
-          props && "font-hanzi-props font-normal text-3xl",
-          open && "opacity-55"
+          props && "font-hanzi-props font-normal text-3xl"
         )}
         lang={props ? "zh-CN" : undefined}
       >
@@ -218,7 +220,7 @@ function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
           className={cn(
             "min-w-0 truncate",
             open
-              ? "type-control text-faint-foreground"
+              ? "type-control text-muted-foreground"
               : "type-heading text-foreground"
           )}
         >

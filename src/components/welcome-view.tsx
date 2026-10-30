@@ -13,10 +13,11 @@ import {
 import { isShortcut, useWindowKeys } from "../hooks/use-window-keys";
 import { defaultToneRooms } from "../lib/pinyin";
 import { cn } from "../lib/utils";
-import { brand, shell } from "./app-shell";
+import { brand, shell, topBar } from "./app-shell";
 import { DitherGradient } from "./dither-kit/gradient";
 import { BrandMark } from "./ui/brand-mark";
 import { ActionButton } from "./ui/button";
+import { Rule } from "./ui/dither";
 import { glyphBox, HanziGlyph, ToneContour } from "./ui/hanzi";
 import { chip, label, PageHeader } from "./ui/layout";
 import { partColor } from "./ui/part-colors";
@@ -254,8 +255,8 @@ const slides: {
 }[] = [
   {
     kicker: "好 · good",
-    title: "Every character is a short movie",
-    line: "Symbols are hard to remember. People, places and things are easy. So each character becomes a scene.",
+    title: "every character is a short movie",
+    line: "symbols are hard to remember. people, places and things are easy. so each character becomes a scene.",
   },
   {
     kicker: "initial",
@@ -264,7 +265,7 @@ const slides: {
         <b className={cn(code, kindColors.actor)}>h-</b> is an actor
       </>
     ),
-    line: "Pick someone you can picture clearly, real or famous. Every h- sound stars them. Actors come in four kinds.",
+    line: "pick someone you can picture clearly, real or famous. every h- sound stars them. actors come in four kinds.",
     visual: <Actors />,
   },
   {
@@ -274,7 +275,7 @@ const slides: {
         <b className={cn(code, kindColors.set)}>-ao</b> is a place
       </>
     ),
-    line: "Pick a building you know well enough to walk through in your head. Every -ao scene happens there.",
+    line: "pick a building you know well enough to walk through in your head. every -ao scene happens there.",
     visual: <Place />,
   },
   {
@@ -287,19 +288,19 @@ const slides: {
         is a room in that place
       </>
     ),
-    line: "Every place has the same five rooms. hǎo dips, so it plays in the bedroom.",
+    line: "every place has the same five rooms. hǎo dips, so it plays in the bedroom.",
     visual: <Rooms />,
   },
   {
     kicker: "props",
-    title: "The parts are props",
-    line: "Pick an object for each part, by how it looks or what it means. Put it where the part sits.",
+    title: "the parts are props",
+    line: "pick an object for each part, by how it looks or what it means. put it where the part sits.",
     visual: <Props />,
   },
   {
     kicker: "script",
-    title: "The actor acts out the meaning",
-    line: "Props always do something, and the room is part of it.",
+    title: "the actor acts out the meaning",
+    line: "props always do something, and the room is part of it.",
     visual: <Script />,
   },
 ];
@@ -339,11 +340,12 @@ export function WelcomeView({
   const { kicker, title, line, visual } = slides[slide];
   return (
     <div className={shell}>
-      <div className="flex h-14 shrink-0 items-center border-border border-b px-gutter">
+      <div className={cn(topBar, "relative")}>
         <span className={brand}>
           <BrandMark />
           fluenc
         </span>
+        <Rule className="absolute inset-x-0 bottom-0 h-0.5" />
       </div>
       <main className="mx-auto box-border flex min-h-0 w-full max-w-welcome flex-1 flex-col gap-4 px-gutter pt-page-top pb-6">
         <PageHeader

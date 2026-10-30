@@ -416,8 +416,9 @@ function LibraryResults({
         {sections.map((section) => (
           <button
             className={cn(
-              "type-control h-8 min-w-9 shrink-0 rounded-md border border-transparent px-2.5 tabular-nums transition-colors hover:border-border-strong hover:text-foreground",
-              section.learned > 0 ? "text-foreground" : "text-faint-foreground"
+              // Text keys, the first on the gutter, like a crumb trail.
+              "type-control h-8 shrink-0 px-2.5 tabular-nums transition-colors first:pl-0 hover:text-foreground",
+              section.learned > 0 ? "text-foreground" : "text-muted-foreground"
             )}
             key={section.key}
             onClick={jumpTo}

@@ -34,9 +34,8 @@ import {
   clueRole as roleText,
 } from "./character-studio/clues";
 import type { CharacterItem } from "./character-studio/types";
-import { DitherButton } from "./dither-kit/button";
 import { WordGloss } from "./review-card";
-import { tool } from "./ui/buttons";
+import { Chip } from "./ui/chip";
 import {
   AudioButton,
   glyphBox,
@@ -57,12 +56,12 @@ import { StatusMeta, Tile, TileGlyph, tileClass, Wall } from "./ui/tile";
 
 /** The character or gloss beside its definition; stacked and centred on phones. */
 const hero =
-  "grid justify-items-center gap-6 pb-6 text-center hero:grid-cols-entry hero:items-center hero:justify-items-start hero:gap-12 hero:text-left";
+  "grid justify-items-center gap-6 text-center hero:grid-cols-entry hero:items-center hero:justify-items-start hero:gap-12 hero:text-left";
 const definition = "grid justify-items-center gap-2 hero:justify-items-start";
 const entryMeaning = cn(meaningText, "text-3xl");
 const entrySound = cn(soundRow, "mt-0");
 const section = "mt-12 grid gap-2";
-const emptyNote = "type-control text-faint-foreground leading-wrap";
+const emptyNote = "type-control text-muted-foreground leading-wrap";
 /** The memory link as a line of text, typed over in place. */
 const linkInput =
   "type-body w-full border-border border-b bg-transparent py-3 text-foreground outline-none transition-colors placeholder:type-control placeholder:text-faint-foreground focus:border-blue";
@@ -228,8 +227,8 @@ function CharacterEntry({
             <AudioButton pinyin={item.pinyin} text={item.hanzi} />
           </div>
           <Senses meanings={meaning.alternatives} />
-          <p className="type-control max-w-measure text-center text-faint-foreground">
-            {item.strokes} strokes · radical{" "}
+          <p className="type-control max-w-measure hero:text-left text-center text-muted-foreground">
+            {item.strokes} {item.strokes === 1 ? "stroke" : "strokes"} · radical{" "}
             <span className="font-hanzi" lang="zh-CN">
               {item.radical}
             </span>
@@ -240,15 +239,9 @@ function CharacterEntry({
               </span>
             ))}
           </p>
-          <DitherButton
-            aria-pressed={xray}
-            className={tool}
-            color={xray ? "blue" : "grey"}
-            onClick={toggleXray}
-            variant={xray ? "gradient" : "dotted"}
-          >
-            <span>parts</span>
-          </DitherButton>
+          <Chip onClick={toggleXray} pressed={xray}>
+            parts
+          </Chip>
         </div>
       </header>
 
@@ -289,7 +282,7 @@ function CharacterEntry({
       <section aria-label="Words" className={section}>
         <SectionHead className="mb-0" label="in words" meta={words.length} />
         {words.length ? (
-          <Wall tight>
+          <Wall>
             {words.map((word) => (
               <Tile item={{ ...word, kind: "words" }} key={word.id} />
             ))}
@@ -450,7 +443,7 @@ function WordEntry({
 
       <section aria-label="Characters" className={section}>
         <SectionHead className="mb-0" label="characters" />
-        <Wall tight>
+        <Wall>
           {characters.map(({ part, character }) =>
             character ? (
               <Tile

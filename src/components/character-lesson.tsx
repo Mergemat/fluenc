@@ -204,7 +204,7 @@ function UsageList({ usage }: { usage: ReturnType<typeof useUsage> }) {
           }
         >
           <UsageHanzi chars={word.chars} />
-          <span className="type-label text-faint-foreground">
+          <span className="type-label text-muted-foreground">
             {word.pinyin}
           </span>
           <span>{word.meaning}</span>

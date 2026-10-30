@@ -257,6 +257,10 @@ export function DeckCard({
   );
 }
 
+/** The figure on a card lying on the table, at its size: a timer or a verdict. */
+export const slotFigure = (size: string) =>
+  cn("type-display relative", size, "leading-none");
+
 /** A card lying on the table's line under its figure. */
 export const slotNote = "relative type-label text-muted-foreground";
 
