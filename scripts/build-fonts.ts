@@ -6,15 +6,13 @@
 // - The Latin fonts keep only what the interface, the course's pinyin and learners' own names use.
 //
 // Writes assets/fonts/web/** and src/fonts.generated.css, whose url()s Vite turns into hashed files
-// that are cached for good. Needs FontTools (see assets/fonts/README.md):
-//
-//   FLUENC_FONT_PYTHON=/tmp/fluenc-font-env/bin/python bun scripts/build-fonts.ts
+// that are cached for good. `bun run data:sync` runs it when the course changes.
 import { mkdir, rm } from "node:fs/promises";
 
 import curriculum from "../src/data/curriculum.generated.json";
 import { partCodePoint, partsOf } from "../src/lib/glyph-parts";
+import { python } from "./font-python";
 
-const python = Bun.env.FLUENC_FONT_PYTHON ?? "python3";
 const WEB = "assets/fonts/web";
 // A screen of review cards shows characters from all over the course, each pulling in its whole
 // chunk. A chunk's own overhead is about half a kilobyte, so small chunks cost little.
@@ -42,7 +40,7 @@ const LATIN = [
 async function subset(source: string, output: string, unicodes: string) {
   const run = Bun.spawn(
     [
-      python,
+      ...python,
       "-m",
       "fontTools.subset",
       source,

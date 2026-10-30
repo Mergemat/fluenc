@@ -5,6 +5,7 @@ import { join } from "node:path";
 import strokeData from "../assets/strokes.json";
 import curriculum from "../src/data/curriculum.generated.json";
 import { partCodePoint, partsOf } from "../src/lib/glyph-parts";
+import { python } from "./font-python";
 
 // Two fonts from the stroke outlines in assets/strokes.json:
 //
@@ -89,11 +90,7 @@ async function encode(family: string, output: string, glyphs: Glyph[]) {
     const input = join(directory, "glyphs.json");
     await Bun.write(input, JSON.stringify({ family, output, glyphs }));
     const encoder = Bun.spawn(
-      [
-        Bun.env.FLUENC_FONT_PYTHON ?? "python3",
-        "scripts/build-hanzi-font.py",
-        input,
-      ],
+      [...python, "scripts/build-hanzi-font.py", input],
       { stdout: "inherit", stderr: "inherit" }
     );
     if ((await encoder.exited) !== 0) {

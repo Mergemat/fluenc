@@ -12,7 +12,7 @@ export const partsOf = (character: { hanzi: string; components: string[] }) =>
 
 // Supplementary Private Use Area-A: nothing else the app shows lives here. Parts are numbered in
 // teaching order, the order the font is cut into chunks in, so each chunk is a single range.
-// Reordering the course, adding characters or changing a character's parts needs the font built again.
+// `bun run data:sync` rebuilds the fonts whenever this numbering would change.
 const places = new Map<string, { first: number; parts: string[] }>();
 let next = 0xf_00_00;
 for (const character of curriculum.characters.toSorted(

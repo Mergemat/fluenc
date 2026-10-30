@@ -5,10 +5,10 @@ The app ships cut-down copies of the full fonts in this folder, made by `scripts
 - The Chinese fonts are split into chunks of 25 characters in teaching order, in `fluenc-hanzi/`, `fluenc-hanzi-parts/` and `noto-sans-sc-props/`. Each chunk is declared with its `unicode-range`, so a browser downloads only the chunks holding characters on screen.
 - The Geist fonts in `geist/` keep Latin, pinyin's tone letters, punctuation and the interface's symbols.
 
-The faces are written to `src/fonts.generated.css`. Rebuild them after changing a font here, with the FontTools environment below:
+The faces are written to `src/fonts.generated.css`. Rebuild them after changing a font here:
 
 ```sh
-FLUENC_FONT_PYTHON=/tmp/fluenc-font-env/bin/python bun scripts/build-fonts.ts
+bun scripts/build-fonts.ts
 ```
 
 `fluenc-hanzi.woff2` is the shared Chinese font for lessons, reviews, reading, and the library. It contains every course character and every component the course teaches as a prop. Reading sentences use only course characters. Props use Noto Sans CJK SC, described below. The Latin interface keeps its existing font.
@@ -23,15 +23,13 @@ The font is a modified derivative of the Arphic stroke graphics and is freely av
 
 ## Rebuild
 
-Normal app builds use the committed font and do not need Python. After updating the curriculum or `assets/strokes.json`, regenerate with Bun. FontTools and Brotli are only required for this font-authoring step.
+App builds use the committed fonts. `bun run data:sync` rebuilds them itself whenever the course's characters, props, parts or teaching order change, so they can't fall behind the curriculum. To rebuild them by hand, for example after editing `assets/strokes.json`:
 
 ```sh
-python3 -m venv /tmp/fluenc-font-env
-/tmp/fluenc-font-env/bin/pip install 'fonttools==4.65.0' brotli
-FLUENC_FONT_PYTHON=/tmp/fluenc-font-env/bin/python bun run data:font
+bun run data:font
 ```
 
-`FLUENC_FONT_PYTHON` selects the font-authoring Python environment; otherwise the script uses `python3`. `data:font` writes `assets/fonts/fluenc-hanzi.woff2` and `assets/fonts/fluenc-hanzi-parts.woff2`, then the shipped chunks. The Bun script gathers the app's characters, components and parts from `assets/strokes.json` and passes their paths to the FontTools encoder. Temporary input files are removed after generation.
+The font scripts run FontTools through [uv](https://docs.astral.sh/uv/), which fetches the pinned version on first use (see `scripts/font-python.ts`); nothing else needs setting up. `data:font` writes `assets/fonts/fluenc-hanzi.woff2` and `assets/fonts/fluenc-hanzi-parts.woff2`, then the shipped chunks. The Bun script gathers the app's characters, components and parts from `assets/strokes.json` and passes their paths to the FontTools encoder. Temporary input files are removed after generation.
 
 The chunks are precached by the service worker. Unsupported characters outside the shipped curriculum use the platform's Chinese font.
 
@@ -41,10 +39,10 @@ The chunks are precached by the service worker. Unsupported characters outside t
 
 The source is [Noto Sans CJK SC Regular](https://github.com/notofonts/noto-cjk/blob/165c01b46ea533872e002e0785ff17e44f6d97d8/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf), distributed under the [SIL Open Font License](../licenses/NotoSansSC-OFL.txt). The WOFF2 subset retains its original outlines and is precached by the existing service worker font rule.
 
-To rebuild, download the source OTF to `.cache/noto-sans-cjk-sc.otf`, then use the FontTools environment from the instructions above:
+To rebuild, download the source OTF to `.cache/noto-sans-cjk-sc.otf`, then:
 
 ```sh
 bun -e 'import curriculum from "./src/data/curriculum.generated.json"; await Bun.write(".cache/prop-glyphs.txt", [...new Set(curriculum.characters.flatMap(c => [c.hanzi, ...c.components]))].sort().join(""));'
-/tmp/fluenc-font-env/bin/pyftsubset .cache/noto-sans-cjk-sc.otf --text-file=.cache/prop-glyphs.txt --flavor=woff2 --output-file=assets/fonts/noto-sans-sc-props.woff2
-FLUENC_FONT_PYTHON=/tmp/fluenc-font-env/bin/python bun scripts/build-fonts.ts
+uv run --no-project --with fonttools==4.65.0 --with brotli pyftsubset .cache/noto-sans-cjk-sc.otf --text-file=.cache/prop-glyphs.txt --flavor=woff2 --output-file=assets/fonts/noto-sans-sc-props.woff2
+bun scripts/build-fonts.ts
 ```

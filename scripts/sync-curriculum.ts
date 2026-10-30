@@ -182,6 +182,26 @@ const sentences = selectSentences(
   reviewedSentences
 );
 
+// The fonts draw the course's characters, their props and their parts in teaching order (see
+// scripts/build-fonts.ts), so they're rebuilt whenever any of that changes.
+const CURRICULUM = new URL(
+  "../src/data/curriculum.generated.json",
+  import.meta.url
+);
+const drawn = (course: typeof curriculum) =>
+  JSON.stringify(
+    course.characters.map((character) => [
+      character.order,
+      character.hanzi,
+      character.components,
+    ])
+  );
+const previous = await Bun.file(CURRICULUM)
+  .json()
+  .catch(() => null);
+const fontsStale =
+  ownersChanged || !previous || drawn(previous) !== drawn(curriculum);
+
 // One character a line, so a change to one character's owners is a one-line diff.
 const strokeLines = Object.entries(strokeData.characters).map(
   ([hanzi, shape]) =>
@@ -200,10 +220,7 @@ await Promise.all([
     new URL("../src/data/character-words.generated.json", import.meta.url),
     `${JSON.stringify(characterWordEquivalences(courseCharacters, courseWords))}\n`
   ),
-  Bun.write(
-    new URL("../src/data/curriculum.generated.json", import.meta.url),
-    `${JSON.stringify(curriculum)}\n`
-  ),
+  Bun.write(CURRICULUM, `${JSON.stringify(curriculum)}\n`),
   Bun.write(
     new URL("../src/data/sentences.generated.json", import.meta.url),
     `${JSON.stringify({
@@ -223,6 +240,19 @@ await Promise.all([
     })}\n`
   ),
 ]);
+
+if (fontsStale) {
+  console.log(
+    "The course draws different characters or parts; rebuilding the fonts."
+  );
+  const fonts = Bun.spawn(["bun", "run", "data:font"], {
+    stdout: "inherit",
+    stderr: "inherit",
+  });
+  if ((await fonts.exited) !== 0) {
+    throw new Error("Font rebuild failed; see the error above.");
+  }
+}
 
 console.log(
   `Synced ${courseWords.length} words, ${courseCharacters.length} characters, ${Object.keys(props).length} props, ${sentences.length} sentences${ownersChanged ? ", with new stroke owners" : ""}.`
