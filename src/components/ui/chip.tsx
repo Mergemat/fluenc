@@ -52,5 +52,5 @@ export function Chip<T extends string>({
 
 /** A count inside a chip. */
 export function ChipCount({ children }: { children: ReactNode }) {
-  return <small className="text-xs tabular-nums opacity-60">{children}</small>;
+  return <small className="type-label tabular-nums">{children}</small>;
 }

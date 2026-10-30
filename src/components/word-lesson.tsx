@@ -144,19 +144,30 @@ export function WordLesson({ item }: { item: WordItem }) {
             className={clueRow({
               editable: true,
               marker: trimmed ? null : "empty",
+              stacked: true,
             })}
             data-kind="link"
             style={kindStyle("link")}
           >
-            <span className={clueCode({ kind: "link", editable: true })}>
+            <span
+              className={clueCode({
+                kind: "link",
+                editable: true,
+                stacked: true,
+              })}
+            >
               <Link2 size={18} />
             </span>
-            <span className={clueRole()}>{prompt}</span>
+            <span className={clueRole(true)}>{prompt}</span>
             <input
               aria-invalid={tooShort}
               aria-label="Memory link"
               autoComplete="off"
-              className={clueName({ empty: !trimmed, editable: true })}
+              className={clueName({
+                empty: !trimmed,
+                editable: true,
+                stacked: true,
+              })}
               disabled={finish.isPending}
               enterKeyHint="done"
               onChange={editStory}

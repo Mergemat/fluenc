@@ -20,13 +20,14 @@ export function studio(glyph: boolean) {
 /** Where the prompt sits: beside the clues on wide screens, all their height. */
 export const studioRead =
   "min-h-0 studio:col-start-1 studio:row-start-2 studio:row-end-5";
+// On phones the frame's gap is tight, so the clues' head takes more above it than below.
 export const studioClues =
-  "relative grid min-w-0 gap-2 studio:col-start-2 studio:row-start-3";
+  "relative grid min-w-0 gap-2 max-studio:mt-4 studio:col-start-2 studio:row-start-3";
 
 /** Learn, review and read end in the same action row: as wide as review's column, centred. */
 export const studioActions =
-  "flex w-full gap-2 self-end justify-self-center studio:col-span-2 studio:row-start-5 studio:max-w-actions";
-export const studioAction = cn(action, "min-w-0 flex-1 max-studio:short:h-11");
+  "flex w-full gap-2 self-end justify-self-center studio:col-span-2 studio:row-start-5 studio:max-w-deck";
+export const studioAction = cn(action, "min-w-0 flex-1");
 
 /** The meaning, other meanings and pinyin, sized for the lesson; a short phone drops the others. */
 export const studioMeaning = cn(meaningText, "studio:text-3xl text-3xl");

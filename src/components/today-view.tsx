@@ -62,7 +62,7 @@ function Primary({ to, label }: { to: Lead; label: string }) {
   const go = useCallback(() => navigate({ to }), [navigate, to]);
   return (
     <ActionButton
-      className="mt-2 short:max-studio:h-11"
+      className="mt-2"
       color="blue"
       hint="space"
       onClick={go}
@@ -92,16 +92,18 @@ function ReviewNext({ data }: { data: DashboardData }) {
           <b className="trim-cap type-display text-4xl tabular-nums leading-none tracking-snug">
             {due}
           </b>
-          <span className="type-body text-muted-foreground leading-none">
-            {due === 1 ? "card" : "cards"} · about{" "}
-            {Math.max(1, Math.round((due * SECONDS_PER_CARD) / 60))} min
+          <span className="type-label grid gap-1 text-muted-foreground">
+            <span>{due === 1 ? "card" : "cards"}</span>
+            <span>
+              about {Math.max(1, Math.round((due * SECONDS_PER_CARD) / 60))} min
+            </span>
           </span>
         </p>
       </div>
       {rest.length ? (
         <ol
           aria-label="Cards after it"
-          className="m-0 flex list-none gap-4 overflow-x-clip whitespace-nowrap p-0 text-muted-foreground text-xl leading-none"
+          className="m-0 flex h-6 list-none flex-wrap gap-x-4 gap-y-6 overflow-hidden p-0 text-muted-foreground text-xl leading-6"
           lang="zh-CN"
         >
           {rest.map((item) => (

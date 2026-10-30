@@ -388,13 +388,7 @@ export function WelcomeView({
               back
             </button>
           ) : null}
-          <ActionButton
-            className="short:max-studio:h-11"
-            color="blue"
-            hint="↵"
-            onClick={next}
-            variant="gradient"
-          >
+          <ActionButton color="blue" hint="↵" onClick={next} variant="gradient">
             {last ? "start learning" : "next"}
           </ActionButton>
         </footer>

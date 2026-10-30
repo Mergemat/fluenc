@@ -52,8 +52,8 @@ const statuses = [
 export const controls = "mb-6 grid gap-4";
 /** Filter groups: chip sets on one line, wrapping, the last pushed to the end. */
 // Groups that wrap sit further apart than chips that wrap inside one group.
-export const filterBar = "flex flex-wrap justify-between gap-x-2 gap-y-3";
-export const filterSet = "flex flex-wrap gap-x-4 gap-y-3";
+export const filterBar = "flex flex-wrap justify-between gap-x-2 gap-y-4";
+export const filterSet = "flex flex-wrap gap-x-4 gap-y-4";
 /** A fieldset of chips, without the browser's border and padding. */
 export const filterGroup = "flex min-w-0 flex-wrap gap-2";
 
@@ -222,7 +222,15 @@ export function LibraryView() {
   return (
     <Page
       head={
-        <PageHeader meta={`${learned} learned · ${total}`} title="library" />
+        <PageHeader
+          meta={
+            <span>
+              <b className="font-medium text-foreground">{learned}</b> learned ·{" "}
+              {total}
+            </span>
+          }
+          title="library"
+        />
       }
     >
       <div className={controls}>
@@ -417,9 +425,12 @@ function LibraryResults({
         {sections.map((section) => (
           <button
             className={cn(
-              // Text keys, the first on the gutter, like a crumb trail.
+              // Text keys, the first on the gutter, like a crumb trail. By sound, the sounds
+              // already started stand out.
               "type-control h-8 shrink-0 px-2.5 tabular-nums transition-colors first:pl-0 hover:text-foreground",
-              section.learned > 0 ? "text-foreground" : "text-muted-foreground"
+              progress && section.learned > 0
+                ? "text-foreground"
+                : "text-muted-foreground"
             )}
             key={section.key}
             onClick={jumpTo}
@@ -486,7 +497,11 @@ function LibrarySectionBlock({
           />
         ) : null}
         <div
-          className={cn(headMeta, progress ? "max-md:ml-auto" : "dot-before")}
+          className={cn(
+            headMeta,
+            // The dot is a flex item here, so the gap would double its spacing.
+            progress ? "max-md:ml-auto" : "dot-before gap-0"
+          )}
         >
           {progress ? (
             <>

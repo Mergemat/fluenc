@@ -34,18 +34,29 @@ interface RowState {
   lit?: boolean;
   /** Still to name (a glowing marker) or newly named (a quiet one). */
   marker?: "empty" | "new" | null;
+  /** The name under what it stands for on phones too: a role too long for the line's end. */
+  stacked?: boolean;
 }
 
 /** A highlighted row is rounded like every other surface, and the lines touching it give way. */
 const highlight = "rounded-lg bg-kind/9";
 
-export function clueRow({ lit, lined, dense, editable, marker }: RowState) {
+export function clueRow({
+  lit,
+  lined,
+  dense,
+  editable,
+  marker,
+  stacked,
+}: RowState) {
   return cn(
     "group/row relative grid h-14 content-center gap-x-1 pr-3.5 transition-colors",
     "max-studio:items-center max-studio:gap-x-2",
-    dense
-      ? "inset-shadow-rule-side grid-cols-clue-dense max-studio:h-14 max-studio:grid-cols-clue-dense-phone"
-      : "grid-cols-clue max-studio:h-12 max-studio:short:h-11 max-studio:grid-cols-clue-line",
+    dense &&
+      "inset-shadow-rule-side grid-cols-clue-dense max-studio:h-14 max-studio:grid-cols-clue-dense-phone",
+    stacked && "grid-cols-clue max-studio:grid-cols-clue-dense-phone",
+    !(dense || stacked) &&
+      "grid-cols-clue max-studio:h-12 max-studio:short:h-11 max-studio:grid-cols-clue-line",
     lined && !dense && "inset-shadow-rule",
     editable && "cursor-text focus-within:rounded-lg focus-within:bg-kind/9",
     lit && highlight,
@@ -63,10 +74,14 @@ export function clueCode({
   lit,
   dense,
   editable,
-}: { kind: RowKind } & Pick<RowState, "lit" | "dense" | "editable">) {
+  stacked,
+}: { kind: RowKind } & Pick<
+  RowState,
+  "lit" | "dense" | "editable" | "stacked"
+>) {
   return cn(
     "type-code col-start-1 row-span-2 self-center justify-self-center whitespace-nowrap text-kind transition-glow duration-160",
-    !dense && "max-studio:row-span-1",
+    !(dense || stacked) && "max-studio:row-span-1",
     kind === "prop" &&
       cn(
         "font-hanzi-props font-normal",
@@ -84,11 +99,11 @@ export const clueTone = "h-5 w-7";
 /** A repeated component's count beside its code. */
 export const clueCount = "ml-px align-super type-label font-semibold";
 
-/** What the clue stands for; on phones at the line's end. */
-export function clueRole(dense?: boolean) {
+/** What the clue stands for; on phones at the line's end, unless the row is stacked. */
+export function clueRole(stacked?: boolean) {
   return cn(
     "type-label col-start-2 min-w-0 truncate text-muted-foreground leading-3.5",
-    dense
+    stacked
       ? "max-studio:row-start-1"
       : "max-studio:col-start-3 max-studio:row-start-1 max-studio:max-w-24 max-studio:text-right"
   );
@@ -99,10 +114,13 @@ export function clueName({
   empty,
   dense,
   editable,
-}: { empty: boolean } & Pick<RowState, "dense" | "editable">) {
+  stacked,
+}: { empty: boolean } & Pick<RowState, "dense" | "editable" | "stacked">) {
   return cn(
     "type-heading col-start-2 h-7 w-full min-w-0 text-foreground",
-    dense ? "max-studio:row-start-2 max-studio:h-6" : "max-studio:row-start-1",
+    dense || stacked
+      ? "max-studio:row-start-2 max-studio:h-6"
+      : "max-studio:row-start-1",
     editable
       ? cn(
           "text-ellipsis rounded-none border-transparent border-b bg-transparent p-0 outline-none transition-colors focus-visible:outline-none",

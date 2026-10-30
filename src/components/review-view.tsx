@@ -180,7 +180,7 @@ function ReviewDone({
         </DeckTable>
         <footer className={deckActions()}>
           <ActionButton
-            className={cn(deckAction, "h-14")}
+            className={deckAction}
             color="blue"
             hint="↵"
             onClick={next}
