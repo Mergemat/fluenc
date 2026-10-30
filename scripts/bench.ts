@@ -6,12 +6,15 @@
 //   bun run bench --runs 5     more runs, steadier medians
 //   bun run bench --profile    an unminified build, and where each phase spends its time
 //
+// Bytes are as the CDN sends them: the preview server compresses like Vercel does.
+//
 // Each run starts from a fresh browser profile, so startup is a first open with the learner's
 // progress already on the device. Interactions are timed with the Event Timing API: from input to
 // the next frame painted, like INP.
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
+import { brotliCompressSync } from "node:zlib";
 import {
   type Browser,
   type CDPSession,
@@ -192,6 +195,8 @@ const observe = () => {
     }[],
   };
   Object.assign(window, { __bench: perf });
+  // Every file the session loads, not the first 250.
+  performance.setResourceTimingBufferSize(10_000);
   new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
       perf.longTasks.push({ start: entry.startTime, duration: entry.duration });
@@ -242,6 +247,62 @@ function interactions(perf: Perf, from: number, to = Number.POSITIVE_INFINITY) {
 }
 
 const now = (page: Page) => page.evaluate(() => performance.now());
+
+const COURSE_DATA = /^\/assets\/(curriculum|sentences)-/;
+
+/** What a download is for, by where it comes from. */
+function kindOf(url: string) {
+  const { pathname } = new URL(url);
+  if (pathname.startsWith("/offline/")) {
+    return "offline packs";
+  }
+  if (pathname.startsWith("/strokes/") || pathname.startsWith("/audio/")) {
+    return "strokes and audio";
+  }
+  if (COURSE_DATA.test(pathname)) {
+    return "course data";
+  }
+  if (pathname.endsWith(".js")) {
+    return "code";
+  }
+  if (pathname.endsWith(".css")) {
+    return "css";
+  }
+  if (pathname.endsWith(".woff2")) {
+    return "fonts";
+  }
+  return "other";
+}
+
+/** KB downloaded before `until`, compressed as sent, by kind. */
+async function downloads(page: Page, until = Number.POSITIVE_INFINITY) {
+  const files = await page.evaluate(() =>
+    [
+      ...performance.getEntriesByType("navigation"),
+      ...performance.getEntriesByType("resource"),
+    ].map((entry) => ({
+      url: entry.name,
+      start: entry.startTime,
+      bytes: (entry as PerformanceResourceTiming).encodedBodySize,
+    }))
+  );
+  const kb: Record<string, number> = {};
+  for (const file of files) {
+    if (file.start < until) {
+      const kind = kindOf(file.url);
+      kb[kind] = (kb[kind] ?? 0) + file.bytes / 1024;
+    }
+  }
+  return kb;
+}
+
+/** MB of JavaScript heap in use. */
+async function heap(cdp: CDPSession) {
+  await cdp.send("Performance.enable");
+  const { metrics } = await cdp.send("Performance.getMetrics");
+  const used = metrics.find((metric) => metric.name === "JSHeapUsedSize");
+  return (used?.value ?? 0) / 1024 / 1024;
+}
 
 interface ProfileNode {
   callFrame: { functionName: string; url: string; lineNumber: number };
@@ -464,7 +525,8 @@ async function search(session: Session) {
   });
 }
 
-async function run(browser: Browser, rows: ReturnType<typeof allRows>) {
+/** A fresh phone with the learner's progress on it and no server behind it. */
+async function phone(browser: Browser, rows: ReturnType<typeof allRows>) {
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 3,
@@ -472,7 +534,7 @@ async function run(browser: Browser, rows: ReturnType<typeof allRows>) {
     hasTouch: true,
     serviceWorkers: "block",
   });
-  // No server: sync answers as a signed-out device, and nothing reaches the database.
+  // Sync answers as a signed-out device, and nothing reaches the database.
   await context.route("**/api/**", (route) =>
     route.fulfill({ status: 401, json: { error: "signed out" } })
   );
@@ -484,12 +546,50 @@ async function run(browser: Browser, rows: ReturnType<typeof allRows>) {
   await page.addInitScript(observe);
   const cdp = await context.newCDPSession(page);
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: CPU_SLOWDOWN });
+  return { context, page, cdp };
+}
+
+// Lighthouse's mobile network: 150 ms round trips, 1.6 Mbps down, 750 Kbps up.
+const SLOW_4G = {
+  offline: false,
+  latency: 150,
+  downloadThroughput: (1.6 * 1024 * 1024) / 8,
+  uploadThroughput: (750 * 1024) / 8,
+};
+
+/** A first open over a phone network, with nothing cached yet. */
+async function slowStartup(browser: Browser, rows: ReturnType<typeof allRows>) {
+  const { context, page, cdp } = await phone(browser, rows);
+  await cdp.send("Network.enable");
+  await cdp.send("Network.emulateNetworkConditions", SLOW_4G);
   const session: Session = { cdp, page, profiles: {}, result: {} };
   await startup(session);
+  await context.close();
+  return session.result.startup as number;
+}
+
+async function run(browser: Browser, rows: ReturnType<typeof allRows>) {
+  const { context, page, cdp } = await phone(browser, rows);
+  const session: Session = { cdp, page, profiles: {}, result: {} };
+  await startup(session);
+  const atStartup = await downloads(page, session.result.startup as number);
+  for (const [kind, kb] of Object.entries(atStartup)) {
+    session.result[`startup ${kind} KB`] = kb;
+  }
+  session.result.startupHeap = await heap(cdp);
+  session.result.storage = await page.evaluate(
+    async () => ((await navigator.storage.estimate()).usage ?? 0) / 1024
+  );
   await review(session);
   await tour(session);
   await lesson(session);
   await search(session);
+  const inSession = await downloads(page);
+  for (const [kind, kb] of Object.entries(inSession)) {
+    session.result[`session ${kind} KB`] = kb;
+  }
+  session.result.sessionHeap = await heap(cdp);
+  session.result.slowStartup = await slowStartup(browser, rows);
   await context.close();
   for (const [phase, lines] of Object.entries(session.profiles)) {
     console.info(`\n${phase}\n${lines.join("\n")}`);
@@ -523,6 +623,27 @@ console.info("generating the learner…");
 const state = learner();
 const seeded = allRows(state);
 const due = deriveDashboard(state, new Date()).reviewQueue.length;
+
+// What a new device downloads on its first sync for this learner: the whole account as a patch.
+const firstSync = JSON.stringify({
+  acknowledged: [],
+  cursor: 1,
+  learner: { id: "learner", email: "learner@example.com" },
+  reset: true,
+  patch: {
+    cards: state.cards,
+    actors: state.actors,
+    sets: state.sets,
+    rooms: state.rooms,
+    props: state.props,
+    livingLinks: state.livingLinks,
+    focus: state.focus,
+    removedFocus: [],
+  },
+});
+const syncSizes = {
+  "first sync KB": brotliCompressSync(firstSync).length / 1024,
+};
 console.info(
   `${Object.keys(state.cards).length} cards, ${seeded.length} rows, ${due} due`
 );
@@ -555,8 +676,10 @@ try {
     median(results.map((result) => result[key] as number));
   const pooled = (key: string) =>
     results.flatMap((result) => result[key] as number[]);
+  const keys = Object.keys(results[0] ?? {});
   const summary = {
     "startup ms": scalar("startup"),
+    "startup on slow 4G ms": scalar("slowStartup"),
     "startup blocking ms": scalar("startupBlocking"),
     "open review ms": scalar("openReview"),
     "open review tap ms": Math.max(0, ...pooled("openReviewTaps")),
@@ -581,6 +704,23 @@ try {
     "search p50 ms": median(pooled("search")),
     "search max ms": Math.max(0, ...pooled("search")),
     "search blocking ms": scalar("searchBlocking"),
+    ...Object.fromEntries(
+      keys
+        .filter((key) => key.endsWith(" KB"))
+        .sort()
+        .map((key) => [key, scalar(key)])
+    ),
+    "startup total KB": median(
+      results.map((result) =>
+        Object.entries(result)
+          .filter(([key]) => key.startsWith("startup ") && key.endsWith(" KB"))
+          .reduce((total, [, value]) => total + (value as number), 0)
+      )
+    ),
+    "JS heap after startup MB": scalar("startupHeap"),
+    "JS heap after session MB": scalar("sessionHeap"),
+    "device storage KB": scalar("storage"),
+    ...syncSizes,
   };
   console.table(
     Object.fromEntries(
