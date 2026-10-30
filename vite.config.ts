@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+import { readdirSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 
 import tailwindcss from "@tailwindcss/vite";
@@ -33,19 +35,45 @@ const parsedJson = (): Plugin => ({
 
 const DAY = 24 * 60 * 60;
 
+/** A short hash of a folder's files: their names and bytes. */
+function versionOf(dir: string, extension: string) {
+  const hash = createHash("sha1");
+  for (const name of readdirSync(dir)
+    .filter((file) => file.endsWith(extension))
+    .sort()) {
+    hash.update(name);
+    hash.update(readFileSync(`${dir}/${name}`));
+  }
+  return hash.digest("hex").slice(0, 12);
+}
+
+// Stroke files and recordings are served under a path named by their content, so a device keeps
+// each one for good and fetches it again only when the course changes it.
+const versioned = {
+  strokes: {
+    dir: "assets/strokes",
+    url: `/strokes/${versionOf("assets/strokes", ".json")}`,
+  },
+  audio: {
+    dir: "assets/audio",
+    url: `/audio/${versionOf("assets/audio", ".mp3")}`,
+  },
+};
+
 // Files in these folders are served by Vercel's CDN. A missing one answers 404 there too, instead
 // of starting the server to render a not-found page. Every request to the CDN is billed, so the
 // browser keeps each file a while rather than asking again on every use.
 const staticFolders = {
-  audio: 7 * DAY,
   brand: DAY,
-  fonts: DAY,
-  hanzi: DAY,
   licenses: DAY,
 };
 
 export default defineConfig({
   resolve: { tsconfigPaths: true },
+  define: {
+    "import.meta.env.FLUENC_STROKES": JSON.stringify(versioned.strokes.url),
+    "import.meta.env.FLUENC_AUDIO": JSON.stringify(versioned.audio.url),
+  },
   server: {
     // Production builds write here; reloading the dev tab for them is noise.
     watch: { ignored: ["**/.output/**", "**/.vercel/**"] },
@@ -98,15 +126,29 @@ export default defineConfig({
       ],
     }),
     nitro({
-      publicAssets: Object.entries(staticFolders).map(([folder, maxAge]) => ({
-        baseURL: `/${folder}`,
-        dir: `public/${folder}`,
-        maxAge,
-      })),
+      publicAssets: [
+        ...Object.entries(staticFolders).map(([folder, maxAge]) => ({
+          baseURL: `/${folder}`,
+          dir: `public/${folder}`,
+          maxAge,
+        })),
+        ...Object.values(versioned).map(({ dir, url }) => ({
+          baseURL: url,
+          dir,
+          maxAge: 365 * DAY,
+        })),
+      ],
       routeRules: {
         // Offline packs are named by their content (see scripts/build.ts).
         "/offline/**": {
           headers: { "cache-control": "public, max-age=31536000, immutable" },
+        },
+        // iOS asks for these names too; one icon answers all of them.
+        "/apple-touch-icon-precomposed.png": {
+          redirect: { to: "/apple-touch-icon.png", status: 301 },
+        },
+        "/brand/apple-touch-icon.png": {
+          redirect: { to: "/apple-touch-icon.png", status: 301 },
         },
       },
       vercel: {

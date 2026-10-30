@@ -53,7 +53,7 @@ test("every stroke file draws each prop of its character, and only those", async
     curriculum.characters.map(
       async ({ hanzi }) =>
         (await Bun.file(
-          new URL(`../../public/hanzi/${hanzi}.json`, import.meta.url)
+          new URL(`../../assets/strokes/${hanzi}.json`, import.meta.url)
         ).json()) as {
           strokes: string[];
           medians: number[][][];

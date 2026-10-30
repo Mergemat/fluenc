@@ -6,7 +6,8 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-
+import geistUrl from "../../assets/fonts/web/geist/Geist-Variable.woff2?url";
+import geistMonoUrl from "../../assets/fonts/web/geist/GeistMono-Variable.woff2?url";
 import appCss from "../styles.css?url";
 
 interface RouterContext {
@@ -35,21 +36,14 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       { rel: "stylesheet", href: appCss },
       {
         rel: "preload",
-        href: "/fonts/fluenc-hanzi.woff2",
+        href: geistUrl,
         as: "font",
         type: "font/woff2",
         crossOrigin: "anonymous",
       },
       {
         rel: "preload",
-        href: "/fonts/geist/Geist-Variable.woff2",
-        as: "font",
-        type: "font/woff2",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "preload",
-        href: "/fonts/geist/GeistMono-Variable.woff2",
+        href: geistMonoUrl,
         as: "font",
         type: "font/woff2",
         crossOrigin: "anonymous",

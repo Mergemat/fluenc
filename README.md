@@ -59,6 +59,8 @@ VS Code suggests the Biome and Tailwind extensions and formats on save.
 
 `src/data/README.md` explains the character database, the teaching order and how to change them.
 
+`public/` holds only what browsers ask for by a fixed name: icons, the manifest and licenses. Stroke files, recordings and fonts live in `assets/`, and the build publishes them under paths named by their content, so devices keep them until they change. `assets/fonts/README.md` explains how the fonts are built.
+
 ### Focus
 
 `bun run focus add lesson.json` takes a file like this:

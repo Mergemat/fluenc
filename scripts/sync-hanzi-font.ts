@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import curriculum from "../src/data/curriculum.generated.json";
 
-// Every glyph comes from the vendored stroke files in public/hanzi: a course character from its
+// Every glyph comes from the vendored stroke files in assets/strokes: a course character from its
 // own file, a component from the strokes it draws in a course character.
 const lessonShapes = new Map(
   await Promise.all(
@@ -11,7 +11,7 @@ const lessonShapes = new Map(
       async (character) =>
         [
           character.hanzi,
-          (await Bun.file(`public/hanzi/${character.hanzi}.json`).json()) as {
+          (await Bun.file(`assets/strokes/${character.hanzi}.json`).json()) as {
             strokes: string[];
             owners: string[];
           },

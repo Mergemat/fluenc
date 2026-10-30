@@ -83,5 +83,5 @@ export function getRecordedPinyinPath(pinyin: string) {
   }
 
   const recording = `${syllable.replaceAll("ü", "uu")}${tone}`;
-  return `/audio/pinyin/${recording}.mp3`;
+  return `${import.meta.env.FLUENC_AUDIO}/${recording}.mp3`;
 }

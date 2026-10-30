@@ -17,8 +17,8 @@ declare const self: ServiceWorkerGlobalScope & {
   __WB_MANIFEST: PrecacheEntry[];
 };
 
-const STROKES_PATH = /^\/hanzi\/[^/]+\.json$/;
-const AUDIO_PATH = /^\/audio\/pinyin\/[^/]+\.mp3$/;
+const STROKES_PATH = /^\/strokes\/[^/]+\/[^/]+\.json$/;
+const AUDIO_PATH = /^\/audio\/[^/]+\/[^/]+\.mp3$/;
 
 // A new version waits until the learner asks for it (see use-app-update), so a
 // running page never loses the files it was built with. Workers from before that handshake

@@ -1,39 +1,11 @@
 @import "tailwindcss";
+/* The app's fonts, cut down to what it shows: see scripts/build-fonts.ts. */
+@import "./fonts.generated.css";
 
 /* Fluenc's design system as Tailwind theme tokens. Colours use shadcn's names, so dither-kit and
    any other shadcn registry component pick up the app's colours as they are. Components are
    styled with utilities; this file only holds what utilities can't say: the tokens, the base,
    named variants for relational states, the type roles, and a few compound rules. */
-
-@font-face {
-  font-family: "Geist";
-  src: url("/fonts/geist/Geist-Variable.woff2") format("woff2");
-  font-weight: 100 900;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist Mono";
-  src: url("/fonts/geist/GeistMono-Variable.woff2") format("woff2");
-  font-weight: 100 900;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist Pixel";
-  src: url("/fonts/geist/GeistPixel-Square.woff2") format("woff2");
-  font-display: swap;
-}
-@font-face {
-  font-family: "Fluenc Hanzi";
-  src: url("/fonts/fluenc-hanzi.woff2") format("woff2");
-  font-display: swap;
-}
-@font-face {
-  font-family: "Noto Sans CJK SC";
-  src: url("/fonts/noto-sans-sc-props.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
 
 /* Tailwind's defaults go; only the tokens below exist. A block of its own, so it always comes first. */
 @theme {

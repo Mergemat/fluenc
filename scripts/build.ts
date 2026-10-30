@@ -53,14 +53,11 @@ const result = await injectManifest({
   globDirectory: publicDirectory,
   globPatterns: [
     "offline.html",
-    "assets/**/*.{css,js}",
-    "fonts/**/*.woff2",
+    "assets/**/*.{css,js,woff2}",
     "brand/**/*.png",
     "apple-touch-icon.png",
     "manifest.webmanifest",
   ],
-  // Shipped with the Geist family but not used by any stylesheet.
-  globIgnores: ["fonts/geist/GeistPixel-Grid.woff2"],
   maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
 });
 await rm(workerSource);
@@ -89,7 +86,7 @@ const packGroup = async (
     cwd: publicDirectory,
   })) {
     const bytes = await Bun.file(resolve(publicDirectory, path)).bytes();
-    files.push({ url: `/${path}`, revision: md5(bytes), bytes });
+    files.push({ url: `/${path}`, bytes });
   }
   files.sort((a, b) => a.url.localeCompare(b.url));
   const packed = packFiles(files, json);
@@ -99,8 +96,9 @@ const packGroup = async (
   return { pack, size: packed.bytes.length, files: packed.files };
 };
 const offlineFiles: OfflineFiles = {
-  audio: await packGroup("audio", "audio/pinyin/*.mp3", false),
-  strokes: await packGroup("strokes", "hanzi/*.json", true),
+  // One folder each, named by its content (see vite.config.ts).
+  audio: await packGroup("audio", "audio/*/*.mp3", false),
+  strokes: await packGroup("strokes", "strokes/*/*.json", true),
 };
 if (!(offlineFiles.audio.files.length && offlineFiles.strokes.files.length)) {
   throw new Error("Offline practice files are missing");

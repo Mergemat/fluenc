@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import strokes from "../../public/hanzi/三.json";
+import strokes from "../../assets/strokes/三.json";
 import { gradeStroke, type Point } from "./stroke-match";
 
 const medians = strokes.medians.map((median) =>

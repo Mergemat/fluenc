@@ -28,7 +28,9 @@ export function useStrokes(hanzi: string) {
   return useQuery({
     queryKey: ["character-strokes", hanzi],
     queryFn: async () => {
-      const response = await fetch(`/hanzi/${hanzi}.json`);
+      const response = await fetch(
+        `${import.meta.env.FLUENC_STROKES}/${hanzi}.json`
+      );
       if (!response.ok) {
         throw new Error("Character strokes unavailable");
       }

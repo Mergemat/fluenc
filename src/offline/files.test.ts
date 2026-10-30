@@ -4,12 +4,8 @@ import { packFiles } from "./files";
 
 const encode = (text: string) => new TextEncoder().encode(text);
 const files = [
-  {
-    url: "/hanzi/一.json",
-    revision: "a",
-    bytes: encode('{"strokes":["M 1"]}'),
-  },
-  { url: "/hanzi/二.json", revision: "b", bytes: encode('{"strokes":[]}\n') },
+  { url: "/strokes/v1/一.json", bytes: encode('{"strokes":["M 1"]}') },
+  { url: "/strokes/v1/二.json", bytes: encode('{"strokes":[]}\n') },
 ];
 
 test("each file can be cut back out of its pack unchanged", () => {

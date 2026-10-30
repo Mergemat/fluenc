@@ -54,7 +54,7 @@ font.setupMaxp()
 font.font['head'].created = font.font['head'].modified = 3871929600
 font.font.recalcTimestamp = False
 font.font.flavor = 'woff2'
-output = Path('public/fonts/fluenc-hanzi.woff2')
+output = Path('assets/fonts/fluenc-hanzi.woff2')
 font.save(output)
 encoded = TTFont(output)
 if set(encoded.getBestCmap()) != set(names):

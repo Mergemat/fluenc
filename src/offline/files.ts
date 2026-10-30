@@ -1,6 +1,8 @@
 // Practice files (pinyin audio and stroke data) live outside the service worker's precache, so
 // the app installs in seconds. The page downloads them itself, and the worker serves them from
-// these caches. The build writes the list, with a revision per file, to OFFLINE_FILES_URL.
+// these caches. The build writes the list to OFFLINE_FILES_URL. Each file's URL is named by the
+// content of its folder (see vite.config.ts), so a cached file is current for as long as it is
+// listed.
 //
 // Each group also ships as one pack, so a device fills its cache in one request rather than one
 // per file: the CDN bills every request. The files stay at their own URLs for anything the
@@ -19,7 +21,6 @@ export interface OfflineFile {
   /** Where the file's bytes sit in its group's pack. */
   length: number;
   offset: number;
-  revision: string;
   url: string;
 }
 export interface OfflineGroup {
@@ -38,7 +39,7 @@ const encoder = new TextEncoder();
  * files, byte for byte, so it is served as JSON and the CDN compresses it.
  */
 export function packFiles(
-  files: { bytes: Uint8Array; revision: string; url: string }[],
+  files: { bytes: Uint8Array; url: string }[],
   json: boolean
 ) {
   const parts: Uint8Array[] = [];
@@ -50,13 +51,12 @@ export function packFiles(
   if (json) {
     add(encoder.encode("["));
   }
-  const entries = files.map(({ bytes, revision, url }, index) => {
+  const entries = files.map(({ bytes, url }, index) => {
     if (json && index) {
       add(encoder.encode(","));
     }
     const entry: OfflineFile = {
       url,
-      revision,
       offset: size,
       length: bytes.length,
     };

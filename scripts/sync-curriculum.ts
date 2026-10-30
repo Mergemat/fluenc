@@ -134,7 +134,7 @@ const curriculum = {
 };
 
 // Each stored stroke goes to the prop that draws it. Stroke paths and medians are the vendored
-// Arphic outlines in public/hanzi and never change; only `owners` follows the decomposition.
+// Arphic outlines in assets/strokes and never change; only `owners` follows the decomposition.
 const STROKE_NOTICE =
   "Fluenc: added the teaching prop that draws each stroke; stroke paths and medians unchanged. Graphics copyright Arphic Technology Co., Ltd.; Arphic Public License, /licenses/ARPHICPL.TXT.";
 
@@ -150,7 +150,7 @@ const strokesOf = (part: string) =>
 
 const shapes = await Promise.all(
   courseCharacters.map(async (character) => {
-    const file = Bun.file(`public/hanzi/${character.hanzi}.json`);
+    const file = Bun.file(`assets/strokes/${character.hanzi}.json`);
     return (await file.exists()) ? ((await file.json()) as Shape) : null;
   })
 );
@@ -173,7 +173,7 @@ for (const [index, character] of courseCharacters.entries()) {
   } else if (owners.join() !== shape.owners.join()) {
     strokeWrites.push(
       Bun.write(
-        `public/hanzi/${character.hanzi}.json`,
+        `assets/strokes/${character.hanzi}.json`,
         `${JSON.stringify({ _notice: STROKE_NOTICE, strokes: shape.strokes, medians: shape.medians, owners })}\n`
       )
     );
@@ -181,7 +181,7 @@ for (const [index, character] of courseCharacters.entries()) {
 }
 if (undecided.length) {
   throw new Error(
-    `Set "owners" by hand in public/hanzi for ${undecided.length} characters:\n${undecided.join("\n")}`
+    `Set "owners" by hand in assets/strokes for ${undecided.length} characters:\n${undecided.join("\n")}`
   );
 }
 

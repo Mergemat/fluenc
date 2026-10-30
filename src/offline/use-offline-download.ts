@@ -25,8 +25,6 @@ export type DownloadStatus =
   | "unsupported"
   | "development";
 
-// Each cache keeps the list it was last filled from, so a changed file is fetched again.
-const REVISIONS_KEY = "/__revisions";
 // How long a download may go without receiving anything.
 const STEP_TIMEOUT = 30_000;
 // The longest the download waits for an idle moment, and the wait where browsers can't report one.
@@ -48,14 +46,11 @@ const withTimeout = <T>(promise: Promise<T>, ms = STEP_TIMEOUT) =>
     );
   });
 
+/** The listed files not cached yet. */
 async function staleFiles(cache: Cache, files: OfflineFile[]) {
-  const stored = await cache.match(REVISIONS_KEY);
-  const revisions: Record<string, string> = stored ? await stored.json() : {};
   const cached = new Set((await cache.keys()).map((request) => request.url));
   return files.filter(
-    (file) =>
-      revisions[file.url] !== file.revision ||
-      !cached.has(new URL(file.url, location.origin).href)
+    (file) => !cached.has(new URL(file.url, location.origin).href)
   );
 }
 
@@ -70,13 +65,16 @@ interface CacheGroup extends OfflineGroup {
   stale: OfflineFile[];
 }
 
-const saveRevisions = (group: CacheGroup) =>
-  group.cache.put(
-    REVISIONS_KEY,
-    Response.json(
-      Object.fromEntries(group.files.map((file) => [file.url, file.revision]))
-    )
+/** Forget cached files the list no longer has, such as those of a course since changed. */
+async function pruneCache(group: CacheGroup) {
+  const listed = new Set(
+    group.files.map((file) => new URL(file.url, location.origin).href)
   );
+  const obsolete = (await group.cache.keys()).filter(
+    (request) => !listed.has(request.url)
+  );
+  await Promise.all(obsolete.map((request) => group.cache.delete(request)));
+}
 
 async function readCacheGroups(lists: OfflineFiles) {
   return await Promise.all(
@@ -147,7 +145,7 @@ async function fillFromPack(
   return true;
 }
 
-/** Fill every stale file, recording each cache's file list once all of its files are in. */
+/** Fill every stale file, then drop what each cache no longer needs once all of its files are in. */
 async function fillCaches(groups: CacheGroup[], callbacks: DownloadCallbacks) {
   const total = groups.reduce((sum, group) => sum + group.files.length, 0);
   let completed =
@@ -169,7 +167,7 @@ async function fillCaches(groups: CacheGroup[], callbacks: DownloadCallbacks) {
         !group.stale.length ||
         (await fillFromPack(group, callbacks.isActive, onFile))
       ) {
-        await saveRevisions(group);
+        await pruneCache(group);
       }
     })
   );
