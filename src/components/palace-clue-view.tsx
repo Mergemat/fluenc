@@ -3,10 +3,10 @@ import { Link, useCanGoBack } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useMemo } from "react";
 import { useGoBack } from "../hooks/use-go-back";
-import { buildPalaceBoard, type ClueKind } from "../lib/palace-board";
+import type { ClueKind } from "../lib/palace-board";
 import { getToneDetail } from "../lib/tones";
 import { cn } from "../lib/utils";
-import { useLibrary, usePalace } from "../progress/views";
+import { useLibrary, usePalaceBoard } from "../progress/views";
 import { ClueCode } from "./character-studio/clue-code";
 import { type ClueRow, clueRows, kindStyle } from "./palace-rows";
 import {
@@ -106,13 +106,13 @@ export function PalaceClueView({
   clueKey: string;
 }) {
   const library = useLibrary();
-  const palace = usePalace();
+  const board = usePalaceBoard();
   const row = useMemo(
     () =>
-      clueRows(buildPalaceBoard(library, palace)).find(
+      clueRows(board).find(
         (entry) => entry.kind === kind && entry.key === clueKey
       ),
-    [library, palace, kind, clueKey]
+    [board, kind, clueKey]
   );
   const characters = useMemo(() => {
     const byId = new Map(

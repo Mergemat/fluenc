@@ -11,7 +11,7 @@ import { Status, statusAction } from "../components/ui/layout";
 import { Toaster } from "../components/ui/sonner";
 import { OfflineDownloadProvider } from "../offline/offline-download-provider";
 import { useSync } from "../progress/use-sync";
-import { loadLearner, useDashboard } from "../progress/views";
+import { loadLearner } from "../progress/views";
 import { useAppUpdate } from "../updates/use-app-update";
 
 export const Route = createFileRoute("/_app")({
@@ -27,14 +27,13 @@ export const Route = createFileRoute("/_app")({
 });
 
 function AppLayout() {
-  const data = useDashboard();
   const pathname = useLocation({ select: (location) => location.pathname });
   useSync();
   useAppUpdate();
 
   return (
     <OfflineDownloadProvider>
-      <AppShell data={data} pathname={pathname}>
+      <AppShell pathname={pathname}>
         <Outlet />
       </AppShell>
       <Toaster />

@@ -21,7 +21,7 @@ import type { ReviewItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { previewDue, waitLabel } from "../lib/review-schedule";
 import { cn } from "../lib/utils";
-import { saveReview, takeBackReview, useSave } from "../progress/actions";
+import { saveReview, takeBackReview } from "../progress/actions";
 import { useReviewBack } from "../progress/views";
 import { ClueCode } from "./character-studio/clue-code";
 import { lessonClues } from "./character-studio/clues";
@@ -457,7 +457,6 @@ interface Leaving {
  * save that fails puts it back. The graded card stays on the pile, thrown, until its throw ends.
  */
 function useGrading(due: ReviewItem[], onRestore: (item: ReviewItem) => void) {
-  const { mutateAsync } = useSave(saveReview);
   const [graded, setGraded] = useState<ReadonlySet<string>>(() => new Set());
   // A saved grade gives its card a new key. Forget the old one, since taking the review back brings
   // the card back under it.
@@ -507,13 +506,8 @@ function useGrading(due: ReviewItem[], onRestore: (item: ReviewItem) => void) {
         gone(key);
       }, THROWN_FALLBACK_MS);
       timers.current.add(timer);
-      const settle = window.setTimeout(() => {
-        timers.current.delete(settle);
-        setSettled(true);
-      }, SETTLE_MS);
-      timers.current.add(settle);
       const save = () =>
-        mutateAsync({
+        saveReview({
           itemType: item.type,
           itemId: item.id,
           rating,
@@ -528,18 +522,22 @@ function useGrading(due: ReviewItem[], onRestore: (item: ReviewItem) => void) {
           setFailed(true);
           onRestore(item);
         });
-      const saveTimer = window.setTimeout(() => {
-        saves.current.delete(saveTimer);
-        save();
+      // The throw ends: the deck settles and the save goes, in one render. A flush may have sent
+      // the save already.
+      const settle = window.setTimeout(() => {
+        timers.current.delete(settle);
+        setSettled(true);
+        saves.current.get(settle)?.();
+        saves.current.delete(settle);
       }, SETTLE_MS);
-      saves.current.set(saveTimer, save);
+      timers.current.add(settle);
+      saves.current.set(settle, save);
     },
-    [mutateAsync, gone, onRestore]
+    [gone, onRestore]
   );
-  // Saves waiting on a throw go now, so whatever runs next sees them.
+  // Saves waiting on a throw go now, so whatever runs next sees them; the throws still settle.
   const flush = useCallback(() => {
     for (const [timer, save] of saves.current) {
-      window.clearTimeout(timer);
       saves.current.delete(timer);
       save();
     }
@@ -558,13 +556,13 @@ function useBack(
   pending: boolean
 ) {
   const memory = useReviewBack();
-  const { mutate } = useSave(takeBackReview);
   const canTakeBack = pending || memory.canTakeBack;
   const goBack = useCallback(() => {
     flush();
     onBack();
-    mutate(undefined);
-  }, [flush, onBack, mutate]);
+    // A failed take-back leaves the review as it was, which the deck already shows.
+    takeBackReview().catch(() => undefined);
+  }, [flush, onBack]);
   const onKey = useEffectEvent((event: KeyboardEvent) => {
     if (
       event.key !== "Backspace" ||

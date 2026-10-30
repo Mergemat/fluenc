@@ -12,17 +12,16 @@ import {
   Settings,
   Sun,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useSyncExternalStore } from "react";
 import { useHydrated } from "../hooks/use-hydrated";
 
-import type { DashboardData } from "../lib/learner-views";
 import { cn } from "../lib/utils";
 import {
   type SyncAttention,
   syncAttention,
   useSyncStatus,
 } from "../progress/sync";
-import { useProfile } from "../progress/views";
+import { useDueCount, useProfile } from "../progress/views";
 import { AppScroll } from "./app-scroll";
 import { DitherGradient } from "./dither-kit/gradient";
 import { BrandMark } from "./ui/brand-mark";
@@ -59,6 +58,16 @@ export const iconButton =
 /** The due-review count on the review tab. */
 const badge =
   "box-border h-4 min-w-5 rounded-sm bg-primary px-1 text-center type-micro text-primary-foreground leading-4";
+
+// The theme's `lg` breakpoint, where the sidebar shows.
+const WIDE = "(min-width: 1024px)";
+const subscribeToWide = (onChange: () => void) => {
+  const query = window.matchMedia(WIDE);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+};
+const isWide = () => window.matchMedia(WIDE).matches;
+const notWide = () => false;
 
 /** How far through the course the learner is, learned and learning; shown in the desktop sidebar. */
 function CourseProgress() {
@@ -124,15 +133,13 @@ function SyncMark() {
 }
 
 export function AppShell({
-  data,
   pathname,
   children,
 }: {
-  data: DashboardData;
   pathname: string;
   children: ReactNode;
 }) {
-  const due = data.reviewQueue.length;
+  const due = useDueCount();
   const fixed =
     pathname.startsWith("/lessons") ||
     pathname.startsWith("/review") ||
@@ -146,6 +153,8 @@ export function AppShell({
   // dither-kit paints its canvases in effects, so server HTML has none of them. Hold the shell
   // until hydration: children's effects (the canvas paints) run before this one flips it on.
   const hydrated = useHydrated();
+  // The sidebar's course meters work out the whole profile; a phone never shows them.
+  const wide = useSyncExternalStore(subscribeToWide, isWide, notWide);
 
   return (
     <div
@@ -203,7 +212,7 @@ export function AppShell({
             </Link>
           ))}
         </nav>
-        <CourseProgress />
+        {wide ? <CourseProgress /> : null}
         {corner.map((item, index) => (
           <Link
             activeProps={{ "aria-current": "page" }}

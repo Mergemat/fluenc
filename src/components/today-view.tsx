@@ -20,7 +20,7 @@ import type { BuildItem, DashboardData } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { nextReviews } from "../lib/review-schedule";
 import { cn } from "../lib/utils";
-import { useProfile } from "../progress/views";
+import { useIntroductions } from "../progress/views";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import { action, actionKey } from "./ui/buttons";
@@ -248,7 +248,7 @@ function Later({
 
 /** This week's days with something new, the way the profile's graph counts them. */
 function useWeek() {
-  const { introductions } = useProfile();
+  const introductions = useIntroductions();
   const today = dayKey(new Date());
   return useMemo(() => {
     const now = dateOfKey(today);

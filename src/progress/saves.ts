@@ -1,29 +1,22 @@
 // Saves still being written on this device. A reload waits for them, and each finished save tells
 // sync there is something to send.
-import { useSyncExternalStore } from "react";
-
 const running = new Set<Promise<unknown>>();
-const changeListeners = new Set<() => void>();
 const savedListeners = new Set<() => void>();
-
-function notify(listeners: Set<() => void>) {
-  for (const listener of listeners) {
-    listener();
-  }
-}
 
 /** Follow a save until it is written or has failed. */
 export function trackSave<T>(save: Promise<T>): Promise<T> {
   running.add(save);
-  notify(changeListeners);
   save.then(
-    () => notify(savedListeners),
+    () => {
+      for (const listener of savedListeners) {
+        listener();
+      }
+    },
     () => undefined
   );
   save
     .finally(() => {
       running.delete(save);
-      notify(changeListeners);
     })
     .catch(() => undefined);
   return save;
@@ -43,16 +36,4 @@ export function onSaved(listener: () => void) {
   return () => {
     savedListeners.delete(listener);
   };
-}
-
-const subscribe = (listener: () => void) => {
-  changeListeners.add(listener);
-  return () => {
-    changeListeners.delete(listener);
-  };
-};
-const isSaving = () => running.size > 0;
-
-export function useSaving() {
-  return useSyncExternalStore(subscribe, isSaving, () => false);
 }

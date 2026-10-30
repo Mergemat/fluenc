@@ -115,15 +115,6 @@ export function byTable(changes: RowChange[]) {
   return rows;
 }
 
-// The catalog is rebuilt for each new focus list, so an unchanged list keeps its array.
-let lastFocus: FocusEntry[] = [];
-function stableFocus(focus: FocusEntry[]) {
-  if (JSON.stringify(focus) !== JSON.stringify(lastFocus)) {
-    lastFocus = focus;
-  }
-  return lastFocus;
-}
-
 /** Learner state from rows; missing tables count as empty. */
 export function stateOf(
   rows: {
@@ -148,9 +139,7 @@ export function stateOf(
   for (const row of rows.livingLinks ?? []) {
     state.livingLinks[row.wordId] = row.story;
   }
-  state.focus = stableFocus(
-    [...(rows.focus ?? [])].map(focusOf).sort(byAddedAt)
-  );
+  state.focus = [...(rows.focus ?? [])].map(focusOf).sort(byAddedAt);
   return state;
 }
 

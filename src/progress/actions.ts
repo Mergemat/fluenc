@@ -94,12 +94,14 @@ function showOptimistic({
       collection.insert(row);
     }
   }
-  device.update(DEVICE, (draft) =>
-    replace(draft as unknown as Record<string, unknown>, {
-      id: DEVICE,
-      ...memory,
-    } satisfies DeviceRow)
-  );
+  const row: DeviceRow = { id: DEVICE, ...memory };
+  if (device.has(DEVICE)) {
+    device.update(DEVICE, (draft) =>
+      replace(draft as unknown as Record<string, unknown>, row)
+    );
+  } else {
+    device.insert(row);
+  }
 }
 
 /** Write an intent to the device and show the rows it wrote. */
@@ -137,12 +139,18 @@ const save = createOptimisticAction<Intent>({
 
 /** Save an intent. Resolves once it is on the device; rejects, and undoes it, if it cannot be. */
 function run(intent: Intent) {
-  const transaction = save(intent);
-  // A transaction that changed nothing on screen ends without running its handler, but the
-  // intent is still saved and sent: the device's rows may differ from the screen's.
-  const saving = transaction.mutations.length
-    ? transaction.when("settled").then(() => undefined)
-    : persist(intent);
+  let saving: Promise<void>;
+  try {
+    const transaction = save(intent);
+    // A transaction that changed nothing on screen ends without running its handler, but the
+    // intent is still saved and sent: the device's rows may differ from the screen's.
+    saving = transaction.mutations.length
+      ? transaction.when("settled").then(() => undefined)
+      : persist(intent);
+  } catch (error) {
+    // Callers hear about every failure the same way: the save rejects.
+    saving = Promise.reject(error);
+  }
   return trackSave(saving);
 }
 

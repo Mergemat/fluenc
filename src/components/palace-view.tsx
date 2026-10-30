@@ -11,9 +11,9 @@ import {
   useRef,
 } from "react";
 
-import { buildPalaceBoard, type ClueKind } from "../lib/palace-board";
+import type { ClueKind } from "../lib/palace-board";
 import { cn } from "../lib/utils";
-import { useLibrary, usePalace } from "../progress/views";
+import { usePalaceBoard } from "../progress/views";
 import { ClueCode } from "./character-studio/clue-code";
 import { DitherGradient } from "./dither-kit/gradient";
 import {
@@ -67,14 +67,10 @@ export function PalaceView() {
     },
     [navigate]
   );
-  const library = useLibrary();
-  const palace = usePalace();
+  const board = usePalaceBoard();
   const input = useRef<HTMLInputElement>(null);
   const query = useDeferredValue(q.trim().toLowerCase());
-  const rows = useMemo(
-    () => clueRows(buildPalaceBoard(library, palace)),
-    [library, palace]
-  );
+  const rows = useMemo(() => clueRows(board), [board]);
   const matching = rows.filter(
     (row) =>
       !query ||

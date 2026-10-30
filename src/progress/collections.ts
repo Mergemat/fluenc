@@ -147,10 +147,15 @@ const sources = {
   livingLinks: tableSource("livingLinks"),
   focus: tableSource("focus"),
 };
+let publishedMemory: string | null = null;
 const deviceSource = deviceCollection(
   DEVICE,
   (row: DeviceRow) => row.id,
-  async () => [deviceRow(await readDeviceMemory())]
+  async () => {
+    const memory = await readDeviceMemory();
+    publishedMemory = JSON.stringify(memory);
+    return [deviceRow(memory)];
+  }
 );
 
 export const cards = sources.cards.collection;
@@ -190,7 +195,13 @@ export function publish(saved: Saved) {
       }
     ).publish(changes, saved.reset);
   }
-  deviceSource.publish([{ key: DEVICE, row: deviceRow(saved.memory) }]);
+  // Most saves and syncs leave what the device remembers as it was. Compared with what was last
+  // published rather than what shows, which may be a save's guess still on its way.
+  const memory = JSON.stringify(saved.memory);
+  if (memory !== publishedMemory) {
+    publishedMemory = memory;
+    deviceSource.publish([{ key: DEVICE, row: deviceRow(saved.memory) }]);
+  }
 }
 
 const CHANNEL = "fluenc-progress";

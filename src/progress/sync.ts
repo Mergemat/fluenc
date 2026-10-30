@@ -36,7 +36,19 @@ let status: SyncStatus = {
 };
 const statusListeners = new Set<() => void>();
 
+const sameLearner = (left: Learner | null, right: Learner | null) =>
+  left === right || (left?.id === right?.id && left?.email === right?.email);
+
+/** Change the status, telling readers only when something they show changed. */
 function setStatus(next: Partial<SyncStatus>) {
+  const changed = (Object.keys(next) as (keyof SyncStatus)[]).some((field) =>
+    field === "learner"
+      ? !sameLearner(status.learner, next.learner ?? null)
+      : status[field] !== next[field]
+  );
+  if (!changed) {
+    return;
+  }
   status = { ...status, ...next };
   for (const listener of statusListeners) {
     listener();

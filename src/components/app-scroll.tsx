@@ -8,7 +8,6 @@ import {
   useSyncExternalStore,
 } from "react";
 
-import { useSaving } from "../progress/saves";
 import { reloadApp } from "../updates/use-app-update";
 import {
   IonContent,
@@ -39,7 +38,6 @@ export function AppScroll({
   children: ReactNode;
   pathname: string;
 }) {
-  const pending = useSaving();
   const content = useRef<HTMLIonContentElement>(null);
   const refresher = useRef<HTMLIonRefresherElement>(null);
   // The pull gesture: whether a finger is down, and whether releasing it should refresh.
@@ -81,18 +79,14 @@ export function AppScroll({
     }, 450);
   }, []);
   const refresh = useCallback(
-    (event: RefresherCustomEvent) => {
-      if (pending) {
-        event.detail.complete();
-        return;
-      }
+    (_event: RefresherCustomEvent) => {
       // Native iOS reaches this state before release; refresh once the finger lifts.
       pull.current.refresh = true;
       if (!pull.current.touching) {
         scheduleRefresh();
       }
     },
-    [pending, scheduleRefresh]
+    [scheduleRefresh]
   );
   const startTouch = useCallback(() => {
     pull.current.touching = true;
@@ -133,7 +127,7 @@ export function AppScroll({
     >
       <IonRefresher
         // A reload would lose a lesson's half-written Hanzi Movie.
-        disabled={!standalone || pending || pathname.startsWith("/lessons")}
+        disabled={!standalone || pathname.startsWith("/lessons")}
         onIonRefresh={refresh}
         ref={refresher}
         slot="fixed"

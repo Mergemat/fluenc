@@ -3,13 +3,8 @@ import { State } from "ts-fsrs";
 import { type Catalog, catalogFor } from "./catalog";
 import { characterIsWord } from "./character-words";
 import { cardKey, type LearnerState, parseCardKey } from "./learner-state";
-import {
-  deriveLibrary,
-  derivePalace,
-  type LibraryData,
-  type PalaceData,
-} from "./learner-views";
-import { buildPalaceBoard } from "./palace-board";
+import { deriveLibrary, derivePalace, type LibraryData } from "./learner-views";
+import { buildPalaceBoard, type PalaceBoard } from "./palace-board";
 
 export type TrackId = "characters" | "words" | "sentences";
 type Status = "new" | "learning" | "review";
@@ -34,6 +29,17 @@ function split(statuses: Status[]) {
   };
 }
 
+/** When each introduced item was met; items saved before dates were recorded have none. */
+export function introductionsOf(cards: LearnerState["cards"]) {
+  const introductions: string[] = [];
+  for (const [key, card] of Object.entries(cards)) {
+    if (card.introducedAt && parseCardKey(key)) {
+      introductions.push(card.introducedAt);
+    }
+  }
+  return introductions;
+}
+
 /**
  * Characters, words and sentences, each as learned, learning and still to come, with when each
  * was met; every introduction, for the activity graph; and how many palace clues have a name.
@@ -44,20 +50,16 @@ export function deriveProfile(
   catalog: Catalog = catalogFor(state),
   // Callers that already hold these views pass them in rather than deriving them again.
   library: LibraryData = deriveLibrary(state, catalog),
-  palace: PalaceData = derivePalace(state)
+  board: PalaceBoard = buildPalaceBoard(library, derivePalace(state))
 ) {
-  const board = buildPalaceBoard(library, palace);
-
   const characterDates: string[] = [];
   const sentenceDates: string[] = [];
   const wordIntroducedAt = new Map<string, string>();
-  const introductions: string[] = [];
   for (const [key, card] of Object.entries(state.cards)) {
     const target = parseCardKey(key);
     if (!(target && card.introducedAt)) {
       continue;
     }
-    introductions.push(card.introducedAt);
     let hanzi: string | undefined;
     if (target.type === "character") {
       characterDates.push(card.introducedAt);
@@ -117,7 +119,7 @@ export function deriveProfile(
   return {
     tracks,
     /** Every dated introduction: what the activity graph counts. */
-    introductions,
+    introductions: introductionsOf(state.cards),
     /** Clues with a learner's name, counted like the palace page. */
     palace: {
       named: clues.filter((clue) => clue.name).length,
