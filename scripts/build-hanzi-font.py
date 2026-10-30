@@ -1,4 +1,4 @@
-"""Encode the studio's existing SVG outlines as a shared, static WOFF2 font."""
+"""Encode stroke outlines as a static WOFF2 font: one glyph per code point in the input."""
 import json
 import sys
 from pathlib import Path
@@ -11,9 +11,11 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.svgLib.path import parse_path
 from fontTools.ttLib import TTFont
 
-entries = json.loads(Path(sys.argv[1]).read_text())
+request = json.loads(Path(sys.argv[1]).read_text())
+entries = request['glyphs']
+family = request['family']
 font = FontBuilder(1024, isTTF=True)
-names = {ord(entry['character']): f'uni{ord(entry["character"]):04X}' for entry in entries}
+names = {entry['codePoint']: f'u{entry["codePoint"]:04X}' for entry in entries}
 font.setupGlyphOrder(['.notdef', *names.values()])
 font.setupCharacterMap(names)
 glyphs = {'.notdef': TTGlyphPen(None).glyph()}
@@ -30,19 +32,19 @@ for entry in entries:
     parse_path(path, target)
     glyph = pen.glyph()
     if not glyph.numberOfContours:
-        raise ValueError(f'Empty glyph: {entry["character"]}')
+        raise ValueError(f'Empty glyph: U+{entry["codePoint"]:04X}')
     # Stroke contours may overlap where the original character strokes meet.
     glyph.flags[0] |= 0x40
-    glyphs[names[ord(entry['character'])]] = glyph
+    glyphs[names[entry['codePoint']]] = glyph
 font.setupGlyf(glyphs)
 font.setupHorizontalMetrics({name: (1024, glyph.xMin if glyph.numberOfContours else 0) for name, glyph in glyphs.items()})
 font.setupHorizontalHeader(ascent=900, descent=-124)
 font.setupNameTable({
-    'familyName': 'Fluenc Hanzi',
+    'familyName': family,
     'styleName': 'Regular',
-    'uniqueFontIdentifier': 'Fluenc Hanzi 1.0',
-    'fullName': 'Fluenc Hanzi',
-    'psName': 'FluencHanzi',
+    'uniqueFontIdentifier': f'{family} 1.0',
+    'fullName': family,
+    'psName': family.replace(' ', ''),
     'version': 'Version 1.0',
     'copyright': 'Copyright (C) 1999 Arphic Technology Co., Ltd. Modified by Fluenc, 2026-09-11: studio stroke outlines encoded as WOFF2; standalone components extracted and centered.',
     'licenseDescription': 'Arphic Public License. This modified font is freely available under the same license.',
@@ -54,9 +56,9 @@ font.setupMaxp()
 font.font['head'].created = font.font['head'].modified = 3871929600
 font.font.recalcTimestamp = False
 font.font.flavor = 'woff2'
-output = Path('assets/fonts/fluenc-hanzi.woff2')
+output = Path(request['output'])
 font.save(output)
 encoded = TTFont(output)
 if set(encoded.getBestCmap()) != set(names):
     raise ValueError('Font encoding lost required characters')
-print(f'Built {output}: {len(names)} glyphs, {output.stat().st_size} bytes; {sum(entry["normalize"] for entry in entries)} component shapes extracted from lessons.')
+print(f'Built {output}: {len(names)} glyphs, {output.stat().st_size} bytes.')

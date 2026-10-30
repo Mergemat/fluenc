@@ -47,13 +47,9 @@ function versionOf(dir: string, extension: string) {
   return hash.digest("hex").slice(0, 12);
 }
 
-// Stroke files and recordings are served under a path named by their content, so a device keeps
-// each one for good and fetches it again only when the course changes it.
+// Recordings are served under a path named by their content, so a device keeps each one for good
+// and fetches it again only when they change.
 const versioned = {
-  strokes: {
-    dir: "assets/strokes",
-    url: `/strokes/${versionOf("assets/strokes", ".json")}`,
-  },
   audio: {
     dir: "assets/audio",
     url: `/audio/${versionOf("assets/audio", ".mp3")}`,
@@ -68,10 +64,11 @@ const staticFolders = {
   licenses: DAY,
 };
 
+const FONT_CHUNK = /\/assets\/fonts\/web\/[^/]+\/\d+\.woff2$/;
+
 export default defineConfig({
   resolve: { tsconfigPaths: true },
   define: {
-    "import.meta.env.FLUENC_STROKES": JSON.stringify(versioned.strokes.url),
     "import.meta.env.FLUENC_AUDIO": JSON.stringify(versioned.audio.url),
   },
   server: {
@@ -83,6 +80,10 @@ export default defineConfig({
       build: {
         // `bun run bench --profile` reads function names from the profile.
         minify: process.env.FLUENC_UNMINIFIED !== "1",
+        // A font chunk is fetched only when its characters are on screen; inlined, every page would
+        // download it.
+        assetsInlineLimit: (file) =>
+          FONT_CHUNK.test(file) ? false : undefined,
         rolldownOptions: {
           // The course catalog and sentences ship with the app. Their own chunks keep their hash,
           // so a code change does not re-download the course.

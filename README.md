@@ -55,7 +55,7 @@ VS Code suggests the Biome and Tailwind extensions and formats on save.
 | `bun run db:generate` / `db:migrate` | Create a migration after changing `src/db/schema.ts`, or apply migrations |
 | `bun run focus` | Add, list or remove focus words and sentences for an account |
 | `bun run data:sync` | Check the character database in `src/data/hanzi`, then rebuild the curriculum, reading sentences and stroke owners from it |
-| `bun run data:font` | Rebuild the hanzi font |
+| `bun run data:font` | Rebuild the hanzi fonts |
 
 `src/data/README.md` explains the character database, the teaching order and how to change them.
 

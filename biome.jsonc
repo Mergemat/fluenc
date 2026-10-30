@@ -13,7 +13,7 @@
     // The preset already includes everything else. Generated or pinned data: written by scripts
     // and drizzle-kit, served as-is, or kept verbatim.
     "includes": [
-      "!!**/assets/strokes",
+      "!!**/assets/strokes.json",
       "!!**/drizzle",
       "!!**/src/data/dictionary.source.json",
       "!!**/docs"

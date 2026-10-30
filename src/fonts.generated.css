@@ -664,3 +664,213 @@
   unicode-range: U+5317, U+540E, U+5546, U+5757, U+6267, U+6628, U+684C, U+6905, U+6C99, U+70ED, U+8089, U+82D7;
   font-display: swap;
 }
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/0.woff2") format("woff2");
+  unicode-range: U+F0000-F002E;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/1.woff2") format("woff2");
+  unicode-range: U+F002F-F0064;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/2.woff2") format("woff2");
+  unicode-range: U+F0065-F0099;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/3.woff2") format("woff2");
+  unicode-range: U+F009A-F00CA;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/4.woff2") format("woff2");
+  unicode-range: U+F00CB-F00FE;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/5.woff2") format("woff2");
+  unicode-range: U+F00FF-F0131;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/6.woff2") format("woff2");
+  unicode-range: U+F0132-F0166;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/7.woff2") format("woff2");
+  unicode-range: U+F0167-F019B;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/8.woff2") format("woff2");
+  unicode-range: U+F019C-F01CA;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/9.woff2") format("woff2");
+  unicode-range: U+F01CB-F01FE;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/10.woff2") format("woff2");
+  unicode-range: U+F01FF-F0235;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/11.woff2") format("woff2");
+  unicode-range: U+F0236-F026B;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/12.woff2") format("woff2");
+  unicode-range: U+F026C-F029E;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/13.woff2") format("woff2");
+  unicode-range: U+F029F-F02CF;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/14.woff2") format("woff2");
+  unicode-range: U+F02D0-F0308;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/15.woff2") format("woff2");
+  unicode-range: U+F0309-F033D;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/16.woff2") format("woff2");
+  unicode-range: U+F033E-F0374;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/17.woff2") format("woff2");
+  unicode-range: U+F0375-F03A5;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/18.woff2") format("woff2");
+  unicode-range: U+F03A6-F03D9;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/19.woff2") format("woff2");
+  unicode-range: U+F03DA-F0409;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/20.woff2") format("woff2");
+  unicode-range: U+F040A-F043D;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/21.woff2") format("woff2");
+  unicode-range: U+F043E-F0475;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/22.woff2") format("woff2");
+  unicode-range: U+F0476-F04AA;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/23.woff2") format("woff2");
+  unicode-range: U+F04AB-F04DF;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/24.woff2") format("woff2");
+  unicode-range: U+F04E0-F0515;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/25.woff2") format("woff2");
+  unicode-range: U+F0516-F054A;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/26.woff2") format("woff2");
+  unicode-range: U+F054B-F0580;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/27.woff2") format("woff2");
+  unicode-range: U+F0581-F05B7;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/28.woff2") format("woff2");
+  unicode-range: U+F05B8-F05E5;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fluenc Hanzi Parts";
+  src: url("../assets/fonts/web/fluenc-hanzi-parts/29.woff2") format("woff2");
+  unicode-range: U+F05E6-F05FA;
+  font-display: swap;
+}

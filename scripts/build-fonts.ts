@@ -12,6 +12,7 @@
 import { mkdir, rm } from "node:fs/promises";
 
 import curriculum from "../src/data/curriculum.generated.json";
+import { partCodePoint, partsOf } from "../src/lib/glyph-parts";
 
 const python = Bun.env.FLUENC_FONT_PYTHON ?? "python3";
 const WEB = "assets/fonts/web";
@@ -80,12 +81,14 @@ function unicodeRange(codePoints: number[]) {
   return ranges.join(", ");
 }
 
+const byTeachingOrder = curriculum.characters.toSorted(
+  (left, right) => left.order - right.order
+);
+
 /** Every character and component the course draws, in the order it is taught. */
 const taught: number[] = [];
 const seen = new Set<string>();
-for (const character of curriculum.characters.toSorted(
-  (left, right) => left.order - right.order
-)) {
+for (const character of byTeachingOrder) {
   for (const glyph of [character.hanzi, ...character.components]) {
     if (!seen.has(glyph)) {
       seen.add(glyph);
@@ -101,18 +104,38 @@ interface Face {
   weight?: string;
 }
 
-/** Cut a Chinese font into chunks of `CHUNK` taught characters, in teaching order. */
-async function chunk(source: string, name: string, family: string) {
+/** Teaching order cut into runs of `CHUNK`, each with the code points `pick` gives its members. */
+function runs<T>(items: T[], pick: (item: T) => number[]) {
+  const groups: number[][] = [];
+  for (let index = 0; index * CHUNK < items.length; index += 1) {
+    groups.push(items.slice(index * CHUNK, (index + 1) * CHUNK).flatMap(pick));
+  }
+  return groups;
+}
+
+/**
+ * Cut a Chinese font into one file per group of code points. A font set in lines of text needs a
+ * metrics face as well.
+ */
+async function chunk(
+  source: string,
+  name: string,
+  family: string,
+  groups: number[][],
+  inLines = true
+) {
   await rm(`${WEB}/${name}`, { recursive: true, force: true });
   await mkdir(`${WEB}/${name}`, { recursive: true });
-  // A browser takes a line's height and baseline from the first face whose range has a space. No
-  // chunk has one, so a face holding only the space comes first, or the fallback font's metrics
-  // would move every character.
-  const metrics = `${WEB}/${name}/metrics.woff2`;
-  await subset(source, metrics, "U+0020");
-  const faces: Face[] = [{ family, src: metrics, unicodeRange: "U+0020" }];
-  for (let index = 0; index * CHUNK < taught.length; index += 1) {
-    const codePoints = taught.slice(index * CHUNK, (index + 1) * CHUNK);
+  const faces: Face[] = [];
+  if (inLines) {
+    // A browser takes a line's height and baseline from the first face whose range has a space.
+    // No chunk has one, so a face holding only the space comes first, or the fallback font's
+    // metrics would move every character.
+    const metrics = `${WEB}/${name}/metrics.woff2`;
+    await subset(source, metrics, "U+0020");
+    faces.push({ family, src: metrics, unicodeRange: "U+0020" });
+  }
+  for (const [index, codePoints] of groups.entries()) {
     const range = unicodeRange(codePoints);
     const file = `${WEB}/${name}/${index}.woff2`;
     // biome-ignore lint/performance/noAwaitInLoops: one FontTools process at a time keeps memory low.
@@ -157,15 +180,29 @@ const faces = [
   ...(await chunk(
     "assets/fonts/fluenc-hanzi.woff2",
     "fluenc-hanzi",
-    "Fluenc Hanzi"
+    "Fluenc Hanzi",
+    runs(taught, (codePoint) => [codePoint])
   )),
   ...(
     await chunk(
       "assets/fonts/noto-sans-sc-props.woff2",
       "noto-sans-sc-props",
-      "Noto Sans CJK SC"
+      "Noto Sans CJK SC",
+      runs(taught, (codePoint) => [codePoint])
     )
   ).map((face) => ({ ...face, weight: "400" })),
+  // Drawn only as SVG text, never in a line.
+  ...(await chunk(
+    "assets/fonts/fluenc-hanzi-parts.woff2",
+    "fluenc-hanzi-parts",
+    "Fluenc Hanzi Parts",
+    runs(byTeachingOrder, (character) =>
+      partsOf(character).flatMap(
+        (part) => partCodePoint(character.hanzi, part) ?? []
+      )
+    ),
+    false
+  )),
 ];
 await Bun.write(
   "src/fonts.generated.css",

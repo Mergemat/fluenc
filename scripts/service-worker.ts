@@ -17,7 +17,6 @@ declare const self: ServiceWorkerGlobalScope & {
   __WB_MANIFEST: PrecacheEntry[];
 };
 
-const STROKES_PATH = /^\/strokes\/[^/]+\/[^/]+\.json$/;
 const AUDIO_PATH = /^\/audio\/[^/]+\/[^/]+\.mp3$/;
 
 // A new version waits until the learner asks for it (see use-app-update), so a
@@ -65,12 +64,7 @@ registerRoute(
   })
 );
 
-// The page fills these caches (useOfflineDownload); anything it hasn't reached yet is cached on first use.
-registerRoute(
-  ({ url }) =>
-    url.origin === self.location.origin && STROKES_PATH.test(url.pathname),
-  new CacheFirst({ cacheName: OFFLINE_CACHES.strokes })
-);
+// The page fills this cache (useOfflineDownload); anything it hasn't reached yet is cached on first use.
 registerRoute(
   ({ url }) =>
     url.origin === self.location.origin && AUDIO_PATH.test(url.pathname),

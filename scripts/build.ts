@@ -70,7 +70,7 @@ if (!result.count) {
   throw new Error("Service worker has no assets to precache");
 }
 
-// Audio and strokes download from the page after install; see src/offline/files.ts.
+// Audio downloads from the page after install; see src/offline/files.ts.
 const md5 = (bytes: Uint8Array) => {
   const hasher = new Bun.CryptoHasher("md5");
   hasher.update(bytes);
@@ -78,8 +78,7 @@ const md5 = (bytes: Uint8Array) => {
 };
 const packGroup = async (
   name: string,
-  pattern: string,
-  json: boolean
+  pattern: string
 ): Promise<OfflineGroup> => {
   const files: Parameters<typeof packFiles>[0] = [];
   for await (const path of new Bun.Glob(pattern).scan({
@@ -89,18 +88,17 @@ const packGroup = async (
     files.push({ url: `/${path}`, bytes });
   }
   files.sort((a, b) => a.url.localeCompare(b.url));
-  const packed = packFiles(files, json);
+  const packed = packFiles(files);
   // Named by its content, so it can be cached for good; see the /offline rule in vite.config.ts.
-  const pack = `/offline/${name}.${md5(packed.bytes)}.${json ? "json" : "bin"}`;
+  const pack = `/offline/${name}.${md5(packed.bytes)}.bin`;
   await Bun.write(resolve(publicDirectory, pack.slice(1)), packed.bytes);
   return { pack, size: packed.bytes.length, files: packed.files };
 };
 const offlineFiles: OfflineFiles = {
-  // One folder each, named by its content (see vite.config.ts).
-  audio: await packGroup("audio", "audio/*/*.mp3", false),
-  strokes: await packGroup("strokes", "strokes/*/*.json", true),
+  // A folder named by its content (see vite.config.ts).
+  audio: await packGroup("audio", "audio/*/*.mp3"),
 };
-if (!(offlineFiles.audio.files.length && offlineFiles.strokes.files.length)) {
+if (!offlineFiles.audio.files.length) {
   throw new Error("Offline practice files are missing");
 }
 await Bun.write(

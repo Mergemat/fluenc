@@ -256,8 +256,8 @@ function kindOf(url: string) {
   if (pathname.startsWith("/offline/")) {
     return "offline packs";
   }
-  if (pathname.startsWith("/strokes/") || pathname.startsWith("/audio/")) {
-    return "strokes and audio";
+  if (pathname.startsWith("/audio/")) {
+    return "audio";
   }
   if (COURSE_DATA.test(pathname)) {
     return "course data";

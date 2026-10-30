@@ -10,6 +10,7 @@ import {
   type OfflineFile,
   type OfflineFiles,
   type OfflineGroup,
+  RETIRED_CACHES,
 } from "./files";
 
 export interface DownloadProgress {
@@ -213,6 +214,8 @@ async function downloadOfflineFiles(
     return "idle";
   }
   await fillCaches(groups, callbacks);
+  // Characters are drawn from fonts now; their stroke files only take up room.
+  await Promise.all(RETIRED_CACHES.map((name) => caches.delete(name)));
 
   // The app shell and course install in the service worker; progress comes from the saved learner state.
   await withTimeout(navigator.serviceWorker.ready);
