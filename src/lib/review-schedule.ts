@@ -31,19 +31,20 @@ export function reviewDueAt(due: Date, state: number): Date {
     : due;
 }
 
+/** Learning steps first, then established reviews, then newly introduced cards. */
+export function reviewPriority(state: number) {
+  if (isLearning(state)) {
+    return 0;
+  }
+  return state === State.Review ? 1 : 2;
+}
+
 export function compareReviewOrder(
   left: { due: Date | string; state: number },
   right: { due: Date | string; state: number }
 ) {
-  // Learning steps first, then established reviews, then newly introduced cards.
-  const priority = (state: number) => {
-    if (isLearning(state)) {
-      return 0;
-    }
-    return state === State.Review ? 1 : 2;
-  };
   return (
-    priority(left.state) - priority(right.state) ||
+    reviewPriority(left.state) - reviewPriority(right.state) ||
     new Date(left.due).getTime() - new Date(right.due).getTime()
   );
 }

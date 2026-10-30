@@ -3,7 +3,12 @@ import { State } from "ts-fsrs";
 import { type Catalog, catalogFor } from "./catalog";
 import { characterIsWord } from "./character-words";
 import { cardKey, type LearnerState, parseCardKey } from "./learner-state";
-import { deriveLibrary, derivePalace } from "./learner-views";
+import {
+  deriveLibrary,
+  derivePalace,
+  type LibraryData,
+  type PalaceData,
+} from "./learner-views";
 import { buildPalaceBoard } from "./palace-board";
 
 export type TrackId = "characters" | "words" | "sentences";
@@ -36,10 +41,12 @@ function split(statuses: Status[]) {
  */
 export function deriveProfile(
   state: LearnerState,
-  catalog: Catalog = catalogFor(state)
+  catalog: Catalog = catalogFor(state),
+  // Callers that already hold these views pass them in rather than deriving them again.
+  library: LibraryData = deriveLibrary(state, catalog),
+  palace: PalaceData = derivePalace(state)
 ) {
-  const library = deriveLibrary(state, catalog);
-  const board = buildPalaceBoard(library, derivePalace(state));
+  const board = buildPalaceBoard(library, palace);
 
   const characterDates: string[] = [];
   const sentenceDates: string[] = [];
