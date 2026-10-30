@@ -84,9 +84,9 @@ function CourseProgress() {
             <span>{meter.label}</span>
             <b className="font-medium text-foreground tabular-nums">
               {meter.learned + meter.learning}
-              <small className="text-faint-foreground text-xs">
+              <span className="font-normal text-muted-foreground">
                 /{meter.total}
-              </small>
+              </span>
             </b>
           </p>
           <SplitMeter

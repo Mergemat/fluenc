@@ -222,7 +222,15 @@ export function LibraryView() {
   return (
     <Page
       head={
-        <PageHeader meta={`${learned} learned · ${total}`} title="library" />
+        <PageHeader
+          meta={
+            <span>
+              <b className="font-medium text-foreground">{learned}</b> learned ·{" "}
+              {total}
+            </span>
+          }
+          title="library"
+        />
       }
     >
       <div className={controls}>

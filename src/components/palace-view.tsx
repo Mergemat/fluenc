@@ -122,7 +122,14 @@ export function PalaceView() {
     <Page
       head={
         <PageHeader
-          meta={rows.length ? `${named}/${rows.length} named` : undefined}
+          meta={
+            rows.length ? (
+              <span>
+                <b className="font-medium text-foreground">{named}</b>/
+                {rows.length} named
+              </span>
+            ) : undefined
+          }
           title={
             <>
               <Link className={crumb} to="/profile">
