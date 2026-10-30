@@ -1,7 +1,7 @@
 // Saves. Each one is an intent, applied to the rows on screen at once and then to the device's
 // rows in one transaction; the second becomes the synced rows, so the first can be dropped.
 import { createOptimisticAction, safeRandomUUID } from "@tanstack/react-db";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { studyIdentity } from "../lib/character-words";
 import { cardKey, type LearnerState } from "../lib/learner-state";
@@ -232,19 +232,19 @@ interface SaveCallbacks {
 /** A save with its state for the screen: whether it is under way, and whether the last one failed. */
 export function useSave<T = void>(saveWith: (input: T) => Promise<void>) {
   const [state, setState] = useState<"idle" | "pending" | "error">("idle");
-  // Callers pass a new function each render; the latest one runs, and `mutate` stays the same.
-  const latest = useRef(saveWith);
-  latest.current = saveWith;
-  const mutateAsync = useCallback(async (input: T) => {
-    setState("pending");
-    try {
-      await latest.current(input);
-      setState("idle");
-    } catch (error) {
-      setState("error");
-      throw error;
-    }
-  }, []);
+  const mutateAsync = useCallback(
+    async (input: T) => {
+      setState("pending");
+      try {
+        await saveWith(input);
+        setState("idle");
+      } catch (error) {
+        setState("error");
+        throw error;
+      }
+    },
+    [saveWith]
+  );
   const mutate = useCallback(
     (input: T, callbacks: SaveCallbacks = {}) => {
       mutateAsync(input).then(callbacks.onSuccess, (error: unknown) =>

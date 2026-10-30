@@ -5,7 +5,6 @@ import {
   type ChangeEvent,
   type KeyboardEvent,
   useCallback,
-  useEffectEvent,
   useRef,
   useState,
 } from "react";
@@ -68,7 +67,6 @@ export function WordLesson({ item }: { item: WordItem }) {
     }
     mutate(undefined, { onSuccess: () => toastAdded(item.hanzi) });
   }, [tooShort, isPending, mutate, item.hanzi]);
-  const onEnter = useEffectEvent(primary);
   const editStory = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => setDraft(event.target.value),
     []
@@ -91,7 +89,7 @@ export function WordLesson({ item }: { item: WordItem }) {
   useWindowKeys((event) => {
     if (event.key === "Enter" && !event.defaultPrevented && isShortcut(event)) {
       event.preventDefault();
-      onEnter();
+      primary();
     }
   });
 
