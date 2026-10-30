@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { getRouteApi } from "@tanstack/react-router";
 import { Search, X } from "lucide-react";
 import {
@@ -23,11 +22,7 @@ import {
 } from "../lib/library-index";
 import { createLibrarySearch, type LibraryEntry } from "../lib/library-search";
 import { cn } from "../lib/utils";
-import {
-  dashboardQueryOptions,
-  libraryQueryOptions,
-  palaceQueryOptions,
-} from "../offline/queries";
+import { useDashboard, useLibrary, usePalace } from "../progress/views";
 import { DitherGradient } from "./dither-kit/gradient";
 import { Chip, ChipCount } from "./ui/chip";
 import {
@@ -39,7 +34,7 @@ import {
   statusAction,
 } from "./ui/layout";
 import { progressFill, progressTrack } from "./ui/split-meter";
-import { StatusDot, Tile, tileSkeleton, Wall } from "./ui/tile";
+import { StatusDot, Tile, Wall } from "./ui/tile";
 
 const route = getRouteApi("/_app/library");
 const PAGE = 120;
@@ -56,10 +51,6 @@ const statuses = [
   { id: "learning", label: "learning" },
   { id: "new", label: "new" },
 ] as const;
-const skeletonTiles = Array.from(
-  { length: 24 },
-  (_, index) => `skeleton-${index}`
-);
 
 // The search field and filter chips over a list; the palace shares them.
 /** Search field and filters, above the results. */
@@ -226,22 +217,21 @@ export function LibraryView() {
     },
     [navigate]
   );
-  const library = useQuery(libraryQueryOptions);
-  const palace = useQuery(palaceQueryOptions);
-  const dashboard = useQuery(dashboardQueryOptions);
+  const library = useLibrary();
+  const palace = usePalace();
+  const dashboard = useDashboard();
   // The order lessons will teach new entries in: ready words, then characters, then locked words.
   const queue = useMemo(
     () =>
       new Map(
-        [
-          ...(dashboard.data?.buildQueue ?? []),
-          ...(dashboard.data?.lockedWords ?? []),
-        ].map((item, index) => [
-          queueKey(item.type === "word" ? "words" : "characters", item.id),
-          index,
-        ])
+        [...dashboard.buildQueue, ...dashboard.lockedWords].map(
+          (item, index) => [
+            queueKey(item.type === "word" ? "words" : "characters", item.id),
+            index,
+          ]
+        )
       ),
-    [dashboard.data]
+    [dashboard]
   );
   const commitQuery = useCallback(
     (value: string) => update({ q: value }),
@@ -251,11 +241,10 @@ export function LibraryView() {
   const query = useDeferredValue(draft);
   const searching = query.trim() !== "";
   const search = useMemo(
-    () =>
-      library.data ? createLibrarySearch(library.data, palace.data) : null,
-    [library.data, palace.data]
+    () => createLibrarySearch(library, palace),
+    [library, palace]
   );
-  const matches = useMemo(() => search?.(query) ?? [], [search, query]);
+  const matches = useMemo(() => search(query), [search, query]);
   // Search spans both kinds; browsing shows one kind at a time.
   const pool = useMemo(
     () => (searching ? matches : matches.filter((item) => item.kind === kind)),
@@ -287,43 +276,13 @@ export function LibraryView() {
     () => update({ q: "", status: "all" }),
     [update]
   );
-  const { refetch } = library;
-  const retry = useCallback(() => {
-    refetch();
-  }, [refetch]);
-
-  const learned = library.data
-    ? library.data.characters.filter((item) => item.status === "review")
-        .length +
-      library.data.words.filter((item) => item.status === "review").length
-    : 0;
-  const total = library.data
-    ? library.data.characters.length + library.data.words.length
-    : 0;
+  const learned =
+    library.characters.filter((item) => item.status === "review").length +
+    library.words.filter((item) => item.status === "review").length;
+  const total = library.characters.length + library.words.length;
 
   let results: ReactNode;
-  if (library.isError) {
-    results = (
-      <Status
-        action={
-          <button className={statusAction} onClick={retry} type="button">
-            retry
-          </button>
-        }
-        title="the library isn’t available offline yet"
-      />
-    );
-  } else if (!library.data) {
-    results = (
-      <Wall busy>
-        {skeletonTiles.map((id) => (
-          <span className={tileSkeleton} key={id}>
-            <DitherGradient cell={2} direction="up" from="grey" opacity={0.5} />
-          </span>
-        ))}
-      </Wall>
-    );
-  } else if (items.length) {
+  if (items.length) {
     results = (
       <LibraryResults
         filters={`${query}\n${kind}\n${group}\n${status}`}
@@ -350,10 +309,7 @@ export function LibraryView() {
   return (
     <Page
       head={
-        <PageHeader
-          meta={library.data ? `${learned} learned · ${total}` : undefined}
-          title="library"
-        />
+        <PageHeader meta={`${learned} learned · ${total}`} title="library" />
       }
     >
       <div className={controls}>

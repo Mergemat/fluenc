@@ -2,7 +2,6 @@
 // exactly the scroller's height, so they never scroll. Older pages use the shared colour tokens.
 // Desktop gets a sidebar (navigation, course progress, profile, settings) so pages keep the full height;
 // tablets get a top bar and phones a tab bar.
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
   BookOpen,
@@ -18,12 +17,12 @@ import { useHydrated } from "../hooks/use-hydrated";
 
 import type { DashboardData } from "../lib/learner-views";
 import { cn } from "../lib/utils";
-import { profileQueryOptions } from "../offline/queries";
 import {
   type SyncAttention,
   syncAttention,
   useSyncStatus,
-} from "../offline/sync";
+} from "../progress/sync";
+import { useProfile } from "../progress/views";
 import { AppScroll } from "./app-scroll";
 import { DitherGradient } from "./dither-kit/gradient";
 import { BrandMark } from "./ui/brand-mark";
@@ -63,8 +62,7 @@ const badge =
 
 /** How far through the course the learner is, learned and learning; shown in the desktop sidebar. */
 function CourseProgress() {
-  const { data } = useQuery(profileQueryOptions);
-  const meters = data?.tracks.filter(
+  const meters = useProfile().tracks.filter(
     (track) => track.id === "characters" || track.id === "words"
   );
   return (
@@ -73,7 +71,7 @@ function CourseProgress() {
       className="group/course mt-auto hidden gap-4 border-border border-t px-3 py-3.5 lg:grid"
       to="/profile"
     >
-      {meters?.map((meter) => (
+      {meters.map((meter) => (
         <div className="grid gap-2" key={meter.id}>
           <p className="type-label m-0 flex items-baseline justify-between text-muted-foreground group-hover/course:text-foreground">
             <span>{meter.label}</span>

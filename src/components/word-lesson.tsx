@@ -14,8 +14,7 @@ import { toast } from "sonner";
 import type { BuildItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { cn } from "../lib/utils";
-import { saveEnrollment, saveLivingLinkOffline } from "../offline/progress";
-import { useProgressMutation } from "../offline/use-progress-mutation";
+import { saveEnrollment, saveLivingLink, useSave } from "../progress/actions";
 import {
   clueCode,
   clueName,
@@ -61,9 +60,9 @@ export function WordLesson({ item }: { item: WordItem }) {
   // The server keeps links of four or more characters; anything shorter is a typo, not a link.
   const tooShort = trimmed.length > 0 && trimmed.length < 4;
   const input = useRef<HTMLInputElement>(null);
-  const finish = useProgressMutation(async () => {
+  const finish = useSave(async () => {
     if (trimmed) {
-      await saveLivingLinkOffline({ wordId: item.id, story: trimmed });
+      await saveLivingLink({ wordId: item.id, story: trimmed });
     }
     return saveEnrollment({ itemType: "word", itemId: item.id });
   });

@@ -1,30 +1,18 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-import { onProgressChange, readLearner } from "./progress";
-import { learnerQueryOptions } from "./queries";
-import {
-  getSyncStatus,
-  onSyncedSnapshot,
-  refreshSyncStatus,
-  syncNow,
-} from "./sync";
+import { onOtherTab } from "./collections";
+import { onSaved } from "./saves";
+import { getSyncStatus, refreshSyncStatus, syncNow } from "./sync";
 
 // Changes from other devices arrive this often while fluenc is open. Each pull is a server call;
 // coming back to fluenc and every save sync straight away, so this only covers a screen left open.
 const PULL_INTERVAL = 5 * 60_000;
 const RETRY_DELAYS = [5000, 15_000, 60_000];
 
-export function useOfflineSync() {
-  const queryClient = useQueryClient();
-
+export function useSync() {
   useEffect(() => {
-    const show = (snapshot: Awaited<ReturnType<typeof readLearner>>) =>
-      queryClient.setQueryData(learnerQueryOptions.queryKey, snapshot);
-    const stopSynced = onSyncedSnapshot(show);
     // Another tab saved or synced.
-    const stopTabs = onProgressChange(() => {
-      readLearner().then(show, () => undefined);
+    const stopTabs = onOtherTab(() => {
       refreshSyncStatus().catch(() => undefined);
     });
 
@@ -50,13 +38,11 @@ export function useOfflineSync() {
 
     // Several saves in a row go out together, shortly after the last.
     let pending: number | undefined;
-    const unsubscribe = queryClient.getMutationCache().subscribe((event) => {
-      if (event.type === "updated" && event.action.type === "success") {
-        refreshSyncStatus().catch(() => undefined);
-        window.clearTimeout(pending);
-        if (signedIn()) {
-          pending = window.setTimeout(sync, 400);
-        }
+    const stopSaved = onSaved(() => {
+      refreshSyncStatus().catch(() => undefined);
+      window.clearTimeout(pending);
+      if (signedIn()) {
+        pending = window.setTimeout(sync, 400);
       }
     });
     const pull = window.setInterval(() => {
@@ -75,14 +61,13 @@ export function useOfflineSync() {
     refreshSyncStatus().then(sync, sync);
 
     return () => {
-      stopSynced();
       stopTabs();
-      unsubscribe();
+      stopSaved();
       window.clearTimeout(retry);
       window.clearTimeout(pending);
       window.clearInterval(pull);
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("online", sync);
     };
-  }, [queryClient]);
+  }, []);
 }

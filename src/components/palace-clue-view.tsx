@@ -1,5 +1,4 @@
 // One palace clue and every character it appears in, as library tiles in course order.
-import { useQuery } from "@tanstack/react-query";
 import { Link, useCanGoBack } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useMemo } from "react";
@@ -7,7 +6,7 @@ import { useGoBack } from "../hooks/use-go-back";
 import { buildPalaceBoard, type ClueKind } from "../lib/palace-board";
 import { getToneDetail } from "../lib/tones";
 import { cn } from "../lib/utils";
-import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
+import { useLibrary, usePalace } from "../progress/views";
 import { ClueCode } from "./character-studio/clue-code";
 import { type ClueRow, clueRows, kindStyle } from "./palace-rows";
 import {
@@ -106,38 +105,22 @@ export function PalaceClueView({
   kind: ClueKind;
   clueKey: string;
 }) {
-  const library = useQuery(libraryQueryOptions);
-  const palace = useQuery(palaceQueryOptions);
+  const library = useLibrary();
+  const palace = usePalace();
   const row = useMemo(
     () =>
-      library.data && palace.data
-        ? clueRows(buildPalaceBoard(library.data, palace.data)).find(
-            (entry) => entry.kind === kind && entry.key === clueKey
-          )
-        : undefined,
-    [library.data, palace.data, kind, clueKey]
+      clueRows(buildPalaceBoard(library, palace)).find(
+        (entry) => entry.kind === kind && entry.key === clueKey
+      ),
+    [library, palace, kind, clueKey]
   );
   const characters = useMemo(() => {
     const byId = new Map(
-      library.data?.characters.map((character) => [character.id, character])
+      library.characters.map((character) => [character.id, character])
     );
     return (row?.ids ?? []).flatMap((id) => byId.get(id) ?? []);
-  }, [library.data, row]);
+  }, [library, row]);
 
-  if (!(library.data && palace.data)) {
-    return (
-      <Page>
-        <Status
-          loading={!(library.isError || palace.isError)}
-          title={
-            library.isError || palace.isError
-              ? "your palace isn’t available offline yet"
-              : "loading your palace"
-          }
-        />
-      </Page>
-    );
-  }
   if (!row) {
     return (
       <Page>

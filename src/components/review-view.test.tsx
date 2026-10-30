@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, expect, test } from "bun:test";
+import { afterAll, beforeAll, expect, spyOn, test } from "bun:test";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   createMemoryHistory,
@@ -6,6 +6,7 @@ import {
   createRouter,
   RouterContextProvider,
 } from "@tanstack/react-router";
+import { IDBDatabase } from "fake-indexeddb";
 import { Window } from "happy-dom";
 import { act } from "react";
 import type { Root } from "react-dom/client";
@@ -268,6 +269,13 @@ test("a finished review says when the next reviews come, not which cards were re
 });
 
 test("a grade raises the waiting card before its save lands, and a failed save brings the card back", async () => {
+  // Another test file may have opened a device database; this save must fail either way.
+  const unwritable = spyOn(
+    IDBDatabase.prototype,
+    "transaction"
+  ).mockImplementation(() => {
+    throw new Error("the device database is unavailable");
+  });
   const data = fixture(2);
   await show(data, "optimistic");
   expect(topCard()?.textContent).toContain("Sentence 0");
@@ -287,11 +295,11 @@ test("a grade raises the waiting card before its save lands, and a failed save b
   expect(topCard()).toBe(waiting);
   expect(waiting.getAttribute("data-flipped")).toBe("false");
   expect(host.textContent).toContain("1 left");
-  // The save starts once the throw is over. This test has no device database, so it fails and
-  // the graded card returns.
+  // The save starts once the throw is over. It fails, and the graded card returns.
   await act(async () => {
     await new Promise((resolve) => setTimeout(resolve, 500));
   });
+  unwritable.mockRestore();
   expect(host.textContent).toContain("could not save this review");
   expect(topCard()?.textContent).toContain("Sentence 0");
   expect(host.textContent).toContain("2 left");

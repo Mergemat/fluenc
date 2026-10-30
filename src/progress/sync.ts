@@ -4,14 +4,16 @@ import { useSyncExternalStore } from "react";
 
 import type { Learner, SyncResponse } from "../server/sync.contract";
 import { MAX_SYNC_OPERATIONS } from "../server/sync.limits";
+import { announce, publish } from "./collections";
+import { whenSaved } from "./saves";
 import {
   acceptSync,
   clearProgress,
   countPending,
-  type LearnerSnapshot,
   readLearnerAccount,
   readOutgoing,
-} from "./progress";
+  type Saved,
+} from "./store";
 
 export type SyncPhase = "idle" | "syncing" | "offline" | "error";
 
@@ -33,7 +35,6 @@ let status: SyncStatus = {
   syncedAt: null,
 };
 const statusListeners = new Set<() => void>();
-const snapshotListeners = new Set<(snapshot: LearnerSnapshot) => void>();
 
 function setStatus(next: Partial<SyncStatus>) {
   status = { ...status, ...next };
@@ -56,14 +57,20 @@ export function useSyncStatus() {
 
 export const getSyncStatus = () => status;
 
-/** Hear about progress that sync brought in. */
-export function onSyncedSnapshot(
-  listener: (snapshot: LearnerSnapshot) => void
-) {
-  snapshotListeners.add(listener);
-  return () => {
-    snapshotListeners.delete(listener);
-  };
+/** Show what sync wrote, here and in other tabs. Nothing after the write may fail the sync. */
+function show(saved: Saved) {
+  try {
+    publish(saved);
+    announce(saved);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+/** Forget this device's progress once the saves under way are written, so none lands after. */
+async function clearDevice() {
+  await whenSaved();
+  show(await clearProgress());
 }
 
 /** Bring the status up to date with what is stored, without asking the server. */
@@ -98,10 +105,7 @@ async function exchange() {
   if (!response.ok) {
     throw new SyncError(response.status);
   }
-  const snapshot = await acceptSync((await response.json()) as SyncResponse);
-  for (const listener of snapshotListeners) {
-    listener(snapshot);
-  }
+  show(await acceptSync((await response.json()) as SyncResponse));
   // A full batch may have left more behind.
   return outgoing.operations.length === MAX_SYNC_OPERATIONS;
 }
@@ -130,10 +134,7 @@ async function run(): Promise<boolean> {
     }
     if (error instanceof SyncError && error.status === 409) {
       // The device holds another account's progress; this account starts from its own.
-      const snapshot = await clearProgress();
-      for (const listener of snapshotListeners) {
-        listener(snapshot);
-      }
+      await clearDevice();
       return run();
     }
     setStatus({ phase: navigator.onLine ? "error" : "offline" });
@@ -165,7 +166,7 @@ export function syncNow(): Promise<boolean> {
 
 /** Forget the device's progress, such as on sign-out. */
 export async function forgetDevice() {
-  const snapshot = await clearProgress();
+  await clearDevice();
   setStatus({
     learner: null,
     pending: 0,
@@ -173,9 +174,6 @@ export async function forgetDevice() {
     syncedAt: null,
     phase: "idle",
   });
-  for (const listener of snapshotListeners) {
-    listener(snapshot);
-  }
 }
 
 export type SyncAttention = "signed-out" | "error" | "waiting";

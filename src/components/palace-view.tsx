@@ -1,7 +1,6 @@
 // The memory palace as a lookup, under the profile: search your cast, sets, tone areas and props by code, name or
 // meaning, then open a clue to see every character it appears in. Rows stay compact because
 // the props list grows to hundreds over the course. Derived from the cached library and palace.
-import { useQuery } from "@tanstack/react-query";
 import { getRouteApi, Link } from "@tanstack/react-router";
 import { ArrowLeft, ChevronRight, Search, X } from "lucide-react";
 import {
@@ -14,7 +13,7 @@ import {
 
 import { buildPalaceBoard, type ClueKind } from "../lib/palace-board";
 import { cn } from "../lib/utils";
-import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
+import { useLibrary, usePalace } from "../progress/views";
 import { ClueCode } from "./character-studio/clue-code";
 import { DitherGradient } from "./dither-kit/gradient";
 import {
@@ -46,10 +45,6 @@ const tabs: { id: ClueKind; label: string }[] = [
   { id: "props", label: "props" },
 ];
 
-const skeletonRows = Array.from(
-  { length: 8 },
-  (_, index) => `skeleton-${index}`
-);
 type Show = "all" | "named" | "open";
 
 /** A palace row; every row after the first has a divider above it. */
@@ -72,16 +67,13 @@ export function PalaceView() {
     },
     [navigate]
   );
-  const library = useQuery(libraryQueryOptions);
-  const palace = useQuery(palaceQueryOptions);
+  const library = useLibrary();
+  const palace = usePalace();
   const input = useRef<HTMLInputElement>(null);
   const query = useDeferredValue(q.trim().toLowerCase());
   const rows = useMemo(
-    () =>
-      library.data && palace.data
-        ? clueRows(buildPalaceBoard(library.data, palace.data))
-        : [],
-    [library.data, palace.data]
+    () => clueRows(buildPalaceBoard(library, palace)),
+    [library, palace]
   );
   const matching = rows.filter(
     (row) =>
@@ -113,42 +105,7 @@ export function PalaceView() {
     [show, update]
   );
   const clearAll = useCallback(() => update({ q: "", show: "all" }), [update]);
-  const { refetch: refetchLibrary } = library;
-  const { refetch: refetchPalace } = palace;
-  const retry = useCallback(() => {
-    refetchLibrary();
-    refetchPalace();
-  }, [refetchLibrary, refetchPalace]);
-
   const results = () => {
-    if (!(library.data && palace.data)) {
-      return library.isError || palace.isError ? (
-        <Status
-          action={
-            <button className={statusAction} onClick={retry} type="button">
-              retry
-            </button>
-          }
-          title="your palace isn’t available offline yet"
-        />
-      ) : (
-        <div aria-busy="true" className="grid overflow-hidden">
-          {skeletonRows.map((id, index) => (
-            <span
-              className={cn(rowClass(index === 0), "animate-pulse")}
-              key={id}
-            >
-              <DitherGradient
-                cell={2}
-                direction="right"
-                from="grey"
-                opacity={0.4}
-              />
-            </span>
-          ))}
-        </div>
-      );
-    }
     if (!shown.length) {
       return (
         <Status

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { signOut, unsyncedChanges } from "../account/account";
-import { type SyncStatus, syncNow, useSyncStatus } from "../offline/sync";
+import { type SyncStatus, syncNow, useSyncStatus } from "../progress/sync";
 import { DitherButton } from "./dither-kit/button";
 import { tool } from "./ui/buttons";
 import { SettingRow, type Tone } from "./ui/setting-row";

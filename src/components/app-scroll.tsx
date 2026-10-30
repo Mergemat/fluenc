@@ -1,5 +1,4 @@
 import type { RefresherCustomEvent } from "@ionic/core";
-import { useIsMutating } from "@tanstack/react-query";
 import {
   type ReactNode,
   type TouchEvent,
@@ -9,6 +8,7 @@ import {
   useSyncExternalStore,
 } from "react";
 
+import { useSaving } from "../progress/saves";
 import { reloadApp } from "../updates/use-app-update";
 import {
   IonContent,
@@ -39,7 +39,7 @@ export function AppScroll({
   children: ReactNode;
   pathname: string;
 }) {
-  const pending = useIsMutating() > 0;
+  const pending = useSaving();
   const content = useRef<HTMLIonContentElement>(null);
   const refresher = useRef<HTMLIonRefresherElement>(null);
   // The pull gesture: whether a finger is down, and whether releasing it should refresh.

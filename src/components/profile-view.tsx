@@ -1,7 +1,6 @@
 // The learner's own page: how many characters, words and sentences they have met, a year of
 // activity, and a way into the memory palace. Derived from the cached progress, so it works
 // offline.
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { useMemo } from "react";
@@ -17,10 +16,10 @@ import {
 } from "../lib/activity";
 import type { ProfileData } from "../lib/profile";
 import { cn } from "../lib/utils";
-import { profileQueryOptions } from "../offline/queries";
-import { useSyncStatus } from "../offline/sync";
+import { useSyncStatus } from "../progress/sync";
+import { useProfile } from "../progress/views";
 import { DitherGradient } from "./dither-kit/gradient";
-import { Page, PageHeader, SectionHead, Status } from "./ui/layout";
+import { Page, PageHeader, SectionHead } from "./ui/layout";
 
 const WEEKS = 52;
 const monthFormat = new Intl.DateTimeFormat("en-GB", { month: "short" });
@@ -96,25 +95,18 @@ function ActivityGraph({ weeks }: { weeks: ActivityDay[][] }) {
 }
 
 export function ProfileView() {
-  const profile = useQuery(profileQueryOptions);
+  const profile = useProfile();
   const status = useSyncStatus();
   const who =
     status.signedIn && status.learner ? status.learner.email : "this device";
 
-  if (!profile.data) {
-    return (
-      <Page head={<PageHeader title="profile" />}>
-        <Status loading title="opening your profile" />
-      </Page>
-    );
-  }
   return (
     <Page
       head={
         <PageHeader meta={<Link to="/settings">{who}</Link>} title="profile" />
       }
     >
-      <Profile data={profile.data} />
+      <Profile data={profile} />
     </Page>
   );
 }

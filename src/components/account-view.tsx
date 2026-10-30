@@ -4,7 +4,7 @@ import { type FormEvent, useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { signIn } from "../account/account";
-import { useSyncStatus } from "../offline/sync";
+import { useSyncStatus } from "../progress/sync";
 import { DitherButton } from "./dither-kit/button";
 import { tool } from "./ui/buttons";
 import { ErrorNote, Page, PageHeader } from "./ui/layout";

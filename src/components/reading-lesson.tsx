@@ -5,8 +5,7 @@ import { useCallback, useEffect, useEffectEvent, useState } from "react";
 import { useMandarinSpeech } from "../hooks/use-mandarin-speech";
 import type { DashboardData } from "../lib/learner-views";
 import { cn } from "../lib/utils";
-import { saveEnrollment } from "../offline/progress";
-import { useProgressMutation } from "../offline/use-progress-mutation";
+import { saveEnrollment, useSave } from "../progress/actions";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import { action, actionKey } from "./ui/buttons";
@@ -49,7 +48,7 @@ export function ReadingLesson({
   const [reps, setReps] = useState(0);
   const { speak, status } = useMandarinSpeech();
   const playing = status === "loading" || status === "speaking";
-  const mutation = useProgressMutation(() =>
+  const mutation = useSave(() =>
     saveEnrollment({ itemType: "sentence", itemId: item.id })
   );
   const { isPending, mutate } = mutation;

@@ -1,7 +1,6 @@
 // Home: the one thing to do next, large, beside a short list of everything else today. Reviews
 // come first while any are due, then the next lesson, then reading. Each still opens on its own;
 // the next one gets the page's only button, and Space or Enter.
-import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   type ReactNode,
@@ -21,7 +20,7 @@ import type { BuildItem, DashboardData } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { nextReviews } from "../lib/review-schedule";
 import { cn } from "../lib/utils";
-import { profileQueryOptions } from "../offline/queries";
+import { useProfile } from "../progress/views";
 import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
 import { action, actionKey } from "./ui/buttons";
@@ -249,21 +248,18 @@ function Later({
 
 /** This week's days with something new, the way the profile's graph counts them. */
 function useWeek() {
-  const { data } = useQuery(profileQueryOptions);
+  const { introductions } = useProfile();
   const today = dayKey(new Date());
   return useMemo(() => {
-    if (!data) {
-      return null;
-    }
     const now = dateOfKey(today);
-    const [days = []] = activityCalendar(data.introductions, now, 1);
+    const [days = []] = activityCalendar(introductions, now, 1);
     return {
       today,
       days,
       active: days.filter((day) => day.count > 0).length,
-      learning: activityStreaks(data.introductions, now).activeDays,
+      learning: activityStreaks(introductions, now).activeDays,
     };
-  }, [data, today]);
+  }, [introductions, today]);
 }
 
 /** Everything that isn't next, in the order it comes, and the week so far. */
@@ -324,17 +320,13 @@ function LaterToday({
           </Later>
         )}
         <Later
-          label={
-            week
-              ? `this week · ${plural(week.active, "day", "days")} · ${week.learning} learning`
-              : "this week"
-          }
+          label={`this week · ${plural(week.active, "day", "days")} · ${week.learning} learning`}
           lead="周"
           name="This week"
           to="/profile"
         >
           <span className="flex gap-1.5">
-            {(week?.days ?? []).map((day, index) => (
+            {week.days.map((day, index) => (
               <span
                 className="type-micro grid justify-items-center gap-1 text-faint-foreground"
                 key={day.key}
@@ -342,7 +334,7 @@ function LaterToday({
                 <i
                   className={cn(
                     "relative size-6 overflow-hidden rounded-sm",
-                    day.key === week?.today
+                    day.key === week.today
                       ? "inset-ring inset-ring-blue"
                       : "bg-popover"
                   )}

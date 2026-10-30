@@ -4,7 +4,6 @@
 // in, and saves in the background. The pile and the buttons stay put for the whole session, so a
 // grade only builds the new top card. The reveal button and the grades share one slot, so
 // revealing never moves anything.
-import { useQuery } from "@tanstack/react-query";
 import { Undo2 } from "lucide-react";
 import {
   type CSSProperties,
@@ -22,9 +21,8 @@ import type { ReviewItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { previewDue, waitLabel } from "../lib/review-schedule";
 import { cn } from "../lib/utils";
-import { saveReview, takeBackReview } from "../offline/progress";
-import { reviewBackQueryOptions } from "../offline/queries";
-import { useProgressMutation } from "../offline/use-progress-mutation";
+import { saveReview, takeBackReview, useSave } from "../progress/actions";
+import { useReviewBack } from "../progress/views";
 import { ClueCode } from "./character-studio/clue-code";
 import { lessonClues } from "./character-studio/clues";
 import { DitherButton } from "./dither-kit/button";
@@ -459,7 +457,7 @@ interface Leaving {
  * save that fails puts it back. The graded card stays on the pile, thrown, until its throw ends.
  */
 function useGrading(due: ReviewItem[], onRestore: (item: ReviewItem) => void) {
-  const { mutateAsync } = useProgressMutation(saveReview);
+  const { mutateAsync } = useSave(saveReview);
   const [graded, setGraded] = useState<ReadonlySet<string>>(() => new Set());
   // A saved grade gives its card a new key. Forget the old one, since taking the review back brings
   // the card back under it.
@@ -559,9 +557,9 @@ function useBack(
   /** A grade not saved yet, which flushing makes the one to take back. */
   pending: boolean
 ) {
-  const { data: memory } = useQuery(reviewBackQueryOptions);
-  const { mutate } = useProgressMutation(takeBackReview);
-  const canTakeBack = pending || (memory?.canTakeBack ?? false);
+  const memory = useReviewBack();
+  const { mutate } = useSave(takeBackReview);
+  const canTakeBack = pending || memory.canTakeBack;
   const goBack = useCallback(() => {
     flush();
     onBack();
@@ -590,7 +588,7 @@ function useBack(
     return () => window.removeEventListener("keydown", onKey);
   }, [canTakeBack]);
   return {
-    takenBack: memory?.takenBack ?? [],
+    takenBack: memory.takenBack,
     button: canTakeBack ? (
       <button className={crumb} onClick={goBack} type="button">
         <Undo2 size={14} />

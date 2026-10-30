@@ -1,7 +1,6 @@
 // One library entry, built only from the cached library and palace (works offline).
 // Characters show their glyph, scene and the words that use them; words show their gloss.
 // Scene names and memory links are edited in place and saved on blur, like a lesson saves them.
-import { useQuery } from "@tanstack/react-query";
 import { Link, useCanGoBack } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import {
@@ -22,9 +21,8 @@ import type {
 import { getItemMeaning } from "../lib/meaning";
 import { defaultToneRooms } from "../lib/pinyin";
 import { cn } from "../lib/utils";
-import { saveLivingLinkOffline, saveMovieOffline } from "../offline/progress";
-import { libraryQueryOptions, palaceQueryOptions } from "../offline/queries";
-import { useProgressMutation } from "../offline/use-progress-mutation";
+import { saveLivingLink, saveMovie, useSave } from "../progress/actions";
+import { useLibrary, usePalace } from "../progress/views";
 import { ClueCode } from "./character-studio/clue-code";
 import {
   clueCode,
@@ -97,8 +95,8 @@ export function LibraryEntryPage({
 }) {
   const goBack = useGoBack();
   const canGoBack = useCanGoBack();
-  const library = useQuery(libraryQueryOptions);
-  const palace = useQuery(palaceQueryOptions);
+  const library = useLibrary();
+  const palace = usePalace();
   const back = from === "palace" ? "palace" : "library";
 
   return (
@@ -138,13 +136,9 @@ export function LibraryEntryPage({
       }
     >
       {item.kind === "characters" ? (
-        <CharacterEntry
-          item={item}
-          library={library.data}
-          palace={palace.data}
-        />
+        <CharacterEntry item={item} library={library} palace={palace} />
       ) : (
-        <WordEntry item={item} library={library.data} />
+        <WordEntry item={item} library={library} />
       )}
     </Page>
   );
@@ -323,21 +317,20 @@ function CharacterEntry({
  * scene that uses it. The movie save leaves out the names it gets empty.
  */
 function useRename(item: LibraryCharacter) {
-  const { mutate } = useProgressMutation(
-    (clue: Pick<Clue, "kind" | "code" | "name">) =>
-      saveMovieOffline({
-        characterId: item.id,
-        actorKey: item.movie.actorKey,
-        actorName: clue.kind === "actor" ? clue.name : "",
-        finalKey: item.movie.finalKey,
-        setName: clue.kind === "set" ? clue.name : "",
-        tone: item.movie.tone,
-        roomName: clue.kind === "room" ? clue.name : "",
-        props:
-          clue.kind === "prop"
-            ? [{ component: clue.code, propName: clue.name }]
-            : [],
-      })
+  const { mutate } = useSave((clue: Pick<Clue, "kind" | "code" | "name">) =>
+    saveMovie({
+      characterId: item.id,
+      actorKey: item.movie.actorKey,
+      actorName: clue.kind === "actor" ? clue.name : "",
+      finalKey: item.movie.finalKey,
+      setName: clue.kind === "set" ? clue.name : "",
+      tone: item.movie.tone,
+      roomName: clue.kind === "room" ? clue.name : "",
+      props:
+        clue.kind === "prop"
+          ? [{ component: clue.code, propName: clue.name }]
+          : [],
+    })
   );
   return useCallback(
     (clue: Clue, name: string) =>
@@ -501,7 +494,7 @@ function WordEntry({
 }
 
 function MemoryLink({ saved, wordId }: { saved: string; wordId: string }) {
-  const { mutate } = useProgressMutation(saveLivingLinkOffline);
+  const { mutate } = useSave(saveLivingLink);
   // The server keeps links of four or more characters; a shorter one goes back to the saved link.
   const commit = useCallback(
     (event: FocusEvent<HTMLInputElement>) => {

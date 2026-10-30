@@ -1,12 +1,11 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { ReadingView } from "../components/reading-view";
-import { dashboardQueryOptions } from "../offline/queries";
+import { useDashboard } from "../progress/views";
 
 export const Route = createFileRoute("/_app/reading")({ component: Page });
 
 function Page() {
-  const { data } = useSuspenseQuery(dashboardQueryOptions);
+  const data = useDashboard();
   return <ReadingView data={data} />;
 }

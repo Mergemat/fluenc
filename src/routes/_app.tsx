@@ -1,4 +1,3 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   createFileRoute,
   Outlet,
@@ -11,15 +10,15 @@ import { AppShell } from "../components/app-shell";
 import { Status, statusAction } from "../components/ui/layout";
 import { Toaster } from "../components/ui/sonner";
 import { OfflineDownloadProvider } from "../offline/offline-download-provider";
-import { dashboardQueryOptions, loadLearner } from "../offline/queries";
-import { useOfflineSync } from "../offline/use-offline-sync";
+import { useSync } from "../progress/use-sync";
+import { loadLearner, useDashboard } from "../progress/views";
 import { useAppUpdate } from "../updates/use-app-update";
 
 export const Route = createFileRoute("/_app")({
   // Progress lives on the device, so the server only sends the shell; the device fills it in.
   ssr: false,
-  loader: async ({ context }) => {
-    await loadLearner(context.queryClient);
+  loader: async () => {
+    await loadLearner();
   },
   pendingComponent: () => <Status loading title="opening fluenc" />,
   pendingMinMs: 0,
@@ -28,9 +27,9 @@ export const Route = createFileRoute("/_app")({
 });
 
 function AppLayout() {
-  const { data } = useSuspenseQuery(dashboardQueryOptions);
+  const data = useDashboard();
   const pathname = useLocation({ select: (location) => location.pathname });
-  useOfflineSync();
+  useSync();
   useAppUpdate();
 
   return (
