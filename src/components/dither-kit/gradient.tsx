@@ -2,13 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import { cn } from "./lib";
-import { type Rgb, rgb } from "./palette";
+import type { Rgb } from "./palette";
 import {
   BAYER4,
+  cachedTexture,
   fillOf,
   type PixelBloom,
   type PixelColor,
   pixelBloomStyle,
+  setCell,
 } from "./pixel";
 
 // Backing-resolution caps — a background wash never needs more cells than this.
@@ -75,6 +77,30 @@ function cellPaint(
   return alpha > 0.004 ? { fill: fromFill, alpha } : null;
 }
 
+/** The ordered-dither ramp, one pixel per cell. */
+function gradientTexture(cols: number, rows: number, spec: PaintSpec) {
+  const texture = new ImageData(cols, rows);
+  const fromFill = fillOf(spec.from);
+  const toFill = spec.to === "transparent" ? null : fillOf(spec.to);
+  const ramp = RAMP[spec.direction];
+  for (let y = 0; y < rows; y += 1) {
+    for (let x = 0; x < cols; x += 1) {
+      const density = spec.density ?? 1 - ramp(x, y, cols, rows);
+      const lit = density > BAYER4[y % 4][x % 4];
+      const paint = cellPaint(lit, density, fromFill, toFill, spec.opacity);
+      if (paint) {
+        setCell(texture.data, y * cols + x, paint.fill, paint.alpha);
+      }
+    }
+  }
+  return texture;
+}
+
+const gridOf = (width: number, height: number, cell: number) => ({
+  cols: Math.min(MAX_COLS, Math.max(4, Math.round(width / cell))),
+  rows: Math.min(MAX_ROWS, Math.max(4, Math.round(height / cell))),
+});
+
 /**
  * Paint the ordered-dither ramp onto a low-res backing canvas sized from the
  * wrapper's box. Static — one paint per prop/size change, no animation loop,
@@ -83,34 +109,24 @@ function cellPaint(
 function paintGradient(
   canvas: HTMLCanvasElement,
   bloomCanvas: HTMLCanvasElement | null,
-  width: number,
-  height: number,
+  cols: number,
+  rows: number,
   spec: PaintSpec
 ): void {
   const ctx = canvas.getContext("2d");
-  if (!ctx || width <= 0 || height <= 0) {
+  if (!ctx) {
     return;
   }
-  const cols = Math.min(MAX_COLS, Math.max(4, Math.round(width / spec.cell)));
-  const rows = Math.min(MAX_ROWS, Math.max(4, Math.round(height / spec.cell)));
   canvas.width = cols;
   canvas.height = rows;
-
-  const fromFill = fillOf(spec.from);
-  const toFill = spec.to === "transparent" ? null : fillOf(spec.to);
-  const ramp = RAMP[spec.direction];
-
-  for (let y = 0; y < rows; y += 1) {
-    for (let x = 0; x < cols; x += 1) {
-      const density = spec.density ?? 1 - ramp(x, y, cols, rows);
-      const lit = density > BAYER4[y % 4][x % 4];
-      const paint = cellPaint(lit, density, fromFill, toFill, spec.opacity);
-      if (paint) {
-        ctx.fillStyle = rgb(paint.fill, 1, paint.alpha);
-        ctx.fillRect(x, y, 1, 1);
-      }
-    }
-  }
+  ctx.putImageData(
+    cachedTexture(
+      `gradient ${cols}x${rows} ${spec.from} ${spec.to} ${spec.direction} ${spec.density} ${spec.opacity}`,
+      () => gradientTexture(cols, rows, spec)
+    ),
+    0,
+    0
+  );
 
   const bloomCtx = bloomCanvas?.getContext("2d") ?? null;
   if (bloomCanvas && bloomCtx) {
@@ -148,9 +164,18 @@ export function DitherGradient({
     }
     // The glow canvas only exists while bloom is on.
     const bloomCanvas = bloom === "off" ? null : bloomRef.current;
-    const paint = () => {
-      const box = wrap.getBoundingClientRect();
-      paintGradient(canvas, bloomCanvas, box.width, box.height, {
+    // A resize that keeps the same cells keeps the same picture.
+    let painted = "";
+    const paint = (width: number, height: number) => {
+      if (width <= 0 || height <= 0) {
+        return;
+      }
+      const { cols, rows } = gridOf(width, height, cell);
+      if (painted === `${cols}x${rows}`) {
+        return;
+      }
+      painted = `${cols}x${rows}`;
+      paintGradient(canvas, bloomCanvas, cols, rows, {
         from,
         to,
         direction,
@@ -159,11 +184,17 @@ export function DitherGradient({
         opacity,
       });
     };
-    paint();
     if (typeof ResizeObserver === "undefined") {
+      const box = wrap.getBoundingClientRect();
+      paint(box.width, box.height);
       return;
     }
-    const ro = new ResizeObserver(paint);
+    // It reports the box once observed, so the first paint needs no layout read of its own.
+    const ro = new ResizeObserver(([entry]) => {
+      if (entry) {
+        paint(entry.contentRect.width, entry.contentRect.height);
+      }
+    });
     ro.observe(wrap);
     return () => ro.disconnect();
   }, [from, to, direction, cell, density, opacity, bloom]);
