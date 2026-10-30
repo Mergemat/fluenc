@@ -20,8 +20,9 @@ export function studio(glyph: boolean) {
 /** Where the prompt sits: beside the clues on wide screens, all their height. */
 export const studioRead =
   "min-h-0 studio:col-start-1 studio:row-start-2 studio:row-end-5";
+// On phones the frame's gap is tight, so the clues' head takes more above it than below.
 export const studioClues =
-  "relative grid min-w-0 gap-2 studio:col-start-2 studio:row-start-3";
+  "relative grid min-w-0 gap-2 max-studio:mt-4 studio:col-start-2 studio:row-start-3";
 
 /** Learn, review and read end in the same action row: as wide as review's column, centred. */
 export const studioActions =
