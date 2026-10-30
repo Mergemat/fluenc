@@ -74,6 +74,18 @@ async function readLearner() {
   return { state: saved };
 }
 
+// Test files share modules, and one that ran earlier may have started progress with no device
+// database; start it again so it reads this one.
+const collections = await import("./collections");
+await Promise.all(
+  [
+    collections.cards,
+    collections.names,
+    collections.livingLinks,
+    collections.focus,
+    collections.device,
+  ].map((collection) => collection.cleanup({ dependents: true }))
+);
 await loadLearner();
 const migrated = await readLearner();
 const migratedQueue = await readOutgoing(10);
