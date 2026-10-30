@@ -48,9 +48,13 @@ const corner = [
 export const shell =
   "flex h-dvh flex-col overflow-hidden pt-safe-top font-sans features-ss01 text-foreground antialiased bg-background max-md:pt-safe-header";
 
-/** Fluenc's name beside its mark. */
+/** Fluenc's name beside its mark, pulled out by the step of space the mark keeps inside its box. */
 export const brand =
-  "flex items-center gap-2.5 font-mono font-semibold text-xl text-foreground leading-none tracking-snug type-reset lg:h-8 lg:px-2.5";
+  "-ml-1 flex items-center gap-2.5 font-mono font-semibold text-xl text-foreground leading-none tracking-snug type-reset";
+
+/** The bar along the top of the app and the welcome reel, below the sidebar's width. */
+export const topBar =
+  "flex h-16 shrink-0 items-center gap-6 px-gutter max-md:h-12";
 
 /** A square bordered icon link; on desktop the corner links become sidebar rows. */
 export const iconButton =
@@ -147,6 +151,8 @@ export function AppShell({
   // dither-kit paints its canvases in effects, so server HTML has none of them. Hold the shell
   // until hydration: children's effects (the canvas paints) run before this one flips it on.
   const hydrated = useHydrated();
+  // The account page is reached from settings, so settings stays lit on it.
+  const settingsLit = pathname.startsWith("/account");
   // The sidebar's course meters work out the whole profile; a phone never shows them.
   const wide = useMediaQuery(WIDE);
 
@@ -163,8 +169,17 @@ export function AppShell({
           <PixelLoader label="Opening Fluenc" size={5} />
         </span>
       )}
-      <header className="relative flex h-16 shrink-0 items-center gap-6 px-7 group-data-booting/shell:invisible max-md:h-12 max-md:pr-3.5 max-md:pl-4 lg:h-auto lg:min-h-0 lg:flex-col lg:items-stretch lg:gap-0 lg:border-border lg:border-r lg:px-3 lg:pt-5 lg:pb-4">
-        <Link aria-label="Fluenc home" className={brand} to="/today">
+      <header
+        className={cn(
+          topBar,
+          "relative group-data-booting/shell:invisible lg:h-auto lg:min-h-0 lg:flex-col lg:items-stretch lg:gap-0 lg:border-border lg:border-r lg:px-3 lg:pt-5 lg:pb-4"
+        )}
+      >
+        <Link
+          aria-label="Fluenc home"
+          className={cn(brand, "lg:ml-0 lg:h-8 lg:px-2.5")}
+          to="/today"
+        >
           <BrandMark />
           <span>fluenc</span>
         </Link>
@@ -210,6 +225,9 @@ export function AppShell({
         {corner.map((item, index) => (
           <Link
             activeProps={{ "aria-current": "page" }}
+            aria-current={
+              settingsLit && item.to === "/settings" ? "page" : undefined
+            }
             aria-label={item.label}
             className={cn(
               iconButton,
@@ -222,7 +240,7 @@ export function AppShell({
           >
             {({ isActive }) => (
               <>
-                {isActive ? (
+                {isActive || (settingsLit && item.to === "/settings") ? (
                   <DitherGradient
                     cell={2}
                     direction="up"

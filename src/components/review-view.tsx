@@ -15,13 +15,11 @@ import {
   deckAction,
   deckActions,
   deckPage,
+  slotFigure,
   slotNote,
 } from "./ui/deck";
 import { PageHeader } from "./ui/layout";
 
-/** The figure on a card lying on the table, at its size: a timer or a verdict. */
-const slotFigure = (size: string) =>
-  cn("type-display relative", size, "leading-none");
 const verdict = slotFigure("text-center text-verdict");
 
 type DoneState = "waiting" | "finished" | "empty";

@@ -62,7 +62,8 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
 
   return (
     <Page head={<PageHeader title="settings" />}>
-      <div className="grid gap-12">
+      {/* The rows pad themselves by 12, which makes up the rest of the section gap. */}
+      <div className="grid gap-9">
         <Group label="account">
           <AccountSettings />
         </Group>

@@ -45,22 +45,28 @@ function Cell({ density }: { density: number }) {
   );
 }
 
-/** One column per week, newest on the right; on a phone it scrolls, opening at this week. */
+/**
+ * One column per week, newest on the right. From `md` the weeks share the width; on a phone it
+ * scrolls, opening at this week.
+ */
 function ActivityGraph({ weeks }: { weeks: ActivityDay[][] }) {
   const busiest = Math.max(...weeks.flat().map((day) => day.count));
   return (
     <div className="scrollbar-none flex flex-row-reverse overflow-x-auto">
-      <div className="grid flex-none gap-1.5">
+      <div className="grid flex-none gap-1.5 md:flex-1">
         <div
           aria-hidden="true"
-          className="type-micro flex h-3 whitespace-nowrap text-faint-foreground"
+          className="type-micro flex h-3 whitespace-nowrap text-muted-foreground md:gap-1"
         >
           {weeks.map((week, index) => {
             const month = week[0]?.date.getMonth();
             const starts =
               index > 0 && month !== weeks[index - 1]?.[0]?.date.getMonth();
             return (
-              <span className="w-5 flex-none max-xs:w-3.5" key={week[0]?.key}>
+              <span
+                className="w-5 flex-none max-xs:w-3.5 md:w-auto md:flex-1 md:basis-0"
+                key={week[0]?.key}
+              >
                 {starts && week[0]
                   ? monthFormat.format(week[0].date).toLowerCase()
                   : null}
@@ -70,12 +76,12 @@ function ActivityGraph({ weeks }: { weeks: ActivityDay[][] }) {
         </div>
         <div className="flex gap-1">
           {weeks.map((week) => (
-            <div className="grid gap-1" key={week[0]?.key}>
+            <div className="grid gap-1 md:flex-1" key={week[0]?.key}>
               {week.map((day) => (
                 <i
                   className={cn(
                     dayCell,
-                    "size-4 max-xs:size-3",
+                    "size-4 max-xs:size-3 md:aspect-square md:size-auto",
                     day.future && "invisible"
                   )}
                   key={day.key}
@@ -139,7 +145,7 @@ function Profile({ data }: { data: ProfileData }) {
               <small
                 className={cn(
                   "type-label",
-                  count > 0 ? "text-green" : "text-faint-foreground"
+                  count > 0 ? "text-green" : "text-muted-foreground"
                 )}
               >
                 {count ? `+${count} this week` : "none this week"}
@@ -151,7 +157,7 @@ function Profile({ data }: { data: ProfileData }) {
       <SectionHead className="mt-12" label="activity">
         <span
           aria-hidden="true"
-          className="type-micro inline-flex items-center gap-1 text-faint-foreground"
+          className="type-micro inline-flex items-center gap-1 text-muted-foreground"
         >
           less
           {keyDensities.map((density) => (
@@ -163,7 +169,7 @@ function Profile({ data }: { data: ProfileData }) {
         </span>
       </SectionHead>
       <ActivityGraph weeks={weeks} />
-      <p className="type-control mt-4 mb-12 flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
+      <p className="type-control mt-4 mb-8 flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">
         <span>
           <b className={num}>{streaks.current}</b> day streak
         </span>
@@ -175,12 +181,14 @@ function Profile({ data }: { data: ProfileData }) {
         </span>
       </p>
       <Link
-        className="type-control flex min-h-14 items-center justify-between gap-4 py-3 text-faint-foreground tabular-nums hover:text-muted-foreground"
+        className="type-control flex min-h-14 items-center justify-between gap-4 py-3 text-muted-foreground tabular-nums hover:text-foreground"
         to="/profile/palace"
       >
         <span className="type-heading text-foreground">memory palace</span>
         <span className="inline-flex items-center gap-0.5">
-          <b className={num}>{palace.named}</b>/{palace.total} named
+          <span>
+            <b className={num}>{palace.named}</b>/{palace.total} named
+          </span>
           <ChevronRight aria-hidden="true" size={15} />
         </span>
       </Link>

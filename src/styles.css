@@ -177,11 +177,6 @@
   /* Library walls: tiles as wide as the room allows; words take two. */
   --grid-template-columns-wall: repeat(auto-fill, minmax(96px, 1fr));
   --grid-template-columns-wall-words: repeat(auto-fill, minmax(200px, 1fr));
-  --grid-template-columns-wall-tight: repeat(auto-fill, minmax(88px, 1fr));
-  --grid-template-columns-wall-words-tight: repeat(
-    auto-fill,
-    minmax(184px, 1fr)
-  );
   --grid-template-columns-wall-xs: repeat(auto-fill, minmax(78px, 1fr));
   --grid-template-columns-wall-words-xs: repeat(auto-fill, minmax(164px, 1fr));
   /* A palace row: code, name, count, chevron. */
@@ -189,9 +184,11 @@
   --grid-template-columns-clue-row-xs: 44px minmax(0, 1fr) auto 14px;
   /* Today: next up, wide, beside later today. */
   --grid-template-columns-today: minmax(0, 7fr) minmax(0, 5fr);
-  /* A settings row: what it is and its actions, its state below; on wider screens all in a line. */
+  /* A settings row: what it is and its actions, its state below; on wider screens all in a line.
+     The actions take a fixed least width, so the state column starts at one x on every row. */
   --grid-template-columns-setting: minmax(0, 1fr) auto;
-  --grid-template-columns-setting-wide: minmax(0, 1.1fr) minmax(0, 1fr) auto;
+  --grid-template-columns-setting-wide: minmax(0, 1.1fr) minmax(0, 1fr)
+    minmax(144px, auto);
   /* A lesson: header, the character, its clues, the actions. The prompt takes only its own
      height (the character's size, for a character); what's left falls above the actions. On wide
      screens the character sits beside the clues, which are centred on it. */
@@ -615,7 +612,8 @@
 /* The largest a glyph inside grows: `glyph-max-75` (300px), `glyph-max-glyph` (the lesson size). */
 @utility glyph-max-* {
   --glyph-max: --value(--spacing-*);
-  --glyph-max: calc(var(--spacing) * --value(number));
+  /* Steps off the named scale, still in 4px units: the theme unsets `--spacing`. */
+  --glyph-max: calc(4px * --value(integer));
 }
 /* A sound lighting up: its colour, glow and lift move together. */
 @utility transition-glow {

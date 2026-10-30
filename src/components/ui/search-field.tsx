@@ -9,7 +9,7 @@ import {
 import { isShortcut, useWindowKeys } from "../../hooks/use-window-keys";
 
 const searchBox =
-  "flex h-14 items-center gap-2.5 rounded-lg border border-border bg-card px-3.5 text-muted-foreground transition-colors focus-within:border-blue focus-within:text-foreground";
+  "flex h-12 items-center gap-2.5 rounded-lg border border-border bg-card px-3.5 text-muted-foreground transition-colors focus-within:border-blue focus-within:text-foreground";
 const searchInput =
   "h-full min-w-0 flex-1 border-0 bg-transparent type-heading text-foreground outline-none search-cancel:hidden placeholder:type-control placeholder:text-faint-foreground";
 const searchClear =

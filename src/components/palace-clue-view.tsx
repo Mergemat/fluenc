@@ -123,7 +123,7 @@ export function PalaceClueView({
       head={<ClueHeader cue={row.cue} kind={kind} named={Boolean(row.name)} />}
     >
       <header
-        className="flex items-center gap-6 py-2"
+        className="flex items-center gap-6"
         data-kind={kind}
         style={kindStyle(row)}
       >
@@ -141,9 +141,7 @@ export function PalaceClueView({
           <h1
             className={cn(
               "wrap-anywhere my-1 tracking-tight",
-              row.name
-                ? "type-display"
-                : "type-control text-faint-foreground text-xl"
+              row.name ? "type-display" : "type-heading text-muted-foreground"
             )}
           >
             {row.name || "not named yet"}
@@ -154,7 +152,7 @@ export function PalaceClueView({
         </div>
       </header>
       {row.name ? null : (
-        <p className="type-control m-0 text-faint-foreground leading-wrap">
+        <p className="type-control mt-3 mb-0 text-muted-foreground leading-wrap">
           it gets its name in the lesson of its first character
         </p>
       )}

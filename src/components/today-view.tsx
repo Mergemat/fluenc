@@ -45,10 +45,9 @@ function leadOf(data: DashboardData): Lead | null {
 const plural = (count: number, one: string, many: string) =>
   `${count} ${count === 1 ? one : many}`;
 
-// Next up: the page's one raised surface. It reaches into the gutter by its padding on wide
-// screens, so its text lines up with the page title; on a phone it sits inside the gutters.
-const nextCard =
-  "flex flex-col gap-4 rounded-xl bg-card p-6 max-md:p-5 md:-ml-6";
+// Next up: the page's one raised surface, on the gutter. Its padding is no more than the gutter
+// around it.
+const nextCard = "flex flex-col gap-4 rounded-xl bg-card p-6 max-md:p-4";
 const nextHero = "flex min-w-0 items-end gap-6";
 const nextGlyph = "flex-none font-hanzi text-7xl leading-none max-md:text-7xl";
 const nextWhat = "m-0 grid min-w-0 gap-2 pb-2";
@@ -321,7 +320,7 @@ function LaterToday({
           <span className="flex gap-1.5">
             {week.days.map((day, index) => (
               <span
-                className="type-micro grid justify-items-center gap-1 text-faint-foreground"
+                className="type-micro grid justify-items-center gap-1 text-muted-foreground"
                 key={day.key}
               >
                 <i

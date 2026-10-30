@@ -10,7 +10,7 @@ import { cn } from "../lib/utils";
 import { usePalaceBoard } from "../progress/views";
 import { ClueCode } from "./character-studio/clue-code";
 import { DitherGradient } from "./dither-kit/gradient";
-import { controls, filterBar, filterGroup, filterSet } from "./library-view";
+import { controls, filterBar, filterGroup } from "./library-view";
 import { type ClueRow, clueRows, kindStyle } from "./palace-rows";
 import { Chip, ChipCount } from "./ui/chip";
 import {
@@ -34,7 +34,7 @@ const tabs: { id: ClueKind; label: string }[] = [
 
 type Show = "all" | "named" | "open";
 
-/** A palace row; every row after the first has a divider above it. */
+/** A palace row; every row after the first in its group has a divider above it. */
 const rowClass = (first: boolean) =>
   cn(
     "relative grid min-h-14 grid-cols-clue-row items-center gap-4 overflow-hidden py-1.5 pr-3.5 pl-2 text-muted-foreground transition-colors max-xs:grid-cols-clue-row-xs max-xs:gap-2",
@@ -99,17 +99,21 @@ export function PalaceView() {
     }
     return (
       <div className="grid overflow-hidden">
-        {shown.map((entry, index) => (
-          <div key={`${entry.kind}:${entry.key}`}>
-            {entry.group && entry.group !== shown[index - 1]?.group ? (
-              <SectionHead
-                className={index ? "mt-12" : undefined}
-                label={entry.group}
-              />
-            ) : null}
-            <ClueLink first={index === 0} row={entry} />
-          </div>
-        ))}
+        {shown.map((entry, index) => {
+          const head = entry.group && entry.group !== shown[index - 1]?.group;
+          return (
+            <div key={`${entry.kind}:${entry.key}`}>
+              {head ? (
+                <SectionHead
+                  // Rows pad themselves, which makes up the rest of the gaps around a head.
+                  className={index ? "mt-8 mb-0" : "mt-4 mb-0"}
+                  label={entry.group}
+                />
+              ) : null}
+              <ClueLink first={index === 0 || !!head} row={entry} />
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -141,7 +145,7 @@ export function PalaceView() {
         <div className={filterBar}>
           <div
             aria-label="Palace sections"
-            className={filterSet}
+            className={filterGroup}
             role="tablist"
           >
             {tabs.map((entry) => (
@@ -206,8 +210,7 @@ function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
       <span
         className={cn(
           "type-code justify-self-center whitespace-nowrap text-kind",
-          props && "font-hanzi-props font-normal text-3xl",
-          open && "opacity-55"
+          props && "font-hanzi-props font-normal text-3xl"
         )}
         lang={props ? "zh-CN" : undefined}
       >
@@ -218,7 +221,7 @@ function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
           className={cn(
             "min-w-0 truncate",
             open
-              ? "type-control text-faint-foreground"
+              ? "type-control text-muted-foreground"
               : "type-heading text-foreground"
           )}
         >

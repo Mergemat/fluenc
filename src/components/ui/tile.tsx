@@ -41,13 +41,11 @@ export function StatusDot({ status }: { status: Status }) {
   );
 }
 
-/** A wall of tiles. `tight` packs them closer, for a list inside a page. */
+/** A wall of tiles. */
 export function Wall({
-  tight = false,
   busy,
   children,
 }: {
-  tight?: boolean;
   busy?: boolean;
   children: ReactNode;
 }) {
@@ -56,10 +54,7 @@ export function Wall({
       aria-busy={busy}
       className={cn(
         // Words take two columns beside characters; on a wall of only words the columns double.
-        "group/wall grid grid-flow-row-dense gap-2 has-data-character:grid-cols-wall",
-        tight
-          ? "grid-cols-wall-words-tight has-data-character:grid-cols-wall-tight"
-          : "grid-cols-wall-words",
+        "group/wall grid grid-flow-row-dense grid-cols-wall-words gap-x-2 gap-y-1 has-data-character:grid-cols-wall",
         "max-xs:grid-cols-wall-words-xs max-xs:has-data-character:grid-cols-wall-xs"
       )}
     >
@@ -71,13 +66,14 @@ export function Wall({
 const tileStatus: Record<Status, string> = {
   review: "after:bg-green",
   learning: "after:bg-orange",
-  new: "opacity-50 hover:opacity-100",
+  // Unlearned entries step down to muted rather than fading, so their text stays readable.
+  new: "text-muted-foreground hover:text-foreground",
 };
 
 /** The frame of a tile; `TileGlyph` and the lines under it go inside. */
 export function tileClass(kind: LibraryEntry["kind"], status: Status) {
   return cn(
-    "relative grid min-h-28 content-center justify-items-center gap-1 overflow-hidden rounded-lg px-2 py-2.5 text-center transition hover:bg-card max-xs:min-h-24",
+    "relative grid content-start justify-items-center gap-1 overflow-hidden rounded-lg px-2 py-2 text-center transition hover:bg-card max-xs:px-1",
     "after:absolute after:top-2 after:right-2 after:size-1.5 after:rounded-xs",
     kind === "words" && "col-span-2 group-not-has-data-character/wall:col-auto",
     tileStatus[status]
@@ -108,7 +104,7 @@ export function TileGlyph({
 
 /** A placeholder while the library loads. */
 export const tileSkeleton =
-  "relative min-h-28 animate-pulse overflow-hidden rounded-lg max-xs:min-h-24";
+  "relative min-h-24 animate-pulse overflow-hidden rounded-lg";
 
 export function Tile({ item }: { item: LibraryEntry }) {
   const meaning = getItemMeaning(item);
@@ -126,7 +122,13 @@ export function Tile({ item }: { item: LibraryEntry }) {
       <span className="type-label max-w-full truncate text-muted-foreground">
         {item.pinyin}
       </span>
-      <span className="type-body max-w-full truncate text-foreground">
+      <span
+        className={cn(
+          "type-body wrap-break-word line-clamp-2 max-w-full leading-wrap",
+          // Only a lone word too long for the tile breaks; a phrase wraps between its words.
+          !meaning.primary.includes(" ") && "hyphens-auto"
+        )}
+      >
         {meaning.primary}
       </span>
       {item.approximate ? (

@@ -16,7 +16,7 @@ export type CardSuit = keyof typeof suits;
 
 /** The page: a header, then a deck that fills the rest without scrolling. */
 export const deckPage =
-  "mx-auto flex h-full w-full max-w-frame flex-col gap-4 px-gutter pt-page-top pb-6";
+  "mx-auto flex h-full w-full max-w-frame flex-col gap-6 px-gutter pt-page-top pb-6";
 
 /** A deck: the table with its pile, then the actions under it. */
 export const deck = "flex min-h-0 flex-1 flex-col gap-4";
@@ -257,8 +257,13 @@ export function DeckCard({
   );
 }
 
+/** The figure on a card lying on the table, at its size: a timer or a verdict. */
+export const slotFigure = (size: string) =>
+  cn("type-display relative", size, "leading-none");
+
 /** A card lying on the table's line under its figure. */
-export const slotNote = "relative type-label text-muted-foreground";
+export const slotNote =
+  "relative type-label text-balance text-center text-muted-foreground leading-wrap";
 
 /** A card lying on the table without a flip: face down with a timer, or the empty place. */
 export function DeckSlot({
