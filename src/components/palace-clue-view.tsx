@@ -1,8 +1,4 @@
-// One palace clue and every character it appears in, as library tiles in course order.
-import { Link, useCanGoBack } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
 import { useMemo } from "react";
-import { useGoBack } from "../hooks/use-go-back";
 import type { ClueKind } from "../lib/palace-board";
 import { getToneDetail } from "../lib/tones";
 import { cn } from "../lib/utils";
@@ -10,15 +6,14 @@ import { useLibrary, usePalaceBoard } from "../progress/views";
 import { ClueCode } from "./character-studio/clue-code";
 import { type ClueRow, clueRows, kindStyle } from "./palace-rows";
 import {
+  BackCrumb,
   CrumbSlash,
-  crumb,
+  MissingPage,
   Page,
   PageHeader,
   SectionHead,
-  Status,
-  statusAction,
 } from "./ui/layout";
-import { StatusDot, Tile, Wall } from "./ui/tile";
+import { StatusMeta, Tile, Wall } from "./ui/tile";
 
 const kindLabel: Record<ClueKind, string> = {
   cast: "actor",
@@ -60,31 +55,20 @@ function ClueHeader({
   cue: ClueRow["cue"];
   named: boolean;
 }) {
-  const goBack = useGoBack();
-  const canGoBack = useCanGoBack();
   const props = kind === "props";
   return (
     <PageHeader
       heading={false}
       meta={
-        <span className="inline-flex items-center gap-2">
-          <StatusDot status={named ? "review" : "new"} />
+        <StatusMeta status={named ? "review" : "new"}>
           {named ? "named" : "open"}
-        </span>
+        </StatusMeta>
       }
       title={
         <>
-          {canGoBack ? (
-            <button className={crumb} onClick={goBack} type="button">
-              <ArrowLeft size={14} />
-              palace
-            </button>
-          ) : (
-            <Link className={crumb} search={{ tab: kind }} to="/profile/palace">
-              <ArrowLeft size={14} />
-              palace
-            </Link>
-          )}
+          <BackCrumb link={{ to: "/profile/palace", search: { tab: kind } }}>
+            palace
+          </BackCrumb>
           <CrumbSlash />
           <span
             className={props ? "font-hanzi-props" : undefined}
@@ -123,16 +107,11 @@ export function PalaceClueView({
 
   if (!row) {
     return (
-      <Page>
-        <Status
-          action={
-            <Link className={statusAction} to="/profile/palace">
-              back to palace
-            </Link>
-          }
-          title="this clue isn’t in your palace"
-        />
-      </Page>
+      <MissingPage
+        back="back to palace"
+        link={{ to: "/profile/palace" }}
+        title="this clue isn’t in your palace"
+      />
     );
   }
 

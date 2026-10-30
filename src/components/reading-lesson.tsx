@@ -1,14 +1,14 @@
 // A new sentence, read for meaning on a card like review's: the sentence is the front, its sound
 // and meaning the back. Then it is shadowed (heard and said aloud a few times, each time laying
 // down one small card) before it joins Review, where it is recalled from English.
-import { useCallback, useEffect, useEffectEvent, useState } from "react";
+import { useCallback, useState } from "react";
 import { useMandarinSpeech } from "../hooks/use-mandarin-speech";
+import { isShortcut, useWindowKeys } from "../hooks/use-window-keys";
 import type { DashboardData } from "../lib/learner-views";
 import { cn } from "../lib/utils";
 import { saveEnrollment, useSave } from "../progress/actions";
-import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
-import { action, actionKey } from "./ui/buttons";
+import { ActionButton } from "./ui/button";
 import {
   cardMeaning,
   cardReading,
@@ -63,17 +63,12 @@ export function ReadingLesson({
   }, [speak, item.hanzi, item.pinyin]);
 
   // Space checks the meaning, then plays the line to repeat; Enter adds it once it's shadowed.
-  const onKey = useEffectEvent((event: KeyboardEvent) => {
-    if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) {
-      return;
-    }
+  useWindowKeys((event) => {
     if (
-      event.target instanceof Element &&
-      event.target.closest("input, textarea, button, a, [role=dialog]")
+      event.repeat ||
+      !isShortcut(event) ||
+      (event.code !== "Space" && event.key !== "Enter")
     ) {
-      return;
-    }
-    if (event.code !== "Space" && event.key !== "Enter") {
       return;
     }
     event.preventDefault();
@@ -87,10 +82,6 @@ export function ReadingLesson({
       shadow();
     }
   });
-  useEffect(() => {
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 
   return (
     <div className={deck} data-revealed={revealed} data-type="sentence">
@@ -130,27 +121,27 @@ export function ReadingLesson({
         </DeckPile>
       </DeckTable>
       <footer className={deckActions(true)}>
-        <DitherButton
-          className={cn(action, "h-14 self-end")}
+        <ActionButton
+          className="h-14 self-end"
           color="blue"
           disabled={playing || isPending}
+          hint="space"
           onClick={revealed ? shadow : reveal}
           variant={revealed && shadowed ? "dotted" : "gradient"}
         >
-          <span>{actionLabel(revealed, playing)}</span>
-          <kbd className={actionKey}>space</kbd>
-        </DitherButton>
+          {actionLabel(revealed, playing)}
+        </ActionButton>
         {revealed && shadowed ? (
-          <DitherButton
-            className={cn(action, "h-14 self-end")}
+          <ActionButton
+            className="h-14 self-end"
             color="green"
             disabled={isPending}
+            hint="↵"
             onClick={enroll}
             variant="gradient"
           >
-            <span>{isPending ? "saving" : "add to review"}</span>
-            <kbd className={actionKey}>↵</kbd>
-          </DitherButton>
+            {isPending ? "saving" : "add to review"}
+          </ActionButton>
         ) : null}
       </footer>
       {mutation.isError ? (

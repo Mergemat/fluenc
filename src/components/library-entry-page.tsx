@@ -1,8 +1,3 @@
-// One library entry, built only from the cached library and palace (works offline).
-// Characters show their glyph, scene and the words that use them; words show their gloss.
-// Scene names and memory links are edited in place and saved on blur, like a lesson saves them.
-import { Link, useCanGoBack } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
 import {
   type FocusEvent,
   type KeyboardEvent,
@@ -11,7 +6,6 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
-import { useGoBack } from "../hooks/use-go-back";
 import type { LibraryData, PalaceData } from "../lib/learner-views";
 import type {
   LibraryCharacter,
@@ -52,8 +46,14 @@ import {
   pinyinText,
   soundRow,
 } from "./ui/hanzi";
-import { CrumbSlash, crumb, Page, PageHeader, SectionHead } from "./ui/layout";
-import { StatusDot, Tile, TileGlyph, tileClass, Wall } from "./ui/tile";
+import {
+  BackCrumb,
+  CrumbSlash,
+  Page,
+  PageHeader,
+  SectionHead,
+} from "./ui/layout";
+import { StatusMeta, Tile, TileGlyph, tileClass, Wall } from "./ui/tile";
 
 /** The character or gloss beside its definition; stacked and centred on phones. */
 const hero =
@@ -93,8 +93,6 @@ export function LibraryEntryPage({
   item: LibraryEntry;
   from?: "palace";
 }) {
-  const goBack = useGoBack();
-  const canGoBack = useCanGoBack();
   const library = useLibrary();
   const palace = usePalace();
   const back = from === "palace" ? "palace" : "library";
@@ -105,27 +103,19 @@ export function LibraryEntryPage({
         <PageHeader
           heading={false}
           meta={
-            <span className="inline-flex items-center gap-2">
-              <StatusDot status={item.status} />
+            <StatusMeta status={item.status}>
               {statusLabel[item.status]}
-            </span>
+            </StatusMeta>
           }
           title={
             <>
-              {canGoBack ? (
-                <button className={crumb} onClick={goBack} type="button">
-                  <ArrowLeft size={14} />
-                  {back}
-                </button>
-              ) : (
-                <Link
-                  className={crumb}
-                  to={from === "palace" ? "/profile/palace" : "/library"}
-                >
-                  <ArrowLeft size={14} />
-                  {back}
-                </Link>
-              )}
+              <BackCrumb
+                link={{
+                  to: from === "palace" ? "/profile/palace" : "/library",
+                }}
+              >
+                {back}
+              </BackCrumb>
               <CrumbSlash />
               <span className="font-hanzi" lang="zh-CN">
                 {item.hanzi}

@@ -1,13 +1,7 @@
-import {
-  createFileRoute,
-  Outlet,
-  useLocation,
-  useRouter,
-} from "@tanstack/react-router";
-import { useCallback } from "react";
+import { createFileRoute, Outlet, useLocation } from "@tanstack/react-router";
 
 import { AppShell } from "../components/app-shell";
-import { Status, statusAction } from "../components/ui/layout";
+import { RetryStatus, Status } from "../components/ui/layout";
 import { Toaster } from "../components/ui/sonner";
 import { OfflineDownloadProvider } from "../offline/offline-download-provider";
 import { useSync } from "../progress/use-sync";
@@ -42,18 +36,5 @@ function AppLayout() {
 }
 
 function StartupError() {
-  const router = useRouter();
-  const retry = useCallback(() => {
-    router.invalidate();
-  }, [router]);
-  return (
-    <Status
-      action={
-        <button className={statusAction} onClick={retry} type="button">
-          try again
-        </button>
-      }
-      title="couldn’t open your progress on this device"
-    />
-  );
+  return <RetryStatus title="couldn’t open your progress on this device" />;
 }

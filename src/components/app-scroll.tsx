@@ -5,9 +5,9 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useSyncExternalStore,
 } from "react";
 
+import { useMediaQuery } from "../hooks/use-media-query";
 import { reloadApp } from "../updates/use-app-update";
 import {
   IonContent,
@@ -17,14 +17,6 @@ import {
   useScrollReady,
 } from "./ui/ionic-scroll";
 import "@ionic/core/css/core.css";
-
-const STANDALONE = "(display-mode: standalone)";
-const isStandalone = () => window.matchMedia(STANDALONE).matches;
-const subscribeToDisplayMode = (onChange: () => void) => {
-  const query = window.matchMedia(STANDALONE);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-};
 
 interface PullGesture {
   refresh: boolean;
@@ -47,11 +39,7 @@ export function AppScroll({
   );
   const shownPath = useRef(pathname);
   const ready = useScrollReady();
-  const standalone = useSyncExternalStore(
-    subscribeToDisplayMode,
-    isStandalone,
-    () => false
-  );
+  const standalone = useMediaQuery("(display-mode: standalone)");
 
   // Initialize after hydration: Ionic adds platform classes to the document.
   useEffect(() => {

@@ -1,12 +1,11 @@
 import { useNavigate } from "@tanstack/react-router";
 import { LogIn, LogOut, RefreshCw } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
-
 import { signOut, unsyncedChanges } from "../account/account";
+import { useNow } from "../hooks/use-now";
 import { type SyncStatus, syncNow, useSyncStatus } from "../progress/sync";
-import { DitherButton } from "./dither-kit/button";
-import { tool } from "./ui/buttons";
+import { ToolButton } from "./ui/button";
 import { SettingRow, type Tone } from "./ui/setting-row";
 
 const MINUTE = 60_000;
@@ -55,15 +54,6 @@ function syncLine(status: SyncStatus, now: number): [Tone, string] {
 }
 
 /** Re-render every minute, for "synced 3 min ago". */
-function useMinute() {
-  const [now, setNow] = useState(Date.now);
-  useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), MINUTE / 2);
-    return () => window.clearInterval(timer);
-  }, []);
-  return now;
-}
-
 type SignOut =
   | { step: "idle" }
   | { step: "checking" }
@@ -73,7 +63,8 @@ type SignOut =
 export function AccountSettings() {
   const status = useSyncStatus();
   const navigate = useNavigate();
-  const now = useMinute();
+  // "synced 3 minutes ago" stays within half a minute of true.
+  const now = useNow(MINUTE / 2);
   const [leaving, setLeaving] = useState<SignOut>({ step: "idle" });
 
   const openAccount = useCallback(() => {
@@ -117,15 +108,9 @@ export function AccountSettings() {
         title="sync"
         tone="idle"
       >
-        <DitherButton
-          className={tool}
-          color="blue"
-          onClick={openAccount}
-          variant="gradient"
-        >
-          <LogIn className="shrink-0" size={13} />
+        <ToolButton icon={LogIn} onClick={openAccount} tone="primary">
           sign in
-        </DitherButton>
+        </ToolButton>
       </SettingRow>
     );
   }
@@ -151,60 +136,38 @@ export function AccountSettings() {
       tone={tone}
     >
       {status.signedIn === false ? (
-        <DitherButton
-          className={tool}
-          color="blue"
-          onClick={openAccount}
-          variant="gradient"
-        >
-          <LogIn className="shrink-0" size={13} />
+        <ToolButton icon={LogIn} onClick={openAccount} tone="primary">
           sign in
-        </DitherButton>
+        </ToolButton>
       ) : null}
       {leaving.step === "confirm" ? (
         <>
-          <DitherButton
-            className={tool}
-            color="grey"
-            onClick={keep}
-            variant="dotted"
-          >
+          <ToolButton onClick={keep} tone="quiet">
             keep
-          </DitherButton>
-          <DitherButton
-            className={tool}
-            color="red"
-            onClick={forceSignOut}
-            variant="dotted"
-          >
-            <LogOut className="shrink-0" size={13} />
+          </ToolButton>
+          <ToolButton icon={LogOut} onClick={forceSignOut} tone="danger">
             sign out anyway
-          </DitherButton>
+          </ToolButton>
         </>
       ) : (
         <>
           {status.signedIn ? (
-            <DitherButton
+            <ToolButton
               aria-label="Sync now"
-              className={tool}
-              color="grey"
               disabled={status.phase === "syncing"}
+              icon={RefreshCw}
               onClick={sync}
-              variant="dotted"
-            >
-              <RefreshCw className="shrink-0" size={13} />
-            </DitherButton>
+              tone="quiet"
+            />
           ) : null}
-          <DitherButton
-            className={tool}
-            color="red"
+          <ToolButton
             disabled={leaving.step === "checking"}
+            icon={LogOut}
             onClick={startSignOut}
-            variant="dotted"
+            tone="danger"
           >
-            <LogOut className="shrink-0" size={13} />
             sign out
-          </DitherButton>
+          </ToolButton>
         </>
       )}
     </SettingRow>

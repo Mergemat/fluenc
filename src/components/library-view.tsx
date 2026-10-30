@@ -1,15 +1,10 @@
 import { getRouteApi } from "@tanstack/react-router";
-import { Search, X } from "lucide-react";
 import {
-  type ChangeEvent,
-  type CompositionEvent,
   type MouseEvent,
   type ReactNode,
   useCallback,
   useDeferredValue,
-  useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
 import { flushSync } from "react-dom";
@@ -23,7 +18,6 @@ import {
 import { createLibrarySearch, type LibraryEntry } from "../lib/library-search";
 import { cn } from "../lib/utils";
 import { useDashboard, useLibrary, usePalace } from "../progress/views";
-import { DitherGradient } from "./dither-kit/gradient";
 import { Chip, ChipCount } from "./ui/chip";
 import {
   headMeta,
@@ -33,7 +27,8 @@ import {
   Status,
   statusAction,
 } from "./ui/layout";
-import { progressFill, progressTrack } from "./ui/split-meter";
+import { SearchField, useSearchField } from "./ui/search-field";
+import { SplitMeter } from "./ui/split-meter";
 import { StatusDot, Tile, Wall } from "./ui/tile";
 
 const route = getRouteApi("/_app/library");
@@ -55,12 +50,6 @@ const statuses = [
 // The search field and filter chips over a list; the palace shares them.
 /** Search field and filters, above the results. */
 export const controls = "mb-6 grid gap-4";
-export const searchBox =
-  "flex h-14 items-center gap-2.5 rounded-lg border border-border bg-card px-3.5 text-muted-foreground transition-colors focus-within:border-blue focus-within:text-foreground";
-export const searchInput =
-  "h-full min-w-0 flex-1 border-0 bg-transparent type-heading text-foreground outline-none search-cancel:hidden placeholder:type-control placeholder:text-faint-foreground";
-export const searchClear =
-  "grid size-7 place-items-center rounded-sm text-muted-foreground hover:bg-popover hover:text-foreground";
 /** Filter groups: chip sets on one line, wrapping, the last pushed to the end. */
 export const filterBar = "flex flex-wrap justify-between gap-2";
 export const filterSet = "flex flex-wrap gap-x-4 gap-y-2";
@@ -114,80 +103,6 @@ function usePagedResults(filters: string) {
 
 const sectionId = (key: string) => `library-${key}`;
 
-/**
- * The search field owns its text: echoing it through the URL lands a render late, and resetting
- * the value mid-composition breaks IME input (iOS pinyin). The URL follows once a word is
- * committed. "/" focuses the field from anywhere on the page.
- */
-function useSearchField(q: string, commit: (value: string) => void) {
-  // `sent` is what the field has sent to the URL and not yet seen land; navigations can skip
-  // values. `q` is the URL value the field last saw.
-  const [field, setField] = useState({ q, draft: q, sent: [] as string[] });
-  if (field.q !== q) {
-    const echo = field.sent.indexOf(q);
-    // Changed from outside the field (the sidebar link, clearing): adopt it.
-    setField(
-      echo === -1
-        ? { q, draft: q, sent: [] }
-        : { q, draft: field.draft, sent: field.sent.slice(echo + 1) }
-    );
-  }
-  const composing = useRef<boolean>(false);
-  const input = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) {
-        return;
-      }
-      if (
-        event.target instanceof Element &&
-        event.target.closest("input, textarea")
-      ) {
-        return;
-      }
-      event.preventDefault();
-      input.current?.focus();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
-  const type = useCallback(
-    (value: string, send: boolean) => {
-      setField((previous) => ({
-        ...previous,
-        draft: value,
-        sent: send ? [...previous.sent, value] : previous.sent,
-      }));
-      if (send) {
-        commit(value);
-      }
-    },
-    [commit]
-  );
-  const onChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      type(event.target.value, !composing.current);
-    },
-    [type]
-  );
-  const onCompositionStart = useCallback(() => {
-    composing.current = true;
-  }, []);
-  const onCompositionEnd = useCallback(
-    (event: CompositionEvent<HTMLInputElement>) => {
-      composing.current = false;
-      type(event.currentTarget.value, true);
-    },
-    [type]
-  );
-  return {
-    draft: field.draft,
-    input,
-    handlers: { onChange, onCompositionStart, onCompositionEnd },
-  };
-}
-
 type Section = LibrarySection & { shown: LibraryEntry[] };
 
 /**
@@ -237,7 +152,8 @@ export function LibraryView() {
     (value: string) => update({ q: value }),
     [update]
   );
-  const { draft, input, handlers } = useSearchField(q, commitQuery);
+  const field = useSearchField(q, commitQuery);
+  const { draft } = field;
   const query = useDeferredValue(draft);
   const searching = query.trim() !== "";
   const search = useMemo(
@@ -268,10 +184,6 @@ export function LibraryView() {
     ? pool.filter((item) => status === "all" || item.status === status)
     : sections.flatMap((section) => section.shown);
 
-  const clearQuery = useCallback(() => {
-    update({ q: "" });
-    input.current?.focus();
-  }, [update, input]);
   const clearAll = useCallback(
     () => update({ q: "", status: "all" }),
     [update]
@@ -313,34 +225,11 @@ export function LibraryView() {
       }
     >
       <div className={controls}>
-        <label className={searchBox}>
-          <Search aria-hidden="true" size={16} />
-          <input
-            aria-label="Search the library"
-            autoComplete="off"
-            className={searchInput}
-            placeholder="hanzi, pinyin, meaning, or your clues"
-            ref={input}
-            spellCheck={false}
-            type="search"
-            value={draft}
-            {...handlers}
-          />
-          {draft ? (
-            <button
-              aria-label="Clear search"
-              className={searchClear}
-              onClick={clearQuery}
-              type="button"
-            >
-              <X size={15} />
-            </button>
-          ) : (
-            <kbd className="rounded-sm border border-border-strong px-1.5 py-px">
-              /
-            </kbd>
-          )}
-        </label>
+        <SearchField
+          field={field}
+          label="Search the library"
+          placeholder="hanzi, pinyin, meaning, or your clues"
+        />
         <LibraryFilters
           group={group}
           kind={kind}
@@ -586,27 +475,12 @@ function LibrarySectionBlock({
           {section.label}
         </h2>
         {progress ? (
-          <div
-            aria-label={`${section.label} learned`}
-            aria-valuemax={size}
-            aria-valuemin={0}
-            aria-valuenow={section.learned}
-            className={cn(progressTrack, "max-w-none")}
-            role="progressbar"
-          >
-            <DitherGradient
-              cell={2}
-              direction="right"
-              from="grey"
-              opacity={0.5}
-            />
-            <span
-              className={progressFill}
-              style={{ width: `${(section.learned / size) * 100}%` }}
-            >
-              <DitherGradient cell={2} direction="left" from="green" />
-            </span>
-          </div>
+          <SplitMeter
+            label={`${section.label} learned`}
+            learned={section.learned}
+            text={`${section.learned} of ${size} learned`}
+            total={size}
+          />
         ) : null}
         <div
           className={cn(headMeta, progress ? "max-md:ml-auto" : "dot-before")}

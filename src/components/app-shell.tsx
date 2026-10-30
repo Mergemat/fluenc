@@ -12,8 +12,9 @@ import {
   Settings,
   Sun,
 } from "lucide-react";
-import { type ReactNode, useSyncExternalStore } from "react";
+import type { ReactNode } from "react";
 import { useHydrated } from "../hooks/use-hydrated";
+import { useMediaQuery } from "../hooks/use-media-query";
 
 import { cn } from "../lib/utils";
 import {
@@ -61,13 +62,6 @@ const badge =
 
 // The theme's `lg` breakpoint, where the sidebar shows.
 const WIDE = "(min-width: 1024px)";
-const subscribeToWide = (onChange: () => void) => {
-  const query = window.matchMedia(WIDE);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-};
-const isWide = () => window.matchMedia(WIDE).matches;
-const notWide = () => false;
 
 /** How far through the course the learner is, learned and learning; shown in the desktop sidebar. */
 function CourseProgress() {
@@ -154,7 +148,7 @@ export function AppShell({
   // until hydration: children's effects (the canvas paints) run before this one flips it on.
   const hydrated = useHydrated();
   // The sidebar's course meters work out the whole profile; a phone never shows them.
-  const wide = useSyncExternalStore(subscribeToWide, isWide, notWide);
+  const wide = useMediaQuery(WIDE);
 
   return (
     <div

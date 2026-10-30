@@ -5,12 +5,11 @@ import {
   type ChangeEvent,
   type KeyboardEvent,
   useCallback,
-  useEffect,
   useEffectEvent,
   useRef,
   useState,
 } from "react";
-import { toast } from "sonner";
+import { isShortcut, useWindowKeys } from "../hooks/use-window-keys";
 import type { BuildItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
 import { cn } from "../lib/utils";
@@ -22,6 +21,7 @@ import {
   clueRow,
   kindStyle,
 } from "./character-studio/clue-row";
+import { finishLabel, toastAdded } from "./character-studio/finish";
 import {
   studio,
   studioAction,
@@ -32,22 +32,12 @@ import {
   studioPinyin,
   studioRead,
 } from "./character-studio/studio";
-import { DitherButton } from "./dither-kit/button";
 import { WordGloss } from "./review-card";
+import { ActionButton } from "./ui/button";
 import { AudioButton, ident, pinyinText, soundRow } from "./ui/hanzi";
 import { PageHeader, SectionHead } from "./ui/layout";
 
 type WordItem = Extract<BuildItem, { type: "word" }>;
-
-function actionLabel(saving: boolean, tooShort: boolean, failed: boolean) {
-  if (saving) {
-    return "saving";
-  }
-  if (tooShort) {
-    return "memory link needs 4+ characters";
-  }
-  return failed ? "could not save — try again" : "add to reviews";
-}
 
 export function WordLesson({ item }: { item: WordItem }) {
   const meaning = getItemMeaning(item);
@@ -76,15 +66,7 @@ export function WordLesson({ item }: { item: WordItem }) {
     if (isPending) {
       return;
     }
-    mutate(undefined, {
-      onSuccess: () =>
-        toast(
-          <>
-            <b className="font-hanzi">{item.hanzi}</b>
-            <span>added to reviews</span>
-          </>
-        ),
-    });
+    mutate(undefined, { onSuccess: () => toastAdded(item.hanzi) });
   }, [tooShort, isPending, mutate, item.hanzi]);
   const onEnter = useEffectEvent(primary);
   const editStory = useCallback(
@@ -106,29 +88,12 @@ export function WordLesson({ item }: { item: WordItem }) {
     [primary]
   );
 
-  useEffect(() => {
-    const onKey = (event: globalThis.KeyboardEvent) => {
-      if (
-        event.key !== "Enter" ||
-        event.defaultPrevented ||
-        event.metaKey ||
-        event.ctrlKey ||
-        event.altKey
-      ) {
-        return;
-      }
-      if (
-        event.target instanceof Element &&
-        event.target.closest("input, textarea, button, a, [role=dialog]")
-      ) {
-        return;
-      }
+  useWindowKeys((event) => {
+    if (event.key === "Enter" && !event.defaultPrevented && isShortcut(event)) {
       event.preventDefault();
       onEnter();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+    }
+  });
 
   const prompt = single
     ? "what makes this reading stick?"
@@ -212,18 +177,20 @@ export function WordLesson({ item }: { item: WordItem }) {
       </section>
 
       <footer className={studioActions} data-actions>
-        <DitherButton
+        <ActionButton
           className={studioAction}
           color={tooShort ? "grey" : "blue"}
           disabled={finish.isPending}
+          hint="↵"
           onClick={primary}
           variant={tooShort ? "dotted" : "gradient"}
         >
-          <span role={finish.isError ? "alert" : undefined}>
-            {actionLabel(finish.isPending, tooShort, finish.isError)}
-          </span>
-          <kbd>↵</kbd>
-        </DitherButton>
+          {finishLabel(
+            finish.isPending,
+            finish.isError,
+            tooShort ? "memory link needs 4+ characters" : null
+          )}
+        </ActionButton>
       </footer>
     </article>
   );

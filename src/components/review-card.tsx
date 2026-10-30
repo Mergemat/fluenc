@@ -10,12 +10,12 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
-  useEffectEvent,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { type Grade, Rating } from "ts-fsrs";
+import { isShortcut, useWindowKeys } from "../hooks/use-window-keys";
 import { cardKey as storedKey, toCard } from "../lib/learner-state";
 import type { ReviewItem } from "../lib/learner-views";
 import { getItemMeaning } from "../lib/meaning";
@@ -27,7 +27,8 @@ import { ClueCode } from "./character-studio/clue-code";
 import { lessonClues } from "./character-studio/clues";
 import { DitherButton } from "./dither-kit/button";
 import type { DitherColor } from "./dither-kit/palette";
-import { action, actionKey } from "./ui/buttons";
+import { ActionButton } from "./ui/button";
+import { actionKey } from "./ui/buttons";
 import {
   cardAnswer,
   cardMeaning,
@@ -563,28 +564,17 @@ function useBack(
     // A failed take-back leaves the review as it was, which the deck already shows.
     takeBackReview().catch(() => undefined);
   }, [flush, onBack]);
-  const onKey = useEffectEvent((event: KeyboardEvent) => {
+  // Backspace goes back even from a button: it does nothing there.
+  useWindowKeys((event) => {
     if (
-      event.key !== "Backspace" ||
-      event.repeat ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.altKey ||
-      (event.target instanceof Element &&
-        event.target.closest("input, textarea, [role=dialog]"))
+      event.key === "Backspace" &&
+      !event.repeat &&
+      isShortcut(event, "input, textarea, [role=dialog]")
     ) {
-      return;
+      event.preventDefault();
+      goBack();
     }
-    event.preventDefault();
-    goBack();
-  });
-  useEffect(() => {
-    if (!canTakeBack) {
-      return;
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [canTakeBack]);
+  }, canTakeBack);
   return {
     takenBack: memory.takenBack,
     button: canTakeBack ? (
@@ -688,20 +678,8 @@ export function ReviewDeck({
   );
 
   // Space or Enter reveals; 1–4 rates once the answer shows.
-  const onKey = useEffectEvent((event: KeyboardEvent) => {
-    if (
-      !active ||
-      event.repeat ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.altKey
-    ) {
-      return;
-    }
-    if (
-      event.target instanceof Element &&
-      event.target.closest("input, textarea, button, a, [role=dialog]")
-    ) {
+  useWindowKeys((event) => {
+    if (!active || event.repeat || !isShortcut(event)) {
       return;
     }
     if ((event.code === "Space" || event.key === "Enter") && !revealed) {
@@ -711,10 +689,6 @@ export function ReviewDeck({
       rate(Number(event.key) as Grade);
     }
   });
-  useEffect(() => {
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 
   if (!(active || saving || leaving.length)) {
     return done(worked, back.button);
@@ -773,22 +747,21 @@ export function ReviewDeck({
         </DeckTable>
 
         <footer className={deckActions()}>
-          <DitherButton
+          <ActionButton
             aria-hidden={revealed || !active}
             className={cn(
-              action,
               deckAction,
               "h-14",
               (revealed || !active) && "invisible"
             )}
             color="blue"
+            hint="space"
             inert={revealed || !active}
             onClick={reveal}
             variant="gradient"
           >
-            <span>show answer</span>
-            <kbd className={actionKey}>space</kbd>
-          </DitherButton>
+            show answer
+          </ActionButton>
           <fieldset
             aria-hidden={!revealed}
             aria-label="How well did you recall it?"

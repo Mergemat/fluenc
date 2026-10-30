@@ -1,13 +1,12 @@
-import {
-  createFileRoute,
-  Link,
-  notFound,
-  useRouter,
-} from "@tanstack/react-router";
-import { useCallback } from "react";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { LibraryEntryPage } from "../components/library-entry-page";
-import { Page, Status, statusAction } from "../components/ui/layout";
+import {
+  MissingPage,
+  Page,
+  RetryStatus,
+  Status,
+} from "../components/ui/layout";
 import type { LibraryData } from "../lib/learner-views";
 import type { LibraryEntry } from "../lib/library-search";
 import { oneOf } from "../lib/search-params";
@@ -66,16 +65,11 @@ export const Route = createFileRoute("/_app/library_/$kind/$id")({
 
 function Missing() {
   return (
-    <Page>
-      <Status
-        action={
-          <Link className={statusAction} to="/library">
-            back to library
-          </Link>
-        }
-        title="this entry isn’t in the library"
-      />
-    </Page>
+    <MissingPage
+      back="back to library"
+      link={{ to: "/library" }}
+      title="this entry isn’t in the library"
+    />
   );
 }
 
@@ -87,20 +81,9 @@ function Detail() {
 }
 
 function DetailError() {
-  const router = useRouter();
-  const retry = useCallback(() => {
-    router.invalidate();
-  }, [router]);
   return (
     <Page>
-      <Status
-        action={
-          <button className={statusAction} onClick={retry} type="button">
-            retry
-          </button>
-        }
-        title="couldn’t load these details"
-      />
+      <RetryStatus title="couldn’t load these details" />
     </Page>
   );
 }

@@ -1,17 +1,12 @@
 import { useNavigate } from "@tanstack/react-router";
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useState,
-} from "react";
+import { type ReactNode, useCallback } from "react";
+import { useNow } from "../hooks/use-now";
+import { isShortcut, useWindowKeys } from "../hooks/use-window-keys";
 import type { DashboardData } from "../lib/learner-views";
 import { isLearning, nextReviews } from "../lib/review-schedule";
 import { cn } from "../lib/utils";
-import { DitherButton } from "./dither-kit/button";
 import { ReviewDeck } from "./review-card";
-import { action, actionKey } from "./ui/buttons";
+import { ActionButton } from "./ui/button";
 import {
   DeckPile,
   DeckSlot,
@@ -93,35 +88,19 @@ function ReviewDone({
 }) {
   const navigate = useNavigate();
   const waiting = state === "waiting";
-  const now = useNow(waiting);
+  const now = useNow(1000, waiting);
   const next = useCallback(() => {
     navigate({ to: "/lessons" });
   }, [navigate]);
   // Enter continues to lessons once there is nothing left to wait for.
-  const onKey = useEffectEvent((event: KeyboardEvent) => {
+  useWindowKeys((event) => {
     if (
-      event.key !== "Enter" ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.altKey
+      event.key === "Enter" &&
+      isShortcut(event, "input, textarea, button, a")
     ) {
-      return;
+      next();
     }
-    if (
-      event.target instanceof Element &&
-      event.target.closest("input, textarea, button, a")
-    ) {
-      return;
-    }
-    next();
-  });
-  useEffect(() => {
-    if (waiting) {
-      return;
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [waiting]);
+  }, !waiting);
 
   if (waiting) {
     // The dashboard refetches when the first card is due, which deals the deck back in.
@@ -156,18 +135,18 @@ function ReviewDone({
   }
 
   const [lesson] = data.buildQueue;
-  let label = <span>start your first lesson</span>;
+  let label: ReactNode = "start your first lesson";
   if (state === "finished") {
     label = lesson ? (
-      <span>
+      <>
         learn{" "}
         <b className="font-hanzi" lang="zh-CN">
           {lesson.hanzi}
         </b>{" "}
         next
-      </span>
+      </>
     ) : (
-      <span>learn new characters</span>
+      "learn new characters"
     );
   }
   return (
@@ -202,31 +181,19 @@ function ReviewDone({
           </DeckPile>
         </DeckTable>
         <footer className={deckActions()}>
-          <DitherButton
-            className={cn(action, deckAction, "h-14")}
+          <ActionButton
+            className={cn(deckAction, "h-14")}
             color="blue"
+            hint="↵"
             onClick={next}
             variant="gradient"
           >
             {label}
-            <kbd className={actionKey}>↵</kbd>
-          </DitherButton>
+          </ActionButton>
         </footer>
       </div>
     </>
   );
-}
-
-function useNow(ticking: boolean) {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    if (!ticking) {
-      return;
-    }
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, [ticking]);
-  return now;
 }
 
 function countdown(milliseconds: number) {

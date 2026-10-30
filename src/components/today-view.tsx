@@ -2,14 +2,8 @@
 // come first while any are due, then the next lesson, then reading. Each still opens on its own;
 // the next one gets the page's only button, and Space or Enter.
 import { Link, useNavigate } from "@tanstack/react-router";
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useMemo,
-} from "react";
-
+import { type ReactNode, useCallback, useMemo } from "react";
+import { isShortcut, useWindowKeys } from "../hooks/use-window-keys";
 import {
   activityCalendar,
   activityStreaks,
@@ -21,9 +15,8 @@ import { getItemMeaning } from "../lib/meaning";
 import { nextReviews } from "../lib/review-schedule";
 import { cn } from "../lib/utils";
 import { useIntroductions } from "../progress/views";
-import { DitherButton } from "./dither-kit/button";
 import { DitherGradient } from "./dither-kit/gradient";
-import { action, actionKey } from "./ui/buttons";
+import { ActionButton } from "./ui/button";
 import { MoviePinyin } from "./ui/hanzi";
 import { Page, PageHeader, SectionHead } from "./ui/layout";
 
@@ -69,15 +62,15 @@ function Primary({ to, label }: { to: Lead; label: string }) {
   const navigate = useNavigate();
   const go = useCallback(() => navigate({ to }), [navigate, to]);
   return (
-    <DitherButton
-      className={cn(action, "mt-2 short:max-studio:h-11")}
+    <ActionButton
+      className="mt-2 short:max-studio:h-11"
       color="blue"
+      hint="space"
       onClick={go}
       variant="gradient"
     >
-      <span>{label}</span>
-      <kbd className={actionKey}>space</kbd>
-    </DitherButton>
+      {label}
+    </ActionButton>
   );
 }
 
@@ -362,30 +355,17 @@ function LaterToday({
 export function TodayView({ data }: { data: DashboardData }) {
   const lead = leadOf(data);
   const navigate = useNavigate();
-  const onKey = useEffectEvent((event: KeyboardEvent) => {
+  useWindowKeys((event) => {
     if (
-      !lead ||
-      event.repeat ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.altKey ||
-      !(event.code === "Space" || event.key === "Enter")
+      lead &&
+      !event.repeat &&
+      (event.code === "Space" || event.key === "Enter") &&
+      isShortcut(event)
     ) {
-      return;
+      event.preventDefault();
+      navigate({ to: lead });
     }
-    if (
-      event.target instanceof Element &&
-      event.target.closest("input, textarea, button, a, [role=dialog]")
-    ) {
-      return;
-    }
-    event.preventDefault();
-    navigate({ to: lead });
   });
-  useEffect(() => {
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 
   return (
     <Page
