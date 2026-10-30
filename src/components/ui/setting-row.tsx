@@ -40,7 +40,7 @@ export function SettingRow({
         <h2 className="type-heading m-0" id={id}>
           {title}
         </h2>
-        <p className="type-label mt-1 mb-0 text-muted-foreground leading-wrap">
+        <p className="type-body mt-1 mb-0 text-pretty text-muted-foreground">
           {note}
         </p>
       </div>
