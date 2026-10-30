@@ -62,9 +62,9 @@ const entryMeaning = cn(meaningText, "text-3xl");
 const entrySound = cn(soundRow, "mt-0");
 const section = "mt-12 grid gap-2";
 const emptyNote = "type-control text-muted-foreground leading-wrap";
-/** The memory link as a line of text, typed over in place. */
+/** The memory link as a line of text, typed over in place; underlined like a clue name to fill. */
 const linkInput =
-  "type-body w-full border-border border-b bg-transparent py-3 text-foreground outline-none transition-colors placeholder:type-control placeholder:text-faint-foreground focus:border-blue";
+  "type-body w-full border-transparent border-b bg-transparent py-3 text-foreground outline-none transition-colors placeholder:type-control placeholder:text-faint-foreground placeholder-shown:border-blue/55 placeholder-shown:border-dashed focus:border-blue focus:border-solid";
 
 /** Enter keeps what was typed, Escape puts the saved text back; either way the field lets go. */
 function commitKeys(saved: string) {

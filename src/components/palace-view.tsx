@@ -10,7 +10,7 @@ import { cn } from "../lib/utils";
 import { usePalaceBoard } from "../progress/views";
 import { ClueCode } from "./character-studio/clue-code";
 import { DitherGradient } from "./dither-kit/gradient";
-import { controls, filterBar, filterGroup, filterSet } from "./library-view";
+import { controls, filterBar, filterGroup } from "./library-view";
 import { type ClueRow, clueRows, kindStyle } from "./palace-rows";
 import { Chip, ChipCount } from "./ui/chip";
 import {
@@ -145,7 +145,7 @@ export function PalaceView() {
         <div className={filterBar}>
           <div
             aria-label="Palace sections"
-            className={filterSet}
+            className={filterGroup}
             role="tablist"
           >
             {tabs.map((entry) => (

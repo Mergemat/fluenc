@@ -55,7 +55,8 @@ function partState(part: Part, slide: number): PartState {
 
 function Subject({ slide }: { slide: number }) {
   return (
-    <div className="flex min-h-0 flex-1 flex-col items-center gap-2">
+    // Capped near the glyph's own size: spare height goes under the slide's text, not around 好.
+    <div className="flex max-h-64 min-h-0 flex-1 flex-col items-center gap-2">
       <div className={cn(glyphBox, "glyph-max-50")}>
         <HanziGlyph hanzi="好" parts={parts} xray={slide >= 4} />
       </div>
@@ -366,12 +367,12 @@ export function WelcomeView({
         {/* Tapping the slide skips ahead, as in stories; Enter and the button do the same. */}
         {/* biome-ignore lint/a11y: a pointer shortcut; the button and Enter are the accessible path */}
         <div
-          className="grid min-h-80 welcome-short:min-h-72 shrink-0 animate-rise content-start gap-2"
+          className="grid min-h-80 welcome-short:min-h-72 flex-1 shrink-0 animate-rise content-start gap-2"
           key={slide}
           onClick={last ? undefined : next}
         >
           <p className={label}>{kicker}</p>
-          <h1 className="type-display flex flex-wrap items-center gap-x-2 welcome-short:gap-x-1.5 welcome-short:text-2xl tracking-snug">
+          <h1 className="type-display flex flex-wrap items-center gap-x-2 welcome-short:gap-x-1.5 text-balance welcome-short:text-2xl tracking-snug">
             {title}
           </h1>
           <p className="type-body text-pretty text-muted-foreground">{line}</p>

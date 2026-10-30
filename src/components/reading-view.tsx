@@ -65,9 +65,7 @@ function ReadingEmpty() {
             >
               nothing to read yet
             </b>
-            <small className={slotNote}>
-              sentences unlock as you learn their characters
-            </small>
+            <small className={slotNote}>sentences unlock as you learn</small>
           </DeckSlot>
         </DeckPile>
       </DeckTable>

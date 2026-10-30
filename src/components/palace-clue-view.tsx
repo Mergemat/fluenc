@@ -123,7 +123,7 @@ export function PalaceClueView({
       head={<ClueHeader cue={row.cue} kind={kind} named={Boolean(row.name)} />}
     >
       <header
-        className="flex items-center gap-6 py-2"
+        className="flex items-center gap-6"
         data-kind={kind}
         style={kindStyle(row)}
       >
