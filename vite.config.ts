@@ -75,15 +75,17 @@ export default defineConfig({
     // Production builds write here; reloading the dev tab for them is noise.
     watch: { ignored: ["**/.output/**", "**/.vercel/**"] },
   },
+  build: {
+    // A font chunk is fetched only when its characters are on screen; inlined, every page would
+    // download it. Set for every environment: the server renders the stylesheet link from its own
+    // build of the CSS, and an inlined chunk there changes the hash to a file that doesn't exist.
+    assetsInlineLimit: (file) => (FONT_CHUNK.test(file) ? false : undefined),
+  },
   environments: {
     client: {
       build: {
         // `bun run bench --profile` reads function names from the profile.
         minify: process.env.FLUENC_UNMINIFIED !== "1",
-        // A font chunk is fetched only when its characters are on screen; inlined, every page would
-        // download it.
-        assetsInlineLimit: (file) =>
-          FONT_CHUNK.test(file) ? false : undefined,
         rolldownOptions: {
           // The course catalog and sentences ship with the app. Their own chunks keep their hash,
           // so a code change does not re-download the course.
