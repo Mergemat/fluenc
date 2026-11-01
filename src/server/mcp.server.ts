@@ -283,7 +283,10 @@ function focusServer(learnerId: string) {
         openWorldHint: false,
       },
     },
-    async ({ hanzi }) => json(await removeFocus(learnerId, hanzi))
+    async ({ hanzi }) => {
+      const { removed, upNext } = await removeFocus(learnerId, hanzi);
+      return json({ removed, upNext: upNext.join(" ") });
+    }
   );
 
   return server;
