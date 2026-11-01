@@ -69,8 +69,6 @@ export const wordSchema = z.union([
 
 export const componentSchema = z.strictObject({
   hanzi: unit,
-  /** A concrete, picturable object the learner can reuse in every movie with this part. */
-  prop: z.string().trim().min(1).max(40),
   /** What the part means or depicts. */
   meaning: gloss,
   /** The full form this part is a variant of, such as 水 for 氵, or null. */
@@ -230,10 +228,6 @@ export function databaseProblems(
     ...duplicateProblems(
       "component",
       components.map((item) => item.hanzi)
-    ),
-    ...duplicateProblems(
-      "prop",
-      components.map((item) => normalize(item.prop))
     ),
   ];
 

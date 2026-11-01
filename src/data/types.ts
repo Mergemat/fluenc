@@ -50,10 +50,9 @@ export interface Word {
   usage: number;
 }
 
-/** A component's suggested prop: a reusable object for every movie that has this part. */
+/** A part the learner names as a prop, reused in every movie that has it. */
 export interface Prop {
   meaning: string;
-  prop: string;
   strokes: number;
   variantOf: string | null;
 }
