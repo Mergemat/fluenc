@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { Workbox } from "workbox-window";
 
+import { ToolButton } from "../components/ui/button";
 import { whenSaved } from "../progress/saves";
 
 const UPDATE_TOAST = "app-update";
@@ -10,6 +11,10 @@ const UPDATE_TOAST = "app-update";
 // A version that never takes over must not leave the reload waiting forever.
 const TAKEOVER_TIMEOUT = 3000;
 let switching = false;
+
+const update = () => {
+  reloadApp().catch(() => undefined);
+};
 
 /**
  * Reload once every save is written, switching to a waiting version first so the reload brings
@@ -110,12 +115,11 @@ export function useAppUpdate() {
     toast("new version ready", {
       id: UPDATE_TOAST,
       duration: Number.POSITIVE_INFINITY,
-      action: {
-        label: "update",
-        onClick: () => {
-          reloadApp().catch(() => undefined);
-        },
-      },
+      action: (
+        <ToolButton className="shrink-0" onClick={update} tone="primary">
+          update
+        </ToolButton>
+      ),
     });
     return () => {
       toast.dismiss(UPDATE_TOAST);

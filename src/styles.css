@@ -147,7 +147,8 @@
   --spacing-safe-top: env(safe-area-inset-top);
   --spacing-safe-header: calc(env(safe-area-inset-top) + 14px);
   --spacing-safe-tabbar: calc(4px + env(safe-area-inset-bottom));
-  --spacing-safe-toast: calc(env(safe-area-inset-bottom) + 92px);
+  /* Toasts drop in from the top, clear of the notch. */
+  --spacing-safe-toast: calc(env(safe-area-inset-top) + 16px);
   /* The review deck: the most a pile is tall in its table, clear of its edges (a wide pile also
      of its caption and the sentence's room); and the space between a glossed word's columns. */
   --spacing-pile: calc(100cqh - 24px);
@@ -222,7 +223,6 @@
   --shadow-deck:
     inset 0 1px 0 rgb(255 255 255 / 0.06), 0 30px 60px -24px rgb(0 0 0 / 0.85);
   --shadow-deck-under: 0 2px 6px rgb(0 0 0 / 0.5);
-  --shadow-toast: 0 0 30px -12px var(--color-green);
   /* A hairline along the top that takes no room: rows in a list. */
   --inset-shadow-hairline: inset 0 1px 0 var(--color-border);
   /* The same under a bar pinned over content. */
