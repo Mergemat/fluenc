@@ -19,10 +19,7 @@ export function finishLabel(
 
 /** Tell the learner the lesson's item is now in reviews. */
 export function toastAdded(hanzi: string) {
-  toast(
-    <>
-      <b className="font-hanzi">{hanzi}</b>
-      <span>added to reviews</span>
-    </>
-  );
+  toast("added to reviews", {
+    icon: <span className="font-hanzi text-green">{hanzi}</span>,
+  });
 }

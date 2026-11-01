@@ -1,29 +1,48 @@
-import { Toaster as Sonner } from "sonner";
+import {
+  CircleCheckIcon,
+  InfoIcon,
+  Loader2Icon,
+  OctagonXIcon,
+  TriangleAlertIcon,
+} from "lucide-react";
+import { Toaster as Sonner, type ToasterProps } from "sonner";
 
-/** Quiet toasts over the content, so they never shift layout. */
-export function Toaster() {
-  return (
-    <Sonner
-      // Above the mobile tab bar; centred on the page, not the window, beside the desktop sidebar.
-      // Sonner's unlayered styles reset the margin, so the sidebar shift needs !important.
-      className="[--toast-bottom:var(--spacing-safe-toast)] md:[--toast-bottom:var(--spacing-7)] lg:ml-28!"
-      duration={2400}
-      mobileOffset={{ bottom: "var(--toast-bottom)" }}
-      offset={{ bottom: "var(--toast-bottom)" }}
-      position="bottom-center"
-      theme="dark"
-      toastOptions={{
-        unstyled: true,
-        classNames: {
-          toast:
-            "type-control inset-x-0 mx-auto flex w-fit items-center gap-3 whitespace-nowrap rounded-lg border border-border-strong bg-popover px-3.5 py-2.5 text-foreground has-[button]:py-1.5 has-[button]:pr-1.5 leading-wrap shadow-toast",
-          actionButton:
-            "h-7 cursor-pointer rounded-md bg-blue px-2.5 text-primary-foreground focus-visible:outline-solid",
-          // A mark before the message, like the hanzi just added, in green.
-          title:
-            "flex items-center gap-2 *:first:not-last:font-normal *:first:not-last:text-green *:first:not-last:text-xl",
-        },
-      }}
-    />
-  );
-}
+// shadcn's Sonner, drawn in the app's own type and surfaces. The app is dark-only, so no
+// next-themes.
+const Toaster = ({ ...props }: ToasterProps) => (
+  <Sonner
+    // Centred on the page, not the window: half the desktop sidebar's 216px over. Sonner's
+    // positioning is unlayered CSS, so it takes !important.
+    className="toaster group lg:left-[calc(50%+108px)]!"
+    duration={2400}
+    icons={{
+      success: <CircleCheckIcon className="size-4" />,
+      info: <InfoIcon className="size-4" />,
+      warning: <TriangleAlertIcon className="size-4" />,
+      error: <OctagonXIcon className="size-4" />,
+      loading: <Loader2Icon className="size-4 animate-spin" />,
+    }}
+    // The page runs under the notch (viewport-fit=cover).
+    mobileOffset={{ top: "var(--spacing-safe-toast)" }}
+    position="top-center"
+    theme="dark"
+    toastOptions={{
+      unstyled: true,
+      classNames: {
+        toast:
+          "flex min-h-12 w-full items-center gap-3 rounded-lg border border-border-strong bg-popover py-2 pr-2.5 pl-4 text-popover-foreground shadow-popover",
+        icon: "flex shrink-0 items-center",
+        content: "flex min-w-0 flex-1 flex-col gap-1",
+        title: "type-control text-md leading-wrap",
+        description: "type-control text-muted-foreground leading-wrap",
+        actionButton:
+          "h-7 shrink-0 cursor-pointer rounded-md bg-foreground px-2.5 type-control text-background focus-visible:outline-solid",
+        cancelButton:
+          "h-7 shrink-0 cursor-pointer rounded-md px-2.5 type-control text-muted-foreground hover:text-foreground focus-visible:outline-solid",
+      },
+    }}
+    {...props}
+  />
+);
+
+export { Toaster };
