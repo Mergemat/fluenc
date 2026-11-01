@@ -113,7 +113,6 @@ const props = Object.fromEntries(
     .map((component) => [
       component.hanzi,
       {
-        prop: component.prop,
         meaning: component.meaning,
         variantOf: component.variantOf,
         strokes: component.strokes,
