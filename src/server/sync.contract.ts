@@ -63,7 +63,16 @@ export const livingLinkInput = z.object({
   story: z.string().trim().min(4),
 });
 
+const ownCharacterInput = z.object({
+  hanzi: z.string().min(1),
+  pinyin: z.string().min(1),
+  keyword: z.string().min(1),
+  meaning: z.string().min(1),
+  components: z.array(z.string().min(1)).min(1),
+});
+
 const focusEntryInput = z.object({
+  characters: z.array(ownCharacterInput).optional(),
   kind: z.enum(["word", "sentence"]),
   hanzi: z.string().trim().min(1),
   pinyin: z.string().trim().min(1),

@@ -8,6 +8,7 @@ import type {
   OfflineDownload,
 } from "../offline/use-offline-download";
 import { AccountSettings } from "./account-settings";
+import { AgentSettings } from "./agent-settings";
 import { DitherGradient } from "./dither-kit/gradient";
 import { NotificationSettings } from "./notification-settings";
 import { chip, Page, PageHeader, SectionHead } from "./ui/layout";
@@ -66,6 +67,9 @@ export function SettingsView({ offline }: { offline: OfflineDownload }) {
       <div className="grid gap-9">
         <Group label="account">
           <AccountSettings />
+        </Group>
+        <Group label="your agent">
+          <AgentSettings />
         </Group>
         <Group label="reminders">
           <NotificationSettings />

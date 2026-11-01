@@ -9,7 +9,7 @@ It covers about 1,000 of the most common spoken words and the 726 characters the
 - **Lessons** teach the next character or word whose parts you already know. You build a Hanzi Movie for each character from your actors, sets and props.
 - **Review** shows everything due, scheduled with [FSRS](https://github.com/open-spaced-repetition/ts-fsrs).
 - **Reading** shows sentences made almost entirely from words you know. You shadow each one aloud before it joins Review.
-- **Focus** puts words from a class you're taking at the front of the queue.
+- **Focus** puts words from a class you're taking at the front of the queue. Your coding agent can manage it for you over MCP.
 
 Progress is stored on the device first and syncs to your account when you're online, so the app works offline once installed. A daily push notification can remind you to review.
 
@@ -53,8 +53,9 @@ VS Code suggests the Biome and Tailwind extensions and formats on save.
 | `bun run build` / `bun run preview` | Build the app and its service worker, then serve that build |
 | `bun run db:seed` / `db:reset` | Add the demo account, or start the local database over |
 | `bun run db:generate` / `db:migrate` | Create a migration after changing `src/db/schema.ts`, or apply migrations |
-| `bun run focus` | Add, list or remove focus words and sentences for an account |
+| `bun run focus` | Add, list or remove focus words and sentences for an account, or list and remove community characters |
 | `bun run data:sync` | Check the character database in `src/data/hanzi`, then rebuild the curriculum, reading sentences and stroke owners from it, and the hanzi fonts when the characters or their parts changed |
+| `bun run data:reference` | Rebuild the character reference that checks agents' descriptions of characters the course lacks |
 | `bun run data:font` | Rebuild the hanzi fonts by hand (needs [uv](https://docs.astral.sh/uv/)) |
 
 `src/data/README.md` explains the character database, the teaching order and how to change them.
@@ -74,6 +75,16 @@ VS Code suggests the Biome and Tailwind extensions and formats on save.
 ```
 
 Lessons teach focus words first, starting with the characters they still need. Add `--dry-run` to see what would change.
+
+A word can use characters the course lacks. Describe each one in a `characters` list (`hanzi`, `pinyin`, `keyword`, `meaning`, and `props` from the course's props) and it is taught like a course character, drawn in the system font. Characters are shared: the first valid description of one goes into `community_characters`, and every learner who adds it later gets that version. `bun run focus community` lists them by how many learners use them, and `bun run focus community remove 忧` stops sharing one; learners who have it keep their copy.
+
+### Coding agents
+
+Learners can let a coding agent manage their focus. Settings has a one-click install for Cursor and VS Code and a command for Claude Code and Codex, all pointing at the MCP server at `/mcp`. The agent signs the learner in on `/connect` with OAuth (Better Auth's MCP plugin), then gets six tools: `get_focus`, `check_hanzi`, `list_props`, `add_to_focus`, `save_preview` and `remove_from_focus`. The server's instructions walk the agent through collect, check, describe, preview and save. `add_to_focus` previews instead of saving whenever it would share a new character and returns a preview id, which `save_preview` saves after the learner's yes, so the agent never sends a lesson twice. Results are sized for an agent's context: counts for what went as planned, detail only for what needs attention.
+
+Every description is checked before it is shared: simplified characters only, a reading the character has, a keyword of 1–3 plain words that no other character uses, and props whose strokes add up to the character's with at least one a real part of it. The checks use `src/data/hanzi-reference.generated.json`, built from Make Me a Hanzi by `bun run data:reference`. Each failure comes back as a reason the agent can act on. Settings lists connected agents, and disconnecting one ends its access on its next call.
+
+Tokens are bound to `BETTER_AUTH_URL` + `/mcp`, so to try an agent locally set `BETTER_AUTH_URL` to your dev URL, such as `http://localhost:3000`.
 
 ## Deploy
 

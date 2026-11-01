@@ -8,8 +8,21 @@ import {
   text,
 } from "drizzle-orm/sqlite-core";
 
-import { studyItemTypes } from "../data/types";
-import { account, session, user, verification } from "./auth-schema";
+import { type OwnCharacter, studyItemTypes } from "../data/types";
+import {
+  account,
+  jwks,
+  oauthAccessToken,
+  oauthClient,
+  oauthClientAssertion,
+  oauthClientResource,
+  oauthConsent,
+  oauthRefreshToken,
+  oauthResource,
+  session,
+  user,
+  verification,
+} from "./auth-schema";
 
 /** One per account; its id is the user's id. Every row of progress below belongs to one. */
 export const learners = sqliteTable("learners", {
@@ -195,6 +208,8 @@ export const focusEntries = sqliteTable(
     pinyin: text("pinyin").notNull(),
     meaning: text("meaning").notNull(),
     label: text("label").notNull(),
+    /** The characters it uses that the course lacks; see `OwnCharacter`. */
+    characters: text("characters", { mode: "json" }).$type<OwnCharacter[]>(),
     addedAt: integer("added_at", { mode: "timestamp_ms" }).notNull(),
     /** Set when the entry is removed, so devices that have it learn it is gone. */
     removedAt: integer("removed_at", { mode: "timestamp_ms" }),
@@ -205,6 +220,23 @@ export const focusEntries = sqliteTable(
     index("focus_entries_version_idx").on(table.learnerId, table.version),
   ]
 );
+
+/**
+ * Characters learners added that the course lacks, one shared version each: the first valid
+ * description wins and every later learner reuses it. Learners keep the copy in their focus, so
+ * removing one here only stops new learners getting it.
+ */
+export const communityCharacters = sqliteTable("community_characters", {
+  hanzi: text("hanzi").primaryKey(),
+  pinyin: text("pinyin").notNull(),
+  keyword: text("keyword").notNull(),
+  meaning: text("meaning").notNull(),
+  components: text("components", { mode: "json" }).$type<string[]>().notNull(),
+  createdBy: text("created_by").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(unixepoch() * 1000)`),
+});
 
 export type LearnerItem = typeof learnerItems.$inferSelect;
 export type ItemType = LearnerItem["itemType"];
@@ -222,6 +254,14 @@ export const schema = {
   session,
   account,
   verification,
+  jwks,
+  oauthClient,
+  oauthResource,
+  oauthClientResource,
+  oauthRefreshToken,
+  oauthAccessToken,
+  oauthConsent,
+  oauthClientAssertion,
   learners,
   learnerItems,
   events,
@@ -231,5 +271,6 @@ export const schema = {
   componentProps,
   mnemonics,
   focusEntries,
+  communityCharacters,
   pushSubscriptions,
 };

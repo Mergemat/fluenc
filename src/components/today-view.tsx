@@ -150,6 +150,15 @@ function LessonNext({ item }: { item: BuildItem }) {
         </div>
       </div>
       <Primary label="open lesson" to="/lessons" />
+      {/* Once focus leads the queue, the learner has found it; the label above says where from. */}
+      {item.focus ? null : (
+        <Link
+          className="type-label text-muted-foreground hover:text-foreground self-center transition-colors"
+          to="/settings"
+        >
+          taking a class? your coding agent can put its words first →
+        </Link>
+      )}
     </section>
   );
 }
