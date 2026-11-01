@@ -230,11 +230,12 @@ export async function resolveCharacters(
         .from(communityCharacters)
         .where(inArray(communityCharacters.hanzi, hanzi))
     : [];
-  const wanted = hanzi.filter(
-    (character) => !existing.some((row) => row.hanzi === character)
+  const sharedHanzi = new Set(existing.map((row) => row.hanzi));
+  const wanted = new Set(
+    hanzi.filter((character) => !sharedHanzi.has(character))
   );
   const { valid, problems } = await checkAll(
-    supplied.filter((input) => wanted.includes(input.hanzi.trim()))
+    supplied.filter((input) => wanted.has(input.hanzi.trim()))
   );
   const found = new Map<string, OwnCharacter>(
     [...existing.map(definition), ...valid].map((item) => [item.hanzi, item])

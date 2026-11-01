@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useLocation } from "@tanstack/react-router";
 
 import { ConnectView } from "../components/connect-view";
 
@@ -11,6 +11,7 @@ export const Route = createFileRoute("/_app/connect")({
 });
 
 function Page() {
-  const clientId = new URLSearchParams(window.location.search).get("client_id");
+  const search = useLocation({ select: (location) => location.searchStr });
+  const clientId = new URLSearchParams(search).get("client_id");
   return <ConnectView clientId={clientId} />;
 }

@@ -80,12 +80,15 @@ function SignIn({ agent }: { agent: string }) {
       const form = new FormData(event.currentTarget);
       setBusy(true);
       setError(null);
-      const problem = await signInForAgent(mode, {
-        email: String(form.get("email") ?? "").trim(),
-        password: String(form.get("password") ?? ""),
-      }).catch(() => offline);
-      if (problem) {
-        setError(problem.toLowerCase());
+      try {
+        const problem = await signInForAgent(mode, {
+          email: String(form.get("email") ?? "").trim(),
+          password: String(form.get("password") ?? ""),
+        }).catch(() => offline);
+        if (problem) {
+          setError(problem.toLowerCase());
+        }
+      } finally {
         setBusy(false);
       }
     },
@@ -153,9 +156,12 @@ function Consent({ agent }: { agent: string }) {
   const answer = useCallback(async (accept: boolean) => {
     setBusy(true);
     setError(null);
-    const problem = await answerAgent(accept).catch(() => offline);
-    if (problem) {
-      setError(problem.toLowerCase());
+    try {
+      const problem = await answerAgent(accept).catch(() => offline);
+      if (problem) {
+        setError(problem.toLowerCase());
+      }
+    } finally {
       setBusy(false);
     }
   }, []);
