@@ -111,7 +111,9 @@ const lessonInput = z.object({
           .describe(
             "What the learner pictures: a concrete thing or action in 1–3 plain English words, like fret for 忧. Unique across fluenc."
           ),
-        meaning: z.string(),
+        meaning: z
+          .string()
+          .describe("Used only when check_hanzi gives no gloss for it."),
         props: z
           .array(z.string())
           .describe(
@@ -292,13 +294,17 @@ function focusServer(learnerId: string) {
   return server;
 }
 
-const mcp = createMcpHandler(({ authInfo }) => {
-  const learnerId = authInfo?.extra?.learnerId;
-  if (typeof learnerId !== "string") {
-    throw new Error("MCP request without a verified learner");
-  }
-  return focusServer(learnerId);
-});
+const mcp = createMcpHandler(
+  ({ authInfo }) => {
+    const learnerId = authInfo?.extra?.learnerId;
+    if (typeof learnerId !== "string") {
+      throw new Error("MCP request without a verified learner");
+    }
+    return focusServer(learnerId);
+  },
+  // A full lesson with sentences is a few dozen kilobytes.
+  { maxRequestBodySize: 256 * 1024 }
+);
 
 const unauthorized = () =>
   Response.json(

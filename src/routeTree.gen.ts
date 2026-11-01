@@ -25,6 +25,7 @@ import { Route as AppReviewRouteImport } from './routes/_app.review'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppTodayRouteImport } from './routes/_app.today'
 import { Route as ApiAgentsRouteImport } from './routes/api.agents'
+import { Route as ApiCleanupRouteImport } from './routes/api.cleanup'
 import { Route as ApiPushRouteImport } from './routes/api.push'
 import { Route as ApiReviewReminderRouteImport } from './routes/api.review-reminder'
 import { Route as ApiSyncRouteImport } from './routes/api.sync'
@@ -114,6 +115,11 @@ const ApiAgentsRoute = ApiAgentsRouteImport.update({
   path: '/api/agents',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCleanupRoute = ApiCleanupRouteImport.update({
+  id: '/api/cleanup',
+  path: '/api/cleanup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPushRoute = ApiPushRouteImport.update({
   id: '/api/push',
   path: '/api/push',
@@ -171,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AppSettingsRoute
   '/today': typeof AppTodayRoute
   '/api/agents': typeof ApiAgentsRoute
+  '/api/cleanup': typeof ApiCleanupRoute
   '/api/push': typeof ApiPushRoute
   '/api/review-reminder': typeof ApiReviewReminderRoute
   '/api/sync': typeof ApiSyncRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AppSettingsRoute
   '/today': typeof AppTodayRoute
   '/api/agents': typeof ApiAgentsRoute
+  '/api/cleanup': typeof ApiCleanupRoute
   '/api/push': typeof ApiPushRoute
   '/api/review-reminder': typeof ApiReviewReminderRoute
   '/api/sync': typeof ApiSyncRoute
@@ -222,6 +230,7 @@ export interface FileRoutesById {
   '/_app/settings': typeof AppSettingsRoute
   '/_app/today': typeof AppTodayRoute
   '/api/agents': typeof ApiAgentsRoute
+  '/api/cleanup': typeof ApiCleanupRoute
   '/api/push': typeof ApiPushRoute
   '/api/review-reminder': typeof ApiReviewReminderRoute
   '/api/sync': typeof ApiSyncRoute
@@ -250,6 +259,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/today'
     | '/api/agents'
+    | '/api/cleanup'
     | '/api/push'
     | '/api/review-reminder'
     | '/api/sync'
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/today'
     | '/api/agents'
+    | '/api/cleanup'
     | '/api/push'
     | '/api/review-reminder'
     | '/api/sync'
@@ -300,6 +311,7 @@ export interface FileRouteTypes {
     | '/_app/settings'
     | '/_app/today'
     | '/api/agents'
+    | '/api/cleanup'
     | '/api/push'
     | '/api/review-reminder'
     | '/api/sync'
@@ -317,6 +329,7 @@ export interface RootRouteChildren {
   WelcomeRoute: typeof WelcomeRoute
   Char91DotwellKnownChar93SplatRoute: typeof Char91DotwellKnownChar93SplatRoute
   ApiAgentsRoute: typeof ApiAgentsRoute
+  ApiCleanupRoute: typeof ApiCleanupRoute
   ApiPushRoute: typeof ApiPushRoute
   ApiReviewReminderRoute: typeof ApiReviewReminderRoute
   ApiSyncRoute: typeof ApiSyncRoute
@@ -437,6 +450,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAgentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/cleanup': {
+      id: '/api/cleanup'
+      path: '/api/cleanup'
+      fullPath: '/api/cleanup'
+      preLoaderRoute: typeof ApiCleanupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/push': {
       id: '/api/push'
       path: '/api/push'
@@ -540,6 +560,7 @@ const rootRouteChildren: RootRouteChildren = {
   WelcomeRoute: WelcomeRoute,
   Char91DotwellKnownChar93SplatRoute: Char91DotwellKnownChar93SplatRoute,
   ApiAgentsRoute: ApiAgentsRoute,
+  ApiCleanupRoute: ApiCleanupRoute,
   ApiPushRoute: ApiPushRoute,
   ApiReviewReminderRoute: ApiReviewReminderRoute,
   ApiSyncRoute: ApiSyncRoute,

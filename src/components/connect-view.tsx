@@ -184,6 +184,10 @@ function Consent({ agent }: { agent: string }) {
         it can read your focus list, add words and sentences to it, and remove
         them. it can’t see or change anything else.
       </p>
+      {/* An agent names itself when it registers; only the learner knows they just started this. */}
+      <p className={note}>
+        allow it only if you just added fluenc to {agent} yourself.
+      </p>
       {error ? <ErrorNote>{error}</ErrorNote> : null}
       <div className="mt-2 grid justify-items-center gap-4">
         <ActionButton

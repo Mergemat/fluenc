@@ -23,6 +23,17 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, { provider: "sqlite", schema }),
   emailAndPassword: { enabled: true, autoSignIn: true },
+  rateLimit: {
+    // Serverless instances share no memory; counted in the database, a limit holds on all of them.
+    storage: "database",
+    customRules: {
+      "/sign-in/email": { window: 60, max: 10 },
+      "/sign-up/email": { window: 60 * 60, max: 10 },
+      // Anyone may register an agent, so registration is the endpoint a flood would use.
+      "/oauth2/register": { window: 60 * 60, max: 20 },
+      "/oauth2/token": { window: 60, max: 30 },
+    },
+  },
   session: {
     // A home screen app is opened, not logged into: stay signed in while it is used.
     expiresIn: 180 * DAY_SECONDS,

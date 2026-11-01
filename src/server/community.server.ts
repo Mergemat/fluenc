@@ -147,7 +147,16 @@ function check(
   if (problem) {
     return problem;
   }
-  return { hanzi, pinyin, keyword, meaning: input.meaning.trim(), components };
+  // Shared with every learner who adds the character, so the reference's gloss stands in for the
+  // agent's own words wherever there is one.
+  const gloss = reference[hanzi]?.gloss.split(";")[0]?.trim();
+  return {
+    hanzi,
+    pinyin,
+    keyword,
+    meaning: gloss || input.meaning.trim(),
+    components,
+  };
 }
 
 const definition = (row: OwnCharacter): OwnCharacter => ({
