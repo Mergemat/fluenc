@@ -83,7 +83,7 @@ export function isStandardSyllable(syllable: string) {
   );
 }
 
-const SEPARATORS = /[\s'’-]/g;
+const SEPARATORS = /[\s'’-]/gu;
 
 /**
  * Split a word's reading into one syllable per character. Each piece must be a Mandarin syllable

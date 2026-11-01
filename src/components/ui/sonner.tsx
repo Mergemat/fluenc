@@ -6,7 +6,7 @@ export function Toaster() {
     <Sonner
       // Above the mobile tab bar; centred on the page, not the window, beside the desktop sidebar.
       // Sonner's unlayered styles reset the margin, so the sidebar shift needs !important.
-      className="[--toast-bottom:var(--spacing-safe-toast)] lg:ml-28! md:[--toast-bottom:var(--spacing-7)]"
+      className="[--toast-bottom:var(--spacing-safe-toast)] md:[--toast-bottom:var(--spacing-7)] lg:ml-28!"
       duration={2400}
       mobileOffset={{ bottom: "var(--toast-bottom)" }}
       offset={{ bottom: "var(--toast-bottom)" }}

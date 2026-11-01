@@ -54,7 +54,7 @@ export function Wall({
       aria-busy={busy}
       className={cn(
         // Words take two columns beside characters; on a wall of only words the columns double.
-        "group/wall grid grid-flow-row-dense grid-cols-wall-words gap-x-2 gap-y-1 has-data-character:grid-cols-wall",
+        "group/wall grid-cols-wall-words has-data-character:grid-cols-wall grid grid-flow-row-dense gap-x-2 gap-y-1",
         "max-xs:grid-cols-wall-words-xs max-xs:has-data-character:grid-cols-wall-xs"
       )}
     >
@@ -73,7 +73,7 @@ const tileStatus: Record<Status, string> = {
 /** The frame of a tile; `TileGlyph` and the lines under it go inside. */
 export function tileClass(kind: LibraryEntry["kind"], status: Status) {
   return cn(
-    "relative grid content-start justify-items-center gap-1 overflow-hidden rounded-lg px-2 py-2 text-center transition hover:bg-card max-xs:px-1",
+    "hover:bg-card max-xs:px-1 relative grid content-start justify-items-center gap-1 overflow-hidden rounded-lg px-2 py-2 text-center transition",
     "after:absolute after:top-2 after:right-2 after:size-1.5 after:rounded-xs",
     kind === "words" && "col-span-2 group-not-has-data-character/wall:col-auto",
     tileStatus[status]
@@ -90,7 +90,7 @@ export function TileGlyph({
   return (
     <span
       className={cn(
-        "whitespace-nowrap font-hanzi max-xs:text-3xl",
+        "font-hanzi max-xs:text-3xl whitespace-nowrap",
         kind === "words" ? "text-3xl" : "text-4xl",
         // After the size: tailwind-merge drops a leading that comes before one.
         "leading-tight"
@@ -119,12 +119,12 @@ export function Tile({ item }: { item: LibraryEntry }) {
       to="/library/$kind/$id"
     >
       <TileGlyph kind={item.kind}>{item.hanzi}</TileGlyph>
-      <span className="type-label max-w-full truncate text-muted-foreground">
+      <span className="type-label text-muted-foreground max-w-full truncate">
         {item.pinyin}
       </span>
       <span
         className={cn(
-          "type-body wrap-break-word line-clamp-2 max-w-full leading-wrap",
+          "type-body leading-wrap line-clamp-2 max-w-full wrap-break-word",
           // Only a lone word too long for the tile breaks; a phrase wraps between its words.
           !meaning.primary.includes(" ") && "hyphens-auto"
         )}
@@ -133,7 +133,7 @@ export function Tile({ item }: { item: LibraryEntry }) {
       </span>
       {item.approximate ? (
         <span
-          className="type-label absolute top-1.5 left-2 text-faint-foreground"
+          className="type-label text-faint-foreground absolute top-1.5 left-2"
           title="Similar match"
         >
           ≈

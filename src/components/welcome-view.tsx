@@ -38,7 +38,7 @@ const kindColors: Record<Part, string> = {
 const soundStates = (part: Part): Record<PartState, string> => ({
   todo: "text-faint-foreground",
   done: kindColors[part],
-  now: cn(kindColors[part], "-translate-y-1 text-shadow-glow-lg"),
+  now: cn(kindColors[part], "text-shadow-glow-lg -translate-y-1"),
 });
 
 /** The small line under a code or a name. */
@@ -107,7 +107,7 @@ function Reel({ slide, total }: { slide: number; total: number }) {
         return (
           // Keyed by the current slide too, so its fill restarts when you go back.
           <i
-            className="relative h-1.5 flex-1 overflow-hidden rounded-xs bg-border"
+            className="bg-border relative h-1.5 flex-1 overflow-hidden rounded-xs"
             key={index === slide ? `now-${slide}` : index}
           >
             {state === "todo" ? null : (
@@ -149,7 +149,7 @@ function Actors() {
           <small className={cn(note, kind.lit && "text-foreground")}>
             {kind.label}
           </small>
-          <b className="type-code whitespace-pre text-base text-blue">
+          <b className="type-code text-blue text-base whitespace-pre">
             {kind.codes}
           </b>
         </span>
@@ -160,7 +160,7 @@ function Actors() {
 
 function Place() {
   return (
-    <div className="type-heading flex items-center gap-4 rounded-lg border border-purple/50 bg-purple/10 px-4 py-3.5">
+    <div className="type-heading border-purple/50 bg-purple/10 flex items-center gap-4 rounded-lg border px-4 py-3.5">
       <b className="type-code text-purple text-xl">-ao</b>
       <span aria-hidden="true" className="text-faint-foreground">
         →
@@ -179,14 +179,14 @@ function Rooms() {
       {[1, 2, 3, 4, 5].map((tone) => (
         <li
           className={cn(
-            "type-label grid justify-items-center gap-2 rounded-lg border px-0.5 pt-3 pb-2.5 text-center leading-wrap",
+            "type-label leading-wrap grid justify-items-center gap-2 rounded-lg border px-0.5 pt-3 pb-2.5 text-center",
             tone === 3
               ? "border-green/50 bg-green/12 text-foreground"
               : "border-border text-muted-foreground"
           )}
           key={tone}
         >
-          <ToneContour className="h-4 w-6 text-green" tone={tone} />
+          <ToneContour className="text-green h-4 w-6" tone={tone} />
           <span>{defaultToneRooms[tone]}</span>
         </li>
       ))}
@@ -203,12 +203,12 @@ function Props() {
         { code: "子", prop: "a hook", how: "by look" },
       ].map((prop, index) => (
         <span
-          className="type-heading flex items-center gap-3 rounded-lg border border-part/50 px-3 py-2.5"
+          className="type-heading border-part/50 flex items-center gap-3 rounded-lg border px-3 py-2.5"
           key={prop.code}
           style={{ "--part": partColor(index) } as CSSProperties}
         >
           <b
-            className="font-hanzi-props font-normal text-3xl text-part"
+            className="font-hanzi-props text-part text-3xl font-normal"
             lang="zh-CN"
           >
             {prop.code}
@@ -227,7 +227,7 @@ const clue = "font-semibold";
 
 function Script() {
   return (
-    <p className="type-heading text-pretty text-muted-foreground leading-body">
+    <p className="type-heading text-muted-foreground leading-body text-pretty">
       Your <b className={cn(clue, kindColors.actor)}>h- actor</b> is in the{" "}
       <b className={cn(clue, kindColors.room)}>bedroom</b> at your{" "}
       <b className={cn(clue, kindColors.set)}>-ao place</b>.{" "}
@@ -348,7 +348,7 @@ export function WelcomeView({
         </span>
         <Rule className="absolute inset-x-0 bottom-0 h-0.5" />
       </div>
-      <main className="mx-auto box-border flex min-h-0 w-full max-w-welcome flex-1 flex-col gap-4 px-gutter pt-page-top pb-6">
+      <main className="max-w-welcome px-gutter pt-page-top mx-auto box-border flex min-h-0 w-full flex-1 flex-col gap-4 pb-6">
         <PageHeader
           meta={
             <button
@@ -367,21 +367,21 @@ export function WelcomeView({
         {/* Tapping the slide skips ahead, as in stories; Enter and the button do the same. */}
         {/* biome-ignore lint/a11y: a pointer shortcut; the button and Enter are the accessible path */}
         <div
-          className="grid min-h-80 welcome-short:min-h-72 flex-1 shrink-0 animate-rise content-start gap-2"
+          className="welcome-short:min-h-72 animate-rise grid min-h-80 flex-1 shrink-0 content-start gap-2"
           key={slide}
           onClick={last ? undefined : next}
         >
           <p className={label}>{kicker}</p>
-          <h1 className="type-display flex flex-wrap items-center gap-x-2 welcome-short:gap-x-1.5 text-balance welcome-short:text-2xl tracking-snug">
+          <h1 className="type-display welcome-short:gap-x-1.5 welcome-short:text-2xl tracking-snug flex flex-wrap items-center gap-x-2 text-balance">
             {title}
           </h1>
-          <p className="type-body text-pretty text-muted-foreground">{line}</p>
+          <p className="type-body text-muted-foreground text-pretty">{line}</p>
           {visual ? <div className="mt-2">{visual}</div> : null}
         </div>
         <footer className="flex shrink-0 gap-2">
           {slide > 0 ? (
             <button
-              className={cn(chip, "h-12 rounded-lg px-4 short:max-studio:h-11")}
+              className={cn(chip, "short:max-studio:h-11 h-12 rounded-lg px-4")}
               onClick={back}
               type="button"
             >

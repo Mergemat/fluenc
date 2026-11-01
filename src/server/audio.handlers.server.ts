@@ -49,7 +49,7 @@ async function getCachedAudioUrl(pathname: string) {
 }
 
 // Text that already ends a sentence; anything else gets a full stop so it is read as one.
-const SENTENCE_END = /[。！？!?]$/;
+const SENTENCE_END = /[。！？!?]$/u;
 
 // Each new text costs ElevenLabs credits, so only the app's own signed-in pages may ask.
 async function assertSignedInApp() {

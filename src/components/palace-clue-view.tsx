@@ -22,7 +22,7 @@ const kindLabel: Record<ClueKind, string> = {
   props: "prop",
 };
 
-const PLURAL = /s$/;
+const PLURAL = /s$/u;
 
 /** What kind of clue this is, with its hint: "female actor · ...", "tone area · first tone". */
 function clueKindText(
@@ -129,30 +129,30 @@ export function PalaceClueView({
       >
         <span
           className={cn(
-            "type-code grid h-24 min-w-24 shrink-0 place-items-center rounded-2xl border border-kind/45 px-3 text-4xl text-kind max-xs:h-20 max-xs:min-w-20 max-xs:text-2xl",
-            props && "font-hanzi-props font-normal text-6xl max-xs:text-5xl"
+            "type-code border-kind/45 text-kind max-xs:h-20 max-xs:min-w-20 max-xs:text-2xl grid h-24 min-w-24 shrink-0 place-items-center rounded-2xl border px-3 text-4xl",
+            props && "font-hanzi-props max-xs:text-5xl text-6xl font-normal"
           )}
           lang={props ? "zh-CN" : undefined}
         >
           <ClueCode clue={row.cue} toneClassName="h-9 w-12" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="type-control m-0 text-muted-foreground">{kindText}</p>
+          <p className="type-control text-muted-foreground m-0">{kindText}</p>
           <h1
             className={cn(
-              "wrap-anywhere my-1 tracking-tight",
+              "my-1 tracking-tight wrap-anywhere",
               row.name ? "type-display" : "type-heading text-muted-foreground"
             )}
           >
             {row.name || "not named yet"}
           </h1>
-          <p className="type-control m-0 text-muted-foreground">
+          <p className="type-control text-muted-foreground m-0">
             {row.characters} characters · {row.started} started
           </p>
         </div>
       </header>
       {row.name ? null : (
-        <p className="type-control mt-3 mb-0 text-muted-foreground leading-wrap">
+        <p className="type-control text-muted-foreground leading-wrap mt-3 mb-0">
           it gets its name in the lesson of its first character
         </p>
       )}

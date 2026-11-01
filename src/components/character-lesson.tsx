@@ -195,7 +195,7 @@ function UsageList({ usage }: { usage: ReturnType<typeof useUsage> }) {
     <ul className="grid list-none">
       {usage.words.map((word) => (
         <li
-          className="type-body flex min-w-0 items-baseline gap-2 whitespace-nowrap text-muted-foreground leading-8"
+          className="type-body text-muted-foreground flex min-w-0 items-baseline gap-2 leading-8 whitespace-nowrap"
           key={word.id}
           title={
             word.unknown
@@ -262,7 +262,7 @@ function UsageWords({
         aria-controls={panel}
         aria-expanded={open}
         aria-label={`Words with ${hanzi}`}
-        className="type-label inline-flex h-7 items-center gap-1.5 rounded-md border border-border bg-background pr-2.5 pl-2.5 text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground aria-expanded:border-border-strong aria-expanded:text-foreground"
+        className="type-label border-border bg-background text-muted-foreground hover:border-border-strong hover:text-foreground aria-expanded:border-border-strong aria-expanded:text-foreground inline-flex h-7 items-center gap-1.5 rounded-md border pr-2.5 pl-2.5 transition-colors"
         onClick={toggle}
         type="button"
       >
@@ -273,7 +273,7 @@ function UsageWords({
       {open ? (
         <section
           aria-label={`Words with ${hanzi}`}
-          className="absolute top-full right-0 mt-1.5 box-border min-w-56 max-w-panel origin-top-right animate-enter rounded-lg border border-border-strong bg-popover px-3.5 py-2 shadow-popover"
+          className="max-w-panel animate-enter border-border-strong bg-popover shadow-popover absolute top-full right-0 mt-1.5 box-border min-w-56 origin-top-right rounded-lg border px-3.5 py-2"
           id={panel}
         >
           <UsageList usage={usage} />
@@ -496,7 +496,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
       >
         {/* Stacked when tall, side by side when wide for its height: whichever gives the bigger
             glyph. */}
-        <div className="flex h-full read-wide:flex-row flex-col items-center justify-center gap-2 studio:gap-6 read-wide:max-studio:gap-4">
+        <div className="read-wide:flex-row studio:gap-6 read-wide:max-studio:gap-4 flex h-full flex-col items-center justify-center gap-2">
           <div
             className={cn(
               glyphBox,
@@ -549,7 +549,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
             <button
               aria-expanded={noteOpen}
               aria-label="How the parts fit"
-              className="type-label inline-flex items-center gap-1 text-muted-foreground hover:text-foreground aria-expanded:text-foreground"
+              className="type-label text-muted-foreground hover:text-foreground aria-expanded:text-foreground inline-flex items-center gap-1"
               onClick={toggleNote}
               type="button"
             >
@@ -579,7 +579,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
         {noteOpen && item.movie.componentNote ? (
           <div
             aria-label="How the parts fit"
-            className="absolute inset-x-0 top-6 z-5 origin-top animate-enter rounded-lg border border-border-strong bg-popover py-3 pr-10 pl-3.5 shadow-popover"
+            className="animate-enter border-border-strong bg-popover shadow-popover absolute inset-x-0 top-6 z-5 origin-top rounded-lg border py-3 pr-10 pl-3.5"
             role="note"
           >
             <p className="type-body text-foreground">
@@ -587,7 +587,7 @@ export function CharacterLesson({ item }: { item: CharacterItem }) {
             </p>
             <button
               aria-label="Close shape note"
-              className="absolute top-2.5 right-2.5 grid size-6 place-items-center text-muted-foreground"
+              className="text-muted-foreground absolute top-2.5 right-2.5 grid size-6 place-items-center"
               onClick={closeNote}
               type="button"
             >

@@ -14,8 +14,8 @@ import {
 } from "./local-db";
 
 const ENV_FILE = ".env";
-const ASSIGNMENT = /^([A-Z0-9_]+)=(.*)$/;
-const QUOTED = /^(["'])(.*)\1$/;
+const ASSIGNMENT = /^(?<key>[A-Z0-9_]+)=(?<raw>.*)$/u;
+const QUOTED = /^(?<quote>["'])(?<body>.*)\k<quote>$/u;
 
 const defaults: Record<string, () => string> = {
   TURSO_DATABASE_URL: () => "file:local.db",
@@ -39,7 +39,7 @@ const features = [
   },
 ];
 
-const unquote = (value: string) => value.trim().replace(QUOTED, "$2");
+const unquote = (value: string) => value.trim().replace(QUOTED, "$<body>");
 
 const existing = Bun.file(ENV_FILE);
 const created = !(await existing.exists());

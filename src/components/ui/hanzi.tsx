@@ -190,7 +190,7 @@ function slotAtPoint(svg: SVGSVGElement, event: MouseEvent, hanzi: string) {
   return found;
 }
 
-const NON_ID_CHARACTERS = /[^a-zA-Z0-9]/g;
+const NON_ID_CHARACTERS = /[^a-zA-Z0-9]/gu;
 
 /**
  * The room a glyph sizes itself to: as large as the box, up to `--glyph-max` (set with a
@@ -307,13 +307,13 @@ export function HanziGlyph({
     : "plain";
   return (
     <div
-      className="relative grid size-glyph-box *:col-start-1 *:row-start-1"
+      className="size-glyph-box relative grid *:col-start-1 *:row-start-1"
       data-state={state}
     >
       <span
         aria-hidden={ready}
         className={cn(
-          "grid select-none place-items-center font-hanzi text-foreground text-glyph-ghost leading-none",
+          "font-hanzi text-foreground text-glyph-ghost grid place-items-center leading-none select-none",
           ghostState[state]
         )}
         lang="zh-CN"
@@ -399,7 +399,7 @@ function palette(
   return slot >= 0 ? `lit-${slot}` : "plain";
 }
 
-const SYLLABLE_SEPARATOR = /[\s,/]+/;
+const SYLLABLE_SEPARATOR = /[\s,/]+/u;
 
 /** How many leading letters belong to the actor; with the Ø set the actor takes them all. */
 function actorLetters(total: number, actorKey: string, finalKey?: string) {
@@ -537,7 +537,7 @@ export function AudioButton({
     <button
       aria-label={`Play ${text}`}
       className={cn(
-        "grid size-8 shrink-0 place-items-center rounded-md border border-border text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground disabled:cursor-progress disabled:opacity-100",
+        "border-border text-muted-foreground hover:border-border-strong hover:text-foreground grid size-8 shrink-0 place-items-center rounded-md border transition-colors disabled:cursor-progress disabled:opacity-100",
         label && "type-control inline-flex h-7 w-auto gap-2 pr-3 pl-2.5",
         speaking &&
           "border-blue/50 text-blue hover:border-blue/50 hover:text-blue",
@@ -621,7 +621,7 @@ export function useUsage(hanzi: string, alsoKnown = noExtraKnown) {
 export function UsageHanzi({ chars }: { chars: UsageWord["chars"] }) {
   return (
     <span
-      className="whitespace-nowrap font-hanzi text-xl leading-none"
+      className="font-hanzi text-xl leading-none whitespace-nowrap"
       lang="zh-CN"
     >
       {chars.map((entry) => (

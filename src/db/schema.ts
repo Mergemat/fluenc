@@ -46,7 +46,6 @@ export const learnerItems = sqliteTable(
     due: integer("due", { mode: "timestamp_ms" }).notNull(),
     stability: real("stability").notNull().default(0),
     difficulty: real("difficulty").notNull().default(0),
-    elapsedDays: integer("elapsed_days").notNull().default(0),
     scheduledDays: integer("scheduled_days").notNull().default(0),
     learningSteps: integer("learning_steps").notNull().default(0),
     reps: integer("reps").notNull().default(0),

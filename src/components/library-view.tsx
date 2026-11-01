@@ -225,7 +225,7 @@ export function LibraryView() {
         <PageHeader
           meta={
             <span>
-              <b className="font-medium text-foreground">{learned}</b> learned ·{" "}
+              <b className="text-foreground font-medium">{learned}</b> learned ·{" "}
               {total}
             </span>
           }
@@ -252,7 +252,7 @@ export function LibraryView() {
 
       {results}
 
-      <p className="type-label mt-12 mb-0 text-center text-faint-foreground leading-wrap">
+      <p className="type-label text-faint-foreground leading-wrap mt-12 mb-0 text-center">
         definitions adapted from{" "}
         <a
           className="underline underline-offset-3"
@@ -393,6 +393,7 @@ function LibraryResults({
       }
       flushSync(() => showAtLeast(end));
       document
+        // biome-ignore lint/style/useDomQuerySelector: keys are data, so they'd need escaping as a selector.
         .getElementById(sectionId(key))
         ?.scrollIntoView({ block: "start" });
     },
@@ -420,14 +421,14 @@ function LibraryResults({
       {/* Section keys stay pinned while browsing, so any part of the course is one tap away. */}
       <nav
         aria-label="Jump to section"
-        className="scrollbar-none sticky top-0 z-2 mb-1.5 flex gap-1 overflow-x-auto bg-background py-2 shadow-hairline"
+        className="bg-background shadow-hairline sticky top-0 z-2 mb-1.5 flex scrollbar-none gap-1 overflow-x-auto py-2"
       >
         {sections.map((section) => (
           <button
             className={cn(
               // Text keys, the first on the gutter, like a crumb trail. By sound, the sounds
               // already started stand out.
-              "type-control h-8 shrink-0 px-2.5 tabular-nums transition-colors first:pl-0 hover:text-foreground",
+              "type-control hover:text-foreground h-8 shrink-0 px-2.5 tabular-nums transition-colors first:pl-0",
               progress && section.learned > 0
                 ? "text-foreground"
                 : "text-muted-foreground"
@@ -483,7 +484,7 @@ function LibrarySectionBlock({
       {/* Reads like every section head: label, then its count after a dot. */}
       <header className={cn(headRow, "min-h-0 gap-2")}>
         <h2
-          className="type-label m-0 min-w-3.5 shrink-0 whitespace-nowrap text-foreground"
+          className="type-label text-foreground m-0 min-w-3.5 shrink-0 whitespace-nowrap"
           id={`${id}-title`}
         >
           {section.label}
@@ -505,7 +506,7 @@ function LibrarySectionBlock({
         >
           {progress ? (
             <>
-              <b className="font-medium text-foreground">{section.learned}</b> /{" "}
+              <b className="text-foreground font-medium">{section.learned}</b> /{" "}
               {size}
             </>
           ) : (

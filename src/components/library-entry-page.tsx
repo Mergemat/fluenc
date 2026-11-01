@@ -227,7 +227,7 @@ function CharacterEntry({
             <AudioButton pinyin={item.pinyin} text={item.hanzi} />
           </div>
           <Senses meanings={meaning.alternatives} />
-          <p className="type-control max-w-measure hero:text-left text-center text-muted-foreground">
+          <p className="type-control max-w-measure hero:text-left text-muted-foreground text-center">
             {item.strokes} {item.strokes === 1 ? "stroke" : "strokes"} · radical{" "}
             <span className="font-hanzi" lang="zh-CN">
               {item.radical}
@@ -517,7 +517,7 @@ function Senses({ meanings }: { meanings: string[] }) {
   }
   const hidden = meanings.length - 3;
   return (
-    <ol className="type-body grid max-w-measure list-inside list-decimal gap-1 text-muted-foreground marker:text-faint-foreground">
+    <ol className="type-body max-w-measure text-muted-foreground marker:text-faint-foreground grid list-inside list-decimal gap-1">
       {(open ? meanings : meanings.slice(0, 3)).map((meaning) => (
         <li className="only:list-none" key={meaning}>
           {meaning}

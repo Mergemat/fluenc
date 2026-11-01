@@ -10,7 +10,7 @@ import { defineConfig, type Plugin } from "vite";
 
 // The course data is large. Shipped as a string for JSON.parse, it is read several times faster
 // than the same object written out as JavaScript.
-const GENERATED_JSON = /\.generated\.json$/;
+const GENERATED_JSON = /\.generated\.json$/u;
 const parsedJson = (): Plugin => ({
   name: "fluenc:parsed-json",
   enforce: "pre",
@@ -64,7 +64,7 @@ const staticFolders = {
   licenses: DAY,
 };
 
-const FONT_CHUNK = /\/assets\/fonts\/web\/[^/]+\/\d+\.woff2$/;
+const FONT_CHUNK = /\/assets\/fonts\/web\/[^/]+\/\d+\.woff2$/u;
 
 export default defineConfig({
   resolve: { tsconfigPaths: true },
@@ -90,8 +90,8 @@ export default defineConfig({
           output: {
             codeSplitting: {
               groups: [
-                { name: "curriculum", test: /curriculum\.generated\.json/ },
-                { name: "sentences", test: /sentences\.generated\.json/ },
+                { name: "curriculum", test: /curriculum\.generated\.json/u },
+                { name: "sentences", test: /sentences\.generated\.json/u },
               ],
             },
           },

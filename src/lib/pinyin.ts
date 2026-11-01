@@ -68,9 +68,9 @@ export const defaultToneRooms: Record<number, string> = {
   5: "Rooftop",
 };
 
-const SYLLABLE_SEPARATOR = /[\s,/]+/;
-const TONE_DIGIT = /^[1-5]$/;
-const WILDCARD_ACTOR = /^[jqx]u$/;
+const SYLLABLE_SEPARATOR = /[\s,/]+/u;
+const TONE_DIGIT = /^[1-5]$/u;
+const WILDCARD_ACTOR = /^[jqx]u$/u;
 // Finals written in a contracted form, and bare nasal finals, spelled out in full.
 const CONTRACTED_FINALS: Record<string, string> = {
   iu: "iou",

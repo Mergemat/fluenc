@@ -16,7 +16,6 @@ const cardSnapshot = z.object({
   due: z.iso.datetime(),
   stability: z.number(),
   difficulty: z.number(),
-  elapsedDays: z.number().int(),
   scheduledDays: z.number().int(),
   learningSteps: z.number().int(),
   reps: z.number().int(),

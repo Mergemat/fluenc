@@ -1,0 +1,1 @@
+ALTER TABLE `learner_items` DROP COLUMN `elapsed_days`;

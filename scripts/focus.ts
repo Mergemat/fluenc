@@ -66,7 +66,7 @@ const citation: Record<string, Record<string, string>> = {
 
 /** Course-style word pinyin: lower case, one run, 不 and 一 in their own tone. */
 export function wordPinyin(hanzi: string, reading: string) {
-  const joined = reading.normalize("NFC").toLowerCase().replace(/\s+/g, "");
+  const joined = reading.normalize("NFC").toLowerCase().replace(/\s+/gu, "");
   const syllables = wordSyllables(hanzi, joined);
   if (!syllables) {
     return joined;

@@ -71,7 +71,6 @@ export function cardOf(row: CardRow): CardSnapshot {
     due: row.due,
     stability: row.stability,
     difficulty: row.difficulty,
-    elapsedDays: row.elapsedDays,
     scheduledDays: row.scheduledDays,
     learningSteps: row.learningSteps,
     reps: row.reps,

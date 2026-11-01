@@ -76,7 +76,7 @@ afterAll(async () => {
   }
 });
 
-const NEXT_REVIEWS = /next · \S/;
+const NEXT_REVIEWS = /next · \S/u;
 
 interface Course {
   catalog: Catalog;

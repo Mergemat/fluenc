@@ -23,8 +23,8 @@ const endpoint = z
 export const pushSubscriptionInput = z.object({
   endpoint,
   keys: z.object({
-    p256dh: z.string().regex(/^[A-Za-z0-9_-]{87}={0,1}$/),
-    auth: z.string().regex(/^[A-Za-z0-9_-]{22}={0,2}$/),
+    p256dh: z.string().regex(/^[A-Za-z0-9_-]{87}={0,1}$/u),
+    auth: z.string().regex(/^[A-Za-z0-9_-]{22}={0,2}$/u),
   }),
 });
 

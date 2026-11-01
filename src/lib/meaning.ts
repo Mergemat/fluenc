@@ -3,9 +3,9 @@ type MeaningItem = ({ keyword: string } | { meaning: string }) & {
   senses: readonly string[];
 };
 
-const INFINITIVE = /^to\s+/;
-const TERMINAL_PUNCTUATION = /[.!?…]+$/;
-const WHITESPACE = /\s+/g;
+const INFINITIVE = /^to\s+/u;
+const TERMINAL_PUNCTUATION = /[.!?…]+$/u;
+const WHITESPACE = /\s+/gu;
 
 function meaningKey(meaning: string) {
   return meaning

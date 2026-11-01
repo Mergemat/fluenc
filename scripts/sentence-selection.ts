@@ -19,7 +19,7 @@ const PRONOUNS = /我们|你们|他们|她们|它们|我|你|您|他|她|它/gu;
 const QUANTITIES =
   /[零〇一二两三四五六七八九十百千万亿\d]+(?=个|本|只|条|张|位|件|杯|岁|年|月|天|小时|分钟|点|块|元|次|人)/gu;
 const DIGITS = /\d+/gu;
-const SPEAKING_FRAME = /[对跟向](〈人\d+〉)说/gu;
+const SPEAKING_FRAME = /[对跟向](?<person>〈人\d+〉)说/gu;
 
 export function sentenceTextKey(hanzi: string) {
   return hanzi.normalize("NFKC").replace(PUNCTUATION_AND_SPACE, "");
@@ -37,7 +37,7 @@ export function sentenceTemplateKey(hanzi: string) {
       }
       return `〈人${roles.get(pronoun)}〉`;
     })
-    .replace(SPEAKING_FRAME, "$1说");
+    .replace(SPEAKING_FRAME, "$<person>说");
 }
 
 /**
@@ -111,7 +111,7 @@ export interface SelectedSentence {
 
 const HAN = /\p{Script=Han}/u;
 const LATIN = /\p{Script=Latin}/u;
-const TATOEBA_ID = /^t\d+$/;
+const TATOEBA_ID = /^t\d+$/u;
 const SUPPORTED_TEXT = /^[\p{Script=Han}\p{N}\p{P}\p{Z}\s]+$/u;
 
 function validateIdentities(

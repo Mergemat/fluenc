@@ -75,16 +75,16 @@ function CourseProgress() {
   return (
     <Link
       aria-label="Course progress"
-      className="group/course mt-auto hidden gap-4 border-border border-t px-3 py-3.5 lg:grid"
+      className="group/course border-border mt-auto hidden gap-4 border-t px-3 py-3.5 lg:grid"
       to="/profile"
     >
       {meters.map((meter) => (
         <div className="grid gap-2" key={meter.id}>
-          <p className="type-label m-0 flex items-baseline justify-between text-muted-foreground group-hover/course:text-foreground">
+          <p className="type-label text-muted-foreground group-hover/course:text-foreground m-0 flex items-baseline justify-between">
             <span>{meter.label}</span>
-            <b className="font-medium text-foreground tabular-nums">
+            <b className="text-foreground font-medium tabular-nums">
               {meter.learned + meter.learning}
-              <span className="font-normal text-muted-foreground">
+              <span className="text-muted-foreground font-normal">
                 /{meter.total}
               </span>
             </b>
@@ -160,19 +160,19 @@ export function AppShell({
     <div
       className={cn(
         shell,
-        "group/shell lg:grid lg:grid-cols-shell lg:grid-rows-shell"
+        "group/shell lg:grid-cols-shell lg:grid-rows-shell lg:grid"
       )}
       data-booting={hydrated ? undefined : true}
     >
       {hydrated ? null : (
-        <span className="fixed inset-0 grid place-items-center text-muted-foreground">
+        <span className="text-muted-foreground fixed inset-0 grid place-items-center">
           <PixelLoader label="Opening Fluenc" size={5} />
         </span>
       )}
       <header
         className={cn(
           topBar,
-          "relative group-data-booting/shell:invisible lg:h-auto lg:min-h-0 lg:flex-col lg:items-stretch lg:gap-0 lg:border-border lg:border-r lg:px-3 lg:pt-5 lg:pb-4"
+          "lg:border-border relative group-data-booting/shell:invisible lg:h-auto lg:min-h-0 lg:flex-col lg:items-stretch lg:gap-0 lg:border-r lg:px-3 lg:pt-5 lg:pb-4"
         )}
       >
         <Link
@@ -190,7 +190,7 @@ export function AppShell({
           {navigation.map((item) => (
             <Link
               activeProps={{ "aria-current": "page" }}
-              className="type-control relative isolate inline-flex h-8 items-center gap-2 overflow-hidden rounded-md border border-border current:border-blue px-3 current:text-foreground text-muted-foreground transition-colors hover:border-border-strong hover:text-foreground lg:h-10 lg:rounded-lg lg:border-transparent lg:text-md lg:hover:not-current:border-transparent lg:hover:not-current:bg-card"
+              className="type-control border-border current:border-blue current:text-foreground text-muted-foreground hover:border-border-strong hover:text-foreground lg:text-md lg:hover:not-current:border-transparent lg:hover:not-current:bg-card relative isolate inline-flex h-8 items-center gap-2 overflow-hidden rounded-md border px-3 transition-colors lg:h-10 lg:rounded-lg lg:border-transparent"
               key={item.to}
               to={item.to}
             >
@@ -231,8 +231,8 @@ export function AppShell({
             aria-label={item.label}
             className={cn(
               iconButton,
-              "relative isolate overflow-hidden current:border-blue current:text-foreground",
-              "lg:type-control lg:flex lg:h-10 lg:w-auto lg:justify-start lg:gap-3 lg:rounded-lg lg:border-transparent lg:px-3 lg:text-md lg:hover:not-current:border-transparent lg:hover:not-current:bg-card",
+              "current:border-blue current:text-foreground relative isolate overflow-hidden",
+              "lg:type-control lg:text-md lg:hover:not-current:border-transparent lg:hover:not-current:bg-card lg:flex lg:h-10 lg:w-auto lg:justify-start lg:gap-3 lg:rounded-lg lg:border-transparent lg:px-3",
               index > 0 && "max-md:-ml-3"
             )}
             key={item.to}
@@ -265,13 +265,13 @@ export function AppShell({
       </main>
       <nav
         aria-label="Main tabs"
-        className="relative hidden shrink-0 gap-1 px-1.5 pt-1.5 pb-safe-tabbar group-data-booting/shell:invisible max-md:flex"
+        className="pb-safe-tabbar relative hidden shrink-0 gap-1 px-1.5 pt-1.5 group-data-booting/shell:invisible max-md:flex"
       >
         <Rule className="absolute inset-x-0 top-0 h-0.5" />
         {navigation.map((item) => (
           <Link
             activeProps={{ "aria-current": "page" }}
-            className="type-micro relative flex min-w-0 flex-1 flex-col items-center gap-1 overflow-hidden rounded-lg border border-transparent current:border-blue pt-1 pb-1.5 current:text-foreground text-muted-foreground transition-colors"
+            className="type-micro current:border-blue current:text-foreground text-muted-foreground relative flex min-w-0 flex-1 flex-col items-center gap-1 overflow-hidden rounded-lg border border-transparent pt-1 pb-1.5 transition-colors"
             key={item.to}
             to={item.to}
           >

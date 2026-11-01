@@ -3,7 +3,7 @@ import type { Curriculum } from "../data/types";
 
 const { props } = curriculumJson as Curriculum;
 // A trailing note in brackets, like "(radical)".
-const TRAILING_NOTE = /\s*\([^)]*\)$/;
+const TRAILING_NOTE = /\s*\([^)]*\)$/u;
 
 /** A component's dictionary meaning, cut to its first sense: "city outskirts, suburbs; remote" → "city outskirts, suburbs". */
 export function propMeaning(component: string) {

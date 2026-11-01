@@ -44,10 +44,10 @@ const neutralToneExamples: Record<string, { text: string; pinyin: string }> = {
   耶: { text: "好耶", pinyin: "hǎo ye" },
 };
 
-const MARKED_TONE = /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ1-4]/;
-const PHRASE_PUNCTUATION = /[\s,/.!?。！？]/;
-const PLAIN_LETTER = /^[a-zü]$/;
-const TONE_DIGIT = /^[1-4]$/;
+const MARKED_TONE = /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ1-4]/u;
+const PHRASE_PUNCTUATION = /[\s,/.!?。！？]/u;
+const PLAIN_LETTER = /^[a-zü]$/u;
+const TONE_DIGIT = /^[1-4]$/u;
 
 export function getNeutralToneExample(text: string, pinyin: string) {
   const hasMarkedTone = MARKED_TONE.test(pinyin);

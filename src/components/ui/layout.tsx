@@ -96,7 +96,7 @@ export function PageHeader({
   const Title = heading ? "h1" : "p";
   return (
     <header className={headRow}>
-      <Title className="type-title m-0 inline-flex shrink-0 items-center gap-2 whitespace-nowrap text-foreground">
+      <Title className="type-title text-foreground m-0 inline-flex shrink-0 items-center gap-2 whitespace-nowrap">
         {title}
       </Title>
       {children ?? <Rule className="min-w-10" />}
@@ -139,7 +139,7 @@ export function SectionHead({
         className
       )}
     >
-      <span className="min-w-0 truncate text-foreground">{text}</span>
+      <span className="text-foreground min-w-0 truncate">{text}</span>
       {meta === undefined || meta === null ? null : (
         <span className={cn("dot-before", tone && tones[tone])}>{meta}</span>
       )}
@@ -168,18 +168,18 @@ export function Empty({
     <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16 text-center">
       <span
         aria-hidden="true"
-        className="relative mb-2 grid size-24 place-items-center overflow-hidden rounded-2xl border border-border"
+        className="border-border relative mb-2 grid size-24 place-items-center overflow-hidden rounded-2xl border"
       >
         <DitherGradient cell={2} direction="up" from={tone} opacity={0.55} />
         <span
-          className="relative font-hanzi text-6xl text-foreground leading-none"
+          className="font-hanzi text-foreground relative text-6xl leading-none"
           lang="zh-CN"
         >
           {mark}
         </span>
       </span>
       <h2 className="type-display m-0 tracking-tight">{title}</h2>
-      <p className="type-body m-0 max-w-measure-narrow text-muted-foreground">
+      <p className="type-body max-w-measure-narrow text-muted-foreground m-0">
         {detail}
       </p>
       {children}
@@ -206,11 +206,11 @@ export function Status({
 }) {
   return (
     <div
-      className="grid min-h-52 flex-1 place-content-center justify-items-center gap-4 py-12 text-center text-muted-foreground"
+      className="text-muted-foreground grid min-h-52 flex-1 place-content-center justify-items-center gap-4 py-12 text-center"
       role={loading ? "status" : undefined}
     >
       {loading ? <PixelLoader label={title} size={5} /> : null}
-      <p className="type-body m-0 max-w-measure">{title}</p>
+      <p className="type-body max-w-measure m-0">{title}</p>
       {action}
     </div>
   );
@@ -219,7 +219,7 @@ export function Status({
 export function ErrorNote({ children }: { children: ReactNode }) {
   return (
     <p
-      className="type-label m-0 border-destructive border-l-2 pl-2.5 text-destructive leading-wrap"
+      className="type-label border-destructive text-destructive leading-wrap m-0 border-l-2 pl-2.5"
       role="alert"
     >
       {children}

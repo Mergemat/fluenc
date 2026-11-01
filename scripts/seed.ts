@@ -196,6 +196,7 @@ for (let daysAgo = DAYS; daysAgo > 0; daysAgo -= 1) {
           setName: state.sets[movie.finalKey] ?? nextName(sets, state.sets),
           tone: movie.tone,
           roomName: movie.roomName,
+          // biome-ignore lint/suspicious/noLoopFunc: map runs at once, on this pass's state.
           props: movie.components.map(({ hanzi }) => ({
             component: hanzi,
             propName: state.props[hanzi] ?? nextName(props, state.props),

@@ -1,4 +1,4 @@
-import { type Card, createEmptyCard, type Grade } from "ts-fsrs";
+import { type Card, createEmptyCard, type Grade, type State } from "ts-fsrs";
 
 import {
   type FocusEntry,
@@ -22,7 +22,6 @@ type StudyItemType = (typeof studyItemTypes)[number];
 export interface CardSnapshot {
   difficulty: number;
   due: string;
-  elapsedDays: number;
   /** When the learner first met the item; absent in progress saved before it was recorded. */
   introducedAt?: string;
   lapses: number;
@@ -147,12 +146,12 @@ export function toCard(snapshot: CardSnapshot): Card {
     due: new Date(snapshot.due),
     stability: snapshot.stability,
     difficulty: snapshot.difficulty,
-    elapsed_days: snapshot.elapsedDays,
     scheduled_days: snapshot.scheduledDays,
     learning_steps: snapshot.learningSteps,
     reps: snapshot.reps,
     lapses: snapshot.lapses,
-    state: snapshot.state,
+    // Only the scheduler writes it, so it is always one of the states.
+    state: snapshot.state as State,
     last_review: snapshot.lastReview
       ? new Date(snapshot.lastReview)
       : undefined,
@@ -164,7 +163,6 @@ export function toSnapshot(card: Card): CardSnapshot {
     due: card.due.toISOString(),
     stability: card.stability,
     difficulty: card.difficulty,
-    elapsedDays: card.elapsed_days,
     scheduledDays: card.scheduled_days,
     learningSteps: card.learning_steps,
     reps: card.reps,

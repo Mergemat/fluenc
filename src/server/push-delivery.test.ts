@@ -4,7 +4,7 @@ import webpush from "web-push";
 
 import { sendPush } from "./push-delivery.server";
 
-const BASE64URL_TOPIC = /^[A-Za-z0-9_-]{1,32}$/;
+const BASE64URL_TOPIC = /^[A-Za-z0-9_-]{1,32}$/u;
 
 test("daily and test pushes have stable, distinct topics that a push provider can decode", async () => {
   const keys = webpush.generateVAPIDKeys();

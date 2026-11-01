@@ -3,7 +3,7 @@ import { z } from "zod";
 import { isStandardSyllable, parseSyllable } from "./pinyin-syllables";
 
 const HAN_COMPONENT = /^[\p{Script=Han}⺀-⻿㇀-㇯]$/u;
-const LIST_PUNCTUATION = /[,;/]/;
+const LIST_PUNCTUATION = /[,;/]/u;
 
 export const isHanziUnit = (value: string) =>
   Array.from(value).length === 1 && HAN_COMPONENT.test(value);
@@ -13,7 +13,7 @@ const syllable = z
   .string()
   .refine(isStandardSyllable, "One syllable with a standard tone mark");
 const gloss = z.string().trim().min(1).max(80);
-const sources = z.array(z.url({ protocol: /^https$/ })).min(1);
+const sources = z.array(z.url({ protocol: /^https$/u })).min(1);
 
 export const characterSchema = z.strictObject({
   hanzi: unit,
@@ -88,7 +88,7 @@ const normalize = (value: string) =>
   value
     .normalize("NFC")
     .toLowerCase()
-    .replace(/[\s'’-]/g, "");
+    .replace(/[\s'’-]/gu, "");
 
 /** Every way a character may be read, without tones. */
 export function readingsOf(character: CharacterEntry) {

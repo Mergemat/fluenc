@@ -10,7 +10,7 @@ import { altText, meaningText } from "../ui/hanzi";
  */
 export function studio(glyph: boolean) {
   return cn(
-    "glyph-max-glyph relative mx-auto box-border grid size-full max-w-frame grid-cols-1 gap-2 px-gutter pt-page-top pb-6",
+    "glyph-max-glyph max-w-frame px-gutter pt-page-top relative mx-auto box-border grid size-full grid-cols-1 gap-2 pb-6",
     glyph ? "grid-rows-studio-glyph" : "grid-rows-studio",
     "studio:grid-cols-studio studio:grid-rows-studio-wide studio:gap-x-12 studio:gap-y-4 studio:*:first:col-span-2",
     "*:transition-opacity *:duration-160 data-leaving:*:not-data-actions:opacity-35"

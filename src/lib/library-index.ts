@@ -11,7 +11,7 @@ export interface LibrarySection {
 }
 
 const UP_NEXT = 20;
-const RETROFLEX = /^[zcs]h/;
+const RETROFLEX = /^[zcs]h/u;
 
 /** The dictionary letter a reading files under: its first letter, with zh, ch and sh apart. */
 export function soundKey(pinyin: string) {

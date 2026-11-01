@@ -66,7 +66,7 @@ const ratings: {
   { value: Rating.Easy, label: "easy", note: "instant", color: "green" },
 ];
 
-const RATING_KEY = /^[1-4]$/;
+const RATING_KEY = /^[1-4]$/u;
 
 type CharacterReview = Extract<ReviewItem, { type: "character" }>;
 type Clue = ReturnType<typeof lessonClues>[number];
@@ -99,7 +99,7 @@ function RatingButton({
   // It hangs in the gap over the actions, so the deck keeps no row for it while the answer is hidden.
   return (
     <div className="relative grid min-w-0">
-      <em className="type-micro absolute inset-x-0 bottom-full mb-1 text-center text-muted-foreground tabular-nums">
+      <em className="type-micro text-muted-foreground absolute inset-x-0 bottom-full mb-1 text-center tabular-nums">
         {after}
       </em>
       <DitherButton
@@ -109,7 +109,7 @@ function RatingButton({
         variant="dotted"
       >
         <span className="type-action">{rating.label}</span>
-        <small className="type-micro text-balance px-1 text-center leading-tight opacity-80">
+        <small className="type-micro px-1 text-center leading-tight text-balance opacity-80">
           {rating.note}
         </small>
         <kbd className="absolute top-1.5 right-2">{rating.value}</kbd>
@@ -213,7 +213,7 @@ function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
   if (item.type === "word") {
     return (
       <p
-        className="glyph-max-75 relative m-0 whitespace-nowrap font-hanzi text-word-card leading-none"
+        className="glyph-max-75 font-hanzi text-word-card relative m-0 leading-none whitespace-nowrap"
         lang="zh-CN"
         style={{ "--chars": Array.from(item.hanzi).length } as CSSProperties}
       >
@@ -223,7 +223,7 @@ function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
   }
   return (
     <div className="relative grid justify-items-center gap-4 text-center">
-      <p className="type-label m-0 text-muted-foreground">say it in mandarin</p>
+      <p className="type-label text-muted-foreground m-0">say it in mandarin</p>
       <p className="type-display m-0 text-balance">{item.meaning}</p>
     </div>
   );
@@ -255,7 +255,7 @@ function Focus({ item }: { item: Exclude<ReviewItem, { type: "sentence" }> }) {
     <div
       className={cn(
         ident,
-        "card-short:translate-none card-short:static absolute top-1/2 right-6 left-6 card-short:flex-1 -translate-y-1/2 card-short:content-center gap-2 card-short:px-16 card-short:pt-4"
+        "card-short:translate-none card-short:static card-short:flex-1 card-short:content-center card-short:px-16 card-short:pt-4 absolute top-1/2 right-6 left-6 -translate-y-1/2 gap-2"
       )}
     >
       <div className="inline-flex items-center gap-2">
@@ -354,7 +354,7 @@ function CardAnswer({
       <span
         className={cn(
           answerIndex,
-          "whitespace-nowrap font-hanzi text-3xl leading-none"
+          "font-hanzi text-3xl leading-none whitespace-nowrap"
         )}
         lang="zh-CN"
       >
@@ -363,7 +363,7 @@ function CardAnswer({
       <Focus item={item} />
       <div className={answerEdge}>
         {item.livingLink ? (
-          <p className="type-body m-0 text-center text-muted-foreground">
+          <p className="type-body text-muted-foreground m-0 text-center">
             {item.livingLink}
           </p>
         ) : null}
@@ -715,7 +715,7 @@ export function ReviewDeck({
             {back.button}
             {active ? (
               <span>
-                <b className="font-medium text-foreground">{queue.length}</b>{" "}
+                <b className="text-foreground font-medium">{queue.length}</b>{" "}
                 left
               </span>
             ) : null}
@@ -780,7 +780,7 @@ export function ReviewDeck({
         </footer>
         {failed ? (
           <p
-            className="type-label m-0 text-center text-red leading-wrap"
+            className="type-label text-red leading-wrap m-0 text-center"
             role="alert"
           >
             could not save this review — try again
@@ -817,7 +817,7 @@ export function WordGloss({
   }));
   return (
     <div
-      className={cn("flex shrink-0 justify-center gap-gloss", className)}
+      className={cn("gap-gloss flex shrink-0 justify-center", className)}
       lang="zh-CN"
     >
       {columns.map(({ char, position, syllable, gloss }) => (
@@ -829,7 +829,7 @@ export function WordGloss({
           <span
             aria-hidden={!revealed}
             className={cn(
-              "type-pinyin inline-flex h-7 items-center gap-1 whitespace-nowrap text-xl tracking-snug transition duration-200 ease-out",
+              "type-pinyin tracking-snug inline-flex h-7 items-center gap-1 text-xl whitespace-nowrap transition duration-200 ease-out",
               !revealed && "translate-y-1.5 opacity-0"
             )}
             lang="zh-Latn"
@@ -849,7 +849,7 @@ export function WordGloss({
           <span
             aria-hidden={!revealed}
             className={cn(
-              "type-body line-clamp-2 min-h-5 max-w-32 text-center text-muted-foreground leading-tight transition duration-200 ease-out",
+              "type-body text-muted-foreground line-clamp-2 min-h-5 max-w-32 text-center leading-tight transition duration-200 ease-out",
               !revealed && "-translate-y-1.5 opacity-0"
             )}
             lang="en"

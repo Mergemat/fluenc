@@ -27,7 +27,7 @@ export const deck = "flex min-h-0 flex-1 flex-col gap-4";
  */
 export function deckActions(pair = false) {
   return cn(
-    "mx-auto grid min-h-14 w-full max-w-deck shrink-0",
+    "max-w-deck mx-auto grid min-h-14 w-full shrink-0",
     pair && "auto-cols-fr grid-flow-col gap-2"
   );
 }
@@ -107,7 +107,7 @@ function Under({ count }: { count: number }) {
         return (
           <span
             aria-hidden="true"
-            className="absolute inset-0 origin-bottom overflow-hidden rounded-2xl border border-deck-edge bg-deck-under shadow-deck-under"
+            className="border-deck-edge bg-deck-under shadow-deck-under absolute inset-0 origin-bottom overflow-hidden rounded-2xl border"
             key={tilt}
             style={{
               zIndex: 4 - layer,
@@ -135,7 +135,7 @@ export function DeckTable({
     <div className="@container-size flex min-h-0 flex-1 flex-col items-center justify-center gap-2">
       {children}
       {caption ? (
-        <div className="type-label m-0 min-h-lh text-faint-foreground">
+        <div className="type-label text-faint-foreground m-0 min-h-lh">
           {caption}
         </div>
       ) : null}
@@ -162,8 +162,8 @@ export function DeckPile({
       className={cn(
         "perspective-deck relative mb-8 w-full flex-none",
         wide
-          ? "aspect-7/5 max-h-pile-wide max-w-xl"
-          : "aspect-5/7 max-h-pile max-w-96"
+          ? "max-h-pile-wide aspect-7/5 max-w-xl"
+          : "max-h-pile aspect-5/7 max-w-96"
       )}
     >
       <Under count={under} />
@@ -216,7 +216,7 @@ export function DeckCard({
     <div
       aria-hidden={ghost || waiting || undefined}
       className={cn(
-        "transform-3d absolute inset-0 z-5 transition-card motion-reduce:animate-none motion-reduce:transition-none",
+        "transition-card absolute inset-0 z-5 transform-3d motion-reduce:animate-none motion-reduce:transition-none",
         cardMotion(thrown, waiting),
         flipped ? "rotate-y-180" : "hover:-translate-y-1",
         // A thrown copy flies over the card dealt in under it and takes no input.
@@ -282,7 +282,7 @@ export function DeckSlot({
         face,
         "gap-2",
         state === "down"
-          ? "bg-card before:pointer-events-none before:absolute before:inset-3 before:rounded-xl before:border before:border-foreground/8"
+          ? "bg-card before:border-foreground/8 before:pointer-events-none before:absolute before:inset-3 before:rounded-xl before:border"
           : "border-border-strong border-dashed bg-transparent shadow-none",
         arrive && "animate-enter"
       )}

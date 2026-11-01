@@ -17,7 +17,7 @@ declare const self: ServiceWorkerGlobalScope & {
   __WB_MANIFEST: PrecacheEntry[];
 };
 
-const AUDIO_PATH = /^\/audio\/[^/]+\/[^/]+\.mp3$/;
+const AUDIO_PATH = /^\/audio\/[^/]+\/[^/]+\.mp3$/u;
 
 // A new version waits until the learner asks for it (see use-app-update), so a
 // running page never loses the files it was built with. Workers from before that handshake
@@ -54,12 +54,12 @@ self.addEventListener("notificationclick", (event) => {
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL("/offline.html"), {
     allowlist: [
-      /^\/(?:review|lessons|reading|listen|library|profile|settings|account|welcome)?\/?(?:\?.*)?$/,
-      /^\/library\/(?:characters|words)\/[^/?]+\/?(?:\?.*)?$/,
-      /^\/profile\/palace\/?(?:\?.*)?$/,
+      /^\/(?:review|lessons|reading|listen|library|profile|settings|account|welcome)?\/?(?:\?.*)?$/u,
+      /^\/library\/(?:characters|words)\/[^/?]+\/?(?:\?.*)?$/u,
+      /^\/profile\/palace\/?(?:\?.*)?$/u,
       // The palace's old address, which redirects to the profile.
-      /^\/palace(?:\/[^?]*)?(?:\?.*)?$/,
-      /^\/profile\/palace\/(?:cast|sets|areas|props)\/[^/?]+\/?(?:\?.*)?$/,
+      /^\/palace(?:\/[^?]*)?(?:\?.*)?$/u,
+      /^\/profile\/palace\/(?:cast|sets|areas|props)\/[^/?]+\/?(?:\?.*)?$/u,
     ],
   })
 );

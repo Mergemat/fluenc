@@ -58,7 +58,7 @@ const COMPRESSIBLE = new Set([
   ".txt",
   ".webmanifest",
 ]);
-const NAMED_BY_CONTENT = /^\/(assets|offline|strokes|audio)\//;
+const NAMED_BY_CONTENT = /^\/(?:assets|offline|strokes|audio)\//u;
 const compressed = new Map<string, Buffer<ArrayBuffer>>();
 
 async function brotli(path: string, file: Blob) {

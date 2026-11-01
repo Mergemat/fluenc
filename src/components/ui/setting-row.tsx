@@ -34,19 +34,19 @@ export function SettingRow({
   return (
     <section
       aria-labelledby={id}
-      className="grid grid-cols-setting items-center gap-x-4 gap-y-2 border-border not-last:border-b py-3 sm:grid-cols-setting-wide"
+      className="grid-cols-setting border-border sm:grid-cols-setting-wide grid items-center gap-x-4 gap-y-2 py-3 not-last:border-b"
     >
       <div className="col-start-1 row-start-1 min-w-0">
         <h2 className="type-heading m-0" id={id}>
           {title}
         </h2>
-        <p className="type-body mt-1 mb-0 text-pretty text-muted-foreground">
+        <p className="type-body text-muted-foreground mt-1 mb-0 text-pretty">
           {note}
         </p>
       </div>
       <p
         className={cn(
-          "type-control col-span-2 row-start-2 m-0 flex items-baseline gap-2 leading-wrap sm:col-span-1 sm:col-start-2 sm:row-start-1",
+          "type-control leading-wrap col-span-2 row-start-2 m-0 flex items-baseline gap-2 sm:col-span-1 sm:col-start-2 sm:row-start-1",
           tone === "idle" ? "text-muted-foreground" : "text-foreground"
         )}
         role="status"

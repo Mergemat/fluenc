@@ -120,7 +120,7 @@ export function SearchField({
           <X size={15} />
         </button>
       ) : (
-        <kbd className="rounded-sm border border-border-strong px-1.5 py-px">
+        <kbd className="border-border-strong rounded-sm border px-1.5 py-px">
           /
         </kbd>
       )}

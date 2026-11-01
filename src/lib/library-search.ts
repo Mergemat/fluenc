@@ -18,8 +18,8 @@ export function normalizePinyin(value: string) {
   return value
     .toLowerCase()
     .normalize("NFD")
-    .replace(/u\u0308|u:|v/g, "v")
-    .replace(/[\u0300-\u036f1-5\s'’-]/g, "");
+    .replace(/u\u0308|u:|v/gu, "v")
+    .replace(/[\u0300-\u036f1-5\s'’-]/gu, "");
 }
 
 /** The learner's clue names for an entry, from its movie codes and saved palace names. */
@@ -43,9 +43,9 @@ export function entryClueNames(
   ].filter((name): name is string => Boolean(name));
 }
 
-const WHITESPACE = /\s+/;
+const WHITESPACE = /\s+/u;
 const WORD_BREAK = /[^\p{L}\p{N}]+/u;
-const PLAIN_PINYIN = /^[a-zv]+$/;
+const PLAIN_PINYIN = /^[a-zv]+$/u;
 
 interface SearchEntry {
   hanzi: string;

@@ -89,10 +89,10 @@ function ReviewNext({ data }: { data: DashboardData }) {
           </span>
         ) : null}
         <p className={nextWhat}>
-          <b className="trim-cap type-display text-4xl tabular-nums leading-none tracking-snug">
+          <b className="trim-cap type-display tracking-snug text-4xl leading-none tabular-nums">
             {due}
           </b>
-          <span className="type-label grid gap-1 text-muted-foreground">
+          <span className="type-label text-muted-foreground grid gap-1">
             <span>{due === 1 ? "card" : "cards"}</span>
             <span>
               about {Math.max(1, Math.round((due * SECONDS_PER_CARD) / 60))} min
@@ -103,12 +103,12 @@ function ReviewNext({ data }: { data: DashboardData }) {
       {rest.length ? (
         <ol
           aria-label="Cards after it"
-          className="m-0 flex h-6 list-none flex-wrap gap-x-4 gap-y-6 overflow-hidden p-0 text-muted-foreground text-xl leading-6"
+          className="text-muted-foreground m-0 flex h-6 list-none flex-wrap gap-x-4 gap-y-6 overflow-hidden p-0 text-xl leading-6"
           lang="zh-CN"
         >
           {rest.map((item) => (
             <li
-              className="flex-none font-hanzi"
+              className="font-hanzi flex-none"
               key={`${item.type}:${item.id}`}
             >
               {item.hanzi}
@@ -165,7 +165,7 @@ function ReadingNext({
     <section aria-label="Next up" className={nextCard}>
       <NextHead meta={`read · ${plural(count, "sentence", "sentences")}`} />
       <p
-        className="m-0 font-hanzi text-3xl leading-snug tracking-wide"
+        className="font-hanzi m-0 text-3xl leading-snug tracking-wide"
         lang="zh-CN"
       >
         {sentence.hanzi}
@@ -191,7 +191,7 @@ function NextUp({ data, lead }: { data: DashboardData; lead: Lead | null }) {
   return (
     <section aria-label="Next up" className={nextCard}>
       <NextHead />
-      <p className="type-body m-0 text-muted-foreground">
+      <p className="type-body text-muted-foreground m-0">
         nothing waiting — every lesson is learned
       </p>
     </section>
@@ -218,20 +218,20 @@ function Later({
     <li className="not-first:inset-shadow-hairline">
       <Link
         aria-label={name}
-        className="relative -mx-2 flex items-center gap-4 rounded-lg px-2 py-3 ring-card transition hover:bg-card hover:ring-1"
+        className="ring-card hover:bg-card relative -mx-2 flex items-center gap-4 rounded-lg px-2 py-3 transition hover:ring-1"
         to={to}
       >
         <span
           aria-hidden="true"
-          className="w-10 flex-none text-center font-hanzi text-3xl text-muted-foreground leading-none"
+          className="font-hanzi text-muted-foreground w-10 flex-none text-center text-3xl leading-none"
         >
           {lead}
         </span>
         <span className="grid min-w-0 flex-1 gap-2">
-          <span className="type-label truncate text-muted-foreground">
+          <span className="type-label text-muted-foreground truncate">
             {label}
           </span>
-          <span className="type-heading flex min-w-0 items-baseline gap-2 overflow-hidden whitespace-nowrap leading-none">
+          <span className="type-heading flex min-w-0 items-baseline gap-2 overflow-hidden leading-none whitespace-nowrap">
             {children}
           </span>
         </span>
@@ -306,7 +306,7 @@ function LaterToday({
             to="/reading"
           >
             <span
-              className="truncate font-hanzi text-xl tracking-wide"
+              className="font-hanzi truncate text-xl tracking-wide"
               lang="zh-CN"
             >
               {sentence.hanzi}
@@ -322,14 +322,14 @@ function LaterToday({
           <span className="flex gap-1.5">
             {week.days.map((day, index) => (
               <span
-                className="type-micro grid justify-items-center gap-1 text-muted-foreground"
+                className="type-micro text-muted-foreground grid justify-items-center gap-1"
                 key={day.key}
               >
                 <i
                   className={cn(
                     "relative size-6 overflow-hidden rounded-sm",
                     day.key === week.today
-                      ? "inset-ring inset-ring-blue"
+                      ? "inset-ring-blue inset-ring"
                       : "bg-popover"
                   )}
                   title={`${day.key} · ${day.count} new`}
@@ -379,7 +379,7 @@ export function TodayView({ data }: { data: DashboardData }) {
         />
       }
     >
-      <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-today">
+      <div className="md:grid-cols-today grid grid-cols-1 items-start gap-12">
         <NextUp data={data} lead={lead} />
         <LaterToday data={data} lead={lead} />
       </div>

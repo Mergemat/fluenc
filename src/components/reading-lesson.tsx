@@ -95,7 +95,7 @@ export function ReadingLesson({
             back={
               <div className={sentenceAnswer}>
                 <p
-                  className="m-0 font-hanzi text-muted-foreground text-title"
+                  className="font-hanzi text-muted-foreground text-title m-0"
                   lang="zh-CN"
                 >
                   {item.hanzi}
@@ -179,7 +179,7 @@ export function ShadowTakes({
         return (
           <i
             className={cn(
-              "relative h-10 w-7 overflow-hidden rounded-sm border bg-deck transition-transform duration-360 ease-settle motion-reduce:transition-none",
+              "bg-deck ease-settle relative h-10 w-7 overflow-hidden rounded-sm border transition-transform duration-360 motion-reduce:transition-none",
               laid ? "border-transparent" : "border-deck-edge"
             )}
             key={slot}

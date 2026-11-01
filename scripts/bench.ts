@@ -248,7 +248,7 @@ function interactions(perf: Perf, from: number, to = Number.POSITIVE_INFINITY) {
 
 const now = (page: Page) => page.evaluate(() => performance.now());
 
-const COURSE_DATA = /^\/assets\/(curriculum|sentences)-/;
+const COURSE_DATA = /^\/assets\/(?:curriculum|sentences)-/u;
 
 /** What a download is for, by where it comes from. */
 function kindOf(url: string) {
@@ -372,7 +372,7 @@ type Tab = keyof typeof tabs;
 const nav = (page: Page, tab: Tab) =>
   page.locator(`nav[aria-label="Main tabs"] a[href="${tabs[tab]}"]`);
 
-const LEFT = /(\d+) left/;
+const LEFT = /(?<count>\d+) left/u;
 const nextFrame = (page: Page) =>
   page.evaluate(
     () =>
@@ -424,6 +424,7 @@ async function startup(session: Session) {
     await page.waitForFunction(
       () =>
         !document.querySelector("[data-booting]") &&
+        // biome-ignore lint/performance/useDomNodeTextContent: only text on screen counts as shown.
         document.body.innerText.includes("next up"),
       undefined,
       { polling: "raf" }
@@ -450,7 +451,8 @@ async function review(session: Session) {
   );
   const left = async () =>
     Number(
-      (await page.getByText(LEFT).first().textContent())?.match(LEFT)?.[1]
+      (await page.getByText(LEFT).first().textContent())?.match(LEFT)?.groups
+        ?.count
     );
   await measure(session, "review", async () => {
     for (let index = 0; index < REVIEWS; index += 1) {
@@ -465,8 +467,9 @@ async function review(session: Session) {
       await page.waitForFunction(
         (count) => {
           // biome-ignore lint/performance/useTopLevelRegex: runs in the page, which sees no outer scope.
-          const text = document.body.innerText.match(/(\d+) left/);
-          return !text || Number(text[1]) !== count;
+          // biome-ignore lint/performance/useDomNodeTextContent: the count a learner sees, not hidden copies.
+          const text = document.body.innerText.match(/(?<left>\d+) left/u);
+          return !text || Number(text.groups?.left) !== count;
         },
         before,
         { polling: "raf" }

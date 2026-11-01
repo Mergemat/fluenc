@@ -312,8 +312,8 @@
   /* Position only: a filter here would flatten the card for a moment and show its back. */
   @keyframes deal {
     from {
-      translate: 0 6px;
       rotate: -1.4deg;
+      translate: 0 6px;
     }
   }
   /* A throw starts flipped, with the same transform list as its end, so it never turns back
@@ -511,6 +511,7 @@
 
 /* ── Base ─────────────────────────────────────────────────────────────────── */
 @layer base {
+  /* biome-ignore lint/suspicious/noDuplicateSelectors: the other :root rules sit inside media queries. */
   :root {
     /* The radius every other radius is worked out from, as in shadcn/ui. */
     --radius: 10px;
@@ -564,6 +565,7 @@
   summary {
     cursor: pointer;
   }
+  /* biome-ignore lint/suspicious/useBaseline: browsers without it keep their own highlight. */
   ::selection {
     color: var(--color-primary-foreground);
     background: var(--color-primary);
@@ -625,6 +627,7 @@
 }
 /* Figures without the empty space above them, so the gaps around them are the tokens. */
 @utility trim-cap {
+  /* biome-ignore lint/suspicious/useBaseline: without it the figure keeps its leading, a few px looser. */
   text-box: trim-both cap alphabetic;
 }
 /* Meta after a label, set off by a dot that is decoration, not text. */

@@ -58,10 +58,10 @@ export function clueRow({
     !(dense || stacked) &&
       "grid-cols-clue max-studio:h-12 max-studio:short:h-11 max-studio:grid-cols-clue-line",
     lined && !dense && "inset-shadow-rule",
-    editable && "cursor-text focus-within:rounded-lg focus-within:bg-kind/9",
+    editable && "focus-within:bg-kind/9 cursor-text focus-within:rounded-lg",
     lit && highlight,
     marker &&
-      "before:absolute before:inset-y-3 before:left-0 before:w-0.5 before:rounded-r-xs before:bg-kind",
+      "before:bg-kind before:absolute before:inset-y-3 before:left-0 before:w-0.5 before:rounded-r-xs",
     // The glow takes the marker's colour: `--k`, set as its text colour.
     marker === "empty" && "before:text-kind before:shadow-glow",
     marker === "new" && "before:opacity-35"
@@ -80,12 +80,12 @@ export function clueCode({
   "lit" | "dense" | "editable" | "stacked"
 >) {
   return cn(
-    "type-code col-start-1 row-span-2 self-center justify-self-center whitespace-nowrap text-kind transition-glow duration-160",
+    "type-code text-kind transition-glow col-start-1 row-span-2 self-center justify-self-center whitespace-nowrap duration-160",
     !(dense || stacked) && "max-studio:row-span-1",
     kind === "prop" &&
       cn(
         "font-hanzi-props font-normal",
-        dense ? "text-2xl" : "text-3xl max-studio:short:text-2xl"
+        dense ? "text-2xl" : "max-studio:short:text-2xl text-3xl"
       ),
     kind === "link" && "grid place-items-center",
     editable && "group-focus-within/row:text-shadow-glow",
@@ -102,7 +102,7 @@ export const clueCount = "ml-px align-super type-label font-semibold";
 /** What the clue stands for; on phones at the line's end, unless the row is stacked. */
 export function clueRole(stacked?: boolean) {
   return cn(
-    "type-label col-start-2 min-w-0 truncate text-muted-foreground leading-3.5",
+    "type-label text-muted-foreground col-start-2 min-w-0 truncate leading-3.5",
     stacked
       ? "max-studio:row-start-1"
       : "max-studio:col-start-3 max-studio:row-start-1 max-studio:max-w-24 max-studio:text-right"
@@ -117,13 +117,13 @@ export function clueName({
   stacked,
 }: { empty: boolean } & Pick<RowState, "dense" | "editable" | "stacked">) {
   return cn(
-    "type-heading col-start-2 h-7 w-full min-w-0 text-foreground",
+    "type-heading text-foreground col-start-2 h-7 w-full min-w-0",
     dense || stacked
       ? "max-studio:row-start-2 max-studio:h-6"
       : "max-studio:row-start-1",
     editable
       ? cn(
-          "text-ellipsis rounded-none border-transparent border-b bg-transparent p-0 outline-none transition-colors focus-visible:outline-none",
+          "rounded-none border-b border-transparent bg-transparent p-0 text-ellipsis transition-colors outline-none focus-visible:outline-none",
           "placeholder:type-control placeholder:text-kind placeholder:opacity-75",
           empty ? "border-kind/55 border-dashed" : "focus:border-kind"
         )

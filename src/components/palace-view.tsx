@@ -37,7 +37,7 @@ type Show = "all" | "named" | "open";
 /** A palace row; every row after the first in its group has a divider above it. */
 const rowClass = (first: boolean) =>
   cn(
-    "relative grid min-h-14 grid-cols-clue-row items-center gap-4 overflow-hidden py-1.5 pr-3.5 pl-2 text-muted-foreground transition-colors max-xs:grid-cols-clue-row-xs max-xs:gap-2",
+    "grid-cols-clue-row text-muted-foreground max-xs:grid-cols-clue-row-xs max-xs:gap-2 relative grid min-h-14 items-center gap-4 overflow-hidden py-1.5 pr-3.5 pl-2 transition-colors",
     !first && "inset-shadow-hairline"
   );
 
@@ -125,7 +125,7 @@ export function PalaceView() {
           meta={
             rows.length ? (
               <span>
-                <b className="font-medium text-foreground">{named}</b>/
+                <b className="text-foreground font-medium">{named}</b>/
                 {rows.length} named
               </span>
             ) : undefined
@@ -206,7 +206,7 @@ function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
     <Link
       className={cn(
         rowClass(first),
-        "follows-hover:inset-shadow-none hover:inset-shadow-none hover:rounded-lg hover:bg-popover"
+        "follows-hover:inset-shadow-none hover:bg-popover hover:rounded-lg hover:inset-shadow-none"
       )}
       data-kind={row.kind}
       data-open={open}
@@ -216,8 +216,8 @@ function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
     >
       <span
         className={cn(
-          "type-code justify-self-start whitespace-nowrap text-kind",
-          props && "font-hanzi-props font-normal text-3xl"
+          "type-code text-kind justify-self-start whitespace-nowrap",
+          props && "font-hanzi-props text-3xl font-normal"
         )}
         lang={props ? "zh-CN" : undefined}
       >
@@ -235,14 +235,14 @@ function ClueLink({ row, first }: { row: ClueRow; first: boolean }) {
           {row.name || "open"}
         </span>
         {row.hint ? (
-          <span className="type-label min-w-0 truncate text-muted-foreground">
+          <span className="type-label text-muted-foreground min-w-0 truncate">
             {row.hint}
           </span>
         ) : null}
       </span>
-      <span className="type-control whitespace-nowrap text-foreground tabular-nums">
+      <span className="type-control text-foreground whitespace-nowrap tabular-nums">
         {/* Before the count, so counts line up at the row's end. */}
-        <small className="text-muted-foreground text-xs max-xs:hidden">
+        <small className="text-muted-foreground max-xs:hidden text-xs">
           {row.started ? `${row.started} started · ` : ""}
         </small>
         {row.characters}

@@ -9,7 +9,6 @@ const card = {
   due: "2026-10-01T00:00:00.000Z",
   stability: 3,
   difficulty: 5,
-  elapsedDays: 0,
   scheduledDays: 3,
   learningSteps: 0,
   reps: 4,

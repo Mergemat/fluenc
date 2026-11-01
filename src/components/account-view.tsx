@@ -75,7 +75,7 @@ export function AccountView() {
       <Page head={<PageHeader title="account" />}>
         <p className={note}>
           signed in as{" "}
-          <b className="font-medium text-foreground">{status.learner.email}</b>.{" "}
+          <b className="text-foreground font-medium">{status.learner.email}</b>.{" "}
           <Link to="/settings">back to settings</Link>
         </p>
       </Page>
@@ -85,7 +85,7 @@ export function AccountView() {
   const text = copy[mode];
   return (
     <Page head={<PageHeader title={text.title} />}>
-      <form className="grid max-w-form gap-4" onSubmit={submit}>
+      <form className="max-w-form grid gap-4" onSubmit={submit}>
         <p className={cn(note, "mb-2")}>
           sync progress between your devices. what you learned here joins the
           account.
@@ -128,7 +128,7 @@ export function AccountView() {
             {busy ? "one moment…" : text.submit}
           </ActionButton>
           <button
-            className="type-label text-muted-foreground underline underline-offset-3 transition-colors hover:text-foreground"
+            className="type-label text-muted-foreground hover:text-foreground underline underline-offset-3 transition-colors"
             onClick={toggle}
             type="button"
           >
