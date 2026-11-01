@@ -3,9 +3,12 @@
 //   bun run focus add lesson.json [--dry-run]
 //   bun run focus list
 //   bun run focus remove 中国 学生
+//   bun run focus community
+//   bun run focus community remove 忧
 //
 // Works on the account in FLUENC_EMAIL (.env), or the one passed as --email. Devices pick the
-// change up on their next sync.
+// change up on their next sync. `community` needs no account: it lists the characters learners
+// added that the course lacks, most used first, and `community remove` stops sharing one.
 //
 // lesson.json: { "label": "HSK 1 · L3", "words": [{ "hanzi", "pinyin", "meaning" }],
 // "sentences": [{ "hanzi", "pinyin", "meaning" }] }. Words take dictionary pinyin (不 is bù);
@@ -13,16 +16,16 @@
 import "dotenv/config";
 import { readFile } from "node:fs/promises";
 import { eq } from "drizzle-orm";
-import { z } from "zod";
 
-import type { FocusEntry } from "../src/data/types";
 import { db } from "../src/db";
 import { user } from "../src/db/auth-schema";
-import { catalogFor } from "../src/lib/catalog";
-import { cardKey, type LearnerState } from "../src/lib/learner-state";
-import { deriveDashboard } from "../src/lib/learner-views";
-import { wordSyllables } from "../src/lib/word-syllables";
-import { readLearnerState, writeOperations } from "../src/server/sync.server";
+import { listCommunity, removeCommunity } from "../src/server/community.server";
+import {
+  addFocus,
+  type FocusStatus,
+  readFocus,
+  removeFocus,
+} from "../src/server/focus.server";
 
 /** The arguments without `--email <address>`, and the learner id that address signs in as. */
 export async function resolveLearner(args: string[]) {
@@ -46,145 +49,76 @@ export async function resolveLearner(args: string[]) {
   return { learnerId: account.id, email, args: rest };
 }
 
-const item = z.object({
-  hanzi: z.string().trim().min(1),
-  pinyin: z.string().trim().min(1),
-  meaning: z.string().trim().min(1),
-});
-const lesson = z.object({
-  label: z.string().trim().min(1),
-  words: z.array(item).default([]),
-  sentences: z.array(item).default([]),
-});
-
-const HAN = /\p{Script=Han}/u;
-// 不 and 一 change tone before another syllable; the course spells them in their own tone.
-const citation: Record<string, Record<string, string>> = {
-  不: { bú: "bù" },
-  一: { yí: "yī", yì: "yī" },
-};
-
-/** Course-style word pinyin: lower case, one run, 不 and 一 in their own tone. */
-export function wordPinyin(hanzi: string, reading: string) {
-  const joined = reading.normalize("NFC").toLowerCase().replace(/\s+/gu, "");
-  const syllables = wordSyllables(hanzi, joined);
-  if (!syllables) {
-    return joined;
+function statusText(result: FocusStatus | { status: "already in focus" }) {
+  switch (result.status) {
+    case "queued":
+      return `queued   ${result.own ? "your own" : "course"}`;
+    case "known":
+      return "known    already learned";
+    case "skipped":
+      return `skipped  ${result.reason}`;
+    default:
+      return "kept     already in focus";
   }
-  return Array.from(hanzi)
-    .map((character, index) => {
-      const syllable = syllables[index] ?? "";
-      return citation[character]?.[syllable] ?? syllable;
-    })
-    .join("");
 }
 
-function status(entry: FocusEntry, state: LearnerState) {
-  const [target] = catalogFor({ focus: [entry] }).focus;
-  if (!target) {
-    const missing = Array.from(entry.hanzi).filter(
-      (character) =>
-        HAN.test(character) && !catalogFor(state).charactersById.has(character)
-    );
-    return {
-      add: false,
-      text: missing.length
-        ? `skipped  ${[...new Set(missing)].join("")} not in the course`
-        : "skipped  no hanzi",
-    };
-  }
-  if (state.cards[target.key]) {
-    return { add: true, text: "known    already learned" };
-  }
-  const own = target.key === cardKey(entry.kind, entry.hanzi);
-  return {
-    add: true,
-    text: `queued   ${own ? "your own" : "course"} ${entry.kind}`,
-  };
-}
-
-function writeFocus(
-  learnerId: string,
-  data: { add: FocusEntry[] } | { remove: string[] }
-) {
-  const at = new Date().toISOString();
-  return writeOperations(learnerId, [
-    { id: crypto.randomUUID(), at, kind: "focus", data },
-  ]);
-}
+const row = (entry: { hanzi: string; pinyin: string }, text: string) =>
+  `  ${entry.hanzi.padEnd(8, "　")} ${entry.pinyin.padEnd(18)} ${text}`;
 
 async function add(learnerId: string, file: string, dryRun: boolean) {
-  const input = lesson.parse(JSON.parse(await readFile(file, "utf8")));
-  const start = Date.now();
-  const entries: FocusEntry[] = [
-    ...input.words.map((word) => ({
-      kind: "word" as const,
-      hanzi: word.hanzi,
-      pinyin: wordPinyin(word.hanzi, word.pinyin),
-      meaning: word.meaning,
-    })),
-    ...input.sentences.map((sentence) => ({
-      kind: "sentence" as const,
-      ...sentence,
-    })),
-  ].map((entry, index) => ({
-    ...entry,
-    label: input.label,
-    addedAt: new Date(start + index).toISOString(),
-  }));
-
-  const state = await readLearnerState(learnerId);
-  console.log(`${input.label}: ${entries.length} entries`);
-  const accepted = entries.filter((entry) => {
-    const result = status(entry, state);
-    console.log(
-      `  ${entry.hanzi.padEnd(8, "　")} ${entry.pinyin.padEnd(18)} ${entry.meaning.slice(0, 28).padEnd(28)} ${result.text}`
-    );
-    return result.add;
+  const lesson = JSON.parse(await readFile(file, "utf8"));
+  const { saved, results, upNext } = await addFocus(learnerId, lesson, {
+    dryRun,
   });
-
-  if (dryRun) {
-    console.log("\nDry run: nothing saved.");
-    return;
+  console.log(`${lesson.label}: ${results.length} entries`);
+  for (const result of results) {
+    console.log(row(result, statusText(result)));
   }
-  await writeFocus(learnerId, { add: accepted });
-  const saved = await readLearnerState(learnerId);
-  const dashboard = deriveDashboard(saved, new Date());
   console.log(
-    `\nSaved ${accepted.length}. Next in Build: ${dashboard.buildQueue
-      .slice(0, 12)
-      .map((lessonItem) => lessonItem.hanzi)
-      .join(" ")}`
+    dryRun
+      ? "\nDry run: nothing saved."
+      : `\nSaved ${saved}. Next in Build: ${upNext.join(" ")}`
   );
 }
 
 async function list(learnerId: string) {
-  const state = await readLearnerState(learnerId);
+  const { entries } = await readFocus(learnerId);
   let label = "";
-  for (const entry of state.focus) {
+  for (const entry of entries) {
     if (entry.label !== label) {
       ({ label } = entry);
       console.log(label);
     }
-    console.log(
-      `  ${entry.hanzi.padEnd(8, "　")} ${entry.pinyin.padEnd(18)} ${status(entry, state).text}`
-    );
+    console.log(row(entry, statusText(entry)));
   }
-  if (!state.focus.length) {
+  if (!entries.length) {
     console.log("Focus is empty.");
   }
 }
 
-async function remove(learnerId: string, hanzi: string[]) {
-  const before = await readLearnerState(learnerId);
-  await writeFocus(learnerId, { remove: hanzi });
-  const after = await readLearnerState(learnerId);
-  console.log(`Removed ${before.focus.length - after.focus.length}.`);
+async function community(args: string[]) {
+  if (args[0] === "remove" && args.length > 1) {
+    console.log(`Stopped sharing ${await removeCommunity(args.slice(1))}.`);
+    return;
+  }
+  const characters = await listCommunity();
+  for (const item of characters) {
+    console.log(
+      `  ${item.hanzi}  ${item.pinyin.padEnd(7)} ${item.keyword.padEnd(16)} ${item.components.join(" ").padEnd(14, "　")} ${item.learners} learners`
+    );
+  }
+  if (!characters.length) {
+    console.log("No learner has added a character yet.");
+  }
 }
 
 const [command, ...rest] = process.argv.slice(2);
 const usage =
-  "Usage: bun run focus add <lesson.json> [--dry-run] | list | remove <hanzi…> [--email <address>]";
+  "Usage: bun run focus add <lesson.json> [--dry-run] | list | remove <hanzi…> [--email <address>] | community [remove <hanzi…>]";
+if (command === "community") {
+  await community(rest);
+  process.exit(0);
+}
 if (!(command === "add" || command === "list" || command === "remove")) {
   console.error(usage);
   process.exit(1);
@@ -197,7 +131,8 @@ if (command === "add" && lessonFile) {
 } else if (command === "list") {
   await list(target.learnerId);
 } else if (command === "remove" && target.args.length) {
-  await remove(target.learnerId, target.args);
+  const { removed } = await removeFocus(target.learnerId, target.args);
+  console.log(`Removed ${removed}.`);
 } else {
   console.error(usage);
   process.exit(1);

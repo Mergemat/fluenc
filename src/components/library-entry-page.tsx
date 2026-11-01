@@ -227,21 +227,27 @@ function CharacterEntry({
             <AudioButton pinyin={item.pinyin} text={item.hanzi} />
           </div>
           <Senses meanings={meaning.alternatives} />
-          <p className="type-control max-w-measure hero:text-left text-muted-foreground text-center">
-            {item.strokes} {item.strokes === 1 ? "stroke" : "strokes"} · radical{" "}
-            <span className="font-hanzi" lang="zh-CN">
-              {item.radical}
-            </span>
-            {item.readings.map((reading) => (
-              <span key={reading.pinyin}>
-                {" "}
-                · also {reading.pinyin}, {reading.meanings[0]}
-              </span>
-            ))}
-          </p>
-          <Chip onClick={toggleXray} pressed={xray}>
-            parts
-          </Chip>
+          {/* A character a learner added has no stroke data: no count, radical or drawn parts. */}
+          {item.strokes ? (
+            <>
+              <p className="type-control max-w-measure hero:text-left text-muted-foreground text-center">
+                {item.strokes} {item.strokes === 1 ? "stroke" : "strokes"} ·
+                radical{" "}
+                <span className="font-hanzi" lang="zh-CN">
+                  {item.radical}
+                </span>
+                {item.readings.map((reading) => (
+                  <span key={reading.pinyin}>
+                    {" "}
+                    · also {reading.pinyin}, {reading.meanings[0]}
+                  </span>
+                ))}
+              </p>
+              <Chip onClick={toggleXray} pressed={xray}>
+                parts
+              </Chip>
+            </>
+          ) : null}
         </div>
       </header>
 

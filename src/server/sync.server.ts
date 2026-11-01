@@ -67,6 +67,7 @@ function focusEntry(row: typeof focusEntries.$inferSelect): FocusEntry {
     meaning: row.meaning,
     label: row.label,
     addedAt: row.addedAt.toISOString(),
+    ...(row.characters?.length ? { characters: row.characters } : {}),
     ...(row.kind === "word"
       ? { syllables: wordSyllables(row.hanzi, row.pinyin) }
       : {}),
@@ -651,6 +652,7 @@ async function writeChanges(
               pinyin: entry.pinyin,
               meaning: entry.meaning,
               label: entry.label,
+              characters: entry.characters ?? null,
               addedAt: new Date(entry.addedAt),
               removedAt: null,
               version,
@@ -667,6 +669,7 @@ async function writeChanges(
               "pinyin",
               "meaning",
               "label",
+              "characters",
               "addedAt",
               "removedAt",
               "version",

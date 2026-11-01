@@ -74,9 +74,25 @@ export interface Curriculum {
  * course use the course entry; the rest become the learner's own entries, as long as every
  * character is in the course.
  */
+/**
+ * A character the course lacks, described by the learner's agent and shared with every learner
+ * who adds it (see `community_characters`). It is taught like a course character, drawn in the
+ * system font.
+ */
+export interface OwnCharacter {
+  /** The props it is built from, in writing order; `[hanzi]` for a shape learned whole. */
+  components: string[];
+  hanzi: string;
+  keyword: string;
+  meaning: string;
+  pinyin: string;
+}
+
 export interface FocusEntry {
   /** ISO time it was added; earlier entries are taught first. */
   addedAt: string;
+  /** The characters it uses that the course lacks. */
+  characters?: OwnCharacter[];
   hanzi: string;
   kind: "word" | "sentence";
   /** Where it came from, such as "HSK 1 · Lesson 3". */

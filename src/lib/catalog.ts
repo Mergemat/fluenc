@@ -1,6 +1,12 @@
 import curriculumJson from "../data/curriculum.generated.json";
 import { sentences as courseSentences, type Sentence } from "../data/sentences";
-import type { Character, Curriculum, FocusEntry, Word } from "../data/types";
+import type {
+  Character,
+  Curriculum,
+  FocusEntry,
+  OwnCharacter,
+  Word,
+} from "../data/types";
 import { characterIsWord } from "./character-words";
 import { segmentSentence } from "./sentence-words";
 
@@ -14,6 +20,49 @@ const hanOnly = (value: string) =>
 export interface FocusTarget {
   key: string;
   label: string;
+}
+
+/** The characters focus entries bring that the course lacks, placed after the course's own. */
+function ownCharacters(
+  entries: readonly FocusEntry[],
+  courseCharacters: readonly Character[]
+) {
+  const course = new Set(courseCharacters.map((item) => item.id));
+  const lastOrder = Math.max(0, ...courseCharacters.map((item) => item.order));
+  const lastRank = Math.max(
+    0,
+    ...courseCharacters.map((item) => item.frequencyRank)
+  );
+  const own = new Map<string, OwnCharacter>();
+  for (const definition of entries.flatMap((entry) => entry.characters ?? [])) {
+    if (!(course.has(definition.hanzi) || own.has(definition.hanzi))) {
+      own.set(definition.hanzi, definition);
+    }
+  }
+  return [...own.values()].map(
+    (item, index): Character => ({
+      id: item.hanzi,
+      hanzi: item.hanzi,
+      pinyin: item.pinyin,
+      keyword: item.keyword,
+      also: null,
+      senses: [item.meaning],
+      readings: [],
+      components: item.components,
+      componentStructure:
+        item.components.length === 1 && item.components[0] === item.hanzi
+          ? "atomic"
+          : "compound",
+      componentNote: null,
+      order: lastOrder + index + 1,
+      frequencyRank: lastRank + index + 1,
+      // Not drawn from stroke data, so the library shows no count or radical.
+      strokes: 0,
+      radical: "",
+      unlocks: 0,
+      usage: 0,
+    })
+  );
 }
 
 /** Focus words as course characters, course words or, failing both, the learner's own words. */
@@ -121,16 +170,19 @@ function resolveFocusSentences(
  * The course every learner shares, plus the learner's focus entries. Course entries ship with the
  * app, so devices never download them as part of their progress. A focus entry that matches a
  * course spelling points at it; otherwise it becomes the learner's own word or sentence, provided
- * every character is in the course. Entries with other characters are left out.
+ * every character is in the course or among the characters focus entries bring. Entries with
+ * other characters are left out.
  */
 export function createCatalog(
   curriculum: Pick<Curriculum, "version" | "characters" | "words">,
   sentences: Sentence[],
   focus: readonly FocusEntry[] = []
 ) {
-  const charactersById = new Map(
-    curriculum.characters.map((item) => [item.id, item])
-  );
+  const characters = [
+    ...curriculum.characters,
+    ...ownCharacters(focus, curriculum.characters),
+  ];
+  const charactersById = new Map(characters.map((item) => [item.id, item]));
   // The frequency list repeats a spelling with different readings; teach each spelling once.
   const courseWords = [
     ...curriculum.words
@@ -159,7 +211,7 @@ export function createCatalog(
   const targets = [...focusWords.targets, ...focusSentences.targets];
   return {
     version: curriculum.version,
-    characters: curriculum.characters,
+    characters,
     charactersById,
     wordsById: new Map(words.map((item) => [String(item.id), item])),
     uniqueWords: [...courseWords, ...focusWords.ownWords],

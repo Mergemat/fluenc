@@ -10,9 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as Char91DotwellKnownChar93SplatRouteImport } from './routes/[.well-known]/$'
 import { Route as AppIndexRouteImport } from './routes/_app.index'
 import { Route as AppAccountRouteImport } from './routes/_app.account'
+import { Route as AppConnectRouteImport } from './routes/_app.connect'
 import { Route as AppLessonsRouteImport } from './routes/_app.lessons'
 import { Route as AppLibraryRouteImport } from './routes/_app.library'
 import { Route as AppListenRouteImport } from './routes/_app.listen'
@@ -21,6 +24,7 @@ import { Route as AppReadingRouteImport } from './routes/_app.reading'
 import { Route as AppReviewRouteImport } from './routes/_app.review'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppTodayRouteImport } from './routes/_app.today'
+import { Route as ApiAgentsRouteImport } from './routes/api.agents'
 import { Route as ApiPushRouteImport } from './routes/api.push'
 import { Route as ApiReviewReminderRouteImport } from './routes/api.review-reminder'
 import { Route as ApiSyncRouteImport } from './routes/api.sync'
@@ -34,11 +38,22 @@ const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotwellKnownChar93SplatRoute =
+  Char91DotwellKnownChar93SplatRouteImport.update({
+    id: '/.well-known/$',
+    path: '/.well-known/$',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -47,6 +62,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppAccountRoute = AppAccountRouteImport.update({
   id: '/account',
   path: '/account',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConnectRoute = AppConnectRouteImport.update({
+  id: '/connect',
+  path: '/connect',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLessonsRoute = AppLessonsRouteImport.update({
@@ -88,6 +108,11 @@ const AppTodayRoute = AppTodayRouteImport.update({
   id: '/today',
   path: '/today',
   getParentRoute: () => AppRoute,
+} as any)
+const ApiAgentsRoute = ApiAgentsRouteImport.update({
+  id: '/api/agents',
+  path: '/api/agents',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPushRoute = ApiPushRouteImport.update({
   id: '/api/push',
@@ -132,8 +157,11 @@ const AppProfilePalaceKindKeyRoute = AppProfilePalaceKindKeyRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/mcp': typeof McpRoute
   '/welcome': typeof WelcomeRoute
+  '/.well-known/$': typeof Char91DotwellKnownChar93SplatRoute
   '/account': typeof AppAccountRoute
+  '/connect': typeof AppConnectRoute
   '/lessons': typeof AppLessonsRoute
   '/library': typeof AppLibraryRoute
   '/listen': typeof AppListenRoute
@@ -142,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/review': typeof AppReviewRoute
   '/settings': typeof AppSettingsRoute
   '/today': typeof AppTodayRoute
+  '/api/agents': typeof ApiAgentsRoute
   '/api/push': typeof ApiPushRoute
   '/api/review-reminder': typeof ApiReviewReminderRoute
   '/api/sync': typeof ApiSyncRoute
@@ -152,8 +181,11 @@ export interface FileRoutesByFullPath {
   '/profile/palace/$kind/$key': typeof AppProfilePalaceKindKeyRoute
 }
 export interface FileRoutesByTo {
+  '/mcp': typeof McpRoute
   '/welcome': typeof WelcomeRoute
+  '/.well-known/$': typeof Char91DotwellKnownChar93SplatRoute
   '/account': typeof AppAccountRoute
+  '/connect': typeof AppConnectRoute
   '/lessons': typeof AppLessonsRoute
   '/library': typeof AppLibraryRoute
   '/listen': typeof AppListenRoute
@@ -162,6 +194,7 @@ export interface FileRoutesByTo {
   '/review': typeof AppReviewRoute
   '/settings': typeof AppSettingsRoute
   '/today': typeof AppTodayRoute
+  '/api/agents': typeof ApiAgentsRoute
   '/api/push': typeof ApiPushRoute
   '/api/review-reminder': typeof ApiReviewReminderRoute
   '/api/sync': typeof ApiSyncRoute
@@ -175,8 +208,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
+  '/mcp': typeof McpRoute
   '/welcome': typeof WelcomeRoute
+  '/.well-known/$': typeof Char91DotwellKnownChar93SplatRoute
   '/_app/account': typeof AppAccountRoute
+  '/_app/connect': typeof AppConnectRoute
   '/_app/lessons': typeof AppLessonsRoute
   '/_app/library': typeof AppLibraryRoute
   '/_app/listen': typeof AppListenRoute
@@ -185,6 +221,7 @@ export interface FileRoutesById {
   '/_app/review': typeof AppReviewRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/today': typeof AppTodayRoute
+  '/api/agents': typeof ApiAgentsRoute
   '/api/push': typeof ApiPushRoute
   '/api/review-reminder': typeof ApiReviewReminderRoute
   '/api/sync': typeof ApiSyncRoute
@@ -199,8 +236,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/mcp'
     | '/welcome'
+    | '/.well-known/$'
     | '/account'
+    | '/connect'
     | '/lessons'
     | '/library'
     | '/listen'
@@ -209,6 +249,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/settings'
     | '/today'
+    | '/api/agents'
     | '/api/push'
     | '/api/review-reminder'
     | '/api/sync'
@@ -219,8 +260,11 @@ export interface FileRouteTypes {
     | '/profile/palace/$kind/$key'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/mcp'
     | '/welcome'
+    | '/.well-known/$'
     | '/account'
+    | '/connect'
     | '/lessons'
     | '/library'
     | '/listen'
@@ -229,6 +273,7 @@ export interface FileRouteTypes {
     | '/review'
     | '/settings'
     | '/today'
+    | '/api/agents'
     | '/api/push'
     | '/api/review-reminder'
     | '/api/sync'
@@ -241,8 +286,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_app'
+    | '/mcp'
     | '/welcome'
+    | '/.well-known/$'
     | '/_app/account'
+    | '/_app/connect'
     | '/_app/lessons'
     | '/_app/library'
     | '/_app/listen'
@@ -251,6 +299,7 @@ export interface FileRouteTypes {
     | '/_app/review'
     | '/_app/settings'
     | '/_app/today'
+    | '/api/agents'
     | '/api/push'
     | '/api/review-reminder'
     | '/api/sync'
@@ -264,7 +313,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
+  McpRoute: typeof McpRoute
   WelcomeRoute: typeof WelcomeRoute
+  Char91DotwellKnownChar93SplatRoute: typeof Char91DotwellKnownChar93SplatRoute
+  ApiAgentsRoute: typeof ApiAgentsRoute
   ApiPushRoute: typeof ApiPushRoute
   ApiReviewReminderRoute: typeof ApiReviewReminderRoute
   ApiSyncRoute: typeof ApiSyncRoute
@@ -280,11 +332,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/welcome': {
       id: '/welcome'
       path: '/welcome'
       fullPath: '/welcome'
       preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/$': {
+      id: '/.well-known/$'
+      path: '/.well-known/$'
+      fullPath: '/.well-known/$'
+      preLoaderRoute: typeof Char91DotwellKnownChar93SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -299,6 +365,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AppAccountRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/connect': {
+      id: '/_app/connect'
+      path: '/connect'
+      fullPath: '/connect'
+      preLoaderRoute: typeof AppConnectRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/lessons': {
@@ -356,6 +429,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/today'
       preLoaderRoute: typeof AppTodayRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/api/agents': {
+      id: '/api/agents'
+      path: '/api/agents'
+      fullPath: '/api/agents'
+      preLoaderRoute: typeof ApiAgentsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/push': {
       id: '/api/push'
@@ -418,6 +498,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppAccountRoute: typeof AppAccountRoute
+  AppConnectRoute: typeof AppConnectRoute
   AppLessonsRoute: typeof AppLessonsRoute
   AppLibraryRoute: typeof AppLibraryRoute
   AppListenRoute: typeof AppListenRoute
@@ -435,6 +516,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAccountRoute: AppAccountRoute,
+  AppConnectRoute: AppConnectRoute,
   AppLessonsRoute: AppLessonsRoute,
   AppLibraryRoute: AppLibraryRoute,
   AppListenRoute: AppListenRoute,
@@ -454,7 +536,10 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
+  McpRoute: McpRoute,
   WelcomeRoute: WelcomeRoute,
+  Char91DotwellKnownChar93SplatRoute: Char91DotwellKnownChar93SplatRoute,
+  ApiAgentsRoute: ApiAgentsRoute,
   ApiPushRoute: ApiPushRoute,
   ApiReviewReminderRoute: ApiReviewReminderRoute,
   ApiSyncRoute: ApiSyncRoute,

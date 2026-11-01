@@ -16,6 +16,7 @@
       "!!**/assets/strokes.json",
       "!!**/drizzle",
       "!!**/src/data/dictionary.source.json",
+      "!!**/src/components/agent-logos",
       "!!**/docs"
     ]
   }

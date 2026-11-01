@@ -10,6 +10,10 @@ The teaching decomposition is chosen for memory and reuse. It does not depend on
 
 `bun run data:sync` validates the database and writes `curriculum.generated.json`, `character-words.generated.json`, `sentences.generated.json` and the stroke owners, and rebuilds the hanzi fonts when the characters, their props or their order changed. It fails on a broken reference, a duplicate keyword or word reading, a pinyin syllable that isn't standard Mandarin with standard tone-mark placement, or a word syllable its character is never read as (tones may change in words, so 一 and 不 keep their citation tones). `bun test src/lib/curriculum-data.test.ts` runs the same checks, and also checks the strokes against the listed stroke counts and props.
 
+## Characters learners add
+
+`hanzi-reference.generated.json` lists, for every character in Make Me a Hanzi's `dictionary.txt`, its stroke count, parts, readings and a short gloss. The server uses it only to check and guide coding agents' descriptions of characters the course lacks (see `src/server/community.server.ts`); the course itself never reads it. `bun run data:reference` rebuilds it from a pinned commit.
+
 ## Teaching order
 
 Each character and word gets an `order`: the average of its place by frequency and its place by usage. Frequency is the word's rank, or for a character the rank of its most frequent word. Usage counts the reading sentences that contain it (all of `sentences.reviewed.json` and `sentences.authored.json`, not only those the course selects), plus for a character the number of course words it spells. A character the course leans on everywhere moves ahead of a slightly more frequent one that little else uses. Lessons still teach focus entries first, then characters a nearly unlocked word needs, and each prop the learner hasn't named yet sets a character back a few places.

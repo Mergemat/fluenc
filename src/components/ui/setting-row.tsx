@@ -25,7 +25,7 @@ export function SettingRow({
   children,
 }: {
   id: string;
-  title: string;
+  title: ReactNode;
   note: string;
   tone: Tone;
   status: ReactNode;
