@@ -19,7 +19,7 @@ const SPEECH_SETTINGS = {
     similarity_boost: 0.78,
     style: 0,
     use_speaker_boost: true,
-    speed: 0.85,
+    speed: 0.7,
   },
 };
 
