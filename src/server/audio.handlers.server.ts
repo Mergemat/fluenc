@@ -8,7 +8,7 @@ import type { PronunciationInput } from "./audio.contract";
 import { auth } from "./auth.server";
 
 const OUTPUT_FORMAT = "mp3_44100_128";
-const PRONUNCIATION_VERSION = 7;
+const PRONUNCIATION_VERSION = 8;
 const CACHE_MAX_AGE_SECONDS = 31_536_000;
 const SPEECH_SETTINGS = {
   model_id: "eleven_v3",
@@ -77,9 +77,11 @@ export async function getPronunciationAudioHandler(data: PronunciationInput) {
     return { audioUrl: cachedAudioUrl, cached: true };
   }
 
-  const spokenText = SENTENCE_END.test(data.text)
+  const sentence = SENTENCE_END.test(data.text)
     ? data.text
     : `${data.text}。`;
+  // An eleven_v3 audio tag: it sets the delivery and is not read aloud.
+  const spokenText = `[very slowly] ${sentence}`;
   const response = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}?output_format=${OUTPUT_FORMAT}&enable_logging=false`,
     {
