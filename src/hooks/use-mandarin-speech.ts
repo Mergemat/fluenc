@@ -8,7 +8,7 @@ import { getPronunciationAudio } from "../server/audio";
 import type { PronunciationInput } from "../server/audio.contract";
 
 const audioSourceCache = new Map<string, string>();
-const AUDIO_CACHE_VERSION = 10;
+const AUDIO_CACHE_VERSION = 11;
 // Generated speech is kept on the device: which recording each text has, and the recording. A
 // replay, even days later or offline, then needs neither a server call nor a download.
 const SPEECH_URLS_KEY = `fluenc-speech-urls-v${AUDIO_CACHE_VERSION}`;

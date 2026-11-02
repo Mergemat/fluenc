@@ -17,8 +17,7 @@ const SPEECH_SETTINGS = {
   voice_settings: {
     stability: 0.5,
     similarity_boost: 0.78,
-    style: 0,
-    use_speaker_boost: true,
+    // Adding style or speaker boost made eleven_v3 speak much faster despite this speed.
     speed: 0.7,
   },
 };
