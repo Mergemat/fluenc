@@ -8,16 +8,18 @@ import type { PronunciationInput } from "./audio.contract";
 import { auth } from "./auth.server";
 
 const OUTPUT_FORMAT = "mp3_44100_128";
-const PRONUNCIATION_VERSION = 9;
+const PRONUNCIATION_VERSION = 10;
 const CACHE_MAX_AGE_SECONDS = 31_536_000;
 const SPEECH_SETTINGS = {
-  model_id: "eleven_v4",
+  model_id: "eleven_v3",
   language_code: "zh",
   seed: 42,
-  // eleven_v4 reads only these two; pace comes from the audio tag on the text.
   voice_settings: {
     stability: 0.5,
     similarity_boost: 0.78,
+    style: 0,
+    use_speaker_boost: true,
+    speed: 0.85,
   },
 };
 
@@ -78,7 +80,7 @@ export async function getPronunciationAudioHandler(data: PronunciationInput) {
   const sentence = SENTENCE_END.test(data.text)
     ? data.text
     : `${data.text}。`;
-  // An eleven_v4 audio tag: it sets the delivery and is not read aloud.
+  // An eleven_v3 audio tag: it sets the delivery and is not read aloud.
   const spokenText = `[slowly] ${sentence}`;
   const response = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}?output_format=${OUTPUT_FORMAT}&enable_logging=false`,
