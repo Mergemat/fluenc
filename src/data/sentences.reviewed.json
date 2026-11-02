@@ -2873,17 +2873,6 @@
       }
     },
     {
-      "id": "t429467",
-      "hanzi": "我很肯定！",
-      "pinyin": "Wǒ hěn kěndìng!",
-      "meaning": "I'm absolutely sure!",
-      "source": 429467,
-      "review": {
-        "decision": "include",
-        "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
-      }
-    },
-    {
       "id": "t430977",
       "hanzi": "他有三个儿子。",
       "pinyin": "Tā yǒu sāngè érzi.",
@@ -7273,17 +7262,6 @@
       }
     },
     {
-      "id": "t1741722",
-      "hanzi": "我父母不知道。",
-      "pinyin": "Wǒ fùmǔ bù zhīdào.",
-      "meaning": "My parents don't know.",
-      "source": 1741722,
-      "review": {
-        "decision": "include",
-        "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
-      }
-    },
-    {
       "id": "t1746053",
       "hanzi": "我已经道歉了。",
       "pinyin": "Wǒ yǐjīng dàoqiàn le.",
@@ -8483,17 +8461,6 @@
       }
     },
     {
-      "id": "t2333774",
-      "hanzi": "你什么时候回来？",
-      "pinyin": "Nǐ shénme shíhou huílai?",
-      "meaning": "When will you be back?",
-      "source": 2333774,
-      "review": {
-        "decision": "include",
-        "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
-      }
-    },
-    {
       "id": "t2333893",
       "hanzi": "没有你们，就没有这个组织。",
       "pinyin": "Méiyǒu nǐmen, jiù méiyǒu zhège zǔzhī.",
@@ -9528,17 +9495,6 @@
       }
     },
     {
-      "id": "t3537640",
-      "hanzi": "这个问题很麻烦。",
-      "pinyin": "Zhège wèntí hěn máfan.",
-      "meaning": "This problem is really annoying.",
-      "source": 3537640,
-      "review": {
-        "decision": "include",
-        "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
-      }
-    },
-    {
       "id": "t3537655",
       "hanzi": "这件衣服真漂亮。",
       "pinyin": "Zhèjiàn yīfu zhēn piàoliang.",
@@ -10358,17 +10314,6 @@
       "pinyin": "Wǒ bù xǐhuan hējiǔ.",
       "meaning": "I don't like drinking.",
       "source": 4673802,
-      "review": {
-        "decision": "include",
-        "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
-      }
-    },
-    {
-      "id": "t4673810",
-      "hanzi": "我什么都不喜欢。",
-      "pinyin": "Wǒ shénme dōu bù xǐhuan.",
-      "meaning": "I don't like anything.",
-      "source": 4673810,
       "review": {
         "decision": "include",
         "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
@@ -12124,17 +12069,6 @@
       }
     },
     {
-      "id": "t5673830",
-      "hanzi": "不是我的。",
-      "pinyin": "Bù shì wǒ de.",
-      "meaning": "It's not mine.",
-      "source": 5673830,
-      "review": {
-        "decision": "include",
-        "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
-      }
-    },
-    {
       "id": "t5685877",
       "hanzi": "她真的不喜欢狗。",
       "pinyin": "Tā zhēnde bù xǐhuan gǒu.",
@@ -12630,33 +12564,11 @@
       }
     },
     {
-      "id": "t5863315",
-      "hanzi": "你什么时候上班？",
-      "pinyin": "Nǐ shénme shíhou shàngbān?",
-      "meaning": "When do you go to work?",
-      "source": 5863315,
-      "review": {
-        "decision": "include",
-        "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
-      }
-    },
-    {
       "id": "t5883314",
       "hanzi": "他们不需要理由。",
       "pinyin": "Tāmen bù xūyào lǐyóu.",
       "meaning": "They don't need a reason.",
       "source": 5883314,
-      "review": {
-        "decision": "include",
-        "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
-      }
-    },
-    {
-      "id": "t5897891",
-      "hanzi": "我不接受。",
-      "pinyin": "Wǒ bù jiēshòu.",
-      "meaning": "I won't accept that.",
-      "source": 5897891,
       "review": {
         "decision": "include",
         "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
@@ -14505,17 +14417,6 @@
       "pinyin": "Nǐ shì wǒ de.",
       "meaning": "You're mine.",
       "source": 8686674,
-      "review": {
-        "decision": "include",
-        "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
-      }
-    },
-    {
-      "id": "t8686688",
-      "hanzi": "我是第一。",
-      "pinyin": "Wǒ shì dìyī.",
-      "meaning": "I'm first.",
-      "source": 8686688,
       "review": {
         "decision": "include",
         "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
@@ -16843,17 +16744,6 @@
       }
     },
     {
-      "id": "t10023027",
-      "hanzi": "我很放松。",
-      "pinyin": "Wǒ hěn fàngsōng.",
-      "meaning": "I'm relaxed.",
-      "source": 10023027,
-      "review": {
-        "decision": "include",
-        "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
-      }
-    },
-    {
       "id": "t10024458",
       "hanzi": "他想成为一名作家。",
       "pinyin": "Tā xiǎng chéngwéi yīmíng zuò jiā.",
@@ -17827,17 +17717,6 @@
       "pinyin": "Wǒ zhēnde bù jìde le.",
       "meaning": "I really don't remember.",
       "source": 11236332,
-      "review": {
-        "decision": "include",
-        "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
-      }
-    },
-    {
-      "id": "t11236333",
-      "hanzi": "我就是不知道。",
-      "pinyin": "Wǒ jiùshì bù zhīdào.",
-      "meaning": "I just don't know.",
-      "source": 11236333,
       "review": {
         "decision": "include",
         "reason": "Retained after the 2026-10-23 editorial review of standalone usefulness, reading, translation and repetition."
