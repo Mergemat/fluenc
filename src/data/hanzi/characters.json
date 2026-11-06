@@ -181,7 +181,7 @@
     "strokes": 12,
     "radical": "尢",
     "structure": "compound",
-    "components": ["京", "尤"],
+    "components": ["亠", "口", "小", "尤"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/就"]
   },
@@ -1314,7 +1314,7 @@
     "strokes": 10,
     "radical": "讠",
     "structure": "compound",
-    "components": ["讠", "青"],
+    "components": ["讠", "龶", "月"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/请"]
   },
@@ -2041,7 +2041,7 @@
     "strokes": 11,
     "radical": "心",
     "structure": "compound",
-    "components": ["忄", "青"],
+    "components": ["忄", "龶", "月"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/情"]
   },
@@ -2446,7 +2446,7 @@
     "strokes": 13,
     "radical": "钅",
     "structure": "compound",
-    "components": ["钅", "昔"],
+    "components": ["钅", "廿", "日"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/错"]
   },
@@ -3592,7 +3592,7 @@
     "strokes": 13,
     "radical": "木",
     "structure": "compound",
-    "components": ["林", "疋"],
+    "components": ["木", "木", "疋"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/楚"]
   },
@@ -3606,7 +3606,7 @@
     "strokes": 11,
     "radical": "氵",
     "structure": "compound",
-    "components": ["氵", "青"],
+    "components": ["氵", "龶", "月"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/清"]
   },
@@ -4168,7 +4168,7 @@
     "strokes": 11,
     "radical": "麻",
     "structure": "compound",
-    "components": ["广", "林"],
+    "components": ["广", "木", "木"],
     "note": null,
     "sources": [
       "https://www.unicode.org/cgi-bin/GetUnihanData.pl?codepoint=麻",
@@ -4610,7 +4610,7 @@
     "strokes": 14,
     "radical": "氵",
     "structure": "compound",
-    "components": ["氵", "票"],
+    "components": ["氵", "覀", "示"],
     "note": null,
     "sources": [
       "https://en.wiktionary.org/wiki/漂",
@@ -5728,7 +5728,7 @@
     "strokes": 15,
     "radical": "彡",
     "structure": "compound",
-    "components": ["日", "京", "彡"],
+    "components": ["日", "亠", "口", "小", "彡"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/影"]
   },
@@ -5926,7 +5926,7 @@
     "strokes": 13,
     "radical": "目",
     "structure": "compound",
-    "components": ["目", "青"],
+    "components": ["目", "龶", "月"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/睛"]
   },
@@ -6460,7 +6460,7 @@
     "strokes": 16,
     "radical": "米",
     "structure": "compound",
-    "components": ["米", "羔"],
+    "components": ["米", "羊", "灬"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/糕"]
   },
@@ -6488,7 +6488,7 @@
     "strokes": 11,
     "radical": "犭",
     "structure": "compound",
-    "components": ["犭", "青"],
+    "components": ["犭", "龶", "月"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/猜"]
   },
@@ -6859,7 +6859,7 @@
     "strokes": 10,
     "radical": "阝",
     "structure": "compound",
-    "components": ["咅", "阝"],
+    "components": ["立", "口", "阝"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/部"]
   },
@@ -7026,7 +7026,7 @@
     "strokes": 14,
     "radical": "青",
     "structure": "compound",
-    "components": ["青", "争"],
+    "components": ["龶", "月", "争"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/静"]
   },
@@ -7614,7 +7614,7 @@
     "strokes": 17,
     "radical": "戈",
     "structure": "compound",
-    "components": ["十", "戈", "異"],
+    "components": ["十", "戈", "田", "共"],
     "note": null,
     "sources": [
       "https://en.wiktionary.org/wiki/戴",
@@ -7678,7 +7678,7 @@
     "strokes": 11,
     "radical": "亻",
     "structure": "compound",
-    "components": ["亻", "亭"],
+    "components": ["亻", "亠", "口", "冖", "丁"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/停"]
   },
@@ -7739,7 +7739,7 @@
     "strokes": 10,
     "radical": "阝",
     "structure": "compound",
-    "components": ["阝", "咅"],
+    "components": ["阝", "立", "口"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/陪"]
   },
@@ -7851,7 +7851,7 @@
     "strokes": 16,
     "radical": "扌",
     "structure": "compound",
-    "components": ["扌", "品", "木"],
+    "components": ["扌", "口", "口", "口", "木"],
     "note": null,
     "sources": [
       "https://en.wiktionary.org/wiki/操",
@@ -8425,7 +8425,7 @@
     "strokes": 12,
     "radical": "十",
     "structure": "compound",
-    "components": ["十", "尃"],
+    "components": ["十", "甫", "寸"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/博"]
   },
@@ -8545,7 +8545,7 @@
     "strokes": 11,
     "radical": "口",
     "structure": "compound",
-    "components": ["口", "舍"],
+    "components": ["口", "人", "舌"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/啥"]
   },
@@ -9091,7 +9091,7 @@
     "strokes": 11,
     "radical": "木",
     "structure": "compound",
-    "components": ["林", "夕"],
+    "components": ["木", "木", "夕"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/梦"]
   },
@@ -9167,7 +9167,7 @@
     "strokes": 10,
     "radical": "讠",
     "structure": "compound",
-    "components": ["讠", "京"],
+    "components": ["讠", "亠", "口", "小"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/谅"]
   },
@@ -9659,7 +9659,7 @@
     "strokes": 12,
     "radical": "舌",
     "structure": "compound",
-    "components": ["舍", "予"],
+    "components": ["人", "舌", "予"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/舒"]
   },
@@ -10060,7 +10060,7 @@
     "strokes": 13,
     "radical": "石",
     "structure": "compound",
-    "components": ["石", "並"],
+    "components": ["石", "丷", "亚"],
     "note": null,
     "sources": [
       "https://en.wiktionary.org/wiki/碰",
@@ -10275,7 +10275,7 @@
     "strokes": 16,
     "radical": "辶",
     "structure": "compound",
-    "components": ["辶", "敫"],
+    "components": ["辶", "白", "方", "攵"],
     "note": null,
     "sources": [
       "https://en.wiktionary.org/wiki/邀",
@@ -10461,7 +10461,7 @@
     "strokes": 14,
     "radical": "米",
     "structure": "compound",
-    "components": ["米", "青"],
+    "components": ["米", "龶", "月"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/精"]
   },
@@ -11172,7 +11172,7 @@
     "strokes": 11,
     "radical": "辶",
     "structure": "compound",
-    "components": ["辶", "隶"],
+    "components": ["辶", "彐", "氺"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/逮"]
   },
@@ -11186,7 +11186,7 @@
     "strokes": 10,
     "radical": "亻",
     "structure": "compound",
-    "components": ["亻", "昔"],
+    "components": ["亻", "廿", "日"],
     "note": null,
     "sources": ["https://en.wiktionary.org/wiki/借"]
   },
@@ -11295,7 +11295,7 @@
     "strokes": 11,
     "radical": "忄",
     "structure": "compound",
-    "components": ["忄", "昔"],
+    "components": ["忄", "廿", "日"],
     "note": null,
     "sources": [
       "https://en.wiktionary.org/wiki/惜",
