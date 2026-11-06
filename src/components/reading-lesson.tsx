@@ -95,13 +95,22 @@ export function ReadingLesson({
             back={
               <div className={sentenceAnswer}>
                 <p
-                  className="font-hanzi text-muted-foreground text-title m-0"
+                  className="font-hanzi text-muted-foreground text-answer-hanzi m-0"
                   lang="zh-CN"
                 >
                   {item.hanzi}
                 </p>
-                <p className={cardReading}>{item.pinyin}</p>
-                <h2 className={cardMeaning}>{item.meaning}</h2>
+                <p className={cn(cardReading, "text-answer-pinyin")}>
+                  {item.pinyin}
+                </p>
+                <h2
+                  className={cn(
+                    cardMeaning,
+                    "studio:text-answer-meaning text-answer-meaning"
+                  )}
+                >
+                  {item.meaning}
+                </h2>
                 <AudioButton
                   label="listen"
                   pinyin={item.pinyin}

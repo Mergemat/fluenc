@@ -80,6 +80,10 @@
   --text-gloss: clamp(64px, min(22vw, 17dvh), 160px);
   --text-gloss-entry: clamp(64px, 18vw, 120px);
   --text-sentence: clamp(30px, 8cqw, 52px);
+  /* A read card's answer stacks three lines of text, so it shrinks with the card's height. */
+  --text-answer-hanzi: clamp(16px, 6cqh, 22px);
+  --text-answer-pinyin: clamp(14px, 5.5cqh, 20px);
+  --text-answer-meaning: clamp(20px, 8cqh, 30px);
   --text-score: clamp(44px, 9vw, 96px);
   --text-timer: clamp(44px, 16cqw, 64px);
   --text-verdict: clamp(40px, 14cqw, 56px);
