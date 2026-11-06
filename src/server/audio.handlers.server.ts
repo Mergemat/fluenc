@@ -76,9 +76,7 @@ export async function getPronunciationAudioHandler(data: PronunciationInput) {
     return { audioUrl: cachedAudioUrl, cached: true };
   }
 
-  const sentence = SENTENCE_END.test(data.text)
-    ? data.text
-    : `${data.text}。`;
+  const sentence = SENTENCE_END.test(data.text) ? data.text : `${data.text}。`;
   // An eleven_v3 audio tag: it sets the delivery and is not read aloud.
   const spokenText = `[slowly] ${sentence}`;
   const response = await fetch(
