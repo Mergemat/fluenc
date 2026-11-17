@@ -5,6 +5,8 @@ const { props } = curriculumJson as Curriculum;
 // A trailing note in brackets, like "(radical)".
 const TRAILING_NOTE = /\s*\([^)]*\)$/u;
 
+export const propStrokes = (component: string) => props[component]?.strokes;
+
 /** A component's dictionary meaning, cut to its first sense: "city outskirts, suburbs; remote" → "city outskirts, suburbs". */
 export function propMeaning(component: string) {
   const meaning = props[component]?.meaning;

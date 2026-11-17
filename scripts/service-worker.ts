@@ -64,6 +64,17 @@ registerRoute(
   })
 );
 
+// Learners' own characters: their outlines (see api.strokes.$hanzi.ts) and the font chunks
+// outside the course, which aren't precached. Neither changes at its URL, so once seen they draw
+// offline too.
+const RARE_FONT = /^\/assets\/rare-\d+-[\w-]+\.woff2$/u;
+registerRoute(
+  ({ url }) =>
+    url.origin === self.location.origin &&
+    (url.pathname.startsWith("/api/strokes/") || RARE_FONT.test(url.pathname)),
+  new CacheFirst({ cacheName: "fluenc-own-characters" })
+);
+
 // The page fills this cache (useOfflineDownload); anything it hasn't reached yet is cached on first use.
 registerRoute(
   ({ url }) =>

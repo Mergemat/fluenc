@@ -13,9 +13,13 @@ import {
 } from "react";
 
 import { useMandarinSpeech } from "../../hooks/use-mandarin-speech";
+import { catalogFor } from "../../lib/catalog";
 import { glyphParts, SLOT_COLORS } from "../../lib/glyph-parts";
+import { propStrokes } from "../../lib/props";
+import { remapStrokeOwners } from "../../lib/stroke-owners";
 import { getToneDetail } from "../../lib/tones";
 import { cn } from "../../lib/utils";
+import { useLearner } from "../../progress/learner";
 import { useLibrary } from "../../progress/views";
 import { DitherGradient } from "../dither-kit/gradient";
 import { PixelLoader } from "./dither";
@@ -26,6 +30,8 @@ import { partPixelColor } from "./part-colors";
 const GLYPH_SCALE = (1024 - 2 * 55) / 1024;
 const GLYPH_BASELINE = 55 + 900 * GLYPH_SCALE;
 const GLYPH_TRANSFORM = `translate(55 ${GLYPH_BASELINE}) scale(${GLYPH_SCALE})`;
+// Stroke outlines use the font's units with y pointing up, so they flip about the same baseline.
+const STROKE_TRANSFORM = `translate(55 ${GLYPH_BASELINE}) scale(${GLYPH_SCALE} ${-GLYPH_SCALE})`;
 const PARTS_FONT = '"Fluenc Hanzi Parts"';
 // Parts are drawn scaled far down from 1024, where Chrome snaps text to whole pixels and parts
 // drift off their masks; geometricPrecision keeps the outlines where they are.
@@ -107,10 +113,142 @@ function writePalettes() {
   document.head.append(style);
 }
 
-// Hit-testing is by ink: SVG text answers for its whole character box. On a canvas the parts font
-// draws with its own palette, a colour per slot, so one small drawing tells the parts apart.
+/**
+ * How a character is drawn part by part: a course character by the parts font, one the course
+ * lacks by its stroke outlines, each handed to the prop that draws it. `slots` are its parts.
+ */
+type Drawing =
+  | { kind: "font"; slots: string[] }
+  | { kind: "strokes"; slots: string[]; paths: string[][] };
+
+const strokeRequests = new Map<string, Promise<string[] | null>>();
+
+/** A character's stroke outlines, fetched once per page; null when there are none to fetch. */
+function requestStrokes(hanzi: string) {
+  let request = strokeRequests.get(hanzi);
+  if (!request) {
+    request = fetch(`/api/strokes/${encodeURIComponent(hanzi)}`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body: { strokes?: unknown } | null) =>
+        Array.isArray(body?.strokes) ? (body.strokes as string[]) : null
+      )
+      .catch(() => {
+        // Offline before the outlines were ever cached: ask again next time.
+        strokeRequests.delete(hanzi);
+        return null;
+      });
+    strokeRequests.set(hanzi, request);
+  }
+  return request;
+}
+
+/** The outlines of `hanzi`, while it is set; `pending` until they arrive or can't. */
+function useStrokes(hanzi: string | null) {
+  const [loaded, setLoaded] = useState<{
+    hanzi: string;
+    strokes: string[] | null;
+  } | null>(null);
+  useEffect(() => {
+    if (!hanzi) {
+      return;
+    }
+    let current = true;
+    requestStrokes(hanzi).then((strokes) => {
+      if (current) {
+        setLoaded({ hanzi, strokes });
+      }
+    });
+    return () => {
+      current = false;
+    };
+  }, [hanzi]);
+  const done = hanzi !== null && loaded?.hanzi === hanzi;
+  return {
+    strokes: done ? loaded.strokes : null,
+    pending: hanzi !== null && !done,
+  };
+}
+
+/** Each stroke's prop, in writing order by the props' stroke counts, as the course hands them out. */
+function strokeDrawing(
+  strokes: readonly string[],
+  components: readonly string[]
+): Drawing | null {
+  const owners = remapStrokeOwners(
+    strokes.map(() => ""),
+    components,
+    propStrokes
+  );
+  if (!owners) {
+    return null;
+  }
+  const slots = [...new Set(owners)];
+  return {
+    kind: "strokes",
+    slots,
+    paths: slots.map((slot) =>
+      strokes.filter((_, index) => owners[index] === slot)
+    ),
+  };
+}
+
+// Hit-testing is by ink: SVG answers for a text's whole character box. On a canvas the parts font
+// draws with its own palette, a colour per slot, so one small drawing tells the parts apart;
+// outlines are drawn a part at a time.
 const MASK = 128;
 const slotMaps = new Map<string, Int8Array>();
+
+function fontSlots(context: OffscreenCanvasRenderingContext2D, hanzi: string) {
+  const unit = MASK / 1024;
+  context.font = `1024px ${PARTS_FONT}`;
+  context.setTransform(
+    unit * GLYPH_SCALE,
+    0,
+    0,
+    unit * GLYPH_SCALE,
+    55 * unit,
+    GLYPH_BASELINE * unit
+  );
+  context.fillText(hanzi, 0, 0);
+  const pixels = context.getImageData(0, 0, MASK, MASK).data;
+  const map = new Int8Array(MASK * MASK).fill(-1);
+  for (let index = 0; index < map.length; index += 1) {
+    if (pixels[index * 4 + 3]) {
+      map[index] = nearestSlot(pixels, index * 4);
+    }
+  }
+  return map;
+}
+
+function strokeSlots(
+  context: OffscreenCanvasRenderingContext2D,
+  paths: readonly string[][]
+) {
+  const unit = MASK / 1024;
+  const map = new Int8Array(MASK * MASK).fill(-1);
+  for (const [slot, outlines] of paths.entries()) {
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, MASK, MASK);
+    context.setTransform(
+      unit * GLYPH_SCALE,
+      0,
+      0,
+      -unit * GLYPH_SCALE,
+      55 * unit,
+      GLYPH_BASELINE * unit
+    );
+    for (const outline of outlines) {
+      context.fill(new Path2D(outline));
+    }
+    const pixels = context.getImageData(0, 0, MASK, MASK).data;
+    for (let index = 0; index < map.length; index += 1) {
+      if (pixels[index * 4 + 3] && map[index] === -1) {
+        map[index] = slot;
+      }
+    }
+  }
+  return map;
+}
 
 const nearestSlot = (pixels: Uint8ClampedArray, at: number) => {
   let nearest = 0;
@@ -129,32 +267,20 @@ const nearestSlot = (pixels: Uint8ClampedArray, at: number) => {
 };
 
 /** For each pixel of the character drawn `MASK` square, the slot of the part inked there, or -1. */
-function slotMap(hanzi: string) {
-  let map = slotMaps.get(hanzi);
+function slotMap(hanzi: string, drawing: Drawing) {
+  // A learner's own character can be described again with other props, so its key holds them.
+  const key = `${hanzi}:${drawing.slots.join(" ")}`;
+  let map = slotMaps.get(key);
   if (!map) {
     const context = new OffscreenCanvas(MASK, MASK).getContext("2d");
     if (!context) {
       return null;
     }
-    const unit = MASK / 1024;
-    context.font = `1024px ${PARTS_FONT}`;
-    context.setTransform(
-      unit * GLYPH_SCALE,
-      0,
-      0,
-      unit * GLYPH_SCALE,
-      55 * unit,
-      GLYPH_BASELINE * unit
-    );
-    context.fillText(hanzi, 0, 0);
-    const pixels = context.getImageData(0, 0, MASK, MASK).data;
-    map = new Int8Array(MASK * MASK).fill(-1);
-    for (let index = 0; index < map.length; index += 1) {
-      if (pixels[index * 4 + 3]) {
-        map[index] = nearestSlot(pixels, index * 4);
-      }
-    }
-    slotMaps.set(hanzi, map);
+    map =
+      drawing.kind === "font"
+        ? fontSlots(context, hanzi)
+        : strokeSlots(context, drawing.paths);
+    slotMaps.set(key, map);
   }
   return map;
 }
@@ -163,8 +289,13 @@ function slotMap(hanzi: string) {
 const REACH = 2;
 
 /** The slot of the part under a pointer, by where its ink is: the nearest within `REACH`. */
-function slotAtPoint(svg: SVGSVGElement, event: MouseEvent, hanzi: string) {
-  const map = slotMap(hanzi);
+function slotAtPoint(
+  svg: SVGSVGElement,
+  event: MouseEvent,
+  hanzi: string,
+  drawing: Drawing
+) {
+  const map = slotMap(hanzi, drawing);
   if (!map) {
     return -1;
   }
@@ -245,19 +376,33 @@ export function HanziGlyph({
 }) {
   const id = `g${useId().replace(NON_ID_CHARACTERS, "")}`;
   const svg = useRef<SVGSVGElement>(null);
-  // The parts font's slot order; drawn by parts only when every part of the character is in `parts`.
-  const slots = useMemo(() => {
-    const drawn = glyphParts(hanzi);
-    return drawn?.every((part) => parts.includes(part)) ? drawn : null;
-  }, [hanzi, parts]);
-  const font = usePartsFont(slots ? hanzi : "");
-  const ready = slots !== null && font.loaded;
+  const courseParts = glyphParts(hanzi);
+  // A character the course lacks comes with the learner's focus, which says what it's built from.
+  const ownComponents = useLearner((learner) =>
+    courseParts
+      ? null
+      : (catalogFor(learner.state).charactersById.get(hanzi)?.components ??
+        null)
+  );
+  const own = useStrokes(ownComponents ? hanzi : null);
+  // Drawn by parts only when every part of the character is in `parts`.
+  const drawing = useMemo((): Drawing | null => {
+    const drawn = courseParts
+      ? { kind: "font" as const, slots: courseParts }
+      : own.strokes &&
+        ownComponents &&
+        strokeDrawing(own.strokes, ownComponents);
+    return drawn?.slots.every((part) => parts.includes(part)) ? drawn : null;
+  }, [courseParts, own.strokes, ownComponents, parts]);
+  const slots = drawing?.slots ?? null;
+  const font = usePartsFont(drawing?.kind === "font" ? hanzi : "");
+  const ready = drawing !== null && (drawing.kind === "strokes" || font.loaded);
   const lit = (code: string) => !concealed && (xray || highlighted === code);
 
   // Parts are picked and previewed by pointer; the lesson's clue inputs are the keyboard path.
   const pointedAt = (event: MouseEvent) =>
-    svg.current && slots
-      ? (slots[slotAtPoint(svg.current, event, hanzi)] ?? null)
+    svg.current && drawing
+      ? (drawing.slots[slotAtPoint(svg.current, event, hanzi, drawing)] ?? null)
       : null;
   const select = useEffectEvent((event: MouseEvent) => {
     const code = pointedAt(event);
@@ -301,7 +446,10 @@ export function HanziGlyph({
     }
   }, [ready]);
 
-  const state = glyphState(ready, slots === null || font.failed);
+  const state = glyphState(
+    ready,
+    drawing === null ? !own.pending : font.failed
+  );
   const drawnWith = slots
     ? palette(slots, highlighted, xray, concealed)
     : "plain";
@@ -320,7 +468,7 @@ export function HanziGlyph({
       >
         {hanzi}
       </span>
-      {ready && slots ? (
+      {ready && drawing && slots ? (
         <svg
           aria-label={hanzi}
           className="size-full overflow-visible"
@@ -336,26 +484,25 @@ export function HanziGlyph({
                   key={code}
                   maskContentUnits="objectBoundingBox"
                 >
-                  <text
-                    style={{ ...partText, fontPalette: `--parts-only-${slot}` }}
-                    transform={`scale(${1 / 1024}) ${GLYPH_TRANSFORM}`}
-                  >
-                    {hanzi}
-                  </text>
+                  <Ink
+                    drawing={drawing}
+                    hanzi={hanzi}
+                    palette={`only-${slot}`}
+                    scale={1 / 1024}
+                  />
                 </mask>
               ) : null
             )}
           </defs>
-          <text
+          <Ink
             className={cn(
               "transition-[font-palette,opacity] duration-180",
               drawnWith.startsWith("lit-") && "opacity-14"
             )}
-            style={{ ...partText, fontPalette: `--parts-${drawnWith}` }}
-            transform={GLYPH_TRANSFORM}
-          >
-            {hanzi}
-          </text>
+            drawing={drawing}
+            hanzi={hanzi}
+            palette={drawnWith}
+          />
         </svg>
       ) : null}
       {ready && slots
@@ -397,6 +544,63 @@ function palette(
   }
   const slot = highlighted ? slots.indexOf(highlighted) : -1;
   return slot >= 0 ? `lit-${slot}` : "plain";
+}
+
+const PALETTE_SLOT = /^(?:lit|only)-(?<slot>\d+)$/u;
+
+/** The colour a part takes under one of `writePalettes`' palettes, for glyphs drawn from outlines. */
+function slotFill(name: string, slot: number) {
+  const named = Number(PALETTE_SLOT.exec(name)?.groups?.slot ?? -1);
+  if (name.startsWith("only-")) {
+    return slot === named ? "white" : "transparent";
+  }
+  if (name === "clear" || (name.startsWith("lit-") && slot === named)) {
+    return "transparent";
+  }
+  return "var(--color-foreground)";
+}
+
+/** The character in the glyph's box under a palette: by the parts font, or by its outlines. */
+function Ink({
+  drawing,
+  hanzi,
+  palette: name,
+  scale = 1,
+  className,
+}: {
+  drawing: Drawing;
+  hanzi: string;
+  palette: string;
+  scale?: number;
+  className?: string;
+}) {
+  const fit = scale === 1 ? "" : `scale(${scale}) `;
+  if (drawing.kind === "font") {
+    return (
+      <text
+        className={className}
+        style={{ ...partText, fontPalette: `--parts-${name}` }}
+        transform={`${fit}${GLYPH_TRANSFORM}`}
+      >
+        {hanzi}
+      </text>
+    );
+  }
+  return (
+    <g className={className} transform={`${fit}${STROKE_TRANSFORM}`}>
+      {drawing.paths.map((outlines, slot) => (
+        <g
+          className="transition-[fill] duration-180"
+          key={drawing.slots[slot]}
+          style={{ fill: slotFill(name, slot) }}
+        >
+          {outlines.map((outline) => (
+            <path d={outline} key={outline} />
+          ))}
+        </g>
+      ))}
+    </g>
+  );
 }
 
 const SYLLABLE_SEPARATOR = /[\s,/]+/u;
