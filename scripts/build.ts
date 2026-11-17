@@ -58,6 +58,8 @@ const result = await injectManifest({
     "apple-touch-icon.png",
     "manifest.webmanifest",
   ],
+  // Characters outside the course; the worker caches each chunk the first time it's used.
+  globIgnores: ["assets/rare-*.woff2"],
   maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
 });
 await rm(workerSource);

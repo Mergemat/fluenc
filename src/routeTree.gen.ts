@@ -32,6 +32,7 @@ import { Route as ApiSyncRouteImport } from './routes/api.sync'
 import { Route as AppPalaceSplatRouteImport } from './routes/_app.palace.$'
 import { Route as AppProfilePalaceRouteImport } from './routes/_app.profile_.palace'
 import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
+import { Route as ApiStrokesHanziRouteImport } from './routes/api.strokes.$hanzi'
 import { Route as AppLibraryKindIdRouteImport } from './routes/_app.library_.$kind.$id'
 import { Route as AppProfilePalaceKindKeyRouteImport } from './routes/_app.profile_.palace_.$kind.$key'
 
@@ -150,6 +151,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiStrokesHanziRoute = ApiStrokesHanziRouteImport.update({
+  id: '/api/strokes/$hanzi',
+  path: '/api/strokes/$hanzi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppLibraryKindIdRoute = AppLibraryKindIdRouteImport.update({
   id: '/library_/$kind/$id',
   path: '/library/$kind/$id',
@@ -184,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/palace/$': typeof AppPalaceSplatRoute
   '/profile/palace': typeof AppProfilePalaceRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/strokes/$hanzi': typeof ApiStrokesHanziRoute
   '/library/$kind/$id': typeof AppLibraryKindIdRoute
   '/profile/palace/$kind/$key': typeof AppProfilePalaceKindKeyRoute
 }
@@ -210,6 +217,7 @@ export interface FileRoutesByTo {
   '/palace/$': typeof AppPalaceSplatRoute
   '/profile/palace': typeof AppProfilePalaceRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/strokes/$hanzi': typeof ApiStrokesHanziRoute
   '/library/$kind/$id': typeof AppLibraryKindIdRoute
   '/profile/palace/$kind/$key': typeof AppProfilePalaceKindKeyRoute
 }
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/_app/palace/$': typeof AppPalaceSplatRoute
   '/_app/profile_/palace': typeof AppProfilePalaceRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/strokes/$hanzi': typeof ApiStrokesHanziRoute
   '/_app/library_/$kind/$id': typeof AppLibraryKindIdRoute
   '/_app/profile_/palace_/$kind/$key': typeof AppProfilePalaceKindKeyRoute
 }
@@ -266,6 +275,7 @@ export interface FileRouteTypes {
     | '/palace/$'
     | '/profile/palace'
     | '/api/auth/$'
+    | '/api/strokes/$hanzi'
     | '/library/$kind/$id'
     | '/profile/palace/$kind/$key'
   fileRoutesByTo: FileRoutesByTo
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/palace/$'
     | '/profile/palace'
     | '/api/auth/$'
+    | '/api/strokes/$hanzi'
     | '/library/$kind/$id'
     | '/profile/palace/$kind/$key'
   id:
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/_app/palace/$'
     | '/_app/profile_/palace'
     | '/api/auth/$'
+    | '/api/strokes/$hanzi'
     | '/_app/library_/$kind/$id'
     | '/_app/profile_/palace_/$kind/$key'
   fileRoutesById: FileRoutesById
@@ -334,6 +346,7 @@ export interface RootRouteChildren {
   ApiReviewReminderRoute: typeof ApiReviewReminderRoute
   ApiSyncRoute: typeof ApiSyncRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiStrokesHanziRoute: typeof ApiStrokesHanziRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -499,6 +512,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/strokes/$hanzi': {
+      id: '/api/strokes/$hanzi'
+      path: '/api/strokes/$hanzi'
+      fullPath: '/api/strokes/$hanzi'
+      preLoaderRoute: typeof ApiStrokesHanziRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/library_/$kind/$id': {
       id: '/_app/library_/$kind/$id'
       path: '/library/$kind/$id'
@@ -565,6 +585,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiReviewReminderRoute: ApiReviewReminderRoute,
   ApiSyncRoute: ApiSyncRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiStrokesHanziRoute: ApiStrokesHanziRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

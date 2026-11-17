@@ -31,7 +31,7 @@ bun run data:font
 
 The font scripts run FontTools through [uv](https://docs.astral.sh/uv/), which fetches the pinned version on first use (see `scripts/font-python.ts`); nothing else needs setting up. `data:font` writes `assets/fonts/fluenc-hanzi.woff2` and `assets/fonts/fluenc-hanzi-parts.woff2`, then the shipped chunks. The Bun script gathers the app's characters, components and parts from `assets/strokes.json` and passes their paths to the FontTools encoder. Temporary input files are removed after generation.
 
-The chunks are precached by the service worker. Unsupported characters outside the shipped curriculum use the platform's Chinese font.
+The chunks are precached by the service worker. `fluenc-hanzi-rare.woff2` is the rest of `Fluenc Hanzi`: every other character Make Me a Hanzi draws, from its own strokes, so learners' own characters and their sentences read in the same hand as the course. `scripts/sync-hanzi-font.ts` fetches `graphics.txt` for it, pinned to the commit `scripts/sync-hanzi-reference.ts` uses. Its chunks, `fluenc-hanzi-rare/rare-*.woff2`, are cut by code point and left out of the precache; the service worker keeps each one the first time it is used. A lesson or card glyph of a learner's own character is drawn from its stroke outlines (`/api/strokes/$hanzi`), split among its props the way `owners` splits a course character.
 
 ## Modern prop font
 

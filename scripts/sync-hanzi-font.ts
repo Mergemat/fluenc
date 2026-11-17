@@ -10,7 +10,8 @@ import { python } from "./font-python";
 // Two fonts from the stroke outlines in assets/strokes.json:
 //
 // - Fluenc Hanzi: every course character from its own strokes, and every component from the
-//   strokes it draws in a course character.
+//   strokes it draws in a course character. A second file, fluenc-hanzi-rare.woff2, holds every
+//   other character Make Me a Hanzi has, so the course's font doesn't change when it does.
 // - Fluenc Hanzi Parts: every course character as a colour glyph with one layer per part, so the
 //   page can colour, light and pick each part (see src/lib/glyph-parts.ts).
 interface Shape {
@@ -76,6 +77,26 @@ const characterGlyphs: Glyph[] = [
     return { codePoint: codePoint(glyph), strokes: drawn, normalize: true };
   });
 
+// Every other character Make Me a Hanzi draws, so learners' own characters and sentences set in
+// Fluenc Hanzi read in the same hand as the course. Same commit as scripts/sync-hanzi-reference.ts.
+const GRAPHICS =
+  "https://raw.githubusercontent.com/skishore/makemeahanzi/bddc96d41bef78427ed0e034e9f7e31d71fd1b92/graphics.txt";
+const graphics = await fetch(GRAPHICS);
+if (!graphics.ok) {
+  throw new Error(`graphics.txt: ${graphics.status}`);
+}
+const drawnHere = new Set(characterGlyphs.map((glyph) => glyph.codePoint));
+const restGlyphs: Glyph[] = (await graphics.text())
+  .trim()
+  .split("\n")
+  .map((line) => JSON.parse(line) as { character: string; strokes: string[] })
+  .filter((entry) => !drawnHere.has(codePoint(entry.character)))
+  .map((entry) => ({
+    codePoint: codePoint(entry.character),
+    strokes: entry.strokes,
+    normalize: false,
+  }));
+
 // Every part must draw something, or the character couldn't be shown part by part.
 const layeredGlyphs: LayeredGlyph[] = curriculum.characters.map((character) => {
   const parts = partsOf(character);
@@ -126,6 +147,11 @@ await encode(
   "Fluenc Hanzi",
   "assets/fonts/fluenc-hanzi.woff2",
   characterGlyphs
+);
+await encode(
+  "Fluenc Hanzi",
+  "assets/fonts/fluenc-hanzi-rare.woff2",
+  restGlyphs.sort((left, right) => left.codePoint - right.codePoint)
 );
 await encode(
   "Fluenc Hanzi Parts",

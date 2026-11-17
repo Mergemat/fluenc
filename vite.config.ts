@@ -64,7 +64,7 @@ const staticFolders = {
   licenses: DAY,
 };
 
-const FONT_CHUNK = /\/assets\/fonts\/web\/[^/]+\/\d+\.woff2$/u;
+const FONT_CHUNK = /\/assets\/fonts\/web\/[^/]+\/(?:rare-)?\d+\.woff2$/u;
 
 export default defineConfig({
   resolve: { tsconfigPaths: true },

@@ -10,6 +10,7 @@
 import { mkdir, rm } from "node:fs/promises";
 
 import curriculum from "../src/data/curriculum.generated.json";
+import reference from "../src/data/hanzi-reference.generated.json";
 import { python } from "./font-python";
 
 const WEB = "assets/fonts/web";
@@ -36,23 +37,28 @@ const LATIN = [
   "U+2713",
 ].join(",");
 
-async function subset(source: string, output: string, unicodes: string) {
-  const run = Bun.spawn(
-    [
-      ...python,
-      "-m",
-      "fontTools.subset",
-      source,
-      `--unicodes=${unicodes}`,
-      // Every feature stays: the interface uses tabular numbers, and pinyin needs its marks placed.
-      "--layout-features=*",
-      "--flavor=woff2",
-      `--output-file=${output}`,
-    ],
-    { stdout: "ignore", stderr: "inherit" }
-  );
-  if ((await run.exited) !== 0) {
-    throw new Error(`Could not subset ${source}`);
+// Every subset is cut by one FontTools process at the end: started once per subset, Python and
+// decoding the full font cost far more than the cutting.
+const subsets: { source: string; output: string; unicodes: string }[] = [];
+function subset(source: string, output: string, unicodes: string) {
+  subsets.push({ source, output, unicodes });
+}
+
+async function cutSubsets() {
+  const jobs = `${WEB}/subsets.json`;
+  await Bun.write(jobs, JSON.stringify(subsets));
+  try {
+    const run = Bun.spawn([...python, "scripts/subset-fonts.py", jobs], {
+      stdout: "ignore",
+      stderr: "inherit",
+    });
+    if ((await run.exited) !== 0) {
+      throw new Error(
+        "Could not subset the fonts; see the Python error above."
+      );
+    }
+  } finally {
+    await rm(jobs);
   }
 }
 
@@ -108,6 +114,19 @@ for (let index = 0; index * CHUNK < taught.length; index += 1) {
   groups.push(taught.slice(index * CHUNK, (index + 1) * CHUNK));
 }
 
+// Fluenc Hanzi's rare file draws every other character Make Me a Hanzi has (see
+// sync-hanzi-font.ts), for learners' own characters and their sentences. Few are ever on screen,
+// so they're cut by code point into `rare-` chunks the app doesn't precache.
+const taughtSet = new Set(taught);
+const rest = Object.keys(reference.characters)
+  .map((hanzi) => hanzi.codePointAt(0) ?? 0)
+  .filter((codePoint) => !taughtSet.has(codePoint))
+  .sort((left, right) => left - right);
+const rareGroups: number[][] = [];
+for (let index = 0; index * CHUNK < rest.length; index += 1) {
+  rareGroups.push(rest.slice(index * CHUNK, (index + 1) * CHUNK));
+}
+
 /**
  * Cut a Chinese font into one file per group. A font set in lines of text needs a
  * metrics face as well.
@@ -116,7 +135,8 @@ async function chunk(
   source: string,
   name: string,
   family: string,
-  inLines = true
+  inLines = true,
+  files = groups.map((codePoints, index) => ({ codePoints, file: `${index}` }))
 ) {
   await rm(`${WEB}/${name}`, { recursive: true, force: true });
   await mkdir(`${WEB}/${name}`, { recursive: true });
@@ -126,14 +146,13 @@ async function chunk(
     // No chunk has one, so a face holding only the space comes first, or the fallback font's
     // metrics would move every character.
     const metrics = `${WEB}/${name}/metrics.woff2`;
-    await subset(source, metrics, "U+0020");
+    subset(source, metrics, "U+0020");
     faces.push({ family, src: metrics, unicodeRange: "U+0020" });
   }
-  for (const [index, codePoints] of groups.entries()) {
+  for (const { codePoints, file: base } of files) {
     const range = unicodeRange(codePoints);
-    const file = `${WEB}/${name}/${index}.woff2`;
-    // biome-ignore lint/performance/noAwaitInLoops: one FontTools process at a time keeps memory low.
-    await subset(source, file, range.replaceAll(" ", ""));
+    const file = `${WEB}/${name}/${base}.woff2`;
+    subset(source, file, range.replaceAll(" ", ""));
     faces.push({ family, src: file, unicodeRange: range });
   }
   return faces;
@@ -163,11 +182,9 @@ const latin: Face[] = [
   src: `${WEB}/geist/${file}.woff2`,
   weight,
 }));
-await Promise.all(
-  latin.map((face) =>
-    subset(face.src.replace(`${WEB}/`, "assets/fonts/"), face.src, LATIN)
-  )
-);
+for (const face of latin) {
+  subset(face.src.replace(`${WEB}/`, "assets/fonts/"), face.src, LATIN);
+}
 
 const faces = [
   ...latin,
@@ -175,6 +192,17 @@ const faces = [
     "assets/fonts/fluenc-hanzi.woff2",
     "fluenc-hanzi",
     "Fluenc Hanzi"
+  )),
+  // The course's faces above set the line's metrics.
+  ...(await chunk(
+    "assets/fonts/fluenc-hanzi-rare.woff2",
+    "fluenc-hanzi-rare",
+    "Fluenc Hanzi",
+    false,
+    rareGroups.map((codePoints, index) => ({
+      codePoints,
+      file: `rare-${index}`,
+    }))
   )),
   ...(
     await chunk(
@@ -191,6 +219,8 @@ const faces = [
     false
   )),
 ];
+
+await cutSubsets();
 
 await Bun.write(
   "src/fonts.generated.css",
