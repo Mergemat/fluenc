@@ -75,7 +75,7 @@ function Primary({ to, label }: { to: Lead; label: string }) {
 
 function ReviewNext({ data }: { data: DashboardData }) {
   const due = data.reviewQueue.length;
-  // A sentence card's hanzi is its answer, so only characters and words are shown.
+  // A sentence's hanzi would fill its card's gap, so only characters and words are shown.
   const [first, ...rest] = data.reviewQueue
     .filter((item) => item.type !== "sentence")
     .slice(0, QUEUE_SHOWN);
