@@ -38,9 +38,6 @@ interface RowState {
   stacked?: boolean;
 }
 
-/** A highlighted row is rounded like every other surface, and the lines touching it give way. */
-const highlight = "rounded-lg bg-kind/9";
-
 export function clueRow({
   lit,
   lined,
@@ -58,8 +55,12 @@ export function clueRow({
     !(dense || stacked) &&
       "grid-cols-clue max-studio:h-12 max-studio:short:h-11 max-studio:grid-cols-clue-line",
     lined && !dense && "inset-shadow-rule",
-    editable && "focus-within:bg-kind/9 cursor-text focus-within:rounded-lg",
-    lit && highlight,
+    // A highlighted row is rounded like every other surface, and the lines touching it give way.
+    // The dense grid's lines never give way, so there the tint fills its cell square.
+    editable && "focus-within:bg-kind/9 cursor-text",
+    editable && !dense && "focus-within:rounded-lg",
+    lit && "bg-kind/9",
+    lit && !dense && "rounded-lg",
     marker &&
       "before:bg-kind before:absolute before:inset-y-3 before:left-0 before:w-0.5 before:rounded-r-xs",
     // The glow takes the marker's colour: `--k`, set as its text colour.
