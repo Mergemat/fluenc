@@ -7,6 +7,7 @@
 import { Undo2 } from "lucide-react";
 import {
   type CSSProperties,
+  Fragment,
   type ReactNode,
   useCallback,
   useEffect,
@@ -69,6 +70,7 @@ const ratings: {
 const RATING_KEY = /^[1-4]$/u;
 
 type CharacterReview = Extract<ReviewItem, { type: "character" }>;
+type SentenceReview = Extract<ReviewItem, { type: "sentence" }>;
 type Clue = ReturnType<typeof lessonClues>[number];
 
 /** Each grade's wait for a card, worked out when it comes to the top. */
@@ -201,7 +203,7 @@ function SceneChips({ clues, parts }: { clues: Clue[]; parts: PartPointer }) {
 const propCodes = (clues: Clue[]) =>
   clues.filter((clue) => clue.kind === "prop").map((clue) => clue.code);
 
-/** What is asked: the character, the word, or the sentence's meaning. */
+/** What is asked: the character, the word, or the word missing from a sentence. */
 function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
   if (item.type === "character") {
     return (
@@ -221,11 +223,56 @@ function CardFront({ item, clues }: { item: ReviewItem; clues: Clue[] }) {
       </p>
     );
   }
+  // Without its meaning a gap often fits several words (我＿你), so the meaning pins it down.
   return (
-    <div className="relative grid justify-items-center gap-4 text-center">
-      <p className="type-label text-muted-foreground m-0">say it in mandarin</p>
-      <p className="type-display m-0 text-balance">{item.meaning}</p>
+    <div className="relative grid justify-items-center gap-4 px-6 text-center">
+      <Cloze item={item} />
+      <p className="type-body text-muted-foreground m-0 text-lg text-balance">
+        {item.meaning}
+      </p>
     </div>
+  );
+}
+
+/**
+ * The sentence with its anchor, the word it puts in context, blanked on the front and lit on the
+ * back. Every occurrence goes, so a repeat can't give the gap away.
+ */
+function Cloze({
+  item,
+  filled = false,
+}: {
+  item: SentenceReview;
+  filled?: boolean;
+}) {
+  const pieces = item.hanzi.split(item.anchor);
+  const width = Array.from(item.anchor).length;
+  let at = 0;
+  return (
+    <p
+      className={cn(cardSentence, filled && "text-muted-foreground")}
+      lang="zh-CN"
+    >
+      {pieces.map((text, index) => {
+        const start = at;
+        at += text.length + item.anchor.length;
+        return (
+          <Fragment key={start}>
+            {index > 0 &&
+              (filled ? (
+                <span className="text-foreground">{item.anchor}</span>
+              ) : (
+                // Ideographic spaces keep the gap one character wide per character, unlike ASCII
+                // spaces, which collapse.
+                <span className="border-b-2 border-current">
+                  {"　".repeat(width)}
+                </span>
+              ))}
+            {text}
+          </Fragment>
+        );
+      })}
+    </p>
   );
 }
 
@@ -333,9 +380,7 @@ function CardAnswer({
   if (item.type === "sentence") {
     return (
       <div className={sentenceAnswer} data-answer>
-        <p className={cardSentence} lang="zh-CN">
-          {item.hanzi}
-        </p>
+        <Cloze filled item={item} />
         <p className={cardReading}>{item.pinyin}</p>
         <AudioButton label="listen" pinyin={item.pinyin} text={item.hanzi} />
       </div>

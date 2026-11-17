@@ -304,3 +304,12 @@ test("a grade raises the waiting card before its save lands, and a failed save b
   expect(topCard()?.textContent).toContain("Sentence 0");
   expect(host.textContent).toContain("2 left");
 });
+
+test("a sentence card hides its anchor word until it is flipped", async () => {
+  await show(fixture(), "cloze");
+  const front = () => topCard()?.textContent ?? "";
+  expect(front()).toContain("你");
+  expect(front()).not.toContain("好");
+  await reveal();
+  expect(answerShown()?.textContent).toContain("你好");
+});

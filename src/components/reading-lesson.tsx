@@ -1,6 +1,6 @@
 // A new sentence, read for meaning on a card like review's: the sentence is the front, its sound
 // and meaning the back. Then it is shadowed (heard and said aloud a few times, each time laying
-// down one small card) before it joins Review, where it is recalled from English.
+// down one small card) before it joins Review, where its anchor word is recalled from a gap.
 import { useCallback, useState } from "react";
 import { useMandarinSpeech } from "../hooks/use-mandarin-speech";
 import { isShortcut, useWindowKeys } from "../hooks/use-window-keys";

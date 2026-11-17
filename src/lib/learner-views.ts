@@ -184,6 +184,7 @@ function studyItem(
         hanzi: sentence.hanzi,
         pinyin: sentence.pinyin,
         meaning: sentence.meaning,
+        anchor: sentence.anchor,
       }
     : null;
 }
