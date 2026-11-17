@@ -1,5 +1,6 @@
 // Hanzi building blocks: stroke glyph, movie-coded pinyin, audio, and usage examples.
 // Each keeps a fixed footprint while it loads so nothing around it moves.
+import { useQuery } from "@tanstack/react-query";
 import {
   useCallback,
   useEffect,
@@ -121,51 +122,33 @@ type Drawing =
   | { kind: "font"; slots: string[] }
   | { kind: "strokes"; slots: string[]; paths: string[][] };
 
-const strokeRequests = new Map<string, Promise<string[] | null>>();
-
-/** A character's stroke outlines, fetched once per page; null when there are none to fetch. */
-function requestStrokes(hanzi: string) {
-  let request = strokeRequests.get(hanzi);
-  if (!request) {
-    request = fetch(`/api/strokes/${encodeURIComponent(hanzi)}`)
-      .then((response) => (response.ok ? response.json() : null))
-      .then((body: { strokes?: unknown } | null) =>
-        Array.isArray(body?.strokes) ? (body.strokes as string[]) : null
-      )
-      .catch(() => {
-        // Offline before the outlines were ever cached: ask again next time.
-        strokeRequests.delete(hanzi);
-        return null;
-      });
-    strokeRequests.set(hanzi, request);
+/** A character's stroke outlines; null when the source has none. */
+async function fetchStrokes(hanzi: string) {
+  const response = await fetch(`/api/strokes/${encodeURIComponent(hanzi)}`);
+  if (response.status === 404) {
+    return null;
   }
-  return request;
+  if (!response.ok) {
+    throw new Error(`Strokes for ${hanzi}: ${response.status}`);
+  }
+  const body = (await response.json()) as { strokes?: unknown };
+  return Array.isArray(body.strokes) ? (body.strokes as string[]) : null;
 }
 
 /** The outlines of `hanzi`, while it is set; `pending` until they arrive or can't. */
 function useStrokes(hanzi: string | null) {
-  const [loaded, setLoaded] = useState<{
-    hanzi: string;
-    strokes: string[] | null;
-  } | null>(null);
-  useEffect(() => {
-    if (!hanzi) {
-      return;
-    }
-    let current = true;
-    requestStrokes(hanzi).then((strokes) => {
-      if (current) {
-        setLoaded({ hanzi, strokes });
-      }
-    });
-    return () => {
-      current = false;
-    };
-  }, [hanzi]);
-  const done = hanzi !== null && loaded?.hanzi === hanzi;
+  const query = useQuery({
+    queryKey: ["strokes", hanzi],
+    queryFn: () => fetchStrokes(hanzi ?? ""),
+    enabled: hanzi !== null,
+    // Outlines never change. Offline, the service worker answers from what it cached.
+    staleTime: Number.POSITIVE_INFINITY,
+    networkMode: "offlineFirst",
+    retry: 1,
+  });
   return {
-    strokes: done ? loaded.strokes : null,
-    pending: hanzi !== null && !done,
+    strokes: query.data ?? null,
+    pending: hanzi !== null && query.isPending && !query.isError,
   };
 }
 
