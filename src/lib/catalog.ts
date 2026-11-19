@@ -8,6 +8,7 @@ import type {
   Word,
 } from "../data/types";
 import { characterIsWord } from "./character-words";
+import { addOwnProps } from "./props";
 import { segmentSentence } from "./sentence-words";
 
 const HAN = /\p{Script=Han}/u;
@@ -37,6 +38,7 @@ function ownCharacters(
   for (const definition of entries.flatMap((entry) => entry.characters ?? [])) {
     if (!(course.has(definition.hanzi) || own.has(definition.hanzi))) {
       own.set(definition.hanzi, definition);
+      addOwnProps(definition.parts ?? []);
     }
   }
   return [...own.values()].map(

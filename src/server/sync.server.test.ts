@@ -283,6 +283,52 @@ test("names, stories and focus sync, and a removed focus entry reaches devices",
   expect((await readPatch(learner, null)).patch.removedFocus).toEqual([]);
 });
 
+test("a character described again reaches devices in every entry that uses it", async () => {
+  const learner = "learner-redescribed";
+  const character = (components: string[]) => ({
+    hanzi: "汽",
+    pinyin: "qì",
+    keyword: "steam",
+    meaning: "steam",
+    components,
+  });
+  const entry = (hanzi: string, addedAt: string) => ({
+    kind: "word" as const,
+    hanzi,
+    pinyin: hanzi === "汽水" ? "qìshuǐ" : "qìchē",
+    meaning: hanzi,
+    label: "HSK 2 · L7",
+    addedAt,
+    characters: [character(["氵", "𠂉", "一", "⺄"])],
+  });
+  await writeOperations(learner, [
+    change({
+      kind: "focus",
+      data: {
+        add: [
+          entry("汽水", "2026-10-20T08:00:00.000Z"),
+          entry("汽车", "2026-10-20T08:00:00.001Z"),
+        ],
+      },
+    }),
+  ]);
+  const { cursor } = await readPatch(learner, null);
+
+  await writeOperations(learner, [
+    change({ kind: "focus", data: { describe: [character(["氵", "气"])] } }),
+  ]);
+  const next = await readPatch(learner, cursor);
+  expect(
+    next.patch.focus.map((item) => [
+      item.hanzi,
+      item.characters?.[0]?.components,
+    ])
+  ).toEqual([
+    ["汽水", ["氵", "气"]],
+    ["汽车", ["氵", "气"]],
+  ]);
+});
+
 test("an older name or story that arrives late does not replace a newer one", async () => {
   const learner = "learner-renamed";
   const movie = (actorName: string, at: string) =>

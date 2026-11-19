@@ -11,9 +11,12 @@ import { cardKey, focusKey, type LearnerState } from "../lib/learner-state";
 import { deriveDashboard } from "../lib/learner-views";
 import { wordSyllables } from "../lib/word-syllables";
 import {
+  type CharacterInput,
   characterInput,
+  checkRedescribed,
   missingCharacters,
   resolveCharacters,
+  restate,
   share,
   simplifiedOf,
 } from "./community.server";
@@ -143,7 +146,10 @@ export async function readFocus(learnerId: string) {
 
 function writeFocus(
   learnerId: string,
-  data: { add: FocusEntry[] } | { remove: string[] }
+  data:
+    | { add: FocusEntry[] }
+    | { remove: string[] }
+    | { describe: OwnCharacter[] }
 ) {
   const at = new Date().toISOString();
   return writeOperations(learnerId, [
@@ -159,8 +165,11 @@ const PREVIEW_LIFETIME_MS = 60 * 60 * 1000;
 const previewKey = (learnerId: string, id: string) =>
   `focus-preview:${learnerId}:${id}`;
 
-/** Keep a previewed lesson so saving it needs only its id, not the whole lesson again. */
-export async function keepPreview(learnerId: string, lesson: FocusLesson) {
+/** What a preview saves: a lesson, or characters described again. */
+type Previewed = FocusLesson | { describe: CharacterInput[] };
+
+/** Keep a preview so saving it needs only its id, not the whole lesson again. */
+export async function keepPreview(learnerId: string, lesson: Previewed) {
   const id = crypto.randomUUID().slice(0, 8);
   await db.insert(verification).values({
     id: crypto.randomUUID(),
@@ -171,7 +180,7 @@ export async function keepPreview(learnerId: string, lesson: FocusLesson) {
   return id;
 }
 
-/** Save a lesson exactly as previewed. */
+/** Save a lesson or descriptions exactly as previewed. */
 export async function savePreview(learnerId: string, id: string) {
   const [row] = await db
     .select()
@@ -187,9 +196,11 @@ export async function savePreview(learnerId: string, id: string) {
       "That preview expired or was already saved. Preview the lesson again with add_to_focus."
     );
   }
-  const result = await addFocus(learnerId, JSON.parse(row.value), {
-    dryRun: false,
-  });
+  const previewed = JSON.parse(row.value) as Previewed;
+  const result =
+    "describe" in previewed
+      ? await describeAgain(learnerId, previewed.describe, { dryRun: false })
+      : await addFocus(learnerId, previewed, { dryRun: false });
   await db.delete(verification).where(eq(verification.id, row.id));
   return result;
 }
@@ -325,4 +336,40 @@ export async function removeFocus(learnerId: string, hanzi: string[]) {
     removed: before.focus.length - after.focus.length,
     upNext: upNext(after),
   };
+}
+
+const describedAs = (item: OwnCharacter) =>
+  `${item.hanzi} ${item.pinyin} ${item.keyword} (${item.components.join(" ")})`;
+
+/**
+ * Describe characters the learner described before, replacing the shared version and the copy in
+ * each of their focus entries. Learners who already added one keep the copy they have.
+ */
+export async function describeAgain(
+  learnerId: string,
+  input: CharacterInput[],
+  { dryRun = true }: { dryRun?: boolean } = {}
+) {
+  const characters = z
+    .array(characterInput)
+    .min(1)
+    .max(MAX_FOCUS_CHANGE)
+    .parse(input);
+  const { valid, problems, before } = await checkRedescribed(
+    learnerId,
+    characters
+  );
+  const changes = valid.map((item) => {
+    const old = before.get(item.hanzi);
+    return `${old ? describedAs(old) : item.hanzi} → ${describedAs(item)}`;
+  });
+  const attention = [...problems].map(
+    ([hanzi, reason]) => `${hanzi}: ${reason}`
+  );
+  if (dryRun || !valid.length) {
+    return { saved: 0, changes, attention };
+  }
+  await restate(valid, learnerId);
+  await writeFocus(learnerId, { describe: valid });
+  return { saved: valid.length, changes, attention };
 }

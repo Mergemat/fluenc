@@ -195,6 +195,23 @@ function applyFocus(state: LearnerState, data: FocusInput): LearnerState {
     const focus = state.focus.filter((entry) => !removed.has(entry.hanzi));
     return focus.length === state.focus.length ? state : { ...state, focus };
   }
+  if ("describe" in data) {
+    const described = new Map(data.describe.map((item) => [item.hanzi, item]));
+    // Only entries that change become new objects; the server writes just those.
+    const focus = state.focus.map((entry) =>
+      entry.characters?.some((item) => described.has(item.hanzi))
+        ? {
+            ...entry,
+            characters: entry.characters.map(
+              (item) => described.get(item.hanzi) ?? item
+            ),
+          }
+        : entry
+    );
+    return focus.every((entry, index) => entry === state.focus[index])
+      ? state
+      : { ...state, focus };
+  }
   // An entry already in focus keeps its place and label.
   const present = new Set(state.focus.map(focusKey));
   const added = data.add.filter((entry) => {

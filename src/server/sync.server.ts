@@ -637,8 +637,13 @@ async function writeChanges(
 
   if (after.focus !== before.focus) {
     const kept = new Set(after.focus.map(focusKey));
-    const existing = new Set(before.focus.map(focusKey));
-    const added = after.focus.filter((entry) => !existing.has(focusKey(entry)));
+    const previous = new Map(
+      before.focus.map((entry) => [focusKey(entry), entry])
+    );
+    // New entries, and ones a change rewrote, such as a character described again.
+    const added = after.focus.filter(
+      (entry) => previous.get(focusKey(entry)) !== entry
+    );
     const removed = before.focus.filter((entry) => !kept.has(focusKey(entry)));
     if (added.length) {
       writes.push(

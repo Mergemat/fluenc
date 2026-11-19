@@ -1,12 +1,12 @@
 // Characters the course lacks, as learners' agents describe them. One shared version each: the
 // first valid description wins, and every later learner who adds the character reuses it.
-import { inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { Converter } from "opencc-js/t2cn";
 import { z } from "zod";
 
 import curriculumJson from "../data/curriculum.generated.json";
 import hanziReference from "../data/hanzi-reference.generated.json";
-import type { Curriculum, OwnCharacter } from "../data/types";
+import type { Curriculum, OwnCharacter, OwnProp } from "../data/types";
 import { db } from "../db";
 import { communityCharacters, focusEntries } from "../db/schema";
 import { catalog } from "../lib/catalog";
@@ -15,7 +15,8 @@ import { propMeaning } from "../lib/props";
 
 const { props } = curriculumJson as Curriculum;
 const HAN = /^\p{Script=Han}$/u;
-const MAX_PROPS = 6;
+/** A scene holds about three props; more and it stops being one picture. */
+const MAX_PROPS = 3;
 const KEYWORD = /^[\p{L}'-]+(?: [\p{L}'-]+){0,2}$/u;
 
 export const characterInput = z.object({
@@ -23,7 +24,8 @@ export const characterInput = z.object({
   pinyin: z.string().trim(),
   keyword: z.string().trim().min(1).max(30),
   meaning: z.string().trim().min(1).max(120),
-  props: z.array(z.string().trim().min(1)).min(1).max(MAX_PROPS),
+  // Checked in `check`, which says how to fix a long list; this only bounds the input.
+  props: z.array(z.string().trim().min(1)).min(1).max(12),
 });
 export type CharacterInput = z.input<typeof characterInput>;
 
@@ -62,6 +64,35 @@ interface Reference {
 const reference = hanziReference.characters as Record<string, Reference>;
 const DESCRIPTION_SYMBOL = /[\u2FF0-\u2FFF？]/u;
 
+/**
+ * A prop the course lacks, from the stroke reference: as in the Hanzi Movie Method, a character
+ * or part the learner hasn't met becomes a prop when a bigger character needs it.
+ */
+function ownProp(hanzi: string): OwnProp | null {
+  const known = reference[hanzi];
+  if (props[hanzi] || !known) {
+    return null;
+  }
+  return {
+    hanzi,
+    strokes: known.strokes,
+    meaning:
+      catalog.charactersById.get(hanzi)?.keyword ||
+      known.gloss.split(";")[0]?.trim() ||
+      hanzi,
+  };
+}
+
+const strokesOf = (prop: string) =>
+  props[prop]?.strokes ?? ownProp(prop)?.strokes ?? 0;
+
+/** The props among `components` the course lacks, for devices to draw and gloss. */
+function ownParts(hanzi: string, components: readonly string[]) {
+  return [...new Set(components)]
+    .filter((prop) => prop !== hanzi)
+    .flatMap((prop) => ownProp(prop) ?? []);
+}
+
 const directParts = (hanzi: string) =>
   Array.from(reference[hanzi]?.parts ?? "").filter(
     (part) => !DESCRIPTION_SYMBOL.test(part)
@@ -88,10 +119,7 @@ function drawingProblem(hanzi: string, components: string[]) {
   if (!known) {
     return null;
   }
-  const drawn = components.reduce(
-    (sum, prop) => sum + (props[prop]?.strokes ?? 0),
-    0
-  );
+  const drawn = components.reduce((sum, prop) => sum + strokesOf(prop), 0);
   if (drawn !== known.strokes) {
     return `props ${components.join(" ")} draw ${drawn} strokes but ${hanzi} has ${known.strokes}; choose props that draw each stroke once`;
   }
@@ -139,9 +167,14 @@ function check(
   }
   const components = input.props.map((prop) => prop.trim());
   const whole = components.length === 1 && components[0] === hanzi;
-  const unknown = components.filter((prop) => !(whole || props[prop]));
+  const unknown = components.filter(
+    (prop) => !(whole || props[prop] || ownProp(prop))
+  );
   if (unknown.length) {
-    return `${unknown.join(" ")} ${unknown.length === 1 ? "is not a prop" : "are not props"}; use props from list_props, or [${hanzi}] alone for a shape that splits into none`;
+    return `${unknown.join(" ")} ${unknown.length === 1 ? "is not a prop" : "are not props"}; use props from check_hanzi or list_props, or [${hanzi}] alone for a shape that splits into none`;
+  }
+  if (components.length > MAX_PROPS) {
+    return `${components.length} props; describe ${hanzi} with at most ${MAX_PROPS}, using bigger props that each draw several of these`;
   }
   const problem = whole ? null : drawingProblem(hanzi, components);
   if (problem) {
@@ -150,22 +183,29 @@ function check(
   // Shared with every learner who adds the character, so the reference's gloss stands in for the
   // agent's own words wherever there is one.
   const gloss = reference[hanzi]?.gloss.split(";")[0]?.trim();
+  const parts = ownParts(hanzi, components);
   return {
     hanzi,
     pinyin,
     keyword,
     meaning: gloss || input.meaning.trim(),
     components,
+    ...(parts.length ? { parts } : {}),
   };
 }
 
-const definition = (row: OwnCharacter): OwnCharacter => ({
-  hanzi: row.hanzi,
-  pinyin: row.pinyin,
-  keyword: row.keyword,
-  meaning: row.meaning,
-  components: row.components,
-});
+// Parts are worked out again on every read, so a row stores only what the agent chose.
+const definition = (row: OwnCharacter): OwnCharacter => {
+  const parts = ownParts(row.hanzi, row.components);
+  return {
+    hanzi: row.hanzi,
+    pinyin: row.pinyin,
+    keyword: row.keyword,
+    meaning: row.meaning,
+    components: row.components,
+    ...(parts.length ? { parts } : {}),
+  };
+};
 
 /** The descriptions that pass, and why the rest don't. */
 async function checkAll(descriptions: CharacterInput[]) {
@@ -205,7 +245,12 @@ export async function share(characters: OwnCharacter[], learnerId: string) {
   }
   await db
     .insert(communityCharacters)
-    .values(characters.map((item) => ({ ...item, createdBy: learnerId })))
+    .values(
+      characters.map(({ parts: _parts, ...item }) => ({
+        ...item,
+        createdBy: learnerId,
+      }))
+    )
     .onConflictDoNothing();
   const stored = await db
     .select()
@@ -265,6 +310,74 @@ export async function resolveCharacters(
 }
 
 /**
+ * New descriptions of characters the learner described, checked as `resolveCharacters` checks
+ * fresh ones. Characters another learner described stay as they are.
+ */
+export async function checkRedescribed(
+  learnerId: string,
+  supplied: CharacterInput[]
+) {
+  const hanzi = supplied.map((input) => input.hanzi.trim());
+  const rows = hanzi.length
+    ? await db
+        .select()
+        .from(communityCharacters)
+        .where(inArray(communityCharacters.hanzi, hanzi))
+    : [];
+  const stored = new Map(rows.map((row) => [row.hanzi, row]));
+  const mine = (input: CharacterInput) =>
+    stored.get(input.hanzi.trim())?.createdBy === learnerId;
+  const { valid, problems } = await checkAll(supplied.filter(mine));
+  for (const character of hanzi) {
+    const row = stored.get(character);
+    if (!row) {
+      problems.set(
+        character,
+        "nobody has described it yet; add it with add_to_focus"
+      );
+    } else if (row.createdBy !== learnerId) {
+      problems.set(
+        character,
+        "another learner described it, so it stays as it is"
+      );
+    }
+  }
+  return {
+    valid,
+    problems,
+    before: new Map(
+      valid.flatMap((item) => {
+        const row = stored.get(item.hanzi);
+        return row ? [[item.hanzi, definition(row)] as const] : [];
+      })
+    ),
+  };
+}
+
+/** Store new descriptions of characters the learner described. */
+export async function restate(characters: OwnCharacter[], learnerId: string) {
+  const [first, ...rest] = characters.map((item) =>
+    db
+      .update(communityCharacters)
+      .set({
+        pinyin: item.pinyin,
+        keyword: item.keyword,
+        meaning: item.meaning,
+        components: item.components,
+      })
+      .where(
+        and(
+          eq(communityCharacters.hanzi, item.hanzi),
+          eq(communityCharacters.createdBy, learnerId)
+        )
+      )
+  );
+  if (first) {
+    await db.batch([first, ...rest]);
+  }
+}
+
+/**
  * The course props that are real parts of a character, largest first, so most descriptions need
  * no prop list. A character that is itself a prop is drawn whole by that one prop.
  */
@@ -273,22 +386,31 @@ function suggestedProps(hanzi: string) {
     return [`${propLine(hanzi)}: a prop itself, so props [${hanzi}]`];
   }
   const parts = allParts(hanzi);
-  return Object.keys(props)
-    .filter(
-      (prop) => parts.has(prop) || parts.has(props[prop]?.variantOf ?? "")
-    )
-    .toSorted(
-      (left, right) =>
-        (props[right]?.strokes ?? 0) - (props[left]?.strokes ?? 0)
-    )
-    .map(propLine);
+  const course = Object.keys(props).filter(
+    (prop) => parts.has(prop) || parts.has(props[prop]?.variantOf ?? "")
+  );
+  // Its direct parts the course lacks, which become new props: often the one that keeps a
+  // description within three.
+  const fresh = directParts(hanzi).flatMap((part) => ownProp(part) ?? []);
+  return [
+    ...course.map((prop) => ({
+      strokes: strokesOf(prop),
+      line: propLine(prop),
+    })),
+    ...fresh.map((part) => ({
+      strokes: part.strokes,
+      line: `${part.hanzi} ${part.meaning} ${part.strokes} (new prop)`,
+    })),
+  ]
+    .toSorted((left, right) => right.strokes - left.strokes)
+    .map((item) => item.line);
 }
 
 /**
  * What fluenc knows about the characters of `texts`, sized for an agent's context: characters it
  * already teaches or shares as bare hanzi, and full detail only for the ones it must describe.
  */
-export async function lookupHanzi(texts: string[]) {
+export async function lookupHanzi(texts: string[], learnerId: string) {
   const characters = [
     ...new Set(
       texts.flatMap((text) =>
@@ -317,7 +439,7 @@ export async function lookupHanzi(texts: string[]) {
     inCourse: course.join(""),
     shared: shared.map(
       (row) =>
-        `${row.hanzi} ${row.pinyin} ${row.keyword} (${row.components.join(" ")})`
+        `${row.hanzi} ${row.pinyin} ${row.keyword} (${row.components.join(" ")})${row.createdBy === learnerId ? " · yours" : ""}`
     ),
     ...(Object.keys(traditional).length ? { traditional } : {}),
     new: fresh

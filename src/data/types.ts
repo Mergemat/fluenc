@@ -85,7 +85,16 @@ export interface OwnCharacter {
   hanzi: string;
   keyword: string;
   meaning: string;
+  /** Props it uses that the course lacks, so a device can draw and gloss them. */
+  parts?: OwnProp[];
   pinyin: string;
+}
+
+/** A prop the course lacks, as the stroke reference draws it. */
+export interface OwnProp {
+  hanzi: string;
+  meaning: string;
+  strokes: number;
 }
 
 export interface FocusEntry {

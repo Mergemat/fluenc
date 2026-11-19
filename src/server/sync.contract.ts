@@ -69,6 +69,15 @@ const ownCharacterInput = z.object({
   keyword: z.string().min(1),
   meaning: z.string().min(1),
   components: z.array(z.string().min(1)).min(1),
+  parts: z
+    .array(
+      z.object({
+        hanzi: z.string().min(1),
+        strokes: z.number().int().positive(),
+        meaning: z.string().min(1),
+      })
+    )
+    .optional(),
 });
 
 const focusEntryInput = z.object({
@@ -85,6 +94,8 @@ const focusEntryInput = z.object({
 export const focusInput = z.union([
   z.object({ add: z.array(focusEntryInput) }),
   z.object({ remove: z.array(z.string().min(1)) }),
+  /** A character the learner described again, replacing it in every entry that uses it. */
+  z.object({ describe: z.array(ownCharacterInput) }),
 ]);
 
 /** Every change has an id chosen where it was made, so sending it twice applies it once. */

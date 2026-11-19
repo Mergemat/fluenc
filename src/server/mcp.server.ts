@@ -9,6 +9,7 @@ import { authIssuer, mcpResource } from "./auth.server";
 import { lookupHanzi, propList } from "./community.server";
 import {
   addFocus,
+  describeAgain,
   FocusError,
   keepPreview,
   MAX_FOCUS_CHANGE,
@@ -26,7 +27,9 @@ To add what the learner is studying (a class lesson, a text, a word list):
 4. Preview with add_to_focus, dryRun unset, and end your turn: show the learner the entries and each new character with its keyword and props, and ask to save.
 5. When the learner says yes, call save_preview with the previewId. Done when nothing needs attention; for a skipped entry, fix what its reason names and add it again. If the learner asks for changes, preview again instead.
 
-Reorder focus by removing the entries that should come later and adding them back in the new order.`;
+Reorder focus by removing the entries that should come later and adding them back in the new order.
+
+To change a character the learner described (check_hanzi marks it "yours"), preview its new keyword and props with describe_again, show the learner the change and ask, then call save_preview after their yes.`;
 
 const json = (value: unknown) => ({
   content: [{ type: "text" as const, text: JSON.stringify(value) }],
@@ -78,6 +81,23 @@ const failure = (message: string) => ({
 
 // What agents see: shapes and the guidance that steers them. Limits are checked on the server,
 // which answers with a reason the agent can fix, so they cost no context here.
+const characterInput = z.object({
+  hanzi: z.string(),
+  pinyin: z.string().describe("A reading check_hanzi lists, tone marked."),
+  keyword: z
+    .string()
+    .describe(
+      "What the learner pictures: a concrete thing or action in 1–3 plain English words, like fret for 忧. Unique across fluenc."
+    ),
+  meaning: z
+    .string()
+    .describe("Used only when check_hanzi gives no gloss for it."),
+  props: z
+    .array(z.string())
+    .describe(
+      "At most 3, in writing order, from check_hanzi's suggestions or list_props; their strokes add up to its stroke count, the largest prop that fits first. [the character] alone only for a shape with no props."
+    ),
+});
 const entryInput = z.object({
   hanzi: z.string(),
   pinyin: z.string(),
@@ -100,27 +120,7 @@ const lessonInput = z.object({
       "Whole sentences as written, with pinyin and an English translation."
     ),
   characters: z
-    .array(
-      z.object({
-        hanzi: z.string(),
-        pinyin: z
-          .string()
-          .describe("A reading check_hanzi lists, tone marked."),
-        keyword: z
-          .string()
-          .describe(
-            "What the learner pictures: a concrete thing or action in 1–3 plain English words, like fret for 忧. Unique across fluenc."
-          ),
-        meaning: z
-          .string()
-          .describe("Used only when check_hanzi gives no gloss for it."),
-        props: z
-          .array(z.string())
-          .describe(
-            "In writing order, from check_hanzi's suggestions or list_props; their strokes add up to its stroke count, the largest prop that fits first. [the character] alone only for a shape with no props."
-          ),
-      })
-    )
+    .array(characterInput)
     .optional()
     .describe("One for each character check_hanzi calls new."),
   dryRun: z
@@ -180,7 +180,7 @@ function focusServer(learnerId: string) {
     {
       title: "Check hanzi",
       description:
-        "Look up words and sentences before adding them. Returns the characters fluenc already teaches, those another learner described (used as they are), simplified spellings for anything in traditional, and each new character to describe, with its strokes, parts, readings, gloss and the props that draw it.",
+        "Look up words and sentences before adding them. Returns the characters fluenc already teaches, those learners described (used as they are; the learner's own, marked yours, can be described again with describe_again), simplified spellings for anything in traditional, and each new character to describe, with its strokes, parts, readings, gloss and the props that draw it.",
       inputSchema: z.object({
         texts: z
           .array(z.string())
@@ -191,7 +191,8 @@ function focusServer(learnerId: string) {
     async ({ texts }) =>
       json(
         await lookupHanzi(
-          texts.slice(0, MAX_FOCUS_CHANGE).map((item) => item.slice(0, 200))
+          texts.slice(0, MAX_FOCUS_CHANGE).map((item) => item.slice(0, 200)),
+          learnerId
         )
       )
   );
@@ -262,9 +263,43 @@ function focusServer(learnerId: string) {
       },
     },
     ({ previewId }) =>
-      attempt(async () =>
-        json(addedForAgent(await savePreview(learnerId, previewId)))
-      )
+      attempt(async () => {
+        const saved = await savePreview(learnerId, previewId);
+        return json("changes" in saved ? saved : addedForAgent(saved));
+      })
+  );
+
+  server.registerTool(
+    "describe_again",
+    {
+      title: "Describe again",
+      description:
+        "Give characters the learner described (check_hanzi marks them yours) a new keyword and props. Previews the change, old → new, with a previewId for save_preview. Learners who already added one keep the version they have.",
+      inputSchema: z.object({
+        characters: z
+          .array(characterInput)
+          .describe("The whole new description of each character."),
+      }),
+      annotations: {
+        readOnlyHint: true,
+        openWorldHint: false,
+      },
+    },
+    ({ characters }) =>
+      attempt(async () => {
+        const preview = await describeAgain(learnerId, characters);
+        if (!preview.changes.length) {
+          return json(preview);
+        }
+        const previewId = await keepPreview(learnerId, {
+          describe: characters,
+        });
+        return json({
+          ...preview,
+          previewId,
+          next: `Nothing saved. End your turn here: show the learner each change and ask whether to save it. After their yes, call save_preview with ${previewId}.`,
+        });
+      })
   );
 
   server.registerTool(
