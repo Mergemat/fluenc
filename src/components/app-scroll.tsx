@@ -14,6 +14,7 @@ import {
   IonRefresher,
   IonRefresherContent,
   initializeScroll,
+  refresherMode,
   useScrollReady,
 } from "./ui/ionic-scroll";
 import "@ionic/core/css/core.css";
@@ -116,6 +117,7 @@ export function AppScroll({
       <IonRefresher
         // A reload would lose a lesson's half-written Hanzi Movie.
         disabled={!standalone || pathname.startsWith("/lessons")}
+        mode={refresherMode()}
         onIonRefresh={refresh}
         ref={refresher}
         slot="fixed"

@@ -1,5 +1,5 @@
 import type { RefresherCustomEvent } from "@ionic/core";
-import { initialize } from "@ionic/core/components";
+import { initialize, isPlatform } from "@ionic/core/components";
 import {
   IonContent as Content,
   defineCustomElement as defineContent,
@@ -31,6 +31,15 @@ export function initializeScroll() {
   for (const notify of listeners) {
     notify();
   }
+}
+
+/**
+ * iOS mode's refresher only draws over the content where WebKit rubber-bands; elsewhere it
+ * falls back to one hidden behind the content's background. Android gets Material's drop-in
+ * circle instead, which is also what it expects.
+ */
+export function refresherMode(): "ios" | "md" {
+  return isPlatform("ios") ? "ios" : "md";
 }
 
 const subscribe = (notify: () => void) => {

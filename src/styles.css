@@ -531,6 +531,13 @@
   html {
     -webkit-tap-highlight-color: transparent;
   }
+  /* Android's pull-to-refresh disc, which Ionic draws white with a blue spinner. Set on the
+     element itself so it wins over Ionic's unlayered :root palette. */
+  ion-refresher {
+    --ion-color-primary: var(--color-foreground);
+    --ion-color-step-200: var(--color-border-strong);
+    --ion-color-step-250: var(--color-popover);
+  }
   body {
     min-height: 100dvh;
     margin: 0;
