@@ -84,6 +84,10 @@ function unicodeRange(codePoints: number[]) {
   return ranges.join(", ");
 }
 
+/** One range from a group's first code point to its last, gaps and all. */
+const spanRange = (codePoints: number[]) =>
+  `U+${hex(Math.min(...codePoints))}-${hex(Math.max(...codePoints))}`;
+
 const byTeachingOrder = curriculum.characters.toSorted(
   (left, right) => left.order - right.order
 );
@@ -116,15 +120,17 @@ for (let index = 0; index * CHUNK < taught.length; index += 1) {
 
 // Fluenc Hanzi's rare file draws every other character Make Me a Hanzi has (see
 // sync-hanzi-font.ts), for learners' own characters and their sentences. Few are ever on screen,
-// so they're cut by code point into `rare-` chunks the app doesn't precache.
+// so they're cut by code point into larger `rare-` chunks the app doesn't precache.
 const taughtSet = new Set(taught);
 const rest = Object.keys(reference.characters)
   .map((hanzi) => hanzi.codePointAt(0) ?? 0)
   .filter((codePoint) => !taughtSet.has(codePoint))
   .sort((left, right) => left - right);
+// Larger than the course's chunks, since a learner rarely has one on screen.
+const RARE_CHUNK = 100;
 const rareGroups: number[][] = [];
-for (let index = 0; index * CHUNK < rest.length; index += 1) {
-  rareGroups.push(rest.slice(index * CHUNK, (index + 1) * CHUNK));
+for (let index = 0; index * RARE_CHUNK < rest.length; index += 1) {
+  rareGroups.push(rest.slice(index * RARE_CHUNK, (index + 1) * RARE_CHUNK));
 }
 
 /**
@@ -136,7 +142,8 @@ async function chunk(
   name: string,
   family: string,
   inLines = true,
-  files = groups.map((codePoints, index) => ({ codePoints, file: `${index}` }))
+  files = groups.map((codePoints, index) => ({ codePoints, file: `${index}` })),
+  span = false
 ) {
   await rm(`${WEB}/${name}`, { recursive: true, force: true });
   await mkdir(`${WEB}/${name}`, { recursive: true });
@@ -153,7 +160,11 @@ async function chunk(
     const range = unicodeRange(codePoints);
     const file = `${WEB}/${name}/${base}.woff2`;
     subset(source, file, range.replaceAll(" ", ""));
-    faces.push({ family, src: file, unicodeRange: range });
+    faces.push({
+      family,
+      src: file,
+      unicodeRange: span ? spanRange(codePoints) : range,
+    });
   }
   return faces;
 }
@@ -186,42 +197,48 @@ for (const face of latin) {
   subset(face.src.replace(`${WEB}/`, "assets/fonts/"), face.src, LATIN);
 }
 
+// Every other character a learner's own character can use, in files the app doesn't precache.
+// Each spans a block of code points, gaps and all, so its unicode-range stays short: listing every
+// one, since they sit between course characters, cost every page load ~10 KB. A browser checks
+// overlapping faces of a family last-declared first, so these come before the course's faces,
+// which keep drawing (and alone download for) the course's characters inside a span.
+const rare = (source: string, name: string, family: string) =>
+  chunk(
+    source,
+    name,
+    family,
+    false,
+    rareGroups.map((codePoints, index) => ({
+      codePoints,
+      file: `rare-${index}`,
+    })),
+    true
+  );
+
 const faces = [
   ...latin,
+  ...(await rare(
+    "assets/fonts/fluenc-hanzi-rare.woff2",
+    "fluenc-hanzi-rare",
+    "Fluenc Hanzi"
+  )),
   ...(await chunk(
     "assets/fonts/fluenc-hanzi.woff2",
     "fluenc-hanzi",
     "Fluenc Hanzi"
   )),
-  // The course's faces above set the line's metrics.
-  ...(await chunk(
-    "assets/fonts/fluenc-hanzi-rare.woff2",
-    "fluenc-hanzi-rare",
-    "Fluenc Hanzi",
-    false,
-    rareGroups.map((codePoints, index) => ({
-      codePoints,
-      file: `rare-${index}`,
-    }))
-  )),
+  ...(
+    await rare(
+      "assets/fonts/noto-sans-sc-props-rare.woff2",
+      "noto-sans-sc-props-rare",
+      "Noto Sans CJK SC"
+    )
+  ).map((face) => ({ ...face, weight: "400" })),
   ...(
     await chunk(
       "assets/fonts/noto-sans-sc-props.woff2",
       "noto-sans-sc-props",
       "Noto Sans CJK SC"
-    )
-  ).map((face) => ({ ...face, weight: "400" })),
-  // Props learners' own characters bring, which can be any character outside the course.
-  ...(
-    await chunk(
-      "assets/fonts/noto-sans-sc-props-rare.woff2",
-      "noto-sans-sc-props-rare",
-      "Noto Sans CJK SC",
-      false,
-      rareGroups.map((codePoints, index) => ({
-        codePoints,
-        file: `rare-${index}`,
-      }))
     )
   ).map((face) => ({ ...face, weight: "400" })),
   // Drawn only as SVG text, never in a line.
