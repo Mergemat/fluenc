@@ -211,6 +211,19 @@ const faces = [
       "Noto Sans CJK SC"
     )
   ).map((face) => ({ ...face, weight: "400" })),
+  // Props learners' own characters bring, which can be any character outside the course.
+  ...(
+    await chunk(
+      "assets/fonts/noto-sans-sc-props-rare.woff2",
+      "noto-sans-sc-props-rare",
+      "Noto Sans CJK SC",
+      false,
+      rareGroups.map((codePoints, index) => ({
+        codePoints,
+        file: `rare-${index}`,
+      }))
+    )
+  ).map((face) => ({ ...face, weight: "400" })),
   // Drawn only as SVG text, never in a line.
   ...(await chunk(
     "assets/fonts/fluenc-hanzi-parts.woff2",

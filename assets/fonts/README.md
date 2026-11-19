@@ -35,7 +35,7 @@ The chunks are precached by the service worker. `fluenc-hanzi-rare.woff2` is the
 
 ## Modern prop font
 
-`noto-sans-sc-props.woff2` is a locally hosted subset of Noto Sans CJK SC Regular, used for prop glyphs in the studio, clue form, library, and palace. It includes the course characters and components that Noto has. A component symbol absent from Noto uses the Fluenc Hanzi glyph so it stays readable.
+`noto-sans-sc-props.woff2` is a locally hosted subset of Noto Sans CJK SC Regular, used for prop glyphs in the studio, clue form, library, and palace. It includes the course characters and components that Noto has. A component symbol absent from Noto uses the Fluenc Hanzi glyph so it stays readable. `noto-sans-sc-props-rare.woff2` holds every other character in the stroke reference, for the props learners' own characters bring; like `fluenc-hanzi-rare`, its `rare-*` chunks are cut by code point and not precached.
 
 The source is [Noto Sans CJK SC Regular](https://github.com/notofonts/noto-cjk/blob/165c01b46ea533872e002e0785ff17e44f6d97d8/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf), distributed under the [SIL Open Font License](../licenses/NotoSansSC-OFL.txt). The WOFF2 subset retains its original outlines and is precached by the existing service worker font rule.
 
@@ -44,5 +44,7 @@ To rebuild, download the source OTF to `.cache/noto-sans-cjk-sc.otf`, then:
 ```sh
 bun -e 'import curriculum from "./src/data/curriculum.generated.json"; await Bun.write(".cache/prop-glyphs.txt", [...new Set(curriculum.characters.flatMap(c => [c.hanzi, ...c.components]))].sort().join(""));'
 uv run --no-project --with fonttools==4.65.0 --with brotli pyftsubset .cache/noto-sans-cjk-sc.otf --text-file=.cache/prop-glyphs.txt --flavor=woff2 --output-file=assets/fonts/noto-sans-sc-props.woff2
+bun -e 'import curriculum from "./src/data/curriculum.generated.json"; import reference from "./src/data/hanzi-reference.generated.json"; const taught = new Set(curriculum.characters.flatMap(c => [c.hanzi, ...c.components])); await Bun.write(".cache/prop-glyphs-rare.txt", Object.keys(reference.characters).filter(c => !taught.has(c)).sort().join(""));'
+uv run --no-project --with fonttools==4.65.0 --with brotli pyftsubset .cache/noto-sans-cjk-sc.otf --text-file=.cache/prop-glyphs-rare.txt --flavor=woff2 --output-file=assets/fonts/noto-sans-sc-props-rare.woff2
 bun scripts/build-fonts.ts
 ```
